@@ -1,0 +1,10 @@
+{
+  "navbar": {
+    "home": "Home",
+    "community": "Community",
+    "wiki": "Wiki",
+    "resource": "Resource",
+    "blog": "Blog"
+  },
+  "search": "Search"
+}

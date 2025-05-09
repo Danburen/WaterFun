@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/waterfun-admin.iml" filepath="$PROJECT_DIR$/waterfun-admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/waterfun-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/waterfun-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/waterfun-web-client/waterfun-web-client.iml" filepath="$PROJECT_DIR$/waterfun-web-client/waterfun-web-client.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JpaBuddyIdeaProjectConfig" reUseTableSchema="true">
+    <option name="reLastEntityCreationPackage" value="waterfun-service/src/main/java/org/waterwood/waterfunservice" />
+    <option name="reverseEngineeringLastDbConnectionId" value="9b4120e8-8c42-4ef6-a1d4-f37e47e36528" />
+  </component>
+  <component name="JpaPluginProjectSettings" isShowLibraryClassesInOrmView="true" />
+</project>

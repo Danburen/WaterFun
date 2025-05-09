@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "allowJs": true,  // 允许混用 JS
+    "checkJs": false, // 不强制检查 JS 文件
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.vue"],
+  "exclude": ["node_modules"]
+}

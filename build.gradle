@@ -1,0 +1,38 @@
+// build.gradle
+
+plugins {
+    id 'java'
+}
+
+plugins {
+    id 'org.springframework.boot' version '3.4.0' apply false
+    id 'io.spring.dependency-management' version '1.1.6' apply false
+    id 'com.github.node-gradle.node' version '3.2.0'  // 仅用于前端构建
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    // 禁用前端任务（子模块不需要）
+    tasks.whenTaskAdded { task ->
+        if (task.name.contains('Frontend')) {
+            task.enabled = false
+        }
+    }
+}
+
+// 根项目的前端构建（仅当目录存在时执行）
+task buildFrontend(type: Exec) {
+    onlyIf { file("${projectDir}/../waterfun-admin").exists() }
+    workingDir file("${projectDir}/../waterfun-admin")
+    commandLine 'npm', 'install'
+    commandLine 'npm', 'run', 'build'
+}
+
+task copyFrontendBuild(type: Copy) {
+    dependsOn buildFrontend
+    from file("${projectDir}/../waterfun-admin/dist")
+    into file("src/main/resources/static")
+}

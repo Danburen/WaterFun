@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CREATE_TABLES.sql" type="DatabaseScript" editBeforeRun="true" nameIsGenerated="true">
+    <script-file value="$PROJECT_DIR$/waterfun-service/src/main/resources/sql/CREATE_TABLES.sql" />
+    <script-mode>FILE</script-mode>
+    <data-source id="9e68d199-0590-4898-a305-62074952935b" namespace="schema/&quot;waterfun&quot;" />
+    <method v="2" />
+  </configuration>
+</component>
