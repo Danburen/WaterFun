@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/waterfun-service/src/main/resources/sql/CREATE_TABLES.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/waterfun-service/src/main/resources/sql/DROP_TABLES.sql" dialect="MySQL" />
-    <file url="file://$PROJECT_DIR$/waterfun-service/src/main/resources/sql/INSERT_QUERYS.sql" dialect="MySQL" />
     <file url="PROJECT" dialect="MySQL" />
   </component>
 </project>

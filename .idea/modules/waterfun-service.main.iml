@@ -6,6 +6,7 @@
     </content>
     <content url="file://$MODULE_DIR$/../../waterfun-service/src/main" dumb="true">
       <excludeFolder url="file://$MODULE_DIR$/../../waterfun-service/src/main/resources/sql" />
+      <excludeFolder url="file://$MODULE_DIR$/../../waterfun-service/src/main/resources/sqls" />
     </content>
   </component>
   <component name="FacetManager">
