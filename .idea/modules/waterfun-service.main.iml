@@ -4,6 +4,9 @@
     <content url="file://$MODULE_DIR$/../../waterfun-service/build/generated/sources/annotationProcessor/java/main">
       <sourceFolder url="file://$MODULE_DIR$/../../waterfun-service/build/generated/sources/annotationProcessor/java/main" isTestSource="false" generated="true" />
     </content>
+    <content url="file://$MODULE_DIR$/../../waterfun-service/src/main" dumb="true">
+      <excludeFolder url="file://$MODULE_DIR$/../../waterfun-service/src/main/resources/sql" />
+    </content>
   </component>
   <component name="FacetManager">
     <facet type="jpa" name="JPA">
