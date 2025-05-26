@@ -1,0 +1,6 @@
+[submodule "waterfun-web-client"]
+	path = waterfun-web-client
+	url = https://github.com/Danburen/WaterFun-Web-Client
+[submodule "waterfun-service"]
+	path = waterfun-service
+	url = https://github.com/Danburen/WaterFun-Service
