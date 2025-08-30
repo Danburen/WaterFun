@@ -12,12 +12,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
     "element-plus": "^2.11.1",
-    "vue": "^3.5.18"
+    "vue": "^3.5.18",
+    "vue-i18n": "^11.1.11",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/compiler-sfc": "^3.5.20",
+    "typescript": "^5.9.2",
     "vite": "^7.0.6",
+    "vite-plugin-checker": "^0.10.3",
     "vite-plugin-vue-devtools": "^8.0.0"
   }
 }

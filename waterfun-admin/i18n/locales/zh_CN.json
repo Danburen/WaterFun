@@ -1,0 +1,13 @@
+{
+  "nav": {
+    "home": "主页",
+    "manager": "系统管理",
+    "statusMonitor": "系统监控",
+    "userManager": "用户管理",
+    "permissionManager": "权限管理",
+    "roleManager": "角色管理",
+    "serverMonitor": "服务监控",
+    "dynamicWorld": "全球视图",
+    "onlineUser": "在线用户"
+  }
+}
