@@ -1,0 +1,61 @@
+:root {
+    --line-color: #e6e6e6;
+}
+
+.full-page-container {
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    position: fixed;
+}
+
+.items-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.align-center{
+    display: flex;
+    align-items: center;
+}
+
+.float-left{
+    float: left;
+}
+
+.float-right{
+    float: right;
+}
+
+.g-2 {
+    gap: 2px;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.no-scroll-bar{
+    scrollbar-width: none; /* Firefox隐藏滚动条 */
+    -ms-overflow-style: none; /* IE/Edge隐藏滚动条 */
+}
+
+/* Animations */
+.transition-1s{
+    transition: 1s;
+}
+
+/* Color */
+.default-border-bottom{
+    border-bottom: 1px solid var(--line-color);
+}
+.default-border-top {
+    border-top: 1px solid var(--line-color);
+}
