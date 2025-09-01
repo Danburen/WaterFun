@@ -10,14 +10,14 @@ const collapseButtonClick = () =>{
 </script>
 <template>
   <div class="header-container">
-    <el-header class="app-header items-center default-border-bottom">
+    <el-header class="app-header items-center">
       <div class="header-left">
         <div class="align-center logo">
           <el-button size="large" style="width: 40px;height: 40px;" link  @click="collapseButtonClick">
             <div class="collapse-icon" v-if="!menuCollapse"><Fold /></div>
             <div class="collapse-icon" v-else><Expand /></div>
           </el-button>
-          <img src="@/assets/logo.svg" width="35px" height="35px" alt="WaterFun">
+          <img src="../assets/logo.svg" width="35px" height="35px" alt="WaterFun">
           <span style="margin-left: 0.5em; font-size: 1em">WaterFun</span>
         </div>
         <el-breadcrumb class="bread-nav" separator="/">
@@ -36,11 +36,12 @@ const collapseButtonClick = () =>{
 <style scoped>
 .header-container {
   width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 .app-header {
   justify-content: space-between;
   height: 60px;
-  background-color: #fff;
 }
 
 .header-left {

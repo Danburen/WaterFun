@@ -1,4 +1,4 @@
-export interface TagItem {
+export interface TagNavItemType {
     name: string;
     locale: string;
     to: string;
