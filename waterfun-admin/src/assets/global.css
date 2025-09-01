@@ -1,5 +1,7 @@
 :root {
     --line-color: #e6e6e6;
+    --defailt-blue: #409eff;
+    --light-background: #f0f7ff;
 }
 
 .full-page-container {
