@@ -4,3 +4,9 @@ export interface TagNavItemType {
     to: string;
     closeable: boolean;
 }
+
+export interface BreadNavItemType {
+    name: string;
+    locale: string;
+    to: string | null;
+}

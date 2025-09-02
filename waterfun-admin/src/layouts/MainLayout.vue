@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import MainNavBar from "@/layouts/MainNavBar.vue";
 import {ref, computed, onMounted, onBeforeMount, watch} from 'vue'
-import type {TagNavItemType} from "@/layouts/types";
+import type {BreadNavItemType, TagNavItemType} from "@/layouts/types";
 import TagNavigation from "@/layouts/TagNavigation.vue";
 import AsideNavBar from "@/layouts/AsideNavBar.vue";
 import router, {type routeType} from "@/router";
@@ -12,7 +12,16 @@ const tagNavContainer = ref(null)
 const tagStore = useTagStore();
 const activeTags = ref<string>('dashboard');
 
-const tagList = ref<TagNavItemType[]>([])
+const tagList = ref<TagNavItemType[]>([]);
+const breadList = computed(() => {
+  return tagList.value.map((tag: TagNavItemType) => {
+    return {
+      name: tag.name,
+      locale: tag.locale,
+      to: tag.to,
+    } as BreadNavItemType;
+  });
+});
 
 const dashboardTagItem:TagNavItemType = {
   name: 'dashboard',
@@ -39,7 +48,6 @@ const handleRemoveTag = (tagName:string) => {
   activeTags.value = name || activeTags.value
 }
 
-
 const handleOrderUpdated = ({ from, to }: { from: number; to: number }) => {
   const newTags = [...tagStore.getTags]
   const [moved] = newTags.splice(from, 1)
@@ -53,21 +61,19 @@ onBeforeMount(() => {
 
 router.afterEach((to) => {
   addNavTags(to);
-  console.log(tagList);
   activeTags.value = to.name as string;
 })
 
 watch(()=>tagStore.getTags,
     (newTags)=> {
       tagList.value = newTags;
-      console.log(newTags);
     }, { immediate: true, deep: true })
 </script>
 
 <template>
   <div class="container full-page-container">
     <!-- Global Header -->
-    <MainNavBar @collapse="menuCollapse = !menuCollapse" />
+    <MainNavBar :navItems="breadList" @collapse="menuCollapse = !menuCollapse" />
     <!-- Main Container-->
     <div class="main-container">
       <AsideNavBar :collapse="menuCollapse" @menuClick="" />

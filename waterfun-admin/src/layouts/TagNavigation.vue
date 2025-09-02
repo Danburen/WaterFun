@@ -16,7 +16,7 @@ const props = defineProps<{
 
 const localOrder = ref(props.tagList.map(tag => tag.name))
 
-const emit = defineEmits(['orderUpdated','tagRemoved','tagChanged']);
+const emit = defineEmits(['orderUpdated','tagRemoved','tagClick']);
 
 const sortedTags = computed(() => {
   return [...localOrder.value]
@@ -31,7 +31,8 @@ const handleClose = (tagName:string) =>{
 
 const handleClick = (tagName:string) => {
   activeTagName.value = tagName;
-  emit('tagChanged',tagName);
+  router.push({ name: props.tagList.find(tag => tag.name === tagName).to });
+  emit('tagClick',tagName);
 }
 
 /*Control*/
@@ -72,7 +73,7 @@ const handleDragOver = (e: DragEvent) => {
     accumulatedWidth += tagWidthWithGap
   })
   dragPlaceholderIndex.value =
-      Math.max(0,Math.min(newIndex, props.tagList.length)) // ensure not below zero or ubound
+        Math.max(0,Math.min(newIndex, props.tagList.length)) // ensure not below zero or ubound
 }
 
 const handleDrop = () => {
@@ -88,10 +89,8 @@ const handleDrop = () => {
     return
   }
   const newOrder = [...localOrder.value]
-  console.log(newOrder)
   const [draggedItem] = newOrder.splice(dragIndex.value, 1)
   newOrder.splice(dragPlaceholderIndex.value,0 ,draggedItem)
-  console.log(newOrder)
   localOrder.value = newOrder
   emit('orderUpdated',newOrder)
   dragIndex.value = null
@@ -138,7 +137,6 @@ watch(()=> props.modelValue,
 </script>
 
 <template>
-  <div class="tag-nav">
     <div class="tag-container no-scroll-bar" :style="{ gap: `${tagGap || 6}px` }" ref="tagNavContainer">
       <template v-for="(tag, index) in sortedTags" :key="index">
         <div
@@ -168,7 +166,6 @@ watch(()=> props.modelValue,
         />
       </template>
     </div>
-  </div>
 </template>
 
 <style scoped>
