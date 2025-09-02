@@ -1,5 +1,8 @@
 <script setup lang="ts">
+// @ts-ignore
 import { Edit, VideoCamera } from '@element-plus/icons-vue'
+import * as icons from '@element-plus/icons-vue'
+console.log(Object.keys(icons)) // 查看所有可用图标
 import DashBoard from '@/assets/icons/dashboard.svg'
 const props = defineProps<{
   icon: string

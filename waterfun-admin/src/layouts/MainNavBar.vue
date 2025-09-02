@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Expand, Fold, ArrowRight} from "@element-plus/icons-vue";
+import type {BreadNavItemType} from "@/layouts/types.js";
+// @ts-ignore
+import {Expand, Fold} from "@element-plus/icons-vue";
+import {useBreadcrumbs} from "@/composables/useBreadcrumbs.js";
 const menuCollapse = ref(false)
 const emit = defineEmits(['collapse'])
 const collapseButtonClick = () =>{
   menuCollapse.value = !menuCollapse.value
   emit('collapse')
 }
+
+const bcStore = useBreadcrumbs();
+
 </script>
 <template>
   <div class="header-container">
@@ -21,7 +27,7 @@ const collapseButtonClick = () =>{
           <span style="margin-left: 0.5em; font-size: 1em">WaterFun</span>
         </div>
         <el-breadcrumb class="bread-nav" separator="/">
-          <el-breadcrumb-item :to="{ path: '/'}">{{ $t('nav.home') }}</el-breadcrumb-item>
+          <el-breadcrumb-item v-for="item in bcStore.breadcrumbs.value" :to="item.to">{{ $t(item.locale) }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <div class="header-right">
