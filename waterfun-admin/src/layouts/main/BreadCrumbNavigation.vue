@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { watch } from 'vue';
-import { useBreadcrumbs } from '@/composables/useBreadcrumbs';
+import { useBreadcrumbs } from '@/composables/useBreadcrumbs.js';
 import {useRoute} from "vue-router";
 
 const bcStore = useBreadcrumbs();

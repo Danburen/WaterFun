@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import router, {routes, type routeType} from '@/router'
+import router, {routes, type routeType} from '@/router/index.js'
 import IconComponent from "@/components/IconComponent.vue";
 const props = defineProps<{
   collapse: boolean;

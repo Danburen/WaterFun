@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {TagNavItemType} from "@/layouts/types";
+import type {TagNavItemType} from "@/layouts/types.js";
 import {ref, computed, onMounted, onUnmounted, watch, type Ref, type ComputedRef} from 'vue'
 import router from "@/router/index.js";
 const tagNavContainer = ref();
@@ -205,7 +205,7 @@ watch(()=> props.modelValue,
   width: 60px;
   height: 28px;
   background-color: var(--light-background);
-  border: 2px dashed var(--defailt-blue);
+  border: 2px dashed var(--default-blue);
   border-radius: 4px;
   flex-shrink: 0;
 }
