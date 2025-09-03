@@ -4,6 +4,7 @@ import type {BreadNavItemType} from "@/layouts/types.js";
 // @ts-ignore
 import {Expand, Fold} from "@element-plus/icons-vue";
 import {useBreadcrumbs} from "@/composables/useBreadcrumbs.js";
+import UserMenu from "@/layouts/main/UserMenu.vue";
 const menuCollapse = ref(false)
 const emit = defineEmits(['collapse'])
 const collapseButtonClick = () =>{
@@ -23,17 +24,15 @@ const bcStore = useBreadcrumbs();
             <div class="collapse-icon" v-if="!menuCollapse"><Fold /></div>
             <div class="collapse-icon" v-else><Expand /></div>
           </el-button>
-          <img src="../assets/logo.svg" width="35px" height="35px" alt="WaterFun">
+          <img src="../../assets/logo.svg" width="35px" height="35px" alt="WaterFun">
           <span style="margin-left: 0.5em; font-size: 1em">WaterFun</span>
         </div>
         <el-breadcrumb class="bread-nav" separator="/">
           <el-breadcrumb-item v-for="item in bcStore.breadcrumbs.value" :to="item.to">{{ $t(item.locale) }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
-      <div class="header-right">
-        <div class="user-center">
-
-        </div>
+      <div class="header-right float-right">
+        <UserMenu />
       </div>
     </el-header>
   </div>

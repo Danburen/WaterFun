@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import MainNavBar from "@/layouts/MainNavBar.vue";
+import MainNavBar from "@/layouts/main/MainNavBar.vue";
 import {ref, computed, onMounted, onBeforeMount, watch} from 'vue'
-import type {BreadNavItemType, TagNavItemType} from "@/layouts/types";
-import TagNavigation from "@/layouts/TagNavigation.vue";
-import AsideNavBar from "@/layouts/AsideNavBar.vue";
-import router, {type routeType} from "@/router";
+import type {BreadNavItemType, TagNavItemType} from "@/layouts/types.js";
+import TagNavigation from "@/layouts/main/TagNavigation.vue";
+import AsideNavBar from "@/layouts/main/AsideNavBar.vue";
+import router, {type routeType} from "@/router/index.js";
 import {useTagStore} from "@/store/tagStore.js";
 
 const menuCollapse = ref(false)
