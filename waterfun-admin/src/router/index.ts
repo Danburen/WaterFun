@@ -9,25 +9,25 @@ export const routes = [
         }
     },
     {
-        path: '/manager',
-        meta: { locale:'manager.title', icon: 'el-Edit' },
+        path: '/system',
+        meta: { locale:'system.title', icon: 'el-Edit' },
         children: [
             {
                 path: 'user',
                 name: 'userManager',
-                meta: { locale:'manager.user' },
+                meta: { locale:'system.user' },
                 component: () => import("@/views/UserManagerView.vue")
             },
             {
                 path: 'role',
                 name: 'roleManager',
-                meta: { locale:'manager.role'},
+                meta: { locale:'system.role'},
                 component: () => import("@/views/RoleManagerView.vue")
             },
             {
                 path: 'permission',
                 name: 'permissionManager',
-                meta: { locale:'manager.permission' },
+                meta: { locale:'system.permission' },
                 component: () => import("@/views/PermManagerView.vue")
             }
         ]

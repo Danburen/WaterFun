@@ -1,7 +1,7 @@
 {
   "nav": {
     "dashboard": "仪表盘",
-    "manager": {
+    "system": {
       "title": "系统管理",
       "user": "用户管理",
       "role": "角色管理",
@@ -13,5 +13,17 @@
       "online": "在线用户",
       "status": "系统监控"
     }
+  },
+  "btn": {
+    "create": "新增",
+    "delete": "删除",
+    "update": "修改",
+    "export": "导出"
+  },
+  "user": {
+    "profile": "个人中心"
+  },
+  "operation": {
+    "changePassword": "修改密码"
   }
 }

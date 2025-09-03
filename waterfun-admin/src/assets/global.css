@@ -1,6 +1,7 @@
 :root {
     --line-color: #e6e6e6;
-    --defailt-blue: #409eff;
+    --default-dark: #4f4f4f;
+    --default-blue: #409eff;
     --light-background: #f0f7ff;
 }
 
