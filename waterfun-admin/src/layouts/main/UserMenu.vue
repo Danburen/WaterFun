@@ -48,7 +48,7 @@
   right: 0;
   background-color: #f9f9f9;
   min-width: 100px;
-  border: 1px solid var(--line-color);
+  border: 1px solid var(--default-gray);
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
 
@@ -58,11 +58,12 @@
 }
 
 .dropdown-menu a{
-  font-size: 12px;
+  font-size: 14px;
+  text-align: center;
   color: #333;
-  padding: 10px 6px;
   text-decoration: none;
-  display: block;
+  padding: 10px 0;
+  width: 100%;
 }
 
 .dropdown-menu .separator {

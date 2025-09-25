@@ -8,7 +8,6 @@ const props = defineProps<{
 const Icons = { Edit,VideoCamera,DashBoard }
 
 const getIconComponent = (name) =>{
-  console.log(name)
   return Icons[name] || null
 }
 

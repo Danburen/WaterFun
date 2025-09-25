@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import router, {routes, type routeType} from '@/router/index.js'
+import router, {menuRoutes, type routeType} from '@/router/index.js'
 import IconComponent from "@/components/IconComponent.vue";
 const props = defineProps<{
   collapse: boolean;
@@ -12,7 +12,7 @@ const handleMenuClick = (routeName:string) => {
 
 <template>
   <el-menu class="aside-menu" default-active="1" :collapse="collapse">
-    <template v-for="(route,index) in routes">
+    <template v-for="(route,index) in menuRoutes">
       <el-sub-menu v-if="route.children && route.children.length" :index="index.toString()">
         <template #title>
           <el-icon class="menu-icon"><IconComponent :icon="route.meta.icon" /></el-icon>
@@ -39,6 +39,7 @@ const handleMenuClick = (routeName:string) => {
 
 .aside-menu {
   min-height: 100%;
+  width: 175px;
 }
 
 a {

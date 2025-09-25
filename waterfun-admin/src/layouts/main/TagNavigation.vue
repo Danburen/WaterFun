@@ -179,6 +179,7 @@ watch(()=> props.modelValue,
   min-width: 0;
   width: 100%;
   gap: 6px;
+  padding: 0 10px;
 }
 
 .tag {

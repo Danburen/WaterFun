@@ -73,13 +73,14 @@ watch(()=>tagStore.getTags,
 <template>
   <div class="container full-page-container">
     <!-- Global Header -->
-    <MainNavBar :navItems="breadList" @collapse="menuCollapse = !menuCollapse" />
+    <MainNavBar class="header-navbar" :navItems="breadList" @collapse="menuCollapse = !menuCollapse" />
     <!-- Main Container-->
     <div class="main-container">
       <AsideNavBar :collapse="menuCollapse" @menuClick="" />
       <div class="content-container">
         <div class="content-header default-border-bottom">
           <TagNavigation
+              class="tag-nav"
               v-model="activeTags"
               :tag-list="tagList"
               @tag-removed="handleRemoveTag"
@@ -100,6 +101,7 @@ watch(()=>tagStore.getTags,
   flex-direction: column;
   min-height: 100vh
 }
+
 .main-container {
   display: flex;
   flex-grow: 1;
@@ -107,24 +109,34 @@ watch(()=>tagStore.getTags,
   min-width: 0;
 }
 
+.content-header {
+  background: #f9f9f9;
+}
+
 .content-container {
-  background: white;
+  background: var(--light-gray);
   display: flex;
   flex: 1;
   min-height: 0;
-  min-width: 0;
   flex-direction: column;
 }
 
 .content-main {
-  flex: 1; /* 占据剩余空间 */
-  padding: 20px;
+  flex: 1 1 auto; /* 占据剩余空间 */
+  padding: 10px;
+  margin: 10px;
   overflow-y: auto; /* 内容过多时滚动 */
+  background: #fff;
+  min-height: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
 }
 
 .content-footer {
   max-height: 30px;
   font-size: 12px;
+  background: var(--default-white);
+  flex-shrink: 0;
 }
 
 .copyright {
@@ -132,8 +144,7 @@ watch(()=>tagStore.getTags,
   padding: 0.5em 1em;
 }
 
-.content-header {
-  padding: 0 1em;
+.header-navbar {
+  z-index: 100;
 }
-
 </style>

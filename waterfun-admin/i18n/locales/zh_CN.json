@@ -25,5 +25,54 @@
   },
   "operation": {
     "changePassword": "修改密码"
+  },
+  "auth": {
+    "btn": {
+      "login": "登录",
+      "register": "注册",
+      "getVerificationCode": "获取验证码",
+      "expand": "展开",
+      "collapse": "收起"
+    },
+    "tabs": {
+      "password": "账号登录",
+      "emailPhone": "快捷登录"
+    },
+    "countDown": "重新发送({countDown})",
+    "thirdPartyLogin": "第三方登录  ",
+    "toRegister": "没有账号？立即注册",
+    "toLogin": "前往登录",
+    "supplementaryInfo": "补充信息",
+    "username": "用户名",
+    "phone": "手机号",
+    "email": "邮箱",
+    "password": "密码",
+    "keepSignIn": "保持登录状态",
+    "forgetPassword": "忘记密码",
+    "verifyCode": "验证码",
+    "placeholder": {
+      "username": "请输入用户名",
+      "password": "请输入密码",
+      "emailPhone": "请输入注册手机号/邮箱",
+      "verifyCode": "请输入验证码",
+      "phone": "请输入注册用的手机号",
+      "email": "请输入注册用的邮箱"
+    },
+    "validate": {
+      "usernameEmpty": "登录名不能为空",
+      "phoneEmpty": "手机号不能为空",
+      "emailEmpty": "邮箱不能为空",
+      "passwordEmpty": "密码不能为空",
+      "verifyCodeEmpty": "验证码不能为空",
+      "usernameOutOfLength": "用户名长度超出限制(4-20字符)",
+      "invalidUsername": "用户名格式有误",
+      "invalidPhone": "手机号有误",
+      "invalidEmail": "邮箱格式有误",
+      "captchaEmpty": "图形验证码不能为空",
+      "smsCodeEmpty": "手机验证码不能为空",
+      "emailCodeEmpty": "邮箱验证码不能为空",
+      "passwordTooShort": "密码长度必须大于8个字符",
+      "passwordInvalid": "密码必须包含大小写字母和数字!"
+    }
   }
 }
