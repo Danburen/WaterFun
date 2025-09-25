@@ -1,8 +1,14 @@
 :root {
-    --line-color: #e6e6e6;
-    --default-dark: #4f4f4f;
+    --default-gray: #e6e6e6;
+    --default-dark: #474747;
     --default-blue: #409eff;
+    --default-red: #f44336;
+    --default-green: #00d483;
+    --default-yellow: #ffe126;
+    --default-orange: #f48c36;
+    --default-white: #fefefe;
     --light-background: #f0f7ff;
+    --light-gray: #efefef;
 }
 
 .full-page-container {
@@ -57,8 +63,8 @@
 
 /* Color */
 .default-border-bottom{
-    border-bottom: 1px solid var(--line-color);
+    border-bottom: 1px solid var(--default-gray);
 }
 .default-border-top {
-    border-top: 1px solid var(--line-color);
+    border-top: 1px solid var(--default-gray);
 }
