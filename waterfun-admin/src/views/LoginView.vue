@@ -8,7 +8,7 @@
       <div class="left items-center">
         <div class="logo items-center">
           <img src="../assets/logo.svg" style="height: 65px;width: 65px;padding: 10px" alt="">
-          <span>WaterFun</span>
+          <span class="logo-text">WaterFun</span>
         </div>
       </div>
       <div class="form-container items-center">
@@ -61,6 +61,10 @@
   padding: 10px 0;
 }
 
+.logo-text {
+  font-weight: bold;
+  text-shadow: 2px 3px 15px rgba(0, 0, 0, 0.4);
+}
 .form-container {
   background-color: var(--default-white);
   margin: 25px;
