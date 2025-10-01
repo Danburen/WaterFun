@@ -5,7 +5,7 @@ import type {BreadNavItemType, TagNavItemType} from "@/layouts/types.js";
 import TagNavigation from "@/layouts/main/TagNavigation.vue";
 import AsideNavBar from "@/layouts/main/AsideNavBar.vue";
 import router, {type routeType} from "@/router/index.js";
-import {useTagStore} from "@/store/tagStore.js";
+import {useTagStore} from "@/store/ui/navTagStore.js";
 
 const menuCollapse = ref(false)
 const tagNavContainer = ref(null)
