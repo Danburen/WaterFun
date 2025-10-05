@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type {BreadNavItemType} from "@/layouts/types.js";
+import type {BreadNavItemType} from "@/types/ui/tagNav.js";
 // @ts-ignore
 import {Expand, Fold} from "@element-plus/icons-vue";
 import {useBreadcrumbs} from "@/composables/useBreadcrumbs.js";

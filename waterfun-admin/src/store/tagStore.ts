@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import type {TagNavItemType} from "@/layouts/types.d.ts";
 import { readonly } from 'vue';
 import {computed, ref} from 'vue';
+import {TagNavItemType} from "~/types/ui/tagNav";
 export const useTagStore = defineStore('tagStore', ()=>{
     const tags= ref<TagNavItemType[]>([])
     const cache = ref<Set<string>>(new Set())
