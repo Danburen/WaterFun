@@ -1,0 +1,4 @@
+packages:
+  - 'waterfun-admin'
+  - 'waterfun-web-client'
+  - 'waterfun-web-core'
