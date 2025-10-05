@@ -6,3 +6,8 @@ declare module '@vue/runtime-core' {
         $i18n: I18n
     }
 }
+
+declare module '*.css' {
+    const css: string
+    export default css
+}

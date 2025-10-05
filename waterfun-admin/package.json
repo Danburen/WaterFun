@@ -1,5 +1,5 @@
 {
-  "name": "waterfun-admin",
+  "name": "@waterfun/admin",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "@waterfun/web-core": "workspace:*",
     "axios": "^1.12.2",
     "element-plus": "^2.11.1",
     "pinia": "^3.0.3",
@@ -25,7 +26,7 @@
     "@types/node": "^24.3.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/compiler-sfc": "^3.5.20",
-    "typescript": "^5.9.2",
+    "typescript": "^5.9.3",
     "vite": "^7.0.6",
     "vite-plugin-checker": "^0.10.3",
     "vite-plugin-vue-devtools": "^8.0.0"

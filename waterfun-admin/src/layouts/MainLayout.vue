@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import MainNavBar from "@/layouts/main/MainNavBar.vue";
 import {ref, computed, onMounted, onBeforeMount, watch} from 'vue'
-import type {BreadNavItemType, TagNavItemType} from "@/layouts/types.js";
+import type {BreadNavItemType, TagNavItemType} from "@/types/ui/tagNav.js";
 import TagNavigation from "@/layouts/main/TagNavigation.vue";
 import AsideNavBar from "@/layouts/main/AsideNavBar.vue";
-import router, {type routeType} from "@/router/index.js";
+import router, {type routeType} from "@/router";
 import {useTagStore} from "@/store/tagStore.js";
 
 const menuCollapse = ref(false)
@@ -30,7 +30,7 @@ const dashboardTagItem:TagNavItemType = {
   closeable: false
 }
 
-const addNavTags = (to) =>{
+const addNavTags = (to: any) =>{
   tagStore.addTag({
     name: to.name,
     to: to.name,
@@ -42,6 +42,7 @@ const addNavTags = (to) =>{
 const handleRemoveTag = (tagName:string) => {
   let name = null
   if(activeTags.value === tagName){
+    //@ts-ignore
     name =  tagStore.getTags[tagStore.getTags.findIndex((t) => t.name === tagName) - 1].name || ''
   }
   tagStore.removeTag(tagName);
@@ -51,8 +52,10 @@ const handleRemoveTag = (tagName:string) => {
 const handleOrderUpdated = ({ from, to }: { from: number; to: number }) => {
   const newTags = [...tagStore.getTags]
   const [moved] = newTags.splice(from, 1)
-  newTags.splice(to, 0, moved)
-  tagStore.updateTags(newTags)
+  if(moved){
+    newTags.splice(to, 0, moved)
+    tagStore.updateTags(newTags)
+  }
 }
 
 onBeforeMount(() => {

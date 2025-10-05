@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {TagNavItemType} from "@/layouts/types.js";
+import type {TagNavItemType} from "@/types/ui/tagNav.js";
 import {ref, computed, onMounted, onUnmounted, watch, type Ref, type ComputedRef} from 'vue'
 import router from "@/router/index.js";
 const tagNavContainer = ref();
