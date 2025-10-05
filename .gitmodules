@@ -4,3 +4,6 @@
 [submodule "waterfun-service"]
 	path = waterfun-service
 	url = https://github.com/Danburen/WaterFun-Service
+[submodule "waterfun-web-core"]
+	path = waterfun-web-core
+	url = https://github.com/Danburen/waterfun-web-core
