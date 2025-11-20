@@ -1,13 +1,8 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
-  <div>
-    This is dynamic world monitor view
-  </div>
 </template>
 
-<style scoped>
+<script setup lang="ts">
+</script>
 
+<style scoped>
 </style>

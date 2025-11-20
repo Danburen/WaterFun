@@ -6,6 +6,7 @@ export interface TableColumns {
 
 export interface TableData {
     [key: string]: any;
+    id?: number | string;
 }
 
 export interface TableDatasets {
