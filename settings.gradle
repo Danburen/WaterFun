@@ -1,0 +1,4 @@
+rootProject.name = 'waterfun'
+include ':waterfun-common-lib'
+include ':waterfun-service'
+include ':waterfun-admin-service'

@@ -1,0 +1,19 @@
+
+plugins {
+    id 'base'
+}
+
+allprojects {
+    group = 'org.waterwood.waterfun'
+    version = '1.0.0'
+
+    if (tasks.findByName('wrapper') == null) {
+        tasks.register('wrapper')
+    }
+    if (tasks.findByName('prepareKotlinBuildScriptModel') == null) {
+        tasks.register('prepareKotlinBuildScriptModel')
+    }
+}
+
+tasks.register('classes')
+tasks.register('testClasses')

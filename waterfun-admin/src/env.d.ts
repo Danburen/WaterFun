@@ -1,9 +1,13 @@
-import { type I18n } from 'vue-i18n'
+import { type Composer } from 'vue-i18n'
 
-declare module '@vue/runtime-core' {
+declare module 'vue' {
     interface ComponentCustomProperties {
-        $t: I18n['t']
-        $i18n: I18n
+        $t: Composer['t']
+        $i18n: {
+            locale: string
+            availableLocales: string[]
+            t: Composer['t']
+        }
     }
 }
 

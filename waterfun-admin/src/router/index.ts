@@ -1,7 +1,7 @@
 import {createRouter, createMemoryHistory, createWebHistory} from "vue-router";
 export const routes = [
     {
-        path: '/' , component: ()=> import("@/views/HomeView.vue"),
+        path: '/' , component: ()=> import("~/views/DashBoardView.vue"),
         name: "dashboard",
         meta: {
             locale: 'dashboard',
