@@ -1,8 +1,9 @@
-package org.waterwood.waterfunadminservice.infrastructure;
+package org.waterwood.waterfunservicecore.infrastructure;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+import org.waterwood.common.cache.RedisHelperInterface;
 import org.waterwood.utils.JsonUtil;
 import org.waterwood.utils.StringUtil;
 
@@ -13,7 +14,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-public class RedisHelper {
+public class RedisHelper implements RedisHelperInterface {
     private final StringRedisTemplate redisTemplate;
     private String redisKeyPrefix="";
 
@@ -55,7 +56,7 @@ public class RedisHelper {
     }
 
     public void hDel(String key, String... fields) {
-        redisTemplate.opsForHash().delete(getCurrentKey(key), List.of(fields));
+        redisTemplate.opsForHash().delete(getCurrentKey(key), (Object[]) fields);
     }
 
     public <T> T getValue(String key, Class<T> clazz) {
