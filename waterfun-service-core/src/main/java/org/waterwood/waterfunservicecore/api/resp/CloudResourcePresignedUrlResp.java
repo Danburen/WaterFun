@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
-public class CloudResourceViewResp implements Serializable {
-    private String previewUrl;
+public class CloudResourcePresignedUrlResp implements Serializable {
+    private String url;
+    private Instant expireAt;
 }

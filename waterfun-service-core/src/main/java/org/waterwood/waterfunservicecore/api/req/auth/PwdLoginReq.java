@@ -8,7 +8,7 @@ import lombok.Data;
 import org.waterwood.common.validation.StrongPassword;
 
 @Data
-public class PwdLoginRequestBody {
+public class PwdLoginReq {
     @NotEmpty(message = "{validation.required}")
     @Pattern(regexp = "^[0-9a-zA-Z_]+$", message = "{user.username.pattern}")
     private String username;

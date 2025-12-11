@@ -1,12 +1,15 @@
 package org.waterwood.waterfunservicecore.services.email;
 
 import jakarta.mail.internet.MimeMessage;
+import org.aspectj.apache.bcel.classfile.Code;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.waterwood.waterfunservicecore.api.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 
 @Service
 public class SpringEmailService extends EmailServiceBase {
@@ -20,7 +23,7 @@ public class SpringEmailService extends EmailServiceBase {
     }
 
     @Override
-    public EmailCodeResult sendHtmlEmail(String to, String from, String subject, String html) {
+    public CodeResult sendHtmlEmail(String to, String from, String subject, String html) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
         try{
@@ -30,24 +33,24 @@ public class SpringEmailService extends EmailServiceBase {
             helper.setText(html, true);
             mailSender.send(mimeMessage);
         }catch (Exception e){
-            return EmailCodeResult.builder()
-                    .email(to)
+            return CodeResult.builder()
+                    .target(to)
                     .sendSuccess(false)
                     .responseRaw(e.toString())
                     .message("Error occurred when sending:")
                     .build();
         }
-        return EmailCodeResult.success();
+        return CodeResult.success(to, VerifyChannel.EMAIL);
     }
 
     @Override
-    public EmailCodeResult sendSimpleEmail(String to, String from, String subject, String text) {
+    public CodeResult sendSimpleEmail(String to, String from, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(username);
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
         mailSender.send(message);
-        return EmailCodeResult.success();
+        return CodeResult.success(to, VerifyChannel.EMAIL);
     }
 }

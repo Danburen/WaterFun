@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
-import org.waterwood.utils.PasswordUtil;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.entity.user.AccountStatus;
 import org.waterwood.common.exceptions.AuthException;
@@ -22,6 +21,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRep
 import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.utils.UidGenerator;
+import org.waterwood.waterfunservicecore.services.sms.SmsCodeService;
 
 import java.util.List;
 
@@ -41,19 +41,21 @@ public class RegisterServiceImpl implements RegisterService {
     @Transactional
     @Override
     public User register(RegisterRequest body, String smsCodeKey) {
-        userRepo.findByUsername(body.getUsername()).ifPresent(_ -> {
-            throw new BusinessException(BaseResponseCode.USER_ALREADY_EXISTS);
-        });
-        List<EncryptionDataKey> keys = encryptedKeyService.pickEncryptionKeys(0, 1).orElseThrow(() -> new ServiceException("No encryption key available"));
+        List<EncryptionDataKey> keys = encryptedKeyService.pickEncryptionKeys(0, 1)
+                .orElseThrow(() -> new ServiceException("No encryption key available"));
 
         String email = body.getEmail();
-        String phone = body.getPhoneNumber();
+        String phone = body.getPhone();
         EncryptionDataKey hmacKey = keys.get(1);
 
         // STEP 1: Verify phone
-        boolean phoneVerified = smsCodeService.verifySmsCode(phone, smsCodeKey, body.getSmsCode());
+        boolean phoneVerified = smsCodeService.verifyCode(
+                phone,
+                body.getVerify().getScene(),
+                smsCodeKey,
+                body.getVerify().getCode());
         if(! phoneVerified){
-            throw new AuthException(BaseResponseCode.SMS_CODE_INCORRECT);
+            throw new AuthException(BaseResponseCode.VERIFY_CODE_INVALID);
         }
         userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(phone, hmacKey.getEncryptedKey())).ifPresent(
                 _->{
@@ -69,21 +71,24 @@ public class RegisterServiceImpl implements RegisterService {
                     }
             );
         }
-        // STEP 3: Encrypt email, phone, password
+
+        // STEP 3: Verify user whether  exists
+        userRepo.findByUsername(body.getUsername()).ifPresent(_ -> {
+            throw new BusinessException(BaseResponseCode.USER_ALREADY_EXISTS);
+        });
+
+        // STEP 4: Encrypt email, phone, password
         EncryptionDataKey encryptionKey = keys.get(0);
         String encryptedPhone = EncryptionHelper.encryptField(phone, encryptionKey);
         String password = body.getPassword();
-        if (password == null || password.isEmpty()) {
-            password = PasswordUtil.generatePassword(12);
-        }
 
-        // STEP 4: Set user
+        // STEP 5: Set user
         User user = new User();
         user.setUsername(body.getUsername());
         user.setPasswordHash(encoder.encode(password));
         user.setUid(uidGenerator.generateUid());
         user.setAccountStatus(AccountStatus.ACTIVE);
-        // STEP 5: Set user data
+        // STEP 6: Set user data
         UserDatum userDatum = new UserDatum();
         userDatum.setUser(user);
         userDatum.setId(user.getId());

@@ -94,7 +94,7 @@ service.interceptors.response.use(
             //         duration: 3000
             //     })
             // }
-            return Promise.reject(new Error(error.response.data))
+            throw new Error(error);
         }else if(error.request) {
             // no response
             errMessage = translate("message.error.networkError")

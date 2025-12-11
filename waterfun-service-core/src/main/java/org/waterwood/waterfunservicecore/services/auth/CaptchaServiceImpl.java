@@ -2,7 +2,10 @@ package org.waterwood.waterfunservicecore.services.auth;
 
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.waterwood.waterfunservicecore.api.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.VerifyScene;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelper;
 
 import java.time.Duration;
@@ -33,7 +36,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     @Override
-    public boolean validateCaptcha(String uuid, String code){
+    public boolean verifyCode(String uuid, String code){
         return redisHelper.validateAndRemove(uuid,code);
     }
 }

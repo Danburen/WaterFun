@@ -1,12 +1,12 @@
 package org.waterwood.waterfunservicecore.services.auth;
 
 import cn.hutool.captcha.LineCaptcha;
+import org.waterwood.waterfunservicecore.services.auth.code.CodeVerifier;
 
-public interface CaptchaService extends VerifyServiceBase {
+public interface CaptchaService {
     LineCaptchaResult generateCaptcha();
 
-    @Override
     LineCaptcha generateVerifyCode();
 
-    boolean validateCaptcha(String uuid, String code);
+    boolean verifyCode(String uuid, String code);
 }

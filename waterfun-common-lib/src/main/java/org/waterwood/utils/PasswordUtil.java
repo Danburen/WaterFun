@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Use org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+ */
+@Deprecated
 public final class PasswordUtil {
     private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";

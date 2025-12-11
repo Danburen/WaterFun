@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
+import org.waterwood.waterfunservicecore.api.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.VerifyScene;
+import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.infrastructure.auth.RSAJwtTokenService;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.entity.user.User;
@@ -13,13 +16,13 @@ import org.waterwood.common.exceptions.BusinessException;
 import org.waterwood.common.exceptions.ServiceException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
-import org.waterwood.waterfunservicecore.api.req.auth.EmailLoginRequestBody;
-import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginRequestBody;
-import org.waterwood.waterfunservicecore.api.req.auth.SmsLoginRequestBody;
+import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPayload;
 import org.waterwood.utils.codec.HashUtil;
+import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.email.EmailCodeService;
+import org.waterwood.waterfunservicecore.services.sms.SmsCodeService;
 
 import java.util.Optional;
 
@@ -36,8 +39,9 @@ public class LoginServiceImpl implements LoginService {
     private final SmsCodeService smsCodeService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final VerificationService verificationService;
 
-    public LoginServiceImpl(UserRepository ur, AuthServiceImpl as, RSAJwtTokenService ts, CaptchaServiceImpl cs, EncryptedKeyService edks, UserDatumRepo udr, EmailCodeService emailCodeService, SmsCodeService smsCodeService) {
+    public LoginServiceImpl(UserRepository ur, AuthServiceImpl as, RSAJwtTokenService ts, CaptchaServiceImpl cs, EncryptedKeyService edks, UserDatumRepo udr, EmailCodeService emailCodeService, SmsCodeService smsCodeService, VerificationService verificationService) {
         this.userRepo = ur;
         this.authService = as;
         this.tokenService = ts;
@@ -46,58 +50,56 @@ public class LoginServiceImpl implements LoginService {
         this.userDatumRepo = udr;
         this.emailCodeService = emailCodeService;
         this.smsCodeService = smsCodeService;
+        this.verificationService = verificationService;
     }
 
 
 
     @Override
-    public User login(PwdLoginRequestBody body, String verifyUUIDKey){
+    public User login(PwdLoginReq body, String verifyUUIDKey){
         Optional<User> user = userRepo.findByUsername(body.getUsername());
         return user.map(u->{
             if(! encoder.matches(body.getPassword(), u.getPasswordHash())){
                 throw new AuthException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
             }
-            if(! captchaService.validateCaptcha(verifyUUIDKey,body.getCaptcha())){
-                throw new AuthException(BaseResponseCode.CAPTCHA_INCORRECT);
+            if(! captchaService.verifyCode(verifyUUIDKey,body.getCaptcha())){
+                throw new AuthException(BaseResponseCode.CAPTCHA_INVALID);
+            }
+            // User didn't set password so they are not allow to log in by password.
+            if( u.getPasswordHash() == null){
+                throw new BusinessException(BaseResponseCode.FORBIDDEN);
             }
             return u;
         }).orElseThrow(()-> new ServiceException("User not found"));
     }
 
     @Override
-    public User login(SmsLoginRequestBody body, String verifyUUIDKey){
-        String phone = body.getPhoneNumber();
-        EncryptionDataKey key= encryptedKeyService.pickEncryptionKey(1)
-                .orElseThrow(() -> new ServiceException("Couldn't pick encryption key"));
-        UserDatum datum = userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(phone,key.getEncryptedKey()))
-                .orElseThrow(() ->  new BusinessException(BaseResponseCode.PASSWORD_EMPTY_OR_INVALID));
-        boolean verified = smsCodeService.verifySmsCode(phone,verifyUUIDKey,body.getSmsCode());
-        if(verified){
-            return datum.getUser();
-        }else{
-            throw new BusinessException(BaseResponseCode.SMS_CODE_INCORRECT);
-        }
-    }
-
-    @Override
-    public User login(EmailLoginRequestBody body, String verifyUUIDKey){
-        String email = body.getEmail();
-        EncryptionDataKey key= encryptedKeyService.pickEncryptionKey(1)
-                .orElseThrow(() -> new ServiceException("Couldn't pick encryption key"));
-        UserDatum userDatum = userDatumRepo.findByEmailHash(HashUtil.Sha256HmacString(email,key.getEncryptedKey()))
-                .orElseThrow(() ->  new BusinessException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT));
-        boolean verified = emailCodeService.verifyEmailCode(email,verifyUUIDKey,body.getEmailCode());
-        if(verified){
-            return userDatum.getUser();
-        }else{
-            throw new BusinessException(BaseResponseCode.EMAIL_CODE_INCORRECT);
-        }
-    }
-    @Override
     public boolean logout(String refreshToken, String dfp) {
         RefreshTokenPayload payload = tokenService.validateRefreshToken(refreshToken,dfp);
             tokenService.removeAccessToken(payload.userId(), payload.deviceId());
             tokenService.removeRefreshToken(refreshToken);
         return true;
+    }
+
+    @Override
+    public User login(VerifyCodeDto dto, String codeKey) {
+        EncryptionDataKey key= encryptedKeyService.pickEncryptionKey(1)
+                .orElseThrow(() -> new ServiceException("Couldn't pick encryption key"));
+        if(dto.getScene() != VerifyScene.LOGIN){
+            throw new BusinessException(BaseResponseCode.INVALID_VERIFY_SCENE);
+        }
+        UserDatum userDatum = null;
+        VerifyChannel channel = dto.getChannel();
+        if(channel == VerifyChannel.SMS){
+            userDatum = userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(dto.getTarget(),key.getEncryptedKey()))
+                    .orElseThrow(() ->  new BusinessException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT));
+        }else if(channel == VerifyChannel.EMAIL){
+            userDatum = userDatumRepo.findByEmailHash(HashUtil.Sha256HmacString(dto.getTarget(),key.getEncryptedKey()))
+                    .orElseThrow(() ->  new BusinessException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT));
+        }
+        verificationService.verifyCode(dto.getTarget(),dto.getScene(),channel,codeKey,dto.getCode());
+
+        if(userDatum ==  null) throw new BusinessException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
+        return userDatum.getUser();
     }
 }

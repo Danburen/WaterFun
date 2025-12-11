@@ -7,6 +7,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
+
 @Data
 @Entity
 @Table(name = "user_profile", schema = "waterfun")
@@ -38,5 +40,12 @@ public class UserProfile {
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private Gender gender;
+
+    @Column(name = "birthday")
+    private LocalDate birthday;
+
+    @Size(max = 50)
+    @Column(name = "residence", length = 50)
+    private String residence;
 
 }

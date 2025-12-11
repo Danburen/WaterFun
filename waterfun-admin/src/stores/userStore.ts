@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { ref } from "vue";
 
 interface UserData{
     userId: number | null,
@@ -23,6 +24,7 @@ export const useUserStore = defineStore('userStore',()=>{
     };
 
     return { userData, updateUserData, clearUserData };
-},{
-    persist: true
+},{   persist: import.meta.client ? {
+        storage: sessionStorage
+    } : false
 });

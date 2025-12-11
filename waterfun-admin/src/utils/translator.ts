@@ -10,7 +10,7 @@ export class VueI18nService implements I18nService {
             translate: (key, options) => {
                 if (!this.cachedI18n) {
                     try {
-                        this.cachedI18n = i18n
+                        this.cachedI18n = i18n.global || i18n
                     } catch (e) {
                         console.error('Failed to initialize i18n:', e);
                         return options?.default || key;
@@ -20,7 +20,13 @@ export class VueI18nService implements I18nService {
                 if (!this.cachedI18n) return options?.default || key;
 
                 try {
-                    return this.cachedI18n.t(key, options?.args || {});
+                    // 安全地检查t方法是否存在
+                    if (typeof this.cachedI18n.t === 'function') {
+                        return this.cachedI18n.t(key, options?.args || {});
+                    } else {
+                        console.warn(`i18n instance does not have t method:`, this.cachedI18n);
+                        return options?.default || key;
+                    }
                 } catch (e) {
                     console.warn(`Translation error for key "${key}":`, e);
                     return options?.default || key;

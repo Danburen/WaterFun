@@ -12,12 +12,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ApiResponse<T>{
-    Integer code;
+    String code;
     String message;
     T data;
-    public static <T> ApiResponse<T> ok(T data){
-        return new ApiResponse<>(200,null,data);
-    }
+
     public static ApiResponse<Void> response(BaseResponseCode baseResponseCode){
         return new ApiResponse<>(baseResponseCode.getCode(),null,null);
     }
@@ -27,11 +25,11 @@ public class ApiResponse<T>{
     }
 
     public static <T> ApiResponse<T> success(){
-        return new ApiResponse<>(200, "http.success",null);
+        return new ApiResponse<>("success", "http.success",null);
     }
 
     public static <T> ApiResponse<T> success(T data){
-        return new ApiResponse<>(200, "http.success",data);
+        return new ApiResponse<>("success", null,data);
     }
 
 }

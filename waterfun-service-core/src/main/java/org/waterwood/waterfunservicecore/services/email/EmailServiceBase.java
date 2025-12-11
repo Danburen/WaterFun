@@ -2,7 +2,7 @@ package org.waterwood.waterfunservicecore.services.email;
 
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-import org.waterwood.api.enums.EmailTemplateType;
+import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 
 import java.util.Map;
 
@@ -12,25 +12,23 @@ public abstract class EmailServiceBase implements EmailService {
     protected EmailServiceBase(SpringTemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
     }
+
     @Override
-    public EmailCodeResult sendHtmlEmail(String to, EmailTemplateType type, Map<String, Object> data) {
-        return sendHtmlEmail(to,type.getDefaultFrom(),type.getSubject(),"email_base",type.getTemplateKey(),data);
+    public CodeResult sendHtmlEmail(String to, String from,
+                                    String subject,
+                                    String baseTemplate,
+                                    String contentTemplate,
+                                    Map<String, Object> data) {
+        Context ctx = new Context();
+        ctx.setVariable("fragment", "fragment/" + contentTemplate);
+        ctx.setVariables(data);
+        String html = templateEngine.process("layout/" + baseTemplate , ctx);
+        return sendHtmlEmail(to, from, subject, html);
     }
 
     @Override
-    public EmailCodeResult sendHtmlEmail(String to, String from, String subject, String baseTemplate, String contentTemplate, Map<String, Object> data) {
-        Context context = new Context();
-        context.setVariables(data);
-        String contentPart = templateEngine.process("email/" + contentTemplate, context);
-
-        context.setVariable("content", contentPart);
-        String emailContent = templateEngine.process("email/" + baseTemplate , context);
-        return sendHtmlEmail(to, from, subject, emailContent);
-    }
+    public abstract CodeResult sendHtmlEmail(String to, String from, String subject, String html);
 
     @Override
-    public abstract EmailCodeResult sendHtmlEmail(String to, String from, String subject, String html);
-
-    @Override
-    public abstract EmailCodeResult sendSimpleEmail(String to, String from, String subject, String text);
+    public abstract CodeResult sendSimpleEmail(String to, String from, String subject, String text);
 }
