@@ -29,6 +29,5 @@ public class UserJwtAuthConverter implements Converter<Jwt, AbstractAuthenticati
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(context, null, authorities);
         auth.setDetails(source);
         return auth;
-
     }
 }

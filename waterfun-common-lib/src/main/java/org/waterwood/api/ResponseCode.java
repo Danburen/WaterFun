@@ -11,7 +11,5 @@ public interface ResponseCode {
 
     ResponseCode toNoArgsResponse();
 
-    int getCode();
-
-    String getMsgKey();
+    String getCode();
 }

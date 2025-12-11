@@ -1,5 +1,72 @@
 <script setup>
+import { ref, reactive, onMounted} from 'vue'
+import router from '~/router/index.js'
+import { ElMessage } from 'element-plus'
+import { useAuthStore } from '@/stores/authStore'
+import {validateAuthname, validatePassword, validateVerifyCode} from "@/utils/validator";
+import { useI18n } from 'vue-i18n'
+import { throttle } from '@waterfun/web-core/src/triggerControl'
+import { authApi } from '~/api/authApi';
+import { convertArrayBufferToBase64 } from "@waterfun/web-core/src/dataMapper";
+import { generateFingerprint } from '@waterfun/web-core/src/fingerprint';
 
+const { t } = useI18n()
+const authStore = useAuthStore()
+const loginFormRef = ref(null)
+const loginForm = ref({
+  username: '',
+  password: '',
+  captcha: ''
+})
+
+const captchaLoading = ref(false);
+const captchaImage = ref(null);
+
+const validRules = reactive({
+  username:[{validator: validateAuthname('password'),trigger: "blur" }],
+  password:[{validator: validatePassword(false),trigger: "blur"}],
+  captcha:[{validator: validateVerifyCode(false), trigger: "blur"}],
+})
+
+const submitLoginForm = () => {
+  loginFormRef.value?.validate((valid) => {
+    if (valid) {
+      generateFingerprint().then(deviceFp => {
+        authApi.login({
+          ...loginForm.value,
+          deviceFp: deviceFp,
+        }, 'password').then(res => {
+          ElMessage.success(t('message.success.loginSuccess'));
+          router.push({ name: 'dashboard' })
+        }).catch((err) => {
+          ElMessage.error(t('message.error.apiError'));
+          console.log(err);
+        })
+      })
+    } 
+  });
+}
+
+const refreshCaptcha = throttle(() => {
+  if(! captchaLoading.value){
+    captchaLoading.value = true;
+    authApi.getCaptcha().then(res => {
+      const base64 = convertArrayBufferToBase64(res);
+      captchaImage.value = `data:image/png;base64,${base64}`;
+    }).catch((err) => {
+      ElMessage.error(t('message.error.apiError'));
+      console.log(err);
+    }).finally(() => {
+      captchaLoading.value = false;
+    })
+  }
+},1000,
+()=>{
+  ElMessage.error(t('message.throttled.clickTooFast'));
+})
+onMounted(() => {
+  refreshCaptcha();
+})
 </script>
 
 <template>
@@ -12,18 +79,33 @@
         </div>
       </div>
       <div class="form-container items-center">
-        <el-form class="form" label-width="auto" >
-          <el-form-item :label="$t('auth.username')">
-            <el-input></el-input>
-          </el-form-item>
-          <el-form-item :label="$t('auth.password')">
-            <el-input></el-input>
-          </el-form-item>
-          <el-form-item :label="$t('auth.verifyCode')">
-            <el-input></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button class="login-btn" type="primary">{{ $t('auth.btn.login') }}</el-button>
+        <el-form 
+          class="form" 
+          label-width="auto"
+          ref="loginFormRef"
+          :model="loginForm"
+          :rules="validRules"
+        >
+  <el-form-item prop="username" :label="$t('auth.username')">
+    <el-input v-model="loginForm.username" :placeholder="$t('auth.username')"></el-input>
+  </el-form-item>
+  <el-form-item prop="password" :label="$t('auth.password')">
+    <el-input v-model="loginForm.password" type="password" :placeholder="$t('auth.password')"></el-input>
+  </el-form-item>
+  <el-form-item prop="captcha" :label="$t('auth.verifyCode')" class="verify-code-input">
+    <div class="captcha-container">
+      <el-input v-model="loginForm.captcha" :placeholder="$t('auth.verifyCode')" style="width: 120px"></el-input>
+      <el-image
+        :src="captchaImage" :v-loading="captchaLoading"
+        alt="验证码"
+        class="captcha-image"
+        @click="refreshCaptcha"
+      />
+    </div>
+  </el-form-item>
+        <el-form-item>
+            <el-button class="login-btn" type="primary" 
+            @click="submitLoginForm">{{ $t('auth.btn.login') }}</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -70,10 +152,25 @@
 }
 
 .form {
-  max-width: 200px;
+  max-width: 230px;
 }
 
 .login-btn {
   width: 100%;
+}
+
+.captcha-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.captcha-image {
+  padding: 0px 5px;
+  width: 120px;
+  height: 25px;
+  cursor: pointer;
+}
+.verify-code-input {
+  flex: 1;
 }
 </style>

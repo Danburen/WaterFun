@@ -68,13 +68,14 @@ public class GlobalExceptionHandler {
         }
         ErrorResponse response = new ErrorResponse(
                 BaseResponseCode.VALIDATION_ERROR.getCode(),
-                msgSrc.getMessage(BaseResponseCode.VALIDATION_ERROR.getMsgKey(),
+                msgSrc.getMessage(BaseResponseCode.VALIDATION_ERROR.getCode(),
                         null,
                         "Validation Error",
                         LOCALE),
                 errors,
                 new Date()
         );
+        log.info(String.valueOf(errors));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
@@ -98,13 +99,15 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = new ErrorResponse(
                 BaseResponseCode.VALIDATION_ERROR.getCode(),
-                msgSrc.getMessage(BaseResponseCode.VALIDATION_ERROR.getMsgKey(),
+                msgSrc.getMessage(BaseResponseCode.VALIDATION_ERROR.getCode(),
                         null,
                         "Parameter constraint violation",
                         LOCALE),
                 errors,
                 new Date()
         );
+        log.info(String.valueOf(errors));
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
     @ExceptionHandler(HttpMessageNotReadableException.class)

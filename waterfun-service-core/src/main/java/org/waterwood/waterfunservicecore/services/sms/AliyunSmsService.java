@@ -6,7 +6,8 @@ import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.waterwood.waterfunservicecore.api.resp.auth.SmsCodeResult;
+import org.waterwood.waterfunservicecore.api.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.utils.JsonUtil;
 import org.waterwood.waterfunservicecore.configuration.AliyunSmsConfig;
 
@@ -31,12 +32,13 @@ public class AliyunSmsService implements SmsService {
     }
 
     @Override
-    public SmsCodeResult sendSms(String phoneNumber, String templateCode, Map<String, Object> params) {
+    public CodeResult sendSms(String phoneNumber, String templateCode, Map<String, Object> params) {
         if(client == null){
             log.error("Fail send Sms code to {},cause:{}",phoneNumber,"Can't get client instance");
-            return SmsCodeResult.builder()
+            return CodeResult.builder()
                     .sendSuccess(false)
-                    .phoneNumber(phoneNumber)
+                    .target(phoneNumber)
+                    .channel(VerifyChannel.SMS)
                     .message("Can't get client instance")
                     .build();
         }
@@ -49,17 +51,19 @@ public class AliyunSmsService implements SmsService {
             SendSmsResponse sendSmsResponse = client.sendSms(sendSmsRequest);
             String message = sendSmsResponse.getBody().getMessage();
             message = new String(message.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-            return SmsCodeResult.builder()
+            return CodeResult.builder()
                     .sendSuccess(sendSmsResponse.getBody().getCode() != null && sendSmsResponse.getBody().getCode().equals("OK"))
-                    .phoneNumber(phoneNumber)
+                    .target(phoneNumber)
+                    .channel(VerifyChannel.SMS)
                     .message(message)
                     .responseRaw(toJSONString(sendSmsResponse))
                     .build();
         }catch (Exception e){
             log.error("Fail send Sms code to {},cause:{}",phoneNumber,e.getMessage(),e);
-            return SmsCodeResult.builder()
+            return CodeResult.builder()
                     .sendSuccess(false)
-                    .phoneNumber(phoneNumber)
+                    .target(phoneNumber)
+                    .channel(VerifyChannel.SMS)
                     .message("Fail send Sms code: " + e.getMessage())
                     .build();
         }

@@ -1,7 +1,10 @@
-import {createRouter, createMemoryHistory, createWebHistory} from "vue-router";
-export const routes = [
+import {createRouter, createMemoryHistory, createWebHistory, RouteRecordRaw} from "vue-router";
+export const routes: RouteRecordRaw[] = [
     {
-        path: '/' , component: ()=> import("~/views/DashBoardView.vue"),
+        path: '/', redirect: '/dashboard',
+    },
+    {
+        path: '/dashboard' , component: ()=> import("~/views/DashBoardView.vue"),
         name: "dashboard",
         meta: {
             locale: 'dashboard',
@@ -17,6 +20,7 @@ export const routes = [
     },
     {
         path: '/system',
+        component: () => import('@/layouts/EmptyLayout.vue'),
         meta: { locale:'system.title', icon: 'el-Edit' },
         children: [
             {
@@ -41,6 +45,7 @@ export const routes = [
     },
     {
         path: '/monitor',
+        component: () => import('@/layouts/EmptyLayout.vue'),
         meta: { locale: 'monitor.title' ,icon: 'el-VideoCamera' },
         children: [
             {
@@ -60,6 +65,18 @@ export const routes = [
                 name: 'global',
                 meta: { locale: 'monitor.globalView' },
                 component: () => import('@/views/System/GlobalViewMonitorView.vue')
+            }
+        ]
+    },{
+        path: '/post',
+        component: () => import('@/layouts/EmptyLayout.vue'),
+        meta: { locale: 'post.title' ,icon: 'el-Document' },
+        children: [
+            {
+                path: 'list',
+                name: 'postList',
+                meta: { locale: 'post.list' },
+                component: () => import("@/views/Post/Post.vue")
             }
         ]
     }

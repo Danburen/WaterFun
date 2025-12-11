@@ -8,22 +8,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.waterwood.waterfunservicecore.api.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 
 @Slf4j
 @Service
 public class ResendEmailService extends EmailServiceBase {
-    @Value("${mail.resend.api-key}")
-    private String apiKey;
+
 
     private final Resend resend;
-    protected ResendEmailService(SpringTemplateEngine templateEngine) {
+    protected ResendEmailService(SpringTemplateEngine templateEngine, @Value("${mail.resend.api-key}") String apiKey) {
         super(templateEngine);
         this.resend = new Resend(apiKey);
     }
 
 
     @Override
-    public EmailCodeResult sendHtmlEmail(String to, String from, String subject, String html) {
+    public CodeResult sendHtmlEmail(String to, String from, String subject, String html) {
         CreateEmailOptions params = CreateEmailOptions.builder()
                 .from(from)
                 .to(to)
@@ -34,7 +35,7 @@ public class ResendEmailService extends EmailServiceBase {
     }
 
     @Override
-    public EmailCodeResult sendSimpleEmail(String to, String from, String subject, String text) {
+    public CodeResult sendSimpleEmail(String to, String from, String subject, String text) {
         CreateEmailOptions params = CreateEmailOptions.builder()
                 .from(from)
                 .to(to)
@@ -44,18 +45,20 @@ public class ResendEmailService extends EmailServiceBase {
         return sendHtmlEmail(to, from, subject, text);
     }
 
-    private EmailCodeResult sendEmail(CreateEmailOptions params,String to) {
+    private CodeResult sendEmail(CreateEmailOptions params,String to) {
         try{
             CreateEmailResponse res = resend.emails().send(params);
-            return EmailCodeResult.builder()
+            return  CodeResult.builder()
                     .sendSuccess(true)
-                    .email(to)
+                    .target(to)
+                    .channel(VerifyChannel.EMAIL)
                     .responseRaw(res.getId())
                     .build();
         } catch (ResendException e) {
-            EmailCodeResult result = EmailCodeResult.builder()
+            CodeResult result = CodeResult.builder()
                     .sendSuccess(false)
-                    .email(to)
+                    .target(to)
+                    .channel(VerifyChannel.EMAIL)
                     .message("Email send fail,Please check the email provider & params.")
                     .build();
             log.error(result.getMessage(), e);

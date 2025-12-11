@@ -1,6 +1,5 @@
 package org.waterwood.waterfunservicecore.services.storage;
 
-import cn.hutool.core.date.DateUtil;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.http.HttpMethodName;
 import com.qcloud.cos.model.GeneratePresignedUrlRequest;
@@ -12,13 +11,13 @@ import org.springframework.stereotype.Service;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.api.HttpMethod;
 import org.waterwood.waterfunservicecore.api.PostPolicyDto;
+import org.waterwood.waterfunservicecore.api.resp.CloudResourcePresignedUrlResp;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -26,6 +25,8 @@ public class TencentCosService implements CloudFileService {
     private final COSClient cosClient;
     @Value("${tencent.cos.bucket-name}")
     private String bucketName;
+    @Value("${tencent.cos.default-expires-seconds}")
+    private long defaultExpires;
     public TencentCosService(COSClient cosClient){
         this.cosClient = cosClient;
     }
@@ -40,20 +41,27 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public String getFileUrlFromCloud(String path, Duration duration) {
+    public CloudResourcePresignedUrlResp getFileUrlFromCloud(String path, Duration duration) {
         Date expiration = Date.from(Instant.now().plus(duration));
         URL url = cosClient.generatePresignedUrl(
                 bucketName,
                 path,
                 expiration,
                 HttpMethodName.GET);
-        return url.toString();
+        return new CloudResourcePresignedUrlResp(
+                url.toString(),
+                expiration.toInstant()
+        );
     }
 
     @Override
-    public PostPolicyDto buildPutPolicy(String path ,String suffix) {
-        String uuid = UUID.randomUUID().toString();
-        String key = "uploads/" + path + "/" + DateUtil.today().replace("-", "/") + "/" + uuid + "." + suffix;
+    public CloudResourcePresignedUrlResp getFileUrlFromCloud(String path) {
+        return getFileUrlFromCloud(path, Duration.ofHours(1));
+    }
+
+    @Override
+    public PostPolicyDto buildImgUploadsPutPolicy(String uniquePath) {
+        String key = "uploads/img/" + uniquePath;
         Date expire = Date.from(Instant.now().plus(Duration.ofSeconds(5 * 60)));
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, key, HttpMethodName.PUT);
         request.setExpiration(expire);

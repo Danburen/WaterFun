@@ -31,12 +31,14 @@ const dashboardTagItem:TagNavItemType = {
 }
 
 const addNavTags = (to: any) =>{
-  tagStore.addTag({
-    name: to.name,
-    to: to.name,
-    closeable: true,
-    locale: `nav.${to.meta.locale}`,
-  })
+  if (to.meta && to.meta.locale && to.meta.public !== true) {
+    tagStore.addTag({
+      name: to.name,
+      to: to.name,
+      closeable: true,
+      locale: `nav.${to.meta.locale}`,
+    })
+  }
 }
 
 const handleRemoveTag = (tagName:string) => {

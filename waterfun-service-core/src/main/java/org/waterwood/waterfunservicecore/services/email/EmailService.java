@@ -1,17 +1,10 @@
 package org.waterwood.waterfunservicecore.services.email;
 
-import org.waterwood.api.enums.EmailTemplateType;
+import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 
 import java.util.Map;
 
 public interface EmailService {
-    /**
-     * Send email with Html type content by {@link EmailTemplateType}
-     * @param to send to whom
-     * @param type type of email
-     * @param data inject data to template context
-     */
-    EmailCodeResult sendHtmlEmail(String to, EmailTemplateType type, Map<String, Object> data);
     /**
      * Send email with Html type content
      * by choosing <b>base template</b> with <b>content template</b>
@@ -22,7 +15,7 @@ public interface EmailService {
      * @param contentTemplate content Template
      * @param data data to inject into context
      */
-    EmailCodeResult sendHtmlEmail(String to, String from, String subject, String baseTemplate, String contentTemplate, Map<String, Object> data);
+    CodeResult sendHtmlEmail(String to, String from, String subject, String baseTemplate, String contentTemplate, Map<String, Object> data);
 
     /**
      * Send raw html email
@@ -30,9 +23,9 @@ public interface EmailService {
      * @param from from target
      * @param subject subject of email
      * @param html raw html.
-     * @return {@link EmailCodeResult}
+     * @return the result of email send
      */
-    EmailCodeResult sendHtmlEmail(String to, String from, String subject, String html);
+    CodeResult sendHtmlEmail(String to, String from, String subject, String html);
 
     /**
      * Send simple text email
@@ -40,7 +33,7 @@ public interface EmailService {
      * @param from from target
      * @param subject subject of email
      * @param text text
-     * @return {@link EmailCodeResult}
+     * @return the result of email send
      */
-    EmailCodeResult sendSimpleEmail(String to, String from, String subject, String text);
+    CodeResult sendSimpleEmail(String to, String from, String subject, String text);
 }

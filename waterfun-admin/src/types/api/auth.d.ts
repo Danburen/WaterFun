@@ -1,12 +1,10 @@
 interface BaseLoginRequest {
     username: string,
     deviceFp: string,
-    loginType: LoginType,
 }
 
 interface BasicRegisterRequest {
     phone: string,
-    username: string,
     smsCode: string,
     deviceFp: string,
 }
@@ -17,7 +15,7 @@ interface FullRegisterRequest extends BasicRegisterRequest {
 }
 
 interface PasswordLoginRequest extends BaseLoginRequest {
-    loginType: 'password';
+    username: string;
     password: string;
     captcha: string;
     smsCode?: never;
@@ -25,7 +23,7 @@ interface PasswordLoginRequest extends BaseLoginRequest {
 }
 
 interface SmsLoginRequest extends BaseLoginRequest {
-    loginType: 'sms'
+    phoneNumber: string;
     smsCode: string;
     password?: string;
     captcha?: never;
@@ -33,18 +31,17 @@ interface SmsLoginRequest extends BaseLoginRequest {
 }
 
 interface EmailLoginRequest extends BaseLoginRequest {
-    loginType: 'email';
+    email: string;
     emailCode: string;
     password?: never;
     captcha?: never;
     smsCode?: never;
 }
 
-export type LoginType = 'password' | 'email' | 'sms'
 export type LoginRequest = PasswordLoginRequest | EmailLoginRequest | SmsLoginRequest;
 export type RegisterRequest = BasicRegisterRequest | FullRegisterRequest;
 export type SendCodeType = {
-    phoneNumber?: string;
+    phone?: string;
     email?: string;
     purpose: 'login' | 'register' | 'resetPassword'
 }

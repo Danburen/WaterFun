@@ -1,3 +1,6 @@
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+
 interface access {
     token: string;
     expire: number;
@@ -33,8 +36,7 @@ export const useAuthStore = defineStore('accessStore', ()=>{
         accessData,
         isValid,
     }
-},{
-    persist: process.client ? {
+},{    persist: import.meta.client ? {
         storage: sessionStorage
     } : false
 })
