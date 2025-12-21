@@ -47,40 +47,40 @@ public class RSAJwtTokenService implements AuthTokenService {
     }
 
     @Override
-    public TokenResult generateStoreNewAndRevokeOthers(Long userId, String deviceId) {
+    public TokenResult generateStoreNewAndRevokeOthers(Long userUid, String deviceId) {
         String jti = UUID.randomUUID().toString();
         Map<String, Object> claims = new HashMap<>();
-        claims.put(Claims.SUBJECT,String.valueOf(userId));
+        claims.put(Claims.SUBJECT,String.valueOf(userUid));
         claims.put(Claims.ID,jti);
         claims.put("did", deviceId);
 
         Duration expire = Duration.ofSeconds(accessTokenExpire);
         TokenResult result = rsaJwtUtil.generateToken(claims,expire);
         // Store the access token jti to redis repository
-        redisHelper.set(redisHelper.buildKeys(ACCESS_TOKEN_JTI, userId.toString(),deviceId),jti,expire);
+        redisHelper.set(redisHelper.buildKeys(ACCESS_TOKEN_JTI, userUid.toString(),deviceId),jti,expire);
 
         // Revoke other access tokens and device
-        List<String>  userDevices = deviceService.getUserDeviceIds(userId);
+        List<String>  userDevices = deviceService.getUserDeviceIds(userUid);
         for (String did : userDevices) {
             if(did.equals(deviceId)) continue; // skip current device
-            redisHelper.del(redisHelper.buildKeys(ACCESS_TOKEN_JTI, userId.toString(),did));
-            deviceService.removeUserDevice(userId,did);
+            redisHelper.del(redisHelper.buildKeys(ACCESS_TOKEN_JTI, userUid.toString(),did));
+            deviceService.removeUserDevice(userUid,did);
         }
         return result;
     }
 
     /**
      * Generate and store refresh token
-     * @param userId the user ID
+     * @param userUid the user ID
      * @param deviceId the identify of device
      * @param expireInSeconds expiration in seconds
      * @return Token result
      */
     @Override
-    public TokenResult generateAndStoreRefreshToken(long userId, String deviceId, long expireInSeconds) {
+    public TokenResult generateAndStoreRefreshToken(long userUid, String deviceId, long expireInSeconds) {
         String refreshToken = UUID.randomUUID().toString();
         redisHelper.set(redisHelper.buildKeys(REFRESH_TOKEN_KEY,refreshToken),
-                gson.toJson(Map.of("userId",userId,
+                gson.toJson(Map.of("userUid",userUid,
                         "did",deviceId)),
                 Duration.ofSeconds(expireInSeconds));
 //        log.info("Refresh token: {}", refreshToken);
@@ -88,18 +88,18 @@ public class RSAJwtTokenService implements AuthTokenService {
     }
 
     @Override
-    public TokenResult generateAndStoreRefreshToken(long userId, String deviceId) {
-        return generateAndStoreRefreshToken(userId,deviceId,refreshTokenExpire);
+    public TokenResult generateAndStoreRefreshToken(long userUid, String deviceId) {
+        return generateAndStoreRefreshToken(userUid,deviceId,refreshTokenExpire);
     }
 
     @Override
-    public TokenResult RegenerateRefreshToken(String oldRefreshToken, long userId, String deviceId) {
+    public TokenResult RegenerateRefreshToken(String oldRefreshToken, long userUid, String deviceId) {
         long restExpire = redisHelper.getExpire(redisHelper.buildKeys(REFRESH_TOKEN_KEY,oldRefreshToken));
-        return generateAndStoreRefreshToken(userId,deviceId,restExpire);
+        return generateAndStoreRefreshToken(userUid,deviceId,restExpire);
     }
 
     /**
-     * Validates the refresh tokenValue and returns the userId if valid.
+     * Validates the refresh tokenValue and returns the userUid if valid.
      * <p><b>Refresh Token will be removed </b>after validateAndRemove</p>
      * @param refreshToken the refresh tokenValue to validateAndRemove
      * @return Long of <b>UserID</b> if the tokenValue is valid
@@ -111,23 +111,23 @@ public class RSAJwtTokenService implements AuthTokenService {
         if (jsonRes == null) { // MISSING Refresh token
             throw new BusinessException(BaseResponseCode.REAUTHENTICATE_REQUIRED);
         }
-        long userId = Double.valueOf((double)gson.fromJson(jsonRes, Map.class).get("userId")).longValue();
+        long userUid = Double.valueOf((double)gson.fromJson(jsonRes, Map.class).get("userUid")).longValue();
         String originalDid = (String) gson.fromJson(jsonRes, Map.class).get("did");
-        String did = deviceService.generateDeviceId(userId,dfp);
+        String did = deviceService.generateDeviceId(userUid,dfp);
         if(! did.equals(originalDid)) { // Device Fingerprint changed
-            log.info("User ID: {} , device Fingerprint changed: {} -> {}",userId,originalDid,dfp);
+            log.info("User ID: {} , device Fingerprint changed: {} -> {}",userUid,originalDid,dfp);
         }
-        return new RefreshTokenPayload(userId,did);
+        return new RefreshTokenPayload(userUid,did);
     }
 
     @Override
     public void validateAccessTokenAndRejectOld(Claims claims) {
-        String userId = claims.getSubject();
+        String userUid = claims.getSubject();
         String iss = claims.getIssuer();
         String jti = claims.getId();
         String did = (String) claims.get("did");
         if(iss == null || !iss.equals(rsaJwtUtil.getIssuer())) throw new JwtException("Invalid issuer");
-        String jtiKey = redisHelper.buildKeys(redisHelper.buildKeys(ACCESS_TOKEN_JTI, userId,did));
+        String jtiKey = redisHelper.buildKeys(redisHelper.buildKeys(ACCESS_TOKEN_JTI, userUid,did));
         String savedJti = redisHelper.getValue(jtiKey);
         if(savedJti == null || !savedJti.equals(jti)){
             throw new JwtException("Invalid token ID");
@@ -145,12 +145,12 @@ public class RSAJwtTokenService implements AuthTokenService {
     }
 
     @Override
-    public void removeAccessToken(Long userId, String deviceId) {
-        redisHelper.del(redisHelper.buildKeys(ACCESS_TOKEN_JTI, userId.toString(),deviceId));
+    public void removeAccessToken(Long userUid, String deviceId) {
+        redisHelper.del(redisHelper.buildKeys(ACCESS_TOKEN_JTI, userUid.toString(),deviceId));
     }
 
     @Override
-    public Long getCurrentUserId() {
+    public Long getCurrentUserUid() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();

@@ -109,4 +109,8 @@ public class Post {
     )
     private Set<Tag> tags = new HashSet<>();
 
+    @NotNull
+    @Column(name = "pid", nullable = false)
+    private Long pid;
+
 }

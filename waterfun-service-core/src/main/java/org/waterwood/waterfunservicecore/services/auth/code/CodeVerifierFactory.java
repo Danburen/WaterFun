@@ -1,5 +1,6 @@
 package org.waterwood.waterfunservicecore.services.auth.code;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import org.waterwood.waterfunservicecore.api.VerifyChannel;
@@ -18,7 +19,7 @@ public class CodeVerifierFactory {
                 .collect(Collectors.toUnmodifiableMap(CodeVerifier::channel, Function.identity()));
     }
 
-    public CodeVerifier of(VerifyChannel channel) {
-        return channel == null ? null : verifierMap.get(channel);
+    public CodeVerifier of(@NotNull VerifyChannel channel) {
+        return verifierMap.get(channel);
     }
 }

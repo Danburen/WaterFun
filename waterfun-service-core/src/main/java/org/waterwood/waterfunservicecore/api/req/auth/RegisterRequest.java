@@ -16,10 +16,6 @@ public class RegisterRequest {
     @NotBlank(message = "{user.valid.username_invalid}")
     @Pattern(regexp = "^[0-9a-zA-Z_]+$", message = "{user.valid.username_invalid}")
     private String username;
-    @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
-            message = "{user.password.pattern}"
-    )
     @StrongPassword
     private String password;
     @Email(message = "{verification.email_address.invalid")

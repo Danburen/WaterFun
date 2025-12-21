@@ -16,7 +16,7 @@ public class StrongPasswordValidator implements ConstraintValidator<StrongPasswo
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) {
+        if (value == null || value.isEmpty()) {
             return true;
         }
         return PASSWORD_PATTERN.matcher(value).matches();

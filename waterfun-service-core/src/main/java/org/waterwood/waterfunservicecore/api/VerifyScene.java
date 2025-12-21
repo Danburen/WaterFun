@@ -10,9 +10,9 @@ public enum VerifyScene {
     RESET_PASSWORD,
     CHANGE_EMAIL,
     CHANGE_PHONE,
-    ACTIVATE_EMAIL,
-    VERIFY,
-    BIND_EMAIL;
+    ACTIVATE,
+    BIND_EMAIL,
+    UNBIND;
     @JsonValue
     public String getValue() { return name().toLowerCase(); }
     @JsonCreator

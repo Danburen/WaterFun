@@ -9,5 +9,5 @@ import java.util.List;
 public interface TagRepository extends JpaRepository<Tag, Integer>, SlugUniquenessChecker {
   boolean existsTagBySlug(String slug);
 
-  List<Tag> findAllByCreatorId(Long currentUserId);
+  List<Tag> findAllByCreatorId(Long currentUserUid);
 }

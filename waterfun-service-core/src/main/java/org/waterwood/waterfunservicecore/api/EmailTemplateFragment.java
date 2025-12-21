@@ -9,7 +9,8 @@ import java.util.stream.Collectors;
 
 @Getter
 public enum EmailTemplateFragment {
-    VERIFY_CODE("verify_code","email.subject.verify"),;
+    VERIFY_CODE("verify_code","email.subject.verify"),
+    ACTIVATE_EMAIL("verify_code","email.subject.profile.completion");
     private final String templateKey;
     private final String subject;
     EmailTemplateFragment(String templateKey, String subject) {
@@ -19,7 +20,11 @@ public enum EmailTemplateFragment {
 
     // Use switch if needed. as we have only one scene
     private final Set<VerifyScene> scenes =
-            Set.of(VerifyScene.LOGIN, VerifyScene.REGISTER, VerifyScene.SET_PASSWORD, VerifyScene.CHANGE_EMAIL, VerifyScene.RESET_PASSWORD);
+            switch (this){
+                case VERIFY_CODE -> Set.of(VerifyScene.LOGIN, VerifyScene.REGISTER, VerifyScene.SET_PASSWORD, VerifyScene.CHANGE_EMAIL, VerifyScene.RESET_PASSWORD);
+                case ACTIVATE_EMAIL -> Set.of(VerifyScene.ACTIVATE);
+                default -> Set.of();
+            };
 
     private static final Map<VerifyScene, EmailTemplateFragment> SCENE_MAP =
             Arrays.stream(values())

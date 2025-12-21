@@ -36,7 +36,7 @@ public class RedisHelper implements RedisHelperInterface {
     }
 
     public void set(String key, String value, Duration expire) {
-//        log.info("redis set value. key: {}, value: {}",getCurrentKey(key), value);
+        //log.info("redis set value. key: {}, value: {}",getCurrentKey(key), value);
         redisTemplate.opsForValue().set(getCurrentKey(key), value, expire);
     }
 
@@ -70,11 +70,11 @@ public class RedisHelper implements RedisHelperInterface {
 
     public <T> boolean validateAndRemove(String pKey, T value) {
         String stored = getValue(pKey);
-//        log.info("key: {}, stored: {}, value: {}, equal:{}",
-//                getCurrentKey(pKey) ,
-//                StringUtil.noNullStringArray(stored),
-//                value,
-//                stored != null && stored.equals(value));
+        log.info("key: {}, stored: {}, value: {}, equal:{}",
+                getCurrentKey(pKey) ,
+                StringUtil.noNullStringArray(stored),
+                value,
+                stored != null && stored.equals(value));
         if (stored == null || !stored.equals(value)) {
             return false;
         }

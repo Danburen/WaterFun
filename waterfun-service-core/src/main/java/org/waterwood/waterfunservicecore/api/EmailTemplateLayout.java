@@ -18,7 +18,9 @@ public enum EmailTemplateLayout {
         this.templateKey = templateKey;
     }
     private final Set<VerifyScene> scenes =
-            Set.of(VerifyScene.LOGIN, VerifyScene.REGISTER, VerifyScene.SET_PASSWORD, VerifyScene.CHANGE_EMAIL, VerifyScene.RESET_PASSWORD);
+            Set.of(VerifyScene.LOGIN, VerifyScene.REGISTER, VerifyScene.SET_PASSWORD,
+                    VerifyScene.CHANGE_EMAIL, VerifyScene.RESET_PASSWORD, VerifyScene.CHANGE_PHONE,
+                    VerifyScene.ACTIVATE);
 
     private static final Map<VerifyScene, EmailTemplateLayout> SCENE_MAP =
             Arrays.stream(values())

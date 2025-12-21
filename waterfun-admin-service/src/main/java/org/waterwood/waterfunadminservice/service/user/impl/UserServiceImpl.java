@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
         );
         if(checkPassword(newPwd, u.getPasswordHash())) throw  new BusinessException(BaseResponseCode.PASSWORD_TWO_PASSWORD_MUST_DIFFERENT);
         if(!checkPassword(oldPwd, u.getPasswordHash())) throw new BusinessException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
-        userRepository.updatePassword(u.getId(), encoder.encode(newPwd));
+        userRepository.updatePassword(u.getUid(), encoder.encode(newPwd));
     }
 
     @Override

@@ -13,8 +13,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
     @Modifying
-    @Query("UPDATE User u SET u.passwordHash = :passwordHash WHERE u.id = :userId")
-    int updatePassword(@Param("userId") Long userId,@Param("passwordHash") String passwordHash);
+    @Query("UPDATE User u SET u.passwordHash = :passwordHash WHERE u.uid = :userUid")
+    int updatePassword(@Param("userUid") Long userUid,@Param("passwordHash") String passwordHash);
 
     List<User> getUsersById(Long id);
 

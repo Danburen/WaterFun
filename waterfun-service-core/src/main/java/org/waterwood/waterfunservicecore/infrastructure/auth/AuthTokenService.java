@@ -11,17 +11,17 @@ import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPay
 public interface AuthTokenService {
     /**
      * Generate and store access token(jti) to cache service.
-     * @param userId the user ID
+     * @param userUid the user ID
      * @param deviceId device uid
      * @return {@link TokenResult}
      */
-    TokenResult generateStoreNewAndRevokeOthers(Long userId, String deviceId);
+    TokenResult generateStoreNewAndRevokeOthers(Long userUid, String deviceId);
 
-    TokenResult generateAndStoreRefreshToken(long userId, String deviceId, long expireInSeconds);
+    TokenResult generateAndStoreRefreshToken(long userUid, String deviceId, long expireInSeconds);
 
-    TokenResult generateAndStoreRefreshToken(long userId, String deviceId);
+    TokenResult generateAndStoreRefreshToken(long userUid, String deviceId);
 
-    TokenResult RegenerateRefreshToken(String oldRefreshToken, long userId, String deviceId);
+    TokenResult RegenerateRefreshToken(String oldRefreshToken, long userUid, String deviceId);
 
     RefreshTokenPayload validateRefreshToken(String refreshToken, String dfp);
 
@@ -35,7 +35,7 @@ public interface AuthTokenService {
 
     void removeRefreshToken(String refreshToken);
 
-    void removeAccessToken(Long userId, String deviceId);
+    void removeAccessToken(Long userUid, String deviceId);
 
-    Long getCurrentUserId();
+    Long getCurrentUserUid();
 }

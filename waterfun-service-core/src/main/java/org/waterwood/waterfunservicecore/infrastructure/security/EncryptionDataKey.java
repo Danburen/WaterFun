@@ -13,9 +13,11 @@ import java.time.Instant;
 @Table(name = "encryption_data_key")
 public class EncryptionDataKey {
     @Id
-    @Column(name = "id", nullable = false, length = 50)
-    private String id;
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
+    @Column(name = "key_id", nullable = false, length = 50)
+    private String keyId;
     @Column(name = "encrypted_key", nullable = false, length = 512)
     private String encryptedKey;
 

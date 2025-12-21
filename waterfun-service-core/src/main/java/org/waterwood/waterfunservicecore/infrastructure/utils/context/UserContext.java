@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @RequiredArgsConstructor(staticName = "of")
 public class UserContext implements UserDetails {
-    private final Long userId;
+    private final Long userUid;
     private final Set<String> roles;
 
     @Override
@@ -21,7 +21,7 @@ public class UserContext implements UserDetails {
     }
 
     @Override public String getPassword() { return null; }
-    @Override public String getUsername() { return userId.toString(); }
+    @Override public String getUsername() { return userUid.toString(); }
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }

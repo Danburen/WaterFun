@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.services.storage;
+package org.waterwood.waterfunservicecore.services.sys.storage;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.http.HttpMethodName;

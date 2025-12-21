@@ -56,8 +56,8 @@ public final class PostSpec {
                 preds.add(tagJoin.get("id").in(tagIds));
             }
 
-            // Current user id
-            preds.add(criteriaBuilder.equal(root.get("author").get("id"), AuthContextHelper.getCurrentUserId()));
+            // Current user uid
+            preds.add(criteriaBuilder.equal(root.get("author").get("uid"), AuthContextHelper.getCurrentUserUid()));
             return criteriaBuilder.and(preds.toArray(new Predicate[0]));
         };
     }
