@@ -17,13 +17,13 @@ import java.time.Instant;
 @NoArgsConstructor
 public class UserDatum {
     @Id
-    @Column(name = "user_id", nullable = false)
-    private Long id;
+    @Column(name = "user_uid", nullable = false)
+    private Long uid;
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_uid", nullable = false)
     private User user;
 
     @ColumnDefault("0")
@@ -36,10 +36,6 @@ public class UserDatum {
 
     @Column(name = "encryption_key_id", nullable = false, length = 50)
     private String encryptionKeyId;
-
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at")
-    private Instant createdAt;
 
     @Column(name = "updated_at")
     private Instant updatedAt;
@@ -56,9 +52,17 @@ public class UserDatum {
     @Column(name = "phone_hash", length = 65)
     private String phoneHash;
 
+    @ColumnDefault("CURRENT_TIMESTAMP(3)")
+    @Column(name = "created_at")
+    private Instant createAt;
+
+    @Column(name = "email_expire_at")
+    @ColumnDefault("null")
+    private Instant emailExpireAt;
+
     public UserDatum(User user, String email, String phone, String encryptionKeyId) {
         this.user = user;
-        this.id = user.getId();
+        this.uid = user.getUid();
         this.encryptionKeyId = encryptionKeyId;
         this.emailVerified = false;
         this.phoneVerified = false;

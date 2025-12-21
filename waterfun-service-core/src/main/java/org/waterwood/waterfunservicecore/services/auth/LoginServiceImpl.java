@@ -76,15 +76,14 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public boolean logout(String refreshToken, String dfp) {
         RefreshTokenPayload payload = tokenService.validateRefreshToken(refreshToken,dfp);
-            tokenService.removeAccessToken(payload.userId(), payload.deviceId());
+            tokenService.removeAccessToken(payload.userUid(), payload.deviceId());
             tokenService.removeRefreshToken(refreshToken);
         return true;
     }
 
     @Override
     public User login(VerifyCodeDto dto, String codeKey) {
-        EncryptionDataKey key= encryptedKeyService.pickEncryptionKey(1)
-                .orElseThrow(() -> new ServiceException("Couldn't pick encryption key"));
+        EncryptionDataKey key= encryptedKeyService.pickEncryptionKey(1);
         if(dto.getScene() != VerifyScene.LOGIN){
             throw new BusinessException(BaseResponseCode.INVALID_VERIFY_SCENE);
         }

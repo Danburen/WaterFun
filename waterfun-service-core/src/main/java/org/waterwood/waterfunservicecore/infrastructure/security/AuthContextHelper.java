@@ -28,10 +28,10 @@ public final class AuthContextHelper {
         return  jwt.getClaim(claimName);
     }
 
-    public static Long getCurrentUserId() {
+    public static Long getCurrentUserUid() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null && authentication.getPrincipal() instanceof UserContext ctx){
-            return ctx.getUserId();
+            return ctx.getUserUid();
         }else{
             throw new BusinessException(BaseResponseCode.HTTP_UNAUTHORIZED);
         }

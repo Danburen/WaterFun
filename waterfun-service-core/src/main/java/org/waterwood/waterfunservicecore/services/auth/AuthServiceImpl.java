@@ -30,10 +30,10 @@ public class AuthServiceImpl implements AuthService {
     private final CodeSenderFactory codeSenderFactory;
 
     @Override
-    public TokenPair createNewTokens(long userId, String deviceFingerprint) {
-        String deviceId = deviceService.generateAndStoreDeviceId(userId, deviceFingerprint);
-        TokenResult accessToken = tokenService.generateStoreNewAndRevokeOthers(userId, deviceId);
-        TokenResult refreshToken = tokenService.generateAndStoreRefreshToken(userId, deviceId);
+    public TokenPair createNewTokens(long userUid, String deviceFingerprint) {
+        String deviceId = deviceService.generateAndStoreDeviceId(userUid, deviceFingerprint);
+        TokenResult accessToken = tokenService.generateStoreNewAndRevokeOthers(userUid, deviceId);
+        TokenResult refreshToken = tokenService.generateAndStoreRefreshToken(userUid, deviceId);
         return new TokenPair(
                 accessToken.tokenValue(), accessToken.expire(),
                 refreshToken.tokenValue(), refreshToken.expire());
@@ -52,10 +52,10 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthException(BaseResponseCode.REAUTHENTICATE_REQUIRED);
         }
         RefreshTokenPayload payload = tokenService.validateRefreshToken(refreshToken, dfp);
-        long userId = payload.userId();
+        long userUid = payload.userUid();
         String deviceId = payload.deviceId();
-        return userRepository.findById(userId).map(_ ->
-                        tokenService.RegenerateRefreshToken(refreshToken, userId, deviceId))
+        return userRepository.findById(userUid).map(_ ->
+                        tokenService.RegenerateRefreshToken(refreshToken, userUid, deviceId))
                 .orElseThrow(() -> new AuthException(BaseResponseCode.USER_NOT_FOUND));
     }
 }

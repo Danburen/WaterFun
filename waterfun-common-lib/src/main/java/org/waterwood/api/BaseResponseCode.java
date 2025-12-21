@@ -42,7 +42,10 @@ public enum BaseResponseCode implements ResponseCode {
     CAPTCHA_INVALID("verify.captcha.incorrect"),
     USER_ALREADY_EXISTS("user.verify.already_exists"),
     USER_NOT_FOUND("user.verify.not_found"),
-    EMAIL_INVALID("verify.email.invalid"),
+    EMAIL_INVALID("email.verify.invalid"),
+    EMAIL_NOT_FOUND("email.not.found"),
+    VERIFY_TARGET_UNSUPPORTED("verify.target.unsupported"),
+    TWO_VALUE_MUST_DIFFERENT("verify.two_value_must_diff"),
 
 
 

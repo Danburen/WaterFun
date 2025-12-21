@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.services.storage;
+package org.waterwood.waterfunservicecore.services.sys.storage;
 
 import org.waterwood.waterfunservicecore.api.PostPolicyDto;
 import org.waterwood.waterfunservicecore.api.resp.CloudResourcePresignedUrlResp;

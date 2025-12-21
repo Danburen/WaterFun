@@ -41,20 +41,20 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public String generateAndStoreDeviceId(Long userId, String dfp) {
-        String deviceId = this.generateDeviceId(userId,dfp);
-        redisHelper.hSet(userId.toString(),deviceId, String.valueOf(System.currentTimeMillis()));
+    public String generateAndStoreDeviceId(Long userUid, String dfp) {
+        String deviceId = this.generateDeviceId(userUid,dfp);
+        redisHelper.hSet(userUid.toString(),deviceId, String.valueOf(System.currentTimeMillis()));
         return deviceId;
     }
 
     @Override
-    public void removeUserDevice(Long userId, String deviceId){
-        redisHelper.hDel(userId.toString(),deviceId);
+    public void removeUserDevice(Long userUid, String deviceId){
+        redisHelper.hDel(userUid.toString(),deviceId);
     }
 
     @Override
-    public String generateDeviceId(long userId, String dfp){
-        return HashUtil.hashWithSalt(dfp+userId, deviceHashSalt);
+    public String generateDeviceId(long userUid, String dfp){
+        return HashUtil.hashWithSalt(dfp+userUid, deviceHashSalt);
     }
 
     @Async
@@ -63,12 +63,12 @@ public class DeviceServiceImpl implements DeviceService {
         Page<User> users = userRepository.findAll(PageRequest.of(0, batchSize));
         while(!users.getContent().isEmpty()){
             users.forEach(user->{
-                String userId = user.getId().toString();
-                Map<Object,Object> devices = redisHelper.hGetAll(userId);
+                String userUid = user.getUid().toString();
+                Map<Object,Object> devices = redisHelper.hGetAll(userUid);
                 // Get all the devices that are older than the max expire time
                 devices.entrySet().removeIf(
                         entry-> (System.currentTimeMillis() - (long) entry.getValue()) < deviceExpireMaxTimeMillis);
-                redisHelper.hDel(userId, devices.keySet().toArray(new String[0]));
+                redisHelper.hDel(userUid, devices.keySet().toArray(new String[0]));
             });
         }
     }
@@ -80,7 +80,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public List<String> getUserDeviceIds(Long userId) {
-        return redisHelper.hGetAll(userId.toString()).keySet().stream().map(Object::toString).toList();
+    public List<String> getUserDeviceIds(Long userUid) {
+        return redisHelper.hGetAll(userUid.toString()).keySet().stream().map(Object::toString).toList();
     }
 }

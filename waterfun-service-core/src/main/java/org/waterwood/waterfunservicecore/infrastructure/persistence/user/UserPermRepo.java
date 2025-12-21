@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserPermRepo extends JpaRepository<UserPermission,Long> {
-    List<UserPermission> findByUserId(Long userId);
+    List<UserPermission> findByUserUid(Long userUid);
     List<UserPermission> findByPermissionId(Integer permissionId);
-    Optional<UserPermission> findByUserIdAndPermissionId(Long userId, Integer permissionId);
-    void deleteByUserIdAndPermissionId(Long userId, Integer permissionId);
-    boolean existsByUserIdAndPermissionId(Long userId, Integer permissionId);
+    Optional<UserPermission> findByUserUidAndPermissionId(Long userUid, Integer permissionId);
+    void deleteByUserUidAndPermissionId(Long userUid, Integer permissionId);
+    boolean existsByUserUidAndPermissionId(Long userUid, Integer permissionId);
 }

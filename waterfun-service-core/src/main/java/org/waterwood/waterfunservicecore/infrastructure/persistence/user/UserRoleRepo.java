@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRoleRepo extends JpaRepository<UserRole, Long> {
-    List<UserRole> findByUserId(Long userId);
+    List<UserRole> findByUserUid(Long userUid);
     List<UserRole> findByRoleId(Integer roleId);
-    Optional<UserRole> findByUserIdAndRoleId(Long userId, Integer roleId);
-    boolean existsByUserIdAndRoleId(Long userId, Integer roleId);
+    Optional<UserRole> findByUserUidAndRoleId(Long userUid, Integer roleId);
+    boolean existsByUserUidAndRoleId(Long userUid, Integer roleId);
 
-    void deleteByUserId(Long userId);
+    void deleteByUserUid(Long userUid);
 
-    void deleteByUserIdAndRoleIdIn(long attr0, List<Integer> attr1);
+    void deleteByUserUidAndRoleIdIn(long attr0, List<Integer> attr1);
 }

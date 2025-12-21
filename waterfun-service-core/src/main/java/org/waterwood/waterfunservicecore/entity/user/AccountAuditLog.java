@@ -20,8 +20,8 @@ public class AccountAuditLog {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "user_uid", nullable = false)
+    private Long userUid;
 
     @Lob
     @Column(name = "action", nullable = false)

@@ -6,11 +6,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.util.List;
 
 public interface DeviceService {
-    String generateAndStoreDeviceId(Long userId, String dfp);
+    String generateAndStoreDeviceId(Long userUid, String dfp);
 
-    void removeUserDevice(Long userId, String deviceId);
+    void removeUserDevice(Long userUid, String deviceId);
 
-    String generateDeviceId(long userId, String dfp);
+    String generateDeviceId(long userUid, String dfp);
 
     @Async
     void cleanZombieDevicesBatch(int batchSize);
@@ -22,8 +22,8 @@ public interface DeviceService {
 
     /**
      * Get user's devices
-     * @param userId the user ID
+     * @param userUid the user ID
      * @return List of device IDs
      */
-    List<String> getUserDeviceIds(Long userId);
+    List<String> getUserDeviceIds(Long userUid);
 }

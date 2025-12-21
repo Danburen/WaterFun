@@ -45,7 +45,7 @@ public final class EncryptionHelper {
             // Create DEK record
             EncryptionDataKey dekKey = new EncryptionDataKey();
             String dekId = "dek-" + java.util.UUID.randomUUID();
-            dekKey.setId(dekId);
+            dekKey.setKeyId(dekId);
             dekKey.setEncryptedKey(Base64.getEncoder().encodeToString(combined));
             dekKey.setAlgorithm("AES");
             dekKey.setKeyLength(256);

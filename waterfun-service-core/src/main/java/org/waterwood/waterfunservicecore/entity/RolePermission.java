@@ -36,4 +36,7 @@ public class RolePermission {
     @Column(name = "created_at")
     private Instant createdAt;
 
+    @Column(name = "update_at")
+    private Instant updateAt;
+
 }

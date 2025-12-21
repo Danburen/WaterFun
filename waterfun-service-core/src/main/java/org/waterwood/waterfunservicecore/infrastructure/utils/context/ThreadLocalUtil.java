@@ -23,11 +23,11 @@ public class ThreadLocalUtil {
     }
 
     /**
-     * Get userId
-     * @return userId
+     * Get userUid
+     * @return userUid
      */
-    public static long getCurrentUserId(){
-        return get().getUserId();
+    public static long getCurrentUserUid(){
+        return get().getUserUid();
     }
 
     /**

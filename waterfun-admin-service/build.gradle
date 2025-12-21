@@ -58,6 +58,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'com.mysql:mysql-connector-j'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation('com.aliyun:dysmsapi20170525:4.1.1') {
         exclude group: 'com.squareup.okhttp3', module: 'okhttp'

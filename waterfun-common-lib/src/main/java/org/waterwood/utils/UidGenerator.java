@@ -5,11 +5,12 @@ public interface UidGenerator {
      * Generate a uid
      * @return uid
      */
-    String generateUid();
+    Long generateUid();
     /**
      * Generate a uid
+     *
      * @param length uid length
      * @return uid
      */
-    String generateUid(int length);
+    Long generateUid(int length);
 }

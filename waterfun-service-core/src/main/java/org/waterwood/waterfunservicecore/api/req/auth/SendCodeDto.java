@@ -2,11 +2,14 @@ package org.waterwood.waterfunservicecore.api.req.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.waterwood.waterfunservicecore.api.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.VerifyScene;
 
 @Data
+@NoArgsConstructor
 public class SendCodeDto {
     @NotBlank(message = "{valid.need_target}")
     private String target;

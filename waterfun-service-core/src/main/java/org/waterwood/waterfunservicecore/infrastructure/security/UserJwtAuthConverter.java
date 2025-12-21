@@ -24,8 +24,8 @@ public class UserJwtAuthConverter implements Converter<Jwt, AbstractAuthenticati
                 .stream().map(r -> "ROLE_" + r)
                 .map(SimpleGrantedAuthority::new)
                 .toList();
-        Long userId = Long.valueOf(source.getSubject());
-        UserContext context = UserContext.of(userId, roles == null ? Set.of() : new HashSet<>(roles) );
+        Long userUid = Long.valueOf(source.getSubject());
+        UserContext context = UserContext.of(userUid, roles == null ? Set.of() : new HashSet<>(roles) );
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(context, null, authorities);
         auth.setDetails(source);
         return auth;

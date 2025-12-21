@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class LoginServiceResponse {
-    private Long userId;
+    private Long userUid;
 }

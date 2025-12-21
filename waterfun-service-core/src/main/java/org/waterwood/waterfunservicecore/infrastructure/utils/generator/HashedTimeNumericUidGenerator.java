@@ -22,12 +22,12 @@ public class HashedTimeNumericUidGenerator implements UidGenerator {
     private int prefix;
     private static final SecureRandom random = new SecureRandom();
     @Override
-    public String generateUid(){
+    public Long generateUid(){
         return generateUid(LENGTH);
     }
 
     @Override
-    public String generateUid(int length) {
+    public Long generateUid(int length) {
         long timestamp = System.currentTimeMillis() - EPOCH;
         String input = timestamp + "-" + random.nextLong();
 
@@ -43,6 +43,6 @@ public class HashedTimeNumericUidGenerator implements UidGenerator {
             result.append(Math.abs(timestamp % 10));
             timestamp /= 10;
         }
-        return result.substring(0, length);
+        return Long.parseLong(result.substring(0, length));
     }
 }
