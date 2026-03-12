@@ -22,13 +22,6 @@ public class ThreadLocalUtil {
         THREAD_LOCAL.set(context);
     }
 
-    /**
-     * Get userUid
-     * @return userUid
-     */
-    public static long getCurrentUserUid(){
-        return get().getUserUid();
-    }
 
     /**
      * Get jwt identify.

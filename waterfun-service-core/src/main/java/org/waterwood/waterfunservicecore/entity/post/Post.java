@@ -113,4 +113,8 @@ public class Post {
     @Column(name = "pid", nullable = false)
     private Long pid;
 
+    @ColumnDefault("0")
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
 }

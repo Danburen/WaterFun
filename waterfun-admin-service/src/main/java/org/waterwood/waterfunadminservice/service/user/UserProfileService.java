@@ -25,5 +25,4 @@ public interface UserProfileService {
      */
     UserProfile getUserProfile();
 
-    void updateAvatar(String avatarUrl);
 }

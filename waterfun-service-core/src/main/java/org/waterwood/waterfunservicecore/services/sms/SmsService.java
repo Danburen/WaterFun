@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface SmsService {
     /**
-     * Send sms code to a phone number with template
+     * Send sms code to a phone number segment template
      * @param phoneNumber target
      * @param templateCode template code
      * @param params params place to template

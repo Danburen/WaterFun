@@ -24,7 +24,7 @@ public class RsaJwtUtil {
         this.privateKey = privateKey;
     }
 
-    public TokenResult generateToken(Map<String,Object> claims, Duration dur){
+    public TokenResult generateToken(Map<String, String> claims, Duration dur){
         Date expDate = new Date(System.currentTimeMillis() + dur.toMillis());
 
         return new TokenResult(Jwts.builder()
@@ -47,18 +47,10 @@ public class RsaJwtUtil {
     public Claims parseToken(String JwToken) throws JwtException {
         return Jwts.parser()
                 .verifyWith(publicKey)
+                .requireIssuer(JWT_ISSUER)
                 .build()
                 .parseSignedClaims(JwToken)
                 .getPayload();
-    }
-
-    public boolean validateToken(String compactJws){
-        try {
-            Jwts.parser().verifyWith(publicKey).build().parseSignedClaims(compactJws);
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
     }
 
     public String getIssuer() {

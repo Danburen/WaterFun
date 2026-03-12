@@ -16,6 +16,7 @@ export const routes: RouteRecordRaw[] = [
         name: "login",
         meta: {
             public: true,
+            layout: false,
         }
     },
     {
@@ -27,7 +28,17 @@ export const routes: RouteRecordRaw[] = [
                 path: 'user',
                 name: 'userManager',
                 meta: { locale:'system.user' },
-                component: () => import("@/views/System/UserManagerView.vue")
+                component: () => import("@/views/System/user/UserManagerView.vue")
+            },
+            {
+                path: 'user/:uid/edit',
+                name: 'userEdit',
+                component: () => import('@/views/System/user/UserEdit.vue'),
+                props: true,
+                meta: { 
+                    locale: 'user.edit',
+                    isDetail: true,
+                }
             },
             {
                 path: 'role',

@@ -82,7 +82,10 @@ public enum BaseResponseCode implements ResponseCode {
 
     INVALID_VERIFY_SCENE("verify.invalid.scene"),
     CHANNEL_NOT_SUPPORT("error.channel.not.supported" ),
-    OLD_PASSWORD_INCORRECT("user.verify.old_password_incorrect" ),;
+    OLD_PASSWORD_INCORRECT("user.verify.old_password_incorrect" ),
+    NEED_FILE_TYPE("valid.file_type_required"),
+    USER_ROLE_NOT_FOUND("user.role.not_found"),
+    USER_PERMISSION_NOT_FOUND("user.permission.not_found");
     private final String code;
     // private final String defaultMessage;
 

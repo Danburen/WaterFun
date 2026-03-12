@@ -7,25 +7,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.utils.CollectionUtil;
-import org.waterwood.waterfunadminservice.dto.request.user.UserPwdUpdateRequestBody;
-import org.waterwood.waterfunadminservice.dto.request.user.UserRoleItemDto;
-import org.waterwood.waterfunservicecore.entity.Permission;
+import org.waterwood.waterfunadminservice.api.request.user.UserDatumUpdateAReq;
+import org.waterwood.waterfunadminservice.api.request.user.UserInfoAUpdateReq;
+import org.waterwood.waterfunadminservice.api.request.user.UserProfileUpdateAReq;
+import org.waterwood.waterfunadminservice.api.request.user.UserRoleItemDto;
+import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
+import org.waterwood.waterfunadminservice.infrastructure.mapper.UserAdminMapper;
+import org.waterwood.waterfunadminservice.infrastructure.mapper.UserCounterMapper;
+import org.waterwood.waterfunadminservice.infrastructure.mapper.UserMapper;
+import org.waterwood.waterfunadminservice.infrastructure.mapper.UserProfileMapper;
+import org.waterwood.waterfunservicecore.api.ToDictOption;
+import org.waterwood.waterfunservicecore.api.resp.AccountResp;
 import org.waterwood.waterfunservicecore.entity.Role;
-import org.waterwood.waterfunservicecore.entity.user.AccountStatus;
-import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.waterfunservicecore.entity.user.UserPermission;
-import org.waterwood.waterfunservicecore.entity.user.UserRole;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.waterfunservicecore.entity.user.*;
+import org.waterwood.common.exceptions.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRoleRepo;
-import org.waterwood.waterfunservicecore.infrastructure.security.AuthContextHelper;
 import org.waterwood.waterfunadminservice.service.role.RoleServiceImpl;
 import org.waterwood.waterfunadminservice.service.user.UserService;
+import org.waterwood.waterfunservicecore.services.user.*;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,18 +47,28 @@ public class UserServiceImpl implements UserService {
     private final RoleRepo roleRepo;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final UserCoreService userCoreService;
+    private final UserProfileCoreService userProfileCoreService;
+    private final UserDatumCoreService userDatumCoreService;
+    private final UserCounterCoreService userCounterCoreService;
+    private final UserMapper userMapper;
+    private final UserProfileMapper userProfileMapper;
+    private final UserCounterMapper userCounterMapper;
+    private final UserRoleCoreService userRoleCoreService;
+    private final UserPermissionCoreService userPermissionCoreService;
+    private final UserAdminMapper userAdminMapper;
 
     @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(
-                ()-> new BusinessException(BaseResponseCode.USER_NOT_FOUND)
+                ()-> new BizException(BaseResponseCode.USER_NOT_FOUND)
         );
     }
 
     @Override
     public User getUserById(long id) {
         return  userRepository.findById(id).orElseThrow(
-                ()-> new BusinessException(BaseResponseCode.USER_NOT_FOUND)
+                ()-> new BizException(BaseResponseCode.USER_NOT_FOUND)
         );
     }
 
@@ -83,10 +97,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsById(userId);
     }
 
-    private boolean checkPassword(String rawPassword, String hashedPassword) {
-        return encoder.matches(rawPassword, hashedPassword);
-    }
-
     @Override
     public User addUser(User user) {
         return userRepository.save(user);
@@ -97,43 +107,6 @@ public class UserServiceImpl implements UserService {
         return addUser(user);
     }
 
-    @Transactional
-    @Override
-    public void updatePwd(UserPwdUpdateRequestBody userPwdUpdateRequestBody) {
-        String oldPwd = userPwdUpdateRequestBody.getOldPwd();
-        String newPwd = userPwdUpdateRequestBody.getNewPwd();
-        String confirmPwd = userPwdUpdateRequestBody.getConfirmPwd();
-        if(oldPwd.equals(newPwd)) throw new BusinessException(BaseResponseCode.PASSWORD_TWO_PASSWORD_MUST_DIFFERENT);
-        if(! newPwd.equals(confirmPwd)) throw new BusinessException(BaseResponseCode.PASSWORD_TWO_PASSWORD_NOT_EQUAL);
-        User u = userRepository.findUserById(AuthContextHelper.getCurrentUserId()).orElseThrow(
-                ()-> new BusinessException(BaseResponseCode.USER_NOT_FOUND)
-        );
-        if(checkPassword(newPwd, u.getPasswordHash())) throw  new BusinessException(BaseResponseCode.PASSWORD_TWO_PASSWORD_MUST_DIFFERENT);
-        if(!checkPassword(oldPwd, u.getPasswordHash())) throw new BusinessException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
-        userRepository.updatePassword(u.getUid(), encoder.encode(newPwd));
-    }
-
-    @Override
-    public Set<Permission> getUserPermissions(long userId) {
-        List<Role> roles = userRoleRepo.findByUserId(userId).stream().map(UserRole::getRole).toList();
-
-        Set<Permission> rolePermission = roles.stream()
-                .flatMap(role-> roleService.getPermissions(role.getId()).stream())
-                .collect(Collectors.toSet());
-
-        Set<Permission> userPermission = userPermRepo.findByUserId(userId).stream()
-                .map(UserPermission::getPermission).collect(Collectors.toSet());
-        HashSet<Permission> permissions = new HashSet<>();
-        permissions.addAll(rolePermission);
-        permissions.addAll(userPermission);
-        return permissions;
-    }
-
-    @Override
-    public Set<Role> getRoles(long userId) {
-        return userRoleRepo.findByUserId(userId).stream().map(UserRole::getRole).collect(Collectors.toSet());
-    }
-
     @Override
     @Transactional
     public void assignRoles(long id, List<UserRoleItemDto> userRoleItemDtos) {
@@ -142,9 +115,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void replace(long id, List<UserRoleItemDto> replacements) {
-        User user = this.getUserById(id);
-        userRoleRepo.deleteByUserId(id);
+    public void replace(long Uid, List<UserRoleItemDto> replacements) {
+        User user = this.getUserById(Uid);
+        userRoleRepo.deleteByUserUid(Uid);
         if(CollectionUtil.isEmpty(replacements)) return;
         userRoleRepo.saveAll(toUserRoles(user, replacements, false));
     }
@@ -153,11 +126,56 @@ public class UserServiceImpl implements UserService {
     public void change(long id, List<UserRoleItemDto> adds, List<Integer> deletePermIds) {
         User user = this.getUserById(id);
         if(! CollectionUtil.isEmpty(deletePermIds)){
-            userRoleRepo.deleteByUserIdAndRoleIdIn(id, deletePermIds);
+            userRoleRepo.deleteByUserUidAndRoleIdIn(id, deletePermIds);
         }
         if(! CollectionUtil.isEmpty(adds)){
             userRoleRepo.saveAll(toUserRoles(user, adds, false));
         };
+    }
+
+    @Override
+    public UserAdminDetail getUserDetail(long uid) {
+        User u = userCoreService.getUser(uid);
+        UserProfile p = userProfileCoreService.getUserProfile(uid);
+        AccountResp acc = userDatumCoreService.getAccountInfo(uid);
+        UserCounter c = userCounterCoreService.getUserCounter(uid);
+        Set<UserRole> urs = userRoleCoreService.getUserRoles(uid);
+        Set<UserPermission> ups = userPermissionCoreService.getUserPermission(uid);
+
+        return new UserAdminDetail(
+                userMapper.toDto(u),
+                userProfileMapper.toResponse(p),
+                userCounterMapper.toDto(c),
+                acc,
+                urs.stream().map(ToDictOption::toDictOption).collect(Collectors.toSet()),
+                ups.stream().map(ToDictOption::toDictOption).collect(Collectors.toSet())
+        );
+    }
+
+    @Override
+    public void updateUserInfo(long uid, UserInfoAUpdateReq body) {
+        User u = userCoreService.getUserByUid(uid);;
+        u = userAdminMapper.toEntity(body, u);
+        userCoreService.update(u);
+    }
+
+    @Override
+    public void updateUserProfile(long uid, UserProfileUpdateAReq body) {
+        UserProfile p = userProfileCoreService.getUserProfile(uid);
+        p = userProfileMapper.toEntity(body, p);
+        userProfileCoreService.update(p);
+    }
+
+    @Override
+    public void updateUserDatum(long uid, UserDatumUpdateAReq body) {
+        // TODO: send sms & email verification notification to target user;
+        // TODO: add audit log
+        if(body.getPhone() != null){
+            userDatumCoreService.saveNewPhone(uid, body.getPhone(), false);
+        }
+        if(body.getEmail() != null){
+            userDatumCoreService.saveNewEmail(uid, body.getEmail(), false);
+        }
     }
 
     @Transactional
@@ -165,7 +183,6 @@ public class UserServiceImpl implements UserService {
         return findUserAndUpdate(userId, user -> {
             user.setAccountStatus(status);
             user.setStatusChangedAt(Instant.now());
-            user.setStatusChangeReason("Status changed to " + status.name());
         });
     }
 
@@ -196,7 +213,7 @@ public class UserServiceImpl implements UserService {
             List<Integer> notFounds = roleIds.stream()
                     .filter(id -> !roleMap.containsKey(id))
                     .toList();
-            throw new BusinessException(BaseResponseCode.ROLE_NOT_FOUND_WITH_ARGS, notFounds);
+            throw new BizException(BaseResponseCode.ROLE_NOT_FOUND_WITH_ARGS, notFounds);
         }
 
         return items.stream()

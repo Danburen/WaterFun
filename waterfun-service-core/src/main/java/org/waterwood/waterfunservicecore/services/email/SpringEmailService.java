@@ -36,8 +36,6 @@ public class SpringEmailService extends EmailServiceBase {
             return CodeResult.builder()
                     .target(to)
                     .sendSuccess(false)
-                    .responseRaw(e.toString())
-                    .message("Error occurred when sending:")
                     .build();
         }
         return CodeResult.success(to, VerifyChannel.EMAIL);

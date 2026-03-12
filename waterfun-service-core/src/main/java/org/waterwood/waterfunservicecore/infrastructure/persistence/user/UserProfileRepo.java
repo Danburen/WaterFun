@@ -10,7 +10,4 @@ import java.util.Optional;
 
 public interface UserProfileRepo extends JpaRepository<UserProfile, Long> {
     Optional<UserProfile> findUserProfileByUserUid(long userUid);
-    @Modifying
-    @Query("UPDATE UserProfile u SET u.avatarUrl = :avatarUrl WHERE u.user = :userUid")
-    int updateAvatarUrl(@Param("userUid") Long userUid, @Param("avatarUrl") String avatarUrl);
 }

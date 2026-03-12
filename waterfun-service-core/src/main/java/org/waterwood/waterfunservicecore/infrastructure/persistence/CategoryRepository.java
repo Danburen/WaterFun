@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer>, SlugUniquenessChecker {
     boolean existsTagBySlug(String slug);
-    List<Category> findAllByCreatorId(Long creatorId);
+    List<Category> findAllByCreatorUid(Long creatorId);
 
     Optional<Category> findByName(String name);
 

@@ -1,12 +1,11 @@
 package org.waterwood.waterfunservicecore.entity.user;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.*;
 
 import java.time.Instant;
 
@@ -18,10 +17,12 @@ import java.time.Instant;
 public class UserDatum {
     @Id
     @Column(name = "user_uid", nullable = false)
+    @MapsId
+    @JoinColumn(name = "user_uid")
     private Long uid;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL,optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_uid", nullable = false)
     private User user;
@@ -38,6 +39,7 @@ public class UserDatum {
     private String encryptionKeyId;
 
     @Column(name = "updated_at")
+    @UpdateTimestamp
     private Instant updatedAt;
 
     @Column(name = "email_encrypted", length = 50)
@@ -54,7 +56,8 @@ public class UserDatum {
 
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "created_at")
-    private Instant createAt;
+    @CreationTimestamp
+    private Instant createdAt = Instant.now();
 
     @Column(name = "email_expire_at")
     @ColumnDefault("null")

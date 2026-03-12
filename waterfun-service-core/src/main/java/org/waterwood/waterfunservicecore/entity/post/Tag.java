@@ -65,4 +65,8 @@ public class Tag {
     @Column(name = "update_at", nullable = false)
     private Instant updateAt;
 
+    @ColumnDefault("0")
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
 }

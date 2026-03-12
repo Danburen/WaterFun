@@ -1,7 +1,6 @@
 package org.waterwood.waterfunservicecore.entity.user;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -40,9 +39,5 @@ public class UserDataArchive {
 
     @Column(name = "reason", nullable = false)
     private String reason;
-
-    @NotNull
-    @Column(name = "user_uid", nullable = false)
-    private Long userUid1;
 
 }

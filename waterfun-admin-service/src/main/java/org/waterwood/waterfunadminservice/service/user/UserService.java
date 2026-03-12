@@ -1,15 +1,15 @@
 package org.waterwood.waterfunadminservice.service.user;
 
-import org.waterwood.waterfunadminservice.dto.request.user.UserPwdUpdateRequestBody;
-import org.waterwood.waterfunadminservice.dto.request.user.UserRoleItemDto;
-import org.waterwood.waterfunadminservice.dto.response.user.UserInfoResponse;
-import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.waterfunservicecore.entity.Role;
+import jakarta.validation.Valid;
+import org.waterwood.waterfunadminservice.api.request.user.UserDatumUpdateAReq;
+import org.waterwood.waterfunadminservice.api.request.user.UserInfoAUpdateReq;
+import org.waterwood.waterfunadminservice.api.request.user.UserProfileUpdateAReq;
+import org.waterwood.waterfunadminservice.api.request.user.UserRoleItemDto;
+import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
 import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.common.exceptions.BizException;
 
 import java.util.List;
-import java.util.Set;
 
 public interface UserService {
     User getUserByUsername(String username);
@@ -17,8 +17,8 @@ public interface UserService {
     /**
      * Get user by id
      * @param id user id
-     * @throws BusinessException if user not found
-     * @return userinfo response dto of {@link UserInfoResponse}
+     * @throws BizException if user not found
+     * @return user
      */
     User getUserById(long id);
 
@@ -35,22 +35,6 @@ public interface UserService {
     User addUser(User user);
 
     User update(User user);
-
-    void updatePwd(UserPwdUpdateRequestBody userPwdUpdateRequestBody);
-
-    /**
-     * Get user permissions
-     * @param userId user id
-     * @return Set of permissions.
-     */
-    Set<Permission> getUserPermissions(long userId);
-
-    /**
-     * Get user all roles
-     * @param userId user id
-     * @return Set of role
-     */
-    Set<Role> getRoles(long userId);
 
     /**
      * Assign role to user
@@ -77,4 +61,32 @@ public interface UserService {
      * @param deletePermIds list of permission id to delete
      */
     void change(long id, List<UserRoleItemDto> adds, List<Integer> deletePermIds);
+
+    /**
+     * Get user detail info
+     * @param uid user id
+     * @return user detail info
+     */
+    UserAdminDetail getUserDetail(long uid);
+
+    /**
+     * Update user info
+     * @param uid user id
+     * @param body user info request body
+     */
+    void updateUserInfo(long uid, UserInfoAUpdateReq body);
+
+    /**
+     * Update user profile
+     * @param uid user id
+     * @param body user profile update request body
+     */
+    void updateUserProfile(long uid, UserProfileUpdateAReq body);
+
+    /**
+     * Update user datum
+     * @param uid user id
+     * @param body user datum update request body
+     */
+    void updateUserDatum(long uid, UserDatumUpdateAReq body);
 }

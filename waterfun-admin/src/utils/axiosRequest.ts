@@ -1,8 +1,7 @@
 import axios from 'axios'
-import { ElMessage } from "element-plus";
 import { translate } from "@/utils/translator";
-import {getErrorMessage} from "~/utils/errorMessage";
-import {useAuthStore} from "~/stores/authStore";
+import { getErrorMessage } from "~/utils/errorMessage";
+import { useAuthStore } from "~/stores/authStore";
 
 declare module 'axios' {
     interface AxiosRequestConfig {
@@ -29,23 +28,25 @@ service.interceptors.request.use(
         const needCSRF = config.meta?.needCSRF !== false && !isCsrfSkip;
         const needAuth = config.meta?.needAuth !== false && !isAuthSkip;
 
+
         const token = useAuthStore().accessData.token;
-        if (config.method !== 'GET' && needCSRF) {
-            let CSRFToken = getCsrfToken()
-            if (!CSRFToken) {
-                console.log('First request,now try get csrf token');
-                try {
-                    const response = await fetch(`${import.meta.env.VITE_API_BASE}/auth/csrf-token`, {
-                        credentials: 'include'
-                    });
-                    if (!response.ok) return Promise.reject(new Error(`Failed to fetch CSRF Token.Code ${response.status}`));
-                    CSRFToken = getCsrfToken();
-                } catch (error) {
-                    return Promise.reject(error);
-                }
-            }
-            config.headers['X-XSRF-TOKEN'] = CSRFToken;
-        }
+        // TODO: 这里的CSRFToken获取逻辑需要优化，目前是直接从store中获取，后续需要从response中获取并设置到store中
+        // if (config.method !== 'GET' && needCSRF) {
+        //     let CSRFToken = getCsrfToken()
+        //     if (!CSRFToken) {
+        //         console.log('First request,now try get csrf token');
+        //         try {
+        //             const response = await fetch(`${import.meta.env.VITE_API_BASE}/auth/csrf-token`, {
+        //                 credentials: 'include'
+        //             });
+        //             if (!response.ok) return Promise.reject(new Error(`Failed to fetch CSRF Token.Code ${response.status}`));
+        //             CSRFToken = getCsrfToken();
+        //         } catch (error) {
+        //             return Promise.reject(error);
+        //         }
+        //     }
+        //     config.headers['X-XSRF-TOKEN'] = CSRFToken;
+        // }
 
         if(needAuth){
             config.headers['Authorization'] = `Bearer ${token}`;
@@ -87,13 +88,6 @@ service.interceptors.response.use(
                     // window.location.href = '/login'
                     return Promise.reject(new Error('Unauthorized'))
             }
-            // if(showError) {
-            //     ElMessage({
-            //         message: errMessage,
-            //         type: 'error',
-            //         duration: 3000
-            //     })
-            // }
             throw new Error(error);
         }else if(error.request) {
             // no response
@@ -101,12 +95,6 @@ service.interceptors.response.use(
         }else{
             errMessage = translate("message.error.sendRequestError");
         }
-        // if(showError) {
-        //     ElMessage({
-        //         message: errMessage,
-        //         type: 'error',
-        //     })
-        // }
         return Promise.reject(new Error(errMessage));
     }
 )

@@ -1,12 +1,14 @@
 package org.waterwood.waterfunservicecore.entity.user;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.waterwood.waterfunservicecore.api.DictOption;
+import org.waterwood.waterfunservicecore.api.ToDictOption;
 import org.waterwood.waterfunservicecore.entity.Permission;
 
 import java.time.Instant;
@@ -15,7 +17,7 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "user_permission")
-public class UserPermission {
+public class UserPermission implements ToDictOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -36,12 +38,17 @@ public class UserPermission {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
+    @CreationTimestamp
     private Instant createdAt;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_uid", nullable = false)
-    private User userUid;
 
+    @Override
+    public String getName() {
+        return this.permission.getName();
+    }
+
+    @Override
+    public String getCode() {
+        return this.permission.getCode();
+    }
 }

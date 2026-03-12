@@ -33,7 +33,7 @@ public final class CookieUtil {
                 .httpOnly(true)
                 .secure(COOKIE_SECURE)
                 .sameSite(COOKIE_SAME_SITE_CONFIG)
-                .maxAge(expireIn)  // same with jwt refresh tokenValue
+                .maxAge(expireIn)  // same segment jwt refresh tokenValue
                 .path("/api/auth")
                 .build();
         response.addHeader("Set-Cookie", refreshCookie.toString());

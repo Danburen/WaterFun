@@ -2,12 +2,11 @@ package org.waterwood.waterfunservicecore.services.auth.code;
 
 import org.waterwood.waterfunservicecore.api.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.VerifyScene;
-import org.waterwood.waterfunservicecore.api.req.auth.SecuritySendCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.SecurityVerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.common.exceptions.BizException;
 
 /**
  * A service for sending verification codes
@@ -27,7 +26,7 @@ public interface VerificationService {
     CodeResult sendAutoTargetAuthenticationCode(long userUid, VerifyChannel channel, VerifyScene scene);
 
     /**
-     * Send verification code to authenticate user with given target
+     * Send verification code to authenticate user segment given target
      * @param channel channel
      * @param scene  scene
      * @param target target
@@ -44,15 +43,15 @@ public interface VerificationService {
      * @param channel channel
      * @param key key of the code
      * @param code  code
-     * @throws BusinessException if code is invalid
+     * @throws BizException if code is invalid
      */
     void verifyCode(String target, VerifyScene scene, VerifyChannel channel, String key, String code);
 
     void verifyCode(String verifyCodeKey, VerifyCodeDto verifyBody);
 
     /**
-     * Verify code with point target, will check the scene whether is the same as the scene
-     * <b>Usually used for checking the user whether is the account owner</b> with <b>whatever</b> channel.
+     * Verify code segment point target, will check the scene whether is the same as the scene
+     * <b>Usually used for checking the user whether is the account owner</b> segment <b>whatever</b> channel.
      * @param verifyCodeKey key of the code
      * @param verifyBody verify body
      * @param scene target scene
@@ -60,8 +59,8 @@ public interface VerificationService {
     void verifyAuthorizedCode(String verifyCodeKey, SecurityVerifyCodeDto verifyBody, String target, VerifyScene scene);
 
     /**
-     * Verify code with point target, will check the scene whether is the same as the scene
-     * <b>Usually used for verify the new binding target</b> with <b>target</b>channel.
+     * Verify code segment point target, will check the scene whether is the same as the scene
+     * <b>Usually used for verify the new binding target</b> segment <b>target</b>channel.
      * @param verifyCodeKey key of the code
      * @param verifyBody verify body
      * @param scene target scene

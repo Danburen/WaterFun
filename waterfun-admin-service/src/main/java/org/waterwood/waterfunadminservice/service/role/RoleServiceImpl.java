@@ -8,15 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.utils.CollectionUtil;
-import org.waterwood.waterfunadminservice.dto.request.role.RolePermItemDTO;
+import org.waterwood.waterfunadminservice.api.request.role.RolePermItemDTO;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
 import org.waterwood.waterfunservicecore.entity.RolePermission;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.common.exceptions.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RolePermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
-import org.waterwood.waterfunadminservice.service.perm.PermissionService;
 
 import java.time.Instant;
 import java.util.List;
@@ -50,16 +49,15 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role getRole(int id) {
-        // TODO: check permission
         return roleRepo.findById(id)
-                .orElseThrow(()-> new BusinessException(BaseResponseCode.ROLE_NOT_FOUND));
+                .orElseThrow(()-> new BizException(BaseResponseCode.ROLE_NOT_FOUND));
     }
 
     @Override
     public Role addRole(Role role) {
         // TODO: check permission
         if(roleRepo.existsById(role.getId())){
-            throw new BusinessException(BaseResponseCode.ROLE_ALREADY_EXISTS);
+            throw new BizException(BaseResponseCode.ROLE_ALREADY_EXISTS);
         }
         return roleRepo.save(role);
     }
@@ -124,7 +122,7 @@ public class RoleServiceImpl implements RoleService {
                 .collect(Collectors.toMap(Permission::getId, p -> p));
         if(strict && permIds.size() != permEntities.size()){
             List<Integer> notFounds = permIds.stream().filter(pId -> !permMap.containsKey(pId)).toList();
-            throw new BusinessException(BaseResponseCode.PERMISSION_NOT_FOUND, notFounds);
+            throw new BizException(BaseResponseCode.PERMISSION_NOT_FOUND, notFounds);
         }
         return items.stream()
                 .filter(dto -> permMap.containsKey(dto.getPermissionId()))

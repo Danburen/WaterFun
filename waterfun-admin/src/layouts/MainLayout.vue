@@ -26,29 +26,37 @@ const breadList = computed(() => {
 const dashboardTagItem:TagNavItemType = {
   name: 'dashboard',
   locale: 'nav.dashboard',
-  to: '/',
+  to: 'dashboard',
   closeable: false
 }
 
 const addNavTags = (to: any) =>{
-  if (to.meta && to.meta.locale && to.meta.public !== true) {
+  if (to.name && to.meta && to.meta.locale && to.meta.public !== true) {
     tagStore.addTag({
-      name: to.name,
-      to: to.name,
-      closeable: true,
-      locale: `nav.${to.meta.locale}`,
-    })
+        name: to.name,
+        to: to.name,
+        params: to.params,
+        closeable: true,
+        locale: `nav.${to.meta.locale}`,
+      })
   }
 }
 
 const handleRemoveTag = (tagName:string) => {
   let name = null
   if(activeTags.value === tagName){
-    //@ts-ignore
-    name =  tagStore.getTags[tagStore.getTags.findIndex((t) => t.name === tagName) - 1].name || ''
+    const currentTags = tagStore.getTags;
+    const currentIndex = currentTags.findIndex((t) => t.name === tagName);
+    const targetTag = currentTags[currentIndex - 1] || currentTags[currentIndex + 1];
+    if (targetTag) {
+      name = targetTag.name;
+      router.push({ name: targetTag.to });
+    }
   }
   tagStore.removeTag(tagName);
-  activeTags.value = name || activeTags.value
+  if (name) {
+    activeTags.value = name;
+  }
 }
 
 const handleOrderUpdated = ({ from, to }: { from: number; to: number }) => {
@@ -81,7 +89,9 @@ watch(()=>tagStore.getTags,
     <MainNavBar class="header-navbar" :navItems="breadList" @collapse="menuCollapse = !menuCollapse" />
     <!-- Main Container-->
     <div class="main-container">
-      <AsideNavBar :collapse="menuCollapse" @menuClick="" />
+      <aside :class="['aside-navbar', { collapsed: menuCollapse }]">
+        <AsideNavBar :collapse="menuCollapse" @menuClick="" />
+      </aside>
       <div class="content-container">
         <div class="content-header default-border-bottom">
           <TagNavigation
@@ -104,7 +114,9 @@ watch(()=>tagStore.getTags,
 .container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .main-container {
@@ -112,6 +124,16 @@ watch(()=>tagStore.getTags,
   flex-grow: 1;
   min-height: 0;
   min-width: 0;
+}
+
+.aside-navbar {
+  transition: width 0.3s ease;
+  width: 175px;
+  flex-shrink: 0;
+}
+
+.aside-navbar.collapsed {
+  width: 55px;
 }
 
 .content-header {
@@ -123,18 +145,21 @@ watch(()=>tagStore.getTags,
   display: flex;
   flex: 1;
   min-height: 0;
+  min-width: 0;
   flex-direction: column;
+  transition: all 0.3s ease;
 }
 
 .content-main {
   flex: 1 1 auto; /* 占据剩余空间 */
   padding: 10px;
-  margin: 10px;
   overflow-y: auto; /* 内容过多时滚动 */
   background: #fff;
   min-height: 0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   border-radius: 3px;
+  transition: all 0.3s ease;
+  min-width: 0; /* 确保在flex容器中能正确收缩 */
 }
 
 .content-footer {

@@ -1,9 +1,8 @@
 package org.waterwood.waterfunservicecore.services.auth.code;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.common.exceptions.BizException;
 import org.waterwood.waterfunservicecore.api.VerifyChannel;
 
 import java.util.List;
@@ -23,6 +22,6 @@ public class CodeSenderFactory {
 
     public CodeSender of(VerifyChannel channel) {
         return Optional.ofNullable(senderMap.get(channel))
-                .orElseThrow(() -> new BusinessException(BaseResponseCode.CHANNEL_NOT_SUPPORT, channel.getValue()));
+                .orElseThrow(() -> new BizException(BaseResponseCode.CHANNEL_NOT_SUPPORT, channel.getValue()));
     }
 }

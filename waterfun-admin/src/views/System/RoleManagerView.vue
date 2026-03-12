@@ -1,14 +1,9 @@
 <script setup lang="ts">
-
-import TableMain from "@/components/TableMain.vue";
+import TableContainer from "~/components/TableContainer.vue";
 </script>
 
 <template>
-  <div class="main">
-    <TableMain>
-
-    </TableMain>
-  </div>
+  <TableContainer title="角色管理" showAddButton></TableContainer>
 </template>
 
 <style scoped>

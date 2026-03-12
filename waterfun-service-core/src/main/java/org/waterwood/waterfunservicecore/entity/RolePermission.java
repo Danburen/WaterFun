@@ -1,11 +1,10 @@
 package org.waterwood.waterfunservicecore.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.*;
 
 import java.time.Instant;
 
@@ -33,10 +32,12 @@ public class RolePermission {
     private Instant expiresAt;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
+    @CreationTimestamp
     @Column(name = "created_at")
     private Instant createdAt;
 
     @Column(name = "update_at")
+    @UpdateTimestamp
     private Instant updateAt;
 
 }

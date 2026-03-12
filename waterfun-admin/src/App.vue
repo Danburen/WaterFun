@@ -6,7 +6,7 @@ import router from "@/router/index.js";
 import {useRoute} from "vue-router";
 
 const route = useRoute()
-const noLayout = computed(()=> route.meta.public == true)
+const noLayout = computed(()=> route.meta.layout == false)
 </script>
 
 <template>

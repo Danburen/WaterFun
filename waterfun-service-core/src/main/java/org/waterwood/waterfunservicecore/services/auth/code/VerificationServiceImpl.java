@@ -2,14 +2,12 @@ package org.waterwood.waterfunservicecore.services.auth.code;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.common.exceptions.BizException;
 import org.waterwood.waterfunservicecore.api.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.VerifyScene;
-import org.waterwood.waterfunservicecore.api.req.auth.SecuritySendCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.SecurityVerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
@@ -40,13 +38,13 @@ public class VerificationServiceImpl implements VerificationService {
     @Override
     public CodeResult sendAutoTargetAuthenticationCode(long userUid, VerifyChannel channel, VerifyScene scene) {
         UserDatum userDatum = userDatumRepo.findUserDatumByUserUid(userUid)
-                .orElseThrow(() -> new BusinessException(BaseResponseCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
         EncryptionDataKey aesKey = encryptedKeyService.getAesKey();
         CodeSender sender = codeSenderFactory.of(channel);
         String encryptedTarget = switch (channel) {
             case SMS -> userDatum.getPhoneEncrypted();
             case EMAIL -> userDatum.getEmailEncrypted();
-            default -> throw new BusinessException(BaseResponseCode.CHANNEL_NOT_SUPPORT, channel.getValue());
+            default -> throw new BizException(BaseResponseCode.CHANNEL_NOT_SUPPORT, channel.getValue());
         };
         return sender.sendCode(EncryptionHelper.decryptField(encryptedTarget, aesKey), scene);
     }
@@ -67,7 +65,7 @@ public class VerificationServiceImpl implements VerificationService {
     public void verifyCode(String target, VerifyScene scene, VerifyChannel channel, String key, String code) {
         CodeVerifier verifier = codeVerifierFactory.of(channel);
         if(! verifier.verifyCode(target, scene, key, code)){
-            throw new BusinessException(BaseResponseCode.VERIFY_CODE_INVALID);
+            throw new BizException(BaseResponseCode.VERIFY_CODE_INVALID);
         }
     }
 
@@ -83,7 +81,7 @@ public class VerificationServiceImpl implements VerificationService {
     @Override
     public void verifyAuthorizedCode(String verifyCodeKey, SecurityVerifyCodeDto verifyBody, String target, VerifyScene scene){
         if(scene != verifyBody.getScene()){
-            throw new BusinessException(BaseResponseCode.INVALID_VERIFY_SCENE);
+            throw new BizException(BaseResponseCode.INVALID_VERIFY_SCENE);
         }
         this.verifyCode(
                 target,
@@ -96,7 +94,7 @@ public class VerificationServiceImpl implements VerificationService {
     @Override
     public void verifyAuthorizedCodeWithChannel(String verifyCodeKey, SecurityVerifyCodeDto verifyBody, String target, VerifyScene scene, VerifyChannel... allowChannels) {
         if(! Arrays.asList(allowChannels).contains(verifyBody.getChannel())){
-            throw new BusinessException(BaseResponseCode.CHANNEL_NOT_SUPPORT, verifyBody.getChannel());
+            throw new BizException(BaseResponseCode.CHANNEL_NOT_SUPPORT, verifyBody.getChannel());
         }
         verifyAuthorizedCode(verifyCodeKey, verifyBody, target, scene);
     }

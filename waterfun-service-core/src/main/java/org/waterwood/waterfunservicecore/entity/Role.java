@@ -2,10 +2,13 @@ package org.waterwood.waterfunservicecore.entity;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.*;
+import org.waterwood.waterfunservicecore.api.DictOption;
 
 import java.time.Instant;
 
@@ -39,6 +42,11 @@ public class Role {
     @Column(name = "update_at")
     @UpdateTimestamp
     private Instant updateAt;
+
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "code", nullable = false, length = 50)
+    private String code;
 
     public Role(String name, String description) {
         this.name = name;

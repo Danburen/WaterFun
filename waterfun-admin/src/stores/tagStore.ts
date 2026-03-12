@@ -14,6 +14,10 @@ export const useTagStore = defineStore('tagStore', ()=>{
         if(!cache.value.has(tag.name)) {
             cache.value.add(tag.name)
             tags.value.push(tag)
+        }else{
+            cache.value.delete(tag.name)
+            cache.value.add(tag.name)
+            tags.value.push(tag)
         }
     }
 

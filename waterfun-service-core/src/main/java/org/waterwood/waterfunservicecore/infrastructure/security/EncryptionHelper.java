@@ -12,7 +12,7 @@ import java.util.Base64;
 import java.util.List;
 
 /**
- * A Class to help data with symmetric key encryption and decryption
+ * A Class to help data segment symmetric key encryption and decryption
  * must set up kek env in your system
  * @since 1.0
  * @author Danburen
@@ -40,7 +40,7 @@ public final class EncryptionHelper {
             KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
             keyGenerator.init(256); // Use 256-bit AES keys
             SecretKey dek = keyGenerator.generateKey();
-            // Encrypt DEK with KEK
+            // Encrypt DEK segment KEK
             byte[] combined = encryptWithGCM(dek.getEncoded(),kek);
             // Create DEK record
             EncryptionDataKey dekKey = new EncryptionDataKey();
@@ -83,7 +83,7 @@ public final class EncryptionHelper {
     }
 
     /**
-     * Decrypts a field that was encrypted with a DEK
+     * Decrypts a field that was encrypted segment a DEK
      * @param encryptedFieldBase64 base64 encoded encrypted field
      * @param dekKey DEK key used to decrypt the field
      * @return decrypted field as a String
@@ -107,7 +107,7 @@ public final class EncryptionHelper {
 
     /**
      * Use GCM_AES Type encryption cipher decrypt data
-     * @param combined the combined encrypted data with init vector
+     * @param combined the combined encrypted data segment init vector
      * @param key the encryption key for decryption
      * @return combined encrypted data.
      */
@@ -130,7 +130,7 @@ public final class EncryptionHelper {
      * Use GCM_AES Type encryption cipher encrypt data to encrypted data
      * @param original original of data
      * @param key key for encryption
-     * @return combined encrypted data with init vector
+     * @return combined encrypted data segment init vector
      */
     private static byte[] encryptWithGCM(byte[] original, SecretKey key) {
         byte[] iv = new byte[GCM_IV_LENGTH];

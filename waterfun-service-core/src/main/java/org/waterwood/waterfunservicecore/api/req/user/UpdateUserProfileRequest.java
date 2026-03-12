@@ -17,9 +17,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateUserProfileRequest implements Serializable {
-    @Size(max = 12)
-    private String nickname;
-    private String avatarUrl;
     @Size(max = 500)
     private String bio;
     private Gender gender;

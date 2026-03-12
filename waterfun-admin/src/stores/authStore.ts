@@ -1,6 +1,7 @@
+import { LoginRequest } from '@waterfun/web-core/src/types/api/auth';
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-
+import { login } from '@/api/auth';
 interface access {
     token: string;
     expire: number;
@@ -30,14 +31,26 @@ export const useAuthStore = defineStore('accessStore', ()=>{
         return accessData.value.token && Date.now() < accessData.value.expire;
     });
 
+    const tryLogin = async (data: LoginRequest) => {
+        return login(data).then(res => {
+            console.log(res);
+            setToken(
+                res.data.accessToken, 
+                Date.now() + res.data.exp * 1000    
+            );
+            return res;
+        });
+    }
+
     return {
         setToken,
         removeToken,
+        tryLogin,
         accessData,
         isValid,
     }
-},{    persist: import.meta.client ? {
-        storage: sessionStorage
-    } : false
+},{    persist: {
+        storage: localStorage
+    }
 })
 
