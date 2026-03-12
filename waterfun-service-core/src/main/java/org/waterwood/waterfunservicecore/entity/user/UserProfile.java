@@ -1,12 +1,12 @@
 package org.waterwood.waterfunservicecore.entity.user;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.*;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.Instant;
@@ -23,22 +23,16 @@ public class UserProfile {
     @NotNull
     @Id
     @Column(name = "user_uid", nullable = false)
+    @MapsId
+    @JoinColumn(name = "user_uid")
     private Long uid;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_uid", nullable = false)
     @ToString.Exclude
     private User user;
-
-
-    @Size(max = 12)
-    @Column(name = "nickname", length = 12)
-    private String nickname;
-
-    @Column(name = "avatar_url")
-    private String avatarUrl;
 
     @Lob
     @Column(name = "bio")
@@ -49,8 +43,6 @@ public class UserProfile {
     @Column(name = "gender")
     private Gender gender;
 
-    @Column(name = "birthday")
-    private LocalDate birthday;
 
     @Size(max = 50)
     @Column(name = "residence", length = 50)
@@ -60,6 +52,7 @@ public class UserProfile {
     private LocalDate birthDate;
 
     @Column(name = "update_at")
+    @UpdateTimestamp
     private Instant updateAt;
 
     @Override

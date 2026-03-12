@@ -3,7 +3,7 @@ package org.waterwood.waterfunservicecore.services.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.common.exceptions.BizException;
 import org.waterwood.waterfunservicecore.entity.user.UserCounter;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
 
@@ -16,7 +16,7 @@ public class UserCounterCoreServiceImpl implements UserCounterCoreService {
     public UserCounter getUserCounter(long userUid) {
         return userCounterRepository.findById(userUid)
                 .orElseThrow(
-                        () -> new BusinessException(BaseResponseCode.USER_NOT_FOUND)
+                        () -> new BizException(BaseResponseCode.USER_NOT_FOUND)
                 );
     }
 

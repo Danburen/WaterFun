@@ -7,7 +7,7 @@ import org.waterwood.waterfunservicecore.api.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.VerifyScene;
 
 /**
- * A dto to verify code with sms and  email
+ * A dto to verify code segment sms and  email
  */
 @Data
 public class VerifyCodeDto {

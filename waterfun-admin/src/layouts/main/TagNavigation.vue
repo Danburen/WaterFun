@@ -31,7 +31,20 @@ const handleClose = (tagName:string) =>{
 
 const handleClick = (tagName:string) => {
   activeTagName.value = tagName;
-  router.push({ name: props.tagList.find(tag => tag.name === tagName).to });
+  const targetTag = props.tagList.find(tag => tag.name === tagName);
+  console.log(targetTag);
+  if (targetTag && targetTag.to) {
+    try {
+      router.push({ name: targetTag.to, params: targetTag.params });
+    } catch (error) {
+      console.warn('路由跳转失败:', error);
+      if (targetTag.to.startsWith('/')) {
+        router.push(targetTag.to);
+      }
+    }
+  } else {
+    console.warn('未找到目标tag或tag的to属性为空:', tagName);
+  }
   emit('tagClick',tagName);
 }
 

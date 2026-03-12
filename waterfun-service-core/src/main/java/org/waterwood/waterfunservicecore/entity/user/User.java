@@ -16,7 +16,6 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@NoArgsConstructor
 @Table(name = "user", schema = "waterfun")
 public class User {
     @Id
@@ -25,8 +24,6 @@ public class User {
 
     @Column(name = "username", nullable = false, length = 32)
     private String username;
-
-
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
@@ -38,9 +35,6 @@ public class User {
 
     @Column(name = "status_changed_at")
     private Instant statusChangedAt;
-
-    @Column(name = "status_change_reason")
-    private String statusChangeReason;
 
     @Column(name = "updated_at")
     @UpdateTimestamp
@@ -62,12 +56,6 @@ public class User {
     @Column(name = "last_active_at")
     private Instant lastActiveAt;
 
-    public User(String username, String passwordHash) {
-        this.username = username;
-        this.passwordHash = passwordHash;
-        this.accountStatus = AccountStatus.ACTIVE;
-    }
-
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
@@ -83,6 +71,15 @@ public class User {
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserDatum userDatum;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserProfile userProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserCounter userCounter;
 }
 
 

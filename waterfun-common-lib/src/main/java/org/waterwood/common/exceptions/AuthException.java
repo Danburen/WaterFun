@@ -2,7 +2,7 @@ package org.waterwood.common.exceptions;
 
 import org.waterwood.api.BaseResponseCode;
 
-public class AuthException extends BusinessException {
+public class AuthException extends BizException {
     private final String MESSAGE_KEY_PREFIX = "auth";
     public AuthException(String errorCode, String msgKey) {
         super(errorCode,msgKey);

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.waterwood.api.ErrorResponse;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.exceptions.AuthException;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.common.exceptions.BizException;
 
 import java.util.*;
 
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
      * Handle request body validation.
      * e.g. {@link RequestBody}
      * @param ex validation exception
-     * @return the {@link ResponseEntity} of {@link ErrorResponse} body with {@link HttpStatus} 400.
+     * @return the {@link ResponseEntity} of {@link ErrorResponse} body segment {@link HttpStatus} 400.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex){
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
     /**
      * Validate the parameter constraint e.g.{@link NotBlank} in {@link RequestParam}
      * @param ex constraint violation exception
-     * @return the {@link ResponseEntity} of {@link ErrorResponse} body with {@link HttpStatus} 400.
+     * @return the {@link ResponseEntity} of {@link ErrorResponse} body segment {@link HttpStatus} 400.
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex){
@@ -144,7 +144,7 @@ public class GlobalExceptionHandler {
     /**
      * Handle auth exception
      * @param ex auth exception
-     * @return the {@link ResponseEntity} of {@link ErrorResponse} body with {@link}
+     * @return the {@link ResponseEntity} of {@link ErrorResponse} body segment {@link}
      */
 //    @ExceptionHandler(AuthException.class)
     public ResponseEntity<?> handleAuthException(AuthException ex){
@@ -163,10 +163,10 @@ public class GlobalExceptionHandler {
     /**
      * Handle auth exception
      * @param ex auth exception
-     * @return the {@link ResponseEntity} of {@link ErrorResponse} body with {@link}
+     * @return the {@link ResponseEntity} of {@link ErrorResponse} body segment {@link}
      */
 //    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<?> handleBusinessException(BusinessException ex){
+    public ResponseEntity<?> handleBusinessException(BizException ex){
         ErrorResponse response = new ErrorResponse(
                 ex.getErrorCode(),
                 msgSrc.getMessage(ex.getMessage(),

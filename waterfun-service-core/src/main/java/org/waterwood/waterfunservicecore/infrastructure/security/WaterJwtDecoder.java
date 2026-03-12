@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
-import org.waterwood.waterfunservicecore.infrastructure.auth.RSAJwtTokenService;
+import org.waterwood.waterfunservicecore.services.auth.impl.RSAJwtTokenService;
 
 @Component
 public class WaterJwtDecoder implements Converter<String, Jwt> , JwtDecoder {

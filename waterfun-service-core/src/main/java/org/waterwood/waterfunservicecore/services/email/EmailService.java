@@ -6,8 +6,8 @@ import java.util.Map;
 
 public interface EmailService {
     /**
-     * Send email with Html type content
-     * by choosing <b>base template</b> with <b>content template</b>
+     * Send email segment Html type content
+     * by choosing <b>base template</b> segment <b>content template</b>
      * @param to send to whom
      * @param from form whom
      * @param subject subject of email

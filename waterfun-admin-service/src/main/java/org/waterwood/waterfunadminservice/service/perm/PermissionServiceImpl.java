@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.common.exceptions.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
 
 @Service
@@ -19,7 +19,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Permission getPermission(int PermId){
         return permissionRepo.findById(PermId)
-                .orElseThrow(() -> new BusinessException(BaseResponseCode.PERMISSION_NOT_FOUND));
+                .orElseThrow(() -> new BizException(BaseResponseCode.PERMISSION_NOT_FOUND));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class PermissionServiceImpl implements PermissionService {
     public void addPermission(Permission perm) {
         // TODO: check permission
         permissionRepo.findByCode(perm.getCode()).ifPresent(_ -> {
-            throw new BusinessException(BaseResponseCode.PERMISSION_ALREADY_EXISTS);
+            throw new BizException(BaseResponseCode.PERMISSION_ALREADY_EXISTS);
         });
         permissionRepo.save(perm);
     }

@@ -1,8 +1,8 @@
 package org.waterwood.waterfunadminservice.infrastructure.mapper;
 
-import org.waterwood.waterfunadminservice.dto.request.post.CreateTagRequest;
-import org.waterwood.waterfunadminservice.dto.request.post.UpdateTagRequest;
-import org.waterwood.waterfunadminservice.dto.response.post.TagResponse;
+import org.waterwood.waterfunadminservice.api.request.post.CreateTagRequest;
+import org.waterwood.waterfunadminservice.api.request.post.UpdateTagRequest;
+import org.waterwood.waterfunadminservice.api.response.post.TagResponse;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.mapstruct.*;
 

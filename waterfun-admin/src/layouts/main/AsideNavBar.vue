@@ -18,11 +18,18 @@ const handleMenuClick = (routeName:string) => {
           <el-icon class="menu-icon"><IconComponent :icon="route.meta.icon" /></el-icon>
           <span>{{ $t(`nav.${route.meta.locale}`) }}</span>
         </template>
-        <el-menu-item @click="handleMenuClick(child.name as string)" v-for="(child,cIndex) in route.children" :index="`${index}-${cIndex.toString()}`">
+        <el-menu-item @click="handleMenuClick(child.name as string)"  
+          v-for="(child,cIndex) in route.children.filter(child => !child.meta.isDetail)" 
+          :index="`${index}-${cIndex.toString()}`"
+        >
           <span>{{ $t(`nav.${child.meta.locale}`)}}</span>
         </el-menu-item>
       </el-sub-menu>
-      <el-menu-item @click="handleMenuClick(route.name as string)" v-else :index="index.toString()">
+      <el-menu-item 
+        @click="handleMenuClick(route.name as string)" 
+        v-else-if="! route.meta.isDetail" 
+        :index="index.toString()"
+      >
         <el-icon class="menu-icon"><IconComponent :icon="route.meta.icon" /></el-icon>
         <span>{{ $t(`nav.${route.meta.locale}`)}}</span>
       </el-menu-item>

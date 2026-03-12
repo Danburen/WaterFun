@@ -6,10 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import org.waterwood.waterfunadminservice.dto.request.role.*;
+import org.waterwood.waterfunadminservice.api.request.role.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservicecore.entity.Role;
-import org.waterwood.waterfunadminservice.dto.response.role.RoleResp;
+import org.waterwood.waterfunadminservice.api.response.role.RoleResp;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.RoleSpec;
 import org.waterwood.waterfunadminservice.service.role.RoleService;
@@ -31,6 +31,7 @@ public class RoleController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer parentId
     ){
+
         Pageable pageable = Pageable.ofSize(size).withPage(page);
         Specification<Role> spec = RoleSpec.of(name, parentId);
         Page<RoleResp> roles = roleService.listRoles(spec, pageable)

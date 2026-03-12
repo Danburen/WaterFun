@@ -7,7 +7,7 @@ import org.waterwood.waterfunservicecore.entity.user.User;
 public interface LoginService {
     User login(PwdLoginReq body, String verifyUUIDKey);
 
-    boolean logout(String refreshToken, String dfp);
+    boolean logout(long userUid ,String refreshToken, String dfp);
 
     /***
      * Login by code

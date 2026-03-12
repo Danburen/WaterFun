@@ -37,7 +37,6 @@ public class JwtKeyConfig {
     }
 
     private String extraKeyContent(Resource originalPemKeyContent) throws IOException {
-        String filename = originalPemKeyContent.getFilename();
         String content = new String(originalPemKeyContent.getInputStream().readAllBytes());
         if(content.startsWith("-----BEGIN")){
             return content.replaceAll("-----BEGIN (.*)-----", "")

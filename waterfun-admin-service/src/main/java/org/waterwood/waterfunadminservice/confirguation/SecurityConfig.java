@@ -1,7 +1,6 @@
 package org.waterwood.waterfunadminservice.confirguation;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,7 +16,6 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity(debug = false)
-@ComponentScan("org.waterwood.waterfunservicecore")
 public class SecurityConfig {
     private final WaterJwtDecoder jwtConverter;
 
@@ -35,19 +33,8 @@ public class SecurityConfig {
 //                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
 //                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/resource/**").permitAll()
-                        .requestMatchers("/api/dashboard/**").permitAll()
-                        .requestMatchers("/api/user/**").authenticated()
-                        .requestMatchers("/api/post/**").authenticated()
-                        .requestMatchers("/api/role/**").authenticated()
-                        .requestMatchers("/api/permission/**").authenticated()
-                        .requestMatchers("/upload").authenticated()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/account/**").authenticated()
-                        .requestMatchers("/api/content/**").authenticated()
-                        .requestMatchers("/api/admin/**").authenticated()
-                        .anyRequest().denyAll()
+                        .requestMatchers("/api/admin/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 // JWT Configuration apply to interface which need to be authorized
                 .oauth2ResourceServer(oauth2 ->

@@ -3,9 +3,12 @@ package org.waterwood.waterfunservicecore.services.user;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BusinessException;
+import org.waterwood.common.exceptions.BizException;
+import org.waterwood.utils.MaskUtil;
 import org.waterwood.utils.codec.HashUtil;
+import org.waterwood.waterfunservicecore.api.resp.AccountResp;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
@@ -21,48 +24,48 @@ public class UserDatumCoreServiceImpl implements UserDatumCoreService {
     @Override
     public UserDatum getUserDatum(long userUid) {
         return userDatumRepo.findUserDatumByUserUid(userUid)
-                .orElseThrow(() -> new BusinessException(BaseResponseCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
     }
 
     @Override
-    public UserDatum saveNewEmailVerified(long userUid, String email) {
+    public UserDatum saveNewEmail(long userUid, String email, boolean verified) {
         UserDatum ud = getUserDatum(userUid);
         EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
         String newHashed = HashUtil.Sha256HmacString(email, hmacKey.getEncryptedKey());
         // check new email whether equal to old email
         if(newHashed.equals(ud.getEmailHash())){
-            throw new BusinessException(BaseResponseCode.TWO_VALUE_MUST_DIFFERENT,"email");
+            throw new BizException(BaseResponseCode.TWO_VALUE_MUST_DIFFERENT,"email");
         }
         // check new email whether bound by others
         userDatumRepo.findByEmailHash(newHashed).ifPresent(_ ->{
-            throw new BusinessException(BaseResponseCode.EMAIL_ALREADY_USED);
+            throw new BizException(BaseResponseCode.EMAIL_ALREADY_USED);
         });
         // save to the db
         EncryptionDataKey aesKey = encryptedKeyService.getAesKey();
         ud.setEmailEncrypted(EncryptionHelper.encryptField(email, aesKey));
         ud.setEmailHash(newHashed);
-        ud.setEmailVerified(true);
+        ud.setEmailVerified(verified);
         return userDatumRepo.save(ud);
     }
 
     @Override
-    public UserDatum saveNewPhoneVerified(long userUid, String phone) {
+    public UserDatum saveNewPhone(long userUid, String phone, boolean verified) {
         UserDatum ud = getUserDatum(userUid);
         EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
         String newHashed = HashUtil.Sha256HmacString(phone, hmacKey.getEncryptedKey());
         // check new phone whether equal to old phone
         if(newHashed.equals(ud.getPhoneHash())){
-            throw new BusinessException(BaseResponseCode.TWO_VALUE_MUST_DIFFERENT,"phone");
+            throw new BizException(BaseResponseCode.TWO_VALUE_MUST_DIFFERENT,"phone");
         }
         // check new phone whether bound by others
         userDatumRepo.findByPhoneHash(newHashed).ifPresent(_ ->{
-            throw new BusinessException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
+            throw new BizException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
         });
         // save to the db
         EncryptionDataKey aesKey = encryptedKeyService.getAesKey();
         ud.setPhoneEncrypted(EncryptionHelper.encryptField(phone, aesKey));
         ud.setPhoneHash(newHashed);
-        ud.setPhoneVerified(true);
+        ud.setPhoneVerified(verified);
         return userDatumRepo.save(ud);
     }
 
@@ -84,6 +87,22 @@ public class UserDatumCoreServiceImpl implements UserDatumCoreService {
         return EncryptionHelper.decryptField(
                 getUserDatum(userUid).getEmailEncrypted(),
                 encryptedKeyService.getAesKey()
+        );
+    }
+
+    @Override
+    @Transactional
+    public AccountResp getAccountInfo(long userUid) {
+        UserDatum ud = userDatumRepo.findUserDatumByUserUid(userUid)
+                .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
+        EncryptionDataKey aesKey = encryptedKeyService.pickEncryptionKey(0);
+        String realEmail = EncryptionHelper.decryptField(ud.getEmailEncrypted(), aesKey);
+        String realPhone = EncryptionHelper.decryptField(ud.getPhoneEncrypted(), aesKey);
+        return new AccountResp(
+                MaskUtil.maskPhone(realPhone),
+                MaskUtil.maskEmail(realEmail),
+                ud.getPhoneVerified(),
+                ud.getEmailVerified()
         );
     }
 

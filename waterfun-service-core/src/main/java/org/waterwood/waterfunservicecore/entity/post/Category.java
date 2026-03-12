@@ -60,4 +60,9 @@ public class Category {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
+
+    @ColumnDefault("0")
+    @Column(name = "is_deleted")
+    private Boolean isDeleted =  false;
+
 }

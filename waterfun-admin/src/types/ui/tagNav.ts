@@ -3,6 +3,7 @@ export interface TagNavItemType {
     locale: string;
     to: string;
     closeable: boolean;
+    params?: Record<string, string>;
 }
 
 export interface BreadNavItemType {

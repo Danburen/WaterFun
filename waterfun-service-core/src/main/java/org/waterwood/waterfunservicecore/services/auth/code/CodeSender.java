@@ -10,7 +10,7 @@ import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
  */
 public interface CodeSender {
     /**
-     * Direct Send code to target and save to cache with key.
+     * Direct Send code to target and save to cache segment key.
      * @param target  target usually is phone or email
      * @param scene verify scene
      * @return  result

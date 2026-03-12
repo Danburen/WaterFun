@@ -8,14 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.waterwood.common.exceptions.ServiceException;
 import org.waterwood.waterfunservicecore.api.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 
 @Slf4j
 @Service
 public class ResendEmailService extends EmailServiceBase {
-
-
     private final Resend resend;
     protected ResendEmailService(SpringTemplateEngine templateEngine, @Value("${mail.resend.api-key}") String apiKey) {
         super(templateEngine);
@@ -52,17 +51,9 @@ public class ResendEmailService extends EmailServiceBase {
                     .sendSuccess(true)
                     .target(to)
                     .channel(VerifyChannel.EMAIL)
-                    .responseRaw(res.getId())
                     .build();
         } catch (ResendException e) {
-            CodeResult result = CodeResult.builder()
-                    .sendSuccess(false)
-                    .target(to)
-                    .channel(VerifyChannel.EMAIL)
-                    .message("Email send fail,Please check the email provider & params.")
-                    .build();
-            log.error(result.getMessage(), e);
-            return result;
+            throw new ServiceException("Email send fail,Please check the email provider & params." + e.getMessage());
         }
     }
 }

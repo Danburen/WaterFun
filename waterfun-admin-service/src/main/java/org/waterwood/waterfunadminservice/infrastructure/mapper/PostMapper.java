@@ -1,9 +1,9 @@
 package org.waterwood.waterfunadminservice.infrastructure.mapper;
 
 import org.mapstruct.*;
-import org.waterwood.waterfunadminservice.dto.request.post.CreatePostRequest;
-import org.waterwood.waterfunadminservice.dto.request.post.PatchUserPostReq;
-import org.waterwood.waterfunadminservice.dto.response.post.PostResponse;
+import org.waterwood.waterfunadminservice.api.request.post.CreatePostRequest;
+import org.waterwood.waterfunadminservice.api.request.post.PatchUserPostReq;
+import org.waterwood.waterfunadminservice.api.response.post.PostResponse;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 

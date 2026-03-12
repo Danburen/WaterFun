@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted} from 'vue'
 import router from '~/router/index.js'
 import { ElMessage } from 'element-plus'
@@ -6,7 +6,6 @@ import { useAuthStore } from '@/stores/authStore'
 import {validateAuthname, validatePassword, validateVerifyCode} from "@/utils/validator";
 import { useI18n } from 'vue-i18n'
 import { throttle } from '@waterfun/web-core/src/triggerControl'
-import { authApi } from '~/api/authApi';
 import { convertArrayBufferToBase64 } from "@waterfun/web-core/src/dataMapper";
 import { generateFingerprint } from '@waterfun/web-core/src/fingerprint';
 
@@ -19,8 +18,7 @@ const loginForm = ref({
   captcha: ''
 })
 
-const captchaLoading = ref(false);
-const captchaImage = ref(null);
+const captchaDialogVisible = ref(false);
 
 const validRules = reactive({
   username:[{validator: validateAuthname('password'),trigger: "blur" }],
@@ -28,14 +26,17 @@ const validRules = reactive({
   captcha:[{validator: validateVerifyCode(false), trigger: "blur"}],
 })
 
-const submitLoginForm = () => {
-  loginFormRef.value?.validate((valid) => {
-    if (valid) {
-      generateFingerprint().then(deviceFp => {
-        authApi.login({
+const handleCaptchaCancel = () => {
+  captchaDialogVisible.value = false;
+}
+
+const handleCaptchaConfirm = (code: string, callback: (success: boolean) => void) => {
+  loginForm.value.captcha = code;
+   generateFingerprint().then(deviceFp => {
+        authStore.tryLogin({
           ...loginForm.value,
           deviceFp: deviceFp,
-        }, 'password').then(res => {
+        }).then(res => {
           ElMessage.success(t('message.success.loginSuccess'));
           router.push({ name: 'dashboard' })
         }).catch((err) => {
@@ -43,30 +44,16 @@ const submitLoginForm = () => {
           console.log(err);
         })
       })
+  callback(true);
+}
+
+const submitLoginForm = () => {
+  loginFormRef.value?.validate((valid) => {
+    if (valid) {
+      captchaDialogVisible.value = true;
     } 
   });
 }
-
-const refreshCaptcha = throttle(() => {
-  if(! captchaLoading.value){
-    captchaLoading.value = true;
-    authApi.getCaptcha().then(res => {
-      const base64 = convertArrayBufferToBase64(res);
-      captchaImage.value = `data:image/png;base64,${base64}`;
-    }).catch((err) => {
-      ElMessage.error(t('message.error.apiError'));
-      console.log(err);
-    }).finally(() => {
-      captchaLoading.value = false;
-    })
-  }
-},1000,
-()=>{
-  ElMessage.error(t('message.throttled.clickTooFast'));
-})
-onMounted(() => {
-  refreshCaptcha();
-})
 </script>
 
 <template>
@@ -92,17 +79,6 @@ onMounted(() => {
   <el-form-item prop="password" :label="$t('auth.password')">
     <el-input v-model="loginForm.password" type="password" :placeholder="$t('auth.password')"></el-input>
   </el-form-item>
-  <el-form-item prop="captcha" :label="$t('auth.verifyCode')" class="verify-code-input">
-    <div class="captcha-container">
-      <el-input v-model="loginForm.captcha" :placeholder="$t('auth.verifyCode')" style="width: 120px"></el-input>
-      <el-image
-        :src="captchaImage" :v-loading="captchaLoading"
-        alt="验证码"
-        class="captcha-image"
-        @click="refreshCaptcha"
-      />
-    </div>
-  </el-form-item>
         <el-form-item>
             <el-button class="login-btn" type="primary" 
             @click="submitLoginForm">{{ $t('auth.btn.login') }}</el-button>
@@ -111,6 +87,11 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  <CaptchaDialog
+    v-model="captchaDialogVisible"
+    @confirm="handleCaptchaConfirm"
+    @cancel="handleCaptchaCancel"
+  />
 </template>
 
 <style scoped>
