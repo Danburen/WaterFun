@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.infrastructure.security;
+package org.waterwood.waterfun.waterfungateway.component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -7,38 +7,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.waterwood.common.TokenResult;
 
-import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.time.Duration;
-import java.util.Date;
-import java.util.Map;
 
 @Component
-public class RsaJwtUtil {
+public class RsaJwtParser {
     private final PublicKey publicKey;
-    private final PrivateKey privateKey;
     private final String jwtIssuer;
 
-    public RsaJwtUtil(
-            PublicKey publicKey,
-            PrivateKey privateKey,
-            @Value("${jwt.issuer:waterfun}") String jwtIssuer) {
+    public RsaJwtParser(
+            PublicKey publicKey, @Value("${jwt.issuer:waterfun}") String jwtIssuer) {
         this.publicKey = publicKey;
-        this.privateKey = privateKey;
         this.jwtIssuer = jwtIssuer;
-    }
-
-    public TokenResult generateToken(Map<String, String> claims, Duration dur){
-        Date expDate = new Date(System.currentTimeMillis() + dur.toMillis());
-
-        return new TokenResult(Jwts.builder()
-                .claims(claims) //sub
-                .issuer(jwtIssuer) //iss
-                .issuedAt(new Date()) //iat
-                .expiration(expDate)  //exp
-                //.id() //itj
-                .signWith(privateKey,Jwts.SIG.RS256)
-                .compact(), dur.toSeconds());
     }
 
     /**
