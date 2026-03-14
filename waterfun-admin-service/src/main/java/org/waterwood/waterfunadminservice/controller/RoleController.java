@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.waterfunadminservice.api.request.role.*;
 import org.waterwood.api.ApiResponse;
@@ -25,6 +26,7 @@ public class RoleController {
     private final RoleMapper roleMapper;
 
     @GetMapping("/list")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<Page<RoleResp>> listRoles(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -46,6 +48,7 @@ public class RoleController {
     }
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<Void> addRole(@RequestBody CreateRoleRequest body){
         roleService.addRole(roleMapper.toEntity(body));
         return ApiResponse.success();
