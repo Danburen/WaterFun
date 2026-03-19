@@ -1,24 +1,23 @@
 package org.waterwood.waterfunservicecore.infrastructure.utils.context;
 
 
-import org.waterwood.common.context.LoginUser;
-
 /**
  * ThreadLocal Util
  *
  * Use Spring Security instance
  */
-@Deprecated
-public class ThreadLocalUtil {
-    private static final ThreadLocal<LoginUser> THREAD_LOCAL = new ThreadLocal<>();
-    public static LoginUser get(){
+public class UserCtxHolder {
+    private static final ThreadLocal<AuthContext> THREAD_LOCAL = new ThreadLocal<>();
+    public static AuthContext get(){
         return THREAD_LOCAL.get();
     }
-
+    public static Long getUserUid(){
+        return get().getUserUid();
+    }
     /**
      * Set values to ThreadLocal
      */
-    public static void set(LoginUser context){
+    public static void set(AuthContext context){
         THREAD_LOCAL.set(context);
     }
 

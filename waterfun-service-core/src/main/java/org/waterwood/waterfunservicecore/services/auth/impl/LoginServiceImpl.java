@@ -19,6 +19,7 @@ import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPayload;
 import org.waterwood.utils.codec.HashUtil;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.auth.LoginService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 
@@ -57,7 +58,8 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public boolean logout(long userUid, String refreshToken, String dfp) {
+    public boolean logout(String refreshToken, String dfp) {
+        long userUid = UserCtxHolder.getUserUid();
         RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
         tokenService.removeAccessToken(payload.userUid(), payload.deviceId());
         tokenService.removeRefreshToken(userUid, refreshToken);

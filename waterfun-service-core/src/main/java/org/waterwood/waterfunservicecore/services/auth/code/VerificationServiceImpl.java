@@ -18,6 +18,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRep
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sms.SmsCodeService;
 
 import java.util.Arrays;
@@ -36,8 +37,8 @@ public class VerificationServiceImpl implements VerificationService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
-    public CodeResult sendAutoTargetAuthenticationCode(long userUid, VerifyChannel channel, VerifyScene scene) {
-        UserDatum userDatum = userDatumRepo.findUserDatumByUserUid(userUid)
+    public CodeResult sendAutoTargetAuthenticationCode(VerifyChannel channel, VerifyScene scene) {
+        UserDatum userDatum = userDatumRepo.findUserDatumByUserUid(UserCtxHolder.getUserUid())
                 .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
         EncryptionDataKey aesKey = encryptedKeyService.getAesKey();
         CodeSender sender = codeSenderFactory.of(channel);

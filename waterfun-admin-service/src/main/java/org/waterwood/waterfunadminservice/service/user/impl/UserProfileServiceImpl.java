@@ -7,8 +7,8 @@ import org.waterwood.waterfunservicecore.entity.user.UserProfile;
 import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
-import org.waterwood.waterfunservicecore.infrastructure.security.AuthContextHelper;
 import org.waterwood.waterfunadminservice.service.user.UserProfileService;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 @Service
 public class UserProfileServiceImpl implements UserProfileService {
@@ -27,7 +27,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public void updateProfile(UserProfile profile) {
-        User u = userRepository.findUserByUid(AuthContextHelper.getCurrentUserUid()).orElseThrow(
+        User u = userRepository.findUserByUid(UserCtxHolder.getUserUid()).orElseThrow(
                 ()-> new AuthException(BaseResponseCode.USER_NOT_FOUND)
         );
         profile.setUser(u);
@@ -43,7 +43,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserProfile getUserProfile() {
-        return upRepo.findUserProfileByUserUid(AuthContextHelper.getCurrentUserUid()).orElseThrow(()-> new AuthException(BaseResponseCode.USER_NOT_FOUND));
+        return upRepo.findUserProfileByUserUid(UserCtxHolder.getUserUid()).orElseThrow(()-> new AuthException(BaseResponseCode.USER_NOT_FOUND));
     }
 
 }

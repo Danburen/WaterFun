@@ -14,10 +14,9 @@ public interface UserProfileCoreService {
     /**
      * Update the User Profile
      *
-     * @param userUid
-     * @param dto     the DTO
+     * @param dto the DTO
      */
-    void updateProfileByDto(long userUid, UpdateUserProfileRequest dto);
+    void updateProfileByDto(UpdateUserProfileRequest dto);
 
     /**
      * Get the target User Profile
