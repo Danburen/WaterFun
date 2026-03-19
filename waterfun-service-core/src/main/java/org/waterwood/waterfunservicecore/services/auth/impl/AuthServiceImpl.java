@@ -15,6 +15,7 @@ import org.waterwood.common.TokenResult;
 import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPayload;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.auth.AuthService;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSenderFactory;
 
@@ -56,10 +57,11 @@ public class AuthServiceImpl implements AuthService {
      * @return ServiceResult type Token result that contains tokenValue and expirations.
      */
     @Override
-    public TokenResult refreshAccessToken(long userUid ,String refreshToken, String dfp) {
+    public TokenResult refreshAccessToken(String refreshToken, String dfp) {
         if (StringUtil.isBlank(refreshToken)) { // Missing refresh token
             throw new AuthException(BaseResponseCode.REAUTHENTICATE_REQUIRED);
         }
+        long userUid = UserCtxHolder.getUserUid();
         RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
         String deviceId = payload.deviceId();
         return userRepository.findById(userUid).map(_ ->

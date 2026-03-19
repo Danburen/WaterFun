@@ -7,7 +7,7 @@ import org.waterwood.api.enums.PostStatus;
 import org.waterwood.api.enums.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
-import org.waterwood.waterfunservicecore.infrastructure.security.AuthContextHelper;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public final class PostSpec {
             }
 
             // Current user uid
-            preds.add(criteriaBuilder.equal(root.get("author").get("uid"), AuthContextHelper.getCurrentUserUid()));
+            preds.add(criteriaBuilder.equal(root.get("author").get("uid"), UserCtxHolder.getUserUid()));
             return criteriaBuilder.and(preds.toArray(new Predicate[0]));
         };
     }

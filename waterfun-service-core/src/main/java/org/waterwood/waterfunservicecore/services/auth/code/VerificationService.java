@@ -18,12 +18,12 @@ public interface VerificationService {
     /**
      * Send verification code to authenticate user.
      * will check the db and find channel sending target linked to target
-     * @param userUid user id
+     *
      * @param channel channel
-     * @param scene scene
+     * @param scene   scene
      * @return code result
      */
-    CodeResult sendAutoTargetAuthenticationCode(long userUid, VerifyChannel channel, VerifyScene scene);
+    CodeResult sendAutoTargetAuthenticationCode(VerifyChannel channel, VerifyScene scene);
 
     /**
      * Send verification code to authenticate user segment given target

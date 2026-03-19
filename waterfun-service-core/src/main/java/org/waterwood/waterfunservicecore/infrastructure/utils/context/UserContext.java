@@ -11,6 +11,7 @@ import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor(staticName = "of")
+@Deprecated
 public class UserContext implements UserDetails {
     private final Long userUid;
     private final Set<String> roles;

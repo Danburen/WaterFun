@@ -12,7 +12,7 @@ import org.waterwood.common.cache.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
 import org.waterwood.common.exceptions.BizException;
-import org.waterwood.waterfunservicecore.infrastructure.security.AuthContextHelper;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.auth.UserKeyBuilder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
@@ -37,7 +37,7 @@ public class SecurityAspect {
         boolean pass = Arrays.stream(rr.values())
                 .anyMatch(roles::contains);
         if(!pass){
-            log.info("User {} need roles {} ", AuthContextHelper.getCurrentUserUid() ,roles);
+            log.info("User {} need roles {} ",UserCtxHolder.getUserUid() ,roles);
             throw new BizException(BaseResponseCode.HTTP_FORBIDDEN);
         }
     }
@@ -48,13 +48,13 @@ public class SecurityAspect {
         boolean pass = Arrays.stream(rp.values())
                 .anyMatch(perms::contains);
         if(!pass){
-            log.info("User {} need permissions {} ", AuthContextHelper.getCurrentUserUid() ,perms);
+            log.info("User {} need permissions {} ",UserCtxHolder.getUserUid() ,perms);
             throw new BizException(BaseResponseCode.HTTP_FORBIDDEN);
         }
     }
 
     private Set<String> getRoles(){
-        long userUid = AuthContextHelper.getCurrentUserUid();
+        long userUid = UserCtxHolder.getUserUid();
         Set<String> roles = redisHelper.hKeys(UserKeyBuilder.userRole(userUid)).stream()
                 .map(Object::toString).collect(Collectors.toSet());
         if(roles.isEmpty()){
@@ -64,7 +64,7 @@ public class SecurityAspect {
     }
 
     private Set<String> getPermissions(){
-        long userUid = AuthContextHelper.getCurrentUserUid();
+        long userUid = UserCtxHolder.getUserUid();
         Set<String> permissions = redisHelper.hKeys(UserKeyBuilder.userPerm(userUid)).stream()
                 .map(Object::toString).collect(Collectors.toSet());
         if(permissions.isEmpty()){

@@ -1,61 +1,56 @@
 package org.waterwood.waterfun.waterfungateway.config;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
 import java.security.PublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtValidators;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.waterwood.waterfun.waterfungateway.component.RsaJwtDecoder;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableWebFluxSecurity
 public class GatewaySecurityConfig {
     private PublicKey publicKey;
+    private RsaJwtDecoder jwtParser;
     @Bean
-    SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
+    SecurityWebFilterChain securityFilterChain(
+            ServerHttpSecurity http,
             @Value("${waterfun.security.public-paths}") List<String> publicPaths) throws Exception {
 
-        http
-                .csrf(AbstractHttpConfigurer::disable)
+        return http
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(publicPaths.toArray(String[]::new)).permitAll()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
-
-        return http.build();
-    }
-
-    @Bean
-    JwtDecoder jwtDecoder(
-            @Value("${jwt.public-key}") Resource publicKeyResource,
-            @Value("${jwt.issuer:waterfun}") String issuer) throws Exception {
-        RSAPublicKey publicKey = parsePublicKey(publicKeyResource);
-        NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(publicKey).build();
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));
-        return decoder;
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwt -> jwt
+                                .jwtDecoder(jwtParser)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                )
+                .authorizeExchange(exchange -> exchange
+                        .pathMatchers("/api/auth/**").permitAll()
+                        .anyExchange().authenticated()
+                )
+                .build();
     }
 
     @Bean
@@ -77,6 +72,18 @@ public class GatewaySecurityConfig {
                 .map(String::trim)
                 .filter(part -> !part.isEmpty())
                 .toList();
+    }
+
+    @Bean
+    public ReactiveJwtAuthenticationConverterAdapter jwtAuthenticationConverter(){
+        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthorityPrefix("ROLE_");
+        authoritiesConverter.setAuthoritiesClaimName("roles");
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+        converter.setPrincipalClaimName("sub");
+        return new ReactiveJwtAuthenticationConverterAdapter(converter);
     }
 }
 

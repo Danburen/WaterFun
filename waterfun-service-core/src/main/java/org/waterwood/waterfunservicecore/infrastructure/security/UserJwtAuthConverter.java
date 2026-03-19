@@ -15,6 +15,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
+@Deprecated
 public class UserJwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     @Override

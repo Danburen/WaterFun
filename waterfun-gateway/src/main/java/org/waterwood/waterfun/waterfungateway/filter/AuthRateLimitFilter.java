@@ -1,18 +1,21 @@
 package org.waterwood.waterfun.waterfungateway.filter;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -31,7 +34,8 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
     private final List<String> pathPatterns;
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
-    private final Map<String, CounterWindow> counters = new ConcurrentHashMap<>();
+
+    private final Cache<String, CounterWindow> counters;
 
     public AuthRateLimitFilter(
             @Value("${waterfun.rate-limit.auth.enabled:true}") boolean enabled,
@@ -45,10 +49,16 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
                 .map(String::trim)
                 .filter(v -> !v.isEmpty())
                 .toList();
+        long safeWindowSeconds = Math.max(1, windowSeconds);
+        long ttlSeconds = Math.max(120, safeWindowSeconds * 2);
+        this.counters = Caffeine.newBuilder()
+                .expireAfterWrite(Duration.ofSeconds(ttlSeconds))
+                .maximumSize(10_000)
+                .build();
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response,@NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         if (!enabled || !isLimitedPath(request.getRequestURI())) {
@@ -59,7 +69,7 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
         String key = buildKey(request);
         long nowEpochSecond = Instant.now().getEpochSecond();
 
-        CounterWindow counter = counters.computeIfAbsent(key, ignored -> new CounterWindow(nowEpochSecond));
+        CounterWindow counter = Objects.requireNonNull(counters.get(key, ignored -> new CounterWindow(nowEpochSecond)));
 
         int currentCount;
         long retryAfter;

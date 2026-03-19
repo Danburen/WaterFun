@@ -18,6 +18,7 @@ import org.waterwood.waterfunservicecore.infrastructure.mapper.UserCoreMapper;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserProfileCoreMapper;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudResOperationType;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudResType;
@@ -44,8 +45,9 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
 
     @Override
     @Transactional
-    public void updateProfileByDto(long userUid, UpdateUserProfileRequest dto) {
+    public void updateProfileByDto(UpdateUserProfileRequest dto) {
         //TODO
+        long userUid = UserCtxHolder.getUserUid();
         User u = userCoreService.getUser(userUid);
         UserProfile profile = getUserProfile(userUid);
 

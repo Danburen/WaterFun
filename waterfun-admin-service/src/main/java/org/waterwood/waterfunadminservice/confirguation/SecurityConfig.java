@@ -18,6 +18,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity(debug = false)
 @EnableMethodSecurity
+@Deprecated
 public class SecurityConfig {
     private final WaterJwtDecoder jwtConverter;
 

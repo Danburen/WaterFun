@@ -24,7 +24,7 @@ import org.waterwood.common.exceptions.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRoleRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.UserPermSpec;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.UserSpec;
-import org.waterwood.waterfunservicecore.infrastructure.security.AuthContextHelper;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -71,7 +71,7 @@ public class UserCoreServiceImpl implements UserCoreService {
 
     @Override
     public Set<Permission> getUserPermissions(long userUid) {
-        if(userUid != AuthContextHelper.getCurrentUserUid()){
+        if(userUid != UserCtxHolder.getUserUid()){
            throw  new BizException(BaseResponseCode.HTTP_UNAUTHORIZED);
         }
         List<Role> roles = userRoleRepo.findByUserUid(userUid).stream().map(UserRole::getRole).toList();

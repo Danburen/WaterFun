@@ -8,6 +8,7 @@ import org.waterwood.common.exceptions.BizException;
 import org.waterwood.common.exceptions.ServiceException;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserContext;
 
+@Deprecated
 public final class AuthContextHelper {
     public static Jwt getCurrentJwt() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
