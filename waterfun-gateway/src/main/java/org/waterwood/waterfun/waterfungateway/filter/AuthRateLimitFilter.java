@@ -1,6 +1,6 @@
 package org.waterwood.waterfun.waterfungateway.filter;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -10,23 +10,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
-public class AuthRateLimitFilter extends OncePerRequestFilter {
+public class AuthRateLimitFilter implements GlobalFilter, Ordered {
 
     private final boolean enabled;
     private final int requestLimit;
@@ -34,7 +35,6 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
     private final List<String> pathPatterns;
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
-
     private final Cache<String, CounterWindow> counters;
 
     public AuthRateLimitFilter(
@@ -49,6 +49,7 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
                 .map(String::trim)
                 .filter(v -> !v.isEmpty())
                 .toList();
+
         long safeWindowSeconds = Math.max(1, windowSeconds);
         long ttlSeconds = Math.max(120, safeWindowSeconds * 2);
         this.counters = Caffeine.newBuilder()
@@ -58,51 +59,69 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response,@NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
+        String path = request.getURI().getPath();
 
-        if (!enabled || !isLimitedPath(request.getRequestURI())) {
-            filterChain.doFilter(request, response);
-            return;
+        if (!enabled || !isLimitedPath(path)) {
+            return chain.filter(exchange);
         }
 
-        String key = buildKey(request);
+        String key = buildKey(request, path);
         long nowEpochSecond = Instant.now().getEpochSecond();
 
-        CounterWindow counter = Objects.requireNonNull(counters.get(key, ignored -> new CounterWindow(nowEpochSecond)));
+        CounterWindow counter = Objects.requireNonNull(
+                counters.get(key, k -> new CounterWindow(nowEpochSecond))
+        );
 
         int currentCount;
         long retryAfter;
+        long safeWindow = Math.max(1, windowSeconds);
 
         synchronized (counter) {
-            if ((nowEpochSecond - counter.windowStartEpochSecond) >= windowSeconds) {
+            if (nowEpochSecond - counter.windowStartEpochSecond >= safeWindow) {
                 counter.windowStartEpochSecond = nowEpochSecond;
                 counter.counter.set(0);
             }
-
             currentCount = counter.counter.incrementAndGet();
-            retryAfter = Math.max(1, windowSeconds - (nowEpochSecond - counter.windowStartEpochSecond));
+            retryAfter = Math.max(1, safeWindow - (nowEpochSecond - counter.windowStartEpochSecond));
         }
 
         if (currentCount > requestLimit) {
-            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            response.setHeader("Retry-After", String.valueOf(retryAfter));
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":429,\"message\":\"Too many requests\"}");
-            return;
+            return buildTooManyRequestsResponse(exchange, retryAfter);
         }
 
-        filterChain.doFilter(request, response);
+        return chain.filter(exchange);
+    }
+
+    private Mono<Void> buildTooManyRequestsResponse(ServerWebExchange exchange, long retryAfter) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+        response.getHeaders().add("Retry-After", String.valueOf(retryAfter));
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        String body = "{\"code\":429,\"message\":\"Too many requests\"}";
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        DataBuffer buffer = response.bufferFactory().wrap(bytes);
+
+        return response.writeWith(Mono.just(buffer));
     }
 
     private boolean isLimitedPath(String path) {
         return pathPatterns.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 
-    private String buildKey(HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
-        String path = request.getRequestURI();
+    private String buildKey(ServerHttpRequest request, String path) {
+        String remoteAddr = "unknown";
+        if (request.getRemoteAddress() != null) {
+            remoteAddr = request.getRemoteAddress().getAddress().getHostAddress();
+        }
         return remoteAddr + ":" + path;
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE + 10;
     }
 
     private static class CounterWindow {
@@ -114,4 +133,3 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
         }
     }
 }
-

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.waterwood.common.cache.RedisHelperHolder;
+import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.common.cache.RedisKeyBuilder;
 import org.waterwood.waterfunservicecore.api.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.VerifyScene;

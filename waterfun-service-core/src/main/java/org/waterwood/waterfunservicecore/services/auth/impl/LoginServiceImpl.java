@@ -30,7 +30,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
     private final UserRepository userRepo;
-    private final RSAJwtTokenService tokenService;
+    private final TokenService tokenService;
     private final UserDatumRepo userDatumRepo;
     private final EncryptedKeyService encryptedKeyService;
     private final CaptchaServiceImpl captchaService;
@@ -62,7 +62,7 @@ public class LoginServiceImpl implements LoginService {
         long userUid = UserCtxHolder.getUserUid();
         RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
         tokenService.removeAccessToken(payload.userUid(), payload.deviceId());
-        tokenService.removeRefreshToken(userUid, refreshToken);
+        tokenService.removeRefreshToken(userUid, dfp, refreshToken);
         return true;
     }
 

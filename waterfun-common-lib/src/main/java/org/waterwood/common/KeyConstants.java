@@ -3,6 +3,7 @@ package org.waterwood.common;
 public final class KeyConstants {
     public static final String JTI = "jti";
     public static final String REFRESH = "ref";
+    public static final String DEVICES = "devices";
     public static final String DEVICE = "device";
     public static final String ROLE = "role";
     public static final String PERM = "perm";

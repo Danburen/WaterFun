@@ -4,7 +4,7 @@ import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.waterwood.common.cache.RedisHelperHolder;
+import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.services.auth.CaptchaService;
 import org.waterwood.waterfunservicecore.services.auth.LineCaptchaResult;
 import org.waterwood.waterfunservicecore.services.auth.VerifyKeyBuilder;

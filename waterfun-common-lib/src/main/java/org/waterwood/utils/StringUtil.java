@@ -19,6 +19,12 @@ public final class StringUtil {
         return string == null || string.trim().isEmpty();
     }
 
+    public static void isBlankThen(String string, Runnable runnable){
+        if(isBlank(string)){
+            runnable.run();
+        }
+    }
+
     public static boolean isNotBlank(String string){
         return ! isBlank(string);
     }

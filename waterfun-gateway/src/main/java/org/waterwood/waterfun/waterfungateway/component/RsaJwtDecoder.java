@@ -2,17 +2,20 @@ package org.waterwood.waterfun.waterfungateway.component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.stereotype.Component;
+import org.waterwood.common.constratin.UserKeyBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.security.PublicKey;
 
+@Slf4j
 @Component
 public class RsaJwtDecoder implements ReactiveJwtDecoder {
     private final PublicKey publicKey;
@@ -65,9 +68,12 @@ public class RsaJwtDecoder implements ReactiveJwtDecoder {
     }
 
     private Mono<Jwt> validateToken(Claims claims, String token) {
-        String deviceKey = String.format("token:%s:%s",
-                claims.getSubject(),
-                claims.get("did"));
+        String deviceKey = UserKeyBuilder.userAccessDevice(
+                Long.parseLong(claims.getSubject()),
+                claims.get("did").toString()
+        );
+//        log.info("Validating token for user: {}, device: {}, jti: {}",
+//                claims.getSubject(), claims.get("did"), claims.getId());
         return redisTemplate.opsForValue()
                 .get(deviceKey)
                 .filter(savedJti -> savedJti.equals(claims.getId()))

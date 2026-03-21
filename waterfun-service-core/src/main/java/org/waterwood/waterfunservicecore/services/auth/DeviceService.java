@@ -3,14 +3,14 @@ package org.waterwood.waterfunservicecore.services.auth;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.List;
+import java.util.Set;
 
 public interface DeviceService {
     String generateAndStoreDeviceId(Long userUid, String dfp);
 
     void removeUserDevice(Long userUid, String deviceId);
 
-    String generateDeviceId(long userUid, String dfp);
+    String calculaateDid(long userUid, String dfp);
 
     @Async
     void cleanZombieDevicesBatch(int batchSize);
@@ -22,8 +22,13 @@ public interface DeviceService {
 
     /**
      * Get user's devices
+     *
      * @param userUid the user ID
      * @return List of device IDs
      */
-    List<String> getUserDeviceIds(Long userUid);
+    Set<String> getUserDeviceIds(Long userUid);
+
+    void updateUserDeviceActive(long userUid, String did);
+
+    boolean isNewDeviceDid(long userUid, String calculatedHashDid);
 }
