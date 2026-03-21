@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.services.auth;
+package org.waterwood.common.constratin;
 
 import static org.waterwood.common.KeyConstants.*;
 
@@ -13,8 +13,8 @@ public final class UserKeyBuilder {
         return USER_PREFIX + userUid;
     }
 
-    public static String userDevice(long userUid, String device) {
-        return USER_PREFIX + userUid + ":" + DEVICE + ":" + device;
+    public static String userAccessDevice(long userUid, String deviceId) {
+        return USER_PREFIX + userUid + ":device:" + deviceId + ":access";
     }
 
     public static String userRole(long userUid) {
@@ -25,15 +25,16 @@ public final class UserKeyBuilder {
         return USER_PREFIX + userUid + ":" + PERM;
     }
 
-    public static String userDevice(long userUid) {
-        return USER_PREFIX + userUid + ":" + DEVICE;
+    public static String userDevices(long userUid) {
+        return USER_PREFIX + userUid + ":" + DEVICES;
     }
 
     public static String userJti(long userUid, String value) {
         return USER_PREFIX + userUid + ":" + JTI + ":" + value;
     }
 
-    public static String userRefresh(long userUid, String value) {
-        return USER_PREFIX + userUid + ":" + REFRESH + ":" + value;
+    public static String userRefresh(long userUid, String deviceId, String family) {
+        return USER_PREFIX + userUid + "device:" + deviceId + ":ref:" + family;
     }
+
 }

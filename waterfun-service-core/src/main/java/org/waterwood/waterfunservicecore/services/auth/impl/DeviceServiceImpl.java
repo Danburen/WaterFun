@@ -1,24 +1,34 @@
 package org.waterwood.waterfunservicecore.services.auth.impl;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.waterwood.common.cache.RedisHelperHolder;
+import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.services.auth.DeviceService;
-import org.waterwood.waterfunservicecore.services.auth.UserKeyBuilder;
+import org.waterwood.common.constratin.UserKeyBuilder;
 
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.util.*;
 
 @Service
+@Slf4j
+/**
+ * A service aiming to manager devices
+ * we use redis keys like these:
+ * "user:[userUid]:device:[deviceId] -> jti" store the basic one-token-one-device relations
+ * "user:[userUid]:devices -> set(deviceId)" store all the user's devices
+ * "user:[userUid]:device:[deviceId]:last_active -> timestamp(string)" store single
+ * - user's single device's last active time, used for clean up of zombie devices
+ *
+ */
 public class DeviceServiceImpl implements DeviceService {
     private final RedisHelperHolder redisHelper;
     @Getter
@@ -42,18 +52,18 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public String generateAndStoreDeviceId(Long userUid, String dfp) {
-        String deviceId = this.generateDeviceId(userUid,dfp);
-        redisHelper.hSet(getDeviceKey(userUid),deviceId, String.valueOf(System.currentTimeMillis()));
+        String deviceId = this.calculaateDid(userUid,dfp);
+        redisHelper.sAdd(getDevicesKey(userUid),deviceId, String.valueOf(System.currentTimeMillis()));
         return deviceId;
     }
 
     @Override
     public void removeUserDevice(Long userUid, String deviceId){
-        redisHelper.hDel(getDeviceKey(userUid),deviceId);
+        redisHelper.del(UserKeyBuilder.userAccessDevice(userUid, deviceId));
     }
 
     @Override
-    public String generateDeviceId(long userUid, String dfp){
+    public String calculaateDid(long userUid, String dfp){
         return HashUtil.hashWithSalt(dfp+userUid, deviceHashSalt);
     }
 
@@ -63,11 +73,11 @@ public class DeviceServiceImpl implements DeviceService {
         Page<User> users = userRepository.findAll(PageRequest.of(0, batchSize));
         while(!users.getContent().isEmpty()){
             users.forEach(user->{
-                Map<Object,Object> devices = redisHelper.hGetAll(getDeviceKey(user.getUid()));
+                Map<String, Long> devices = getUserDeviceLastActiveTime(user.getUid());
                 // Get all the devices that are older than the max expire time
                 devices.entrySet().removeIf(
-                        entry-> (System.currentTimeMillis() - (long) entry.getValue()) < deviceExpireMaxTimeMillis);
-                redisHelper.hDel(getDeviceKey(user.getUid()), devices.keySet().toArray(new String[0]));
+                        entry-> (System.currentTimeMillis() - entry.getValue()) < deviceExpireMaxTimeMillis);
+                redisHelper.hDel(getDevicesKey(user.getUid()), devices.keySet().toArray(new String[0]));
             });
         }
     }
@@ -79,11 +89,55 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public List<String> getUserDeviceIds(Long userUid) {
-        return redisHelper.hGetAll(getDeviceKey(userUid)).keySet().stream().map(Object::toString).toList();
+    public Set<String> getUserDeviceIds(Long userUid) {
+        return redisHelper.sMem(getDevicesKey(userUid));
     }
 
-    private String getDeviceKey(Long userUid){
-        return UserKeyBuilder.userDevice(userUid);
+    @Override
+    public void updateUserDeviceActive(long userUid, String did){
+        redisHelper.set(getDeviceLastActiveKey(userUid,did), String.valueOf(System.currentTimeMillis()), Duration.ofDays(30));
+    }
+
+    @Override
+    public boolean isNewDeviceDid(long userUid, String calculatedHashDid) {
+        Set<String> userDeviceIds = getUserDeviceIds(userUid);
+        if(userDeviceIds.contains(calculatedHashDid)){
+            return true;
+        }else{
+            // TODO: AUDIT log for new device login, consider to add more info like IP, device type etc.
+            log.info("New Device detected: userUid={}, deviceId={}", userUid, calculatedHashDid);
+            return false;
+        }
+    }
+
+    private Map<String, Long> getUserDeviceLastActiveTime(Long userUid){
+        HashMap<String, Long> res = new HashMap<>();
+        Set<String> deviceIds = getUserDeviceIds(userUid);
+        if (deviceIds == null || deviceIds.isEmpty()) {
+            return res;
+        }
+
+        List<String> keys = deviceIds.stream().map(id -> String.format(getDeviceLastActiveKey(userUid, id))).toList();
+        List<String> values = redisHelper.mget(keys);
+        int index = 0;
+        for (String deviceId : deviceIds) {
+            String value = values.get(index++);
+            if (value != null) {
+                try {
+                    res.put(deviceId, Long.parseLong(value));
+                } catch (NumberFormatException e) {
+                    log.warn("Invalid lastActiveTime format, userUid={}, deviceId={}, value={}",
+                            userUid, deviceId, value);
+                }
+            }
+        }
+        return res;
+    }
+
+    private String getDeviceLastActiveKey(Long userUid, String did){
+        return "user:" + userUid + ":device:" + did + ":last_active";
+    }
+    private String getDevicesKey(Long userUid){
+        return UserKeyBuilder.userDevices(userUid);
     }
 }

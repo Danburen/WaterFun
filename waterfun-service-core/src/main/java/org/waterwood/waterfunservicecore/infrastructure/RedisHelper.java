@@ -1,17 +1,15 @@
 package org.waterwood.waterfunservicecore.infrastructure;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.waterwood.common.cache.RedisHelperHolder;
 import org.waterwood.utils.JsonUtil;
 import org.waterwood.utils.StringUtil;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -55,6 +53,27 @@ public class RedisHelper implements RedisHelperHolder {
         redisTemplate.opsForHash().delete(key, (Object[]) fields);
     }
 
+    @Override
+    public void sAdd(String key, String... values) {
+            redisTemplate.opsForSet().add(key, values);
+    }
+    @Override
+    public void sRem(String key, Object... values) {
+        redisTemplate.opsForSet().remove(key, values);
+    }
+
+    @Override
+    public void sRem(String key, Collection<String> members) {
+        if(members != null && !members.isEmpty()) {
+            redisTemplate.opsForSet().remove(key, members.toArray());
+        }
+    }
+
+    @Override
+    public Set<String> sMem(String key) {
+        return redisTemplate.opsForSet().members(key);
+    }
+
     public <T> T getValue(String key, Class<T> clazz) {
         return JsonUtil.fromJson(redisTemplate.opsForValue().get(key), clazz);
     }
@@ -91,5 +110,20 @@ public class RedisHelper implements RedisHelperHolder {
             return Collections.nCopies(keys.size(), null);
         }
         return values;
+    }
+
+    @Override
+    public Cursor<String> scan(ScanOptions options) {
+        return redisTemplate.scan(options);
+    }
+
+    @Override
+    public boolean hasKey(String ket) {
+        return redisTemplate.hasKey(ket);
+    }
+
+    @Override
+    public List<Boolean> hasKeys(List<String> keys) {
+        return mget(keys).stream().map(Objects::nonNull).toList();
     }
 }

@@ -1,6 +1,10 @@
-package org.waterwood.common.cache;
+package org.waterwood.waterfunservicecore.infrastructure;
+
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +26,10 @@ public interface RedisHelperHolder {
     Set<Object> hKeys(String key);
 
     void hDel(String key, String... fields);
+    void sAdd(String key, String... values);
+    void sRem(String key, Object... values);
+    void sRem(String key, Collection<String> members);
+    Set<String> sMem(String key);
 
     <T> T getValue(String key, Class<T> clazz);
 
@@ -37,4 +45,9 @@ public interface RedisHelperHolder {
      * @return redis values
      */
     List<String> mget(List<String> keys);
+
+    Cursor<String> scan(ScanOptions options);
+
+    boolean hasKey(String key);
+    List<Boolean> hasKeys(List<String> keys);
 }

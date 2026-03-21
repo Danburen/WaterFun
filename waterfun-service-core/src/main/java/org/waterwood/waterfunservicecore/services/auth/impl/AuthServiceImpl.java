@@ -23,7 +23,7 @@ import org.waterwood.waterfunservicecore.services.auth.code.CodeSenderFactory;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private final RSAJwtTokenService tokenService;
+    private final TokenService tokenService;
     private final DeviceServiceImpl deviceService;
     private final UserRepository userRepository;
     private final CodeSenderFactory codeSenderFactory;
@@ -58,14 +58,14 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public TokenResult refreshAccessToken(String refreshToken, String dfp) {
-        if (StringUtil.isBlank(refreshToken)) { // Missing refresh token
+        StringUtil.isBlankThen(refreshToken, () -> {
             throw new AuthException(BaseResponseCode.REAUTHENTICATE_REQUIRED);
-        }
+        });// Missing refresh token
         long userUid = UserCtxHolder.getUserUid();
         RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
         String deviceId = payload.deviceId();
         return userRepository.findById(userUid).map(_ ->
-                        tokenService.ReGenRefreshToken(refreshToken, userUid, deviceId))
+                        tokenService.genAndCacheRefToken(userUid, deviceId))
                 .orElseThrow(() -> new AuthException(BaseResponseCode.USER_NOT_FOUND));
     }
 }
