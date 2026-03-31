@@ -9,7 +9,7 @@ import org.waterwood.common.constratin.UniquenessChecker;
 public interface SlugUniquenessChecker extends UniquenessChecker {
     boolean existsTagBySlug(String slug);
 
-    default boolean exist(String value){
+    default boolean existsWithUniqueIdentify(String value){
         return existsTagBySlug(value);
     }
 }

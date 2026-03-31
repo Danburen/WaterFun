@@ -6,30 +6,36 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
+import org.waterwood.api.TO.BatchResult;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.waterfunadminservice.api.request.user.UserDatumUpdateAReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserInfoAUpdateReq;
+import org.waterwood.waterfunadminservice.api.request.user.UserPermItemDto;
 import org.waterwood.waterfunadminservice.api.request.user.UserProfileUpdateAReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserRoleItemDto;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
+import org.waterwood.waterfunadminservice.infrastructure.exception.PermException;
+import org.waterwood.waterfunadminservice.infrastructure.exception.UserAdminException;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserAdminMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserCounterMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserProfileMapper;
 import org.waterwood.waterfunservicecore.api.ToDictOption;
 import org.waterwood.waterfunservicecore.api.resp.AccountResp;
+import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
 import org.waterwood.waterfunservicecore.entity.user.*;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRoleRepo;
-import org.waterwood.waterfunadminservice.service.role.RoleServiceImpl;
 import org.waterwood.waterfunadminservice.service.user.UserService;
 import org.waterwood.waterfunservicecore.services.user.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,9 +48,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserRoleRepo userRoleRepo;
-    private final RoleServiceImpl roleService;
     private final UserPermRepo userPermRepo;
     private final RoleRepo roleRepo;
+    private final PermissionRepo permissionRepo;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final UserCoreService userCoreService;
@@ -61,14 +67,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(
-                ()-> new BizException(BaseResponseCode.USER_NOT_FOUND)
+                ()-> new UserAdminException(BaseResponseCode.USER_NOT_FOUND)
         );
     }
 
     @Override
     public User getUserById(long id) {
         return  userRepository.findById(id).orElseThrow(
-                ()-> new BizException(BaseResponseCode.USER_NOT_FOUND)
+                ()-> new UserAdminException(BaseResponseCode.USER_NOT_FOUND)
         );
     }
 
@@ -111,7 +117,35 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void assignRoles(long id, List<UserRoleItemDto> userRoleItemDtos) {
         User user = this.getUserById(id);
-        userRoleRepo.saveAll(toUserRoles(user, userRoleItemDtos, true));
+        List<UserRole> incoming = toUserRoles(user, userRoleItemDtos, true);
+        if (CollectionUtil.isEmpty(incoming)) {
+            return;
+        }
+
+        Set<Integer> roleIds = incoming.stream().map(ur -> ur.getRole().getId()).collect(Collectors.toSet());
+        List<UserRole> existing = userRoleRepo.findByUserUidAndRoleIdIn(id, roleIds);
+        Map<Integer, UserRole> existingMap = existing.stream()
+                .collect(Collectors.toMap(ur -> ur.getRole().getId(), ur -> ur));
+
+        List<UserRole> updates = new ArrayList<>();
+        List<UserRole> inserts = new ArrayList<>();
+        for (UserRole candidate : incoming) {
+            int roleId = candidate.getRole().getId();
+            UserRole existed = existingMap.get(roleId);
+            if (existed == null) {
+                inserts.add(candidate);
+            } else {
+                existed.setExpiresAt(candidate.getExpiresAt());
+                updates.add(existed);
+            }
+        }
+
+        if (CollectionUtil.isNotEmpty(updates)) {
+            userRoleRepo.saveAll(updates);
+        }
+        if (CollectionUtil.isNotEmpty(inserts)) {
+            userRoleRepo.saveAll(inserts);
+        }
     }
 
     @Override
@@ -123,14 +157,65 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void change(long id, List<UserRoleItemDto> adds, List<Integer> deletePermIds) {
+    @Transactional
+    public void assignPermissions(long id, List<UserPermItemDto> userPermItemDtos) {
         User user = this.getUserById(id);
-        if(! CollectionUtil.isEmpty(deletePermIds)){
-            userRoleRepo.deleteByUserUidAndRoleIdIn(id, deletePermIds);
+        List<UserPermission> incoming = toUserPerms(user, userPermItemDtos, true);
+        if (CollectionUtil.isEmpty(incoming)) {
+            return;
         }
-        if(! CollectionUtil.isEmpty(adds)){
-            userRoleRepo.saveAll(toUserRoles(user, adds, false));
-        };
+
+        Set<Integer> permissionIds = incoming.stream()
+                .map(up -> up.getPermission().getId())
+                .collect(Collectors.toSet());
+
+        List<UserPermission> existing = userPermRepo.findByUserUidAndPermissionIdIn(id, permissionIds);
+        Map<Integer, UserPermission> existingMap = existing.stream()
+                .collect(Collectors.toMap(up -> up.getPermission().getId(), up -> up));
+
+        List<UserPermission> updates = new ArrayList<>();
+        List<UserPermission> inserts = new ArrayList<>();
+        for (UserPermission candidate : incoming) {
+            int permissionId = candidate.getPermission().getId();
+            UserPermission existed = existingMap.get(permissionId);
+            if (existed == null) {
+                inserts.add(candidate);
+            } else {
+                existed.setExpiresAt(candidate.getExpiresAt());
+                updates.add(existed);
+            }
+        }
+
+        if (CollectionUtil.isNotEmpty(updates)) {
+            userPermRepo.saveAll(updates);
+        }
+        if (CollectionUtil.isNotEmpty(inserts)) {
+            userPermRepo.saveAll(inserts);
+        }
+    }
+
+    @Override
+    @Transactional
+    public BatchResult removeRoles(long id, List<Integer> roleIds) {
+        this.getUserById(id);
+        if (CollectionUtil.isEmpty(roleIds)) {
+            return BatchResult.empty();
+        }
+        Set<Integer> distinctRoleIds = roleIds.stream().collect(Collectors.toSet());
+        int removed = userRoleRepo.deleteByUserUidAndRoleIdIn(id, distinctRoleIds);
+        return BatchResult.of(roleIds.size(), removed);
+    }
+
+    @Override
+    @Transactional
+    public BatchResult removePermissions(long id, List<Integer> permissionIds) {
+        this.getUserById(id);
+        if (CollectionUtil.isEmpty(permissionIds)) {
+            return BatchResult.empty();
+        }
+        Set<Integer> distinctPermissionIds = permissionIds.stream().collect(Collectors.toSet());
+        int removed = userPermRepo.deleteByUserUidAndPermissionIdIn(id, distinctPermissionIds);
+        return BatchResult.of(permissionIds.size(), removed);
     }
 
     @Override
@@ -143,7 +228,7 @@ public class UserServiceImpl implements UserService {
         Set<UserPermission> ups = userPermissionCoreService.getUserPermission(uid);
 
         return new UserAdminDetail(
-                userMapper.toDto(u),
+                userMapper.toUserInfoARes(u),
                 userProfileMapper.toResponse(p),
                 userCounterMapper.toDto(c),
                 acc,
@@ -154,7 +239,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserInfo(long uid, UserInfoAUpdateReq body) {
-        User u = userCoreService.getUserByUid(uid);;
+        User u = userCoreService.getUserByUid(uid);
         u = userAdminMapper.toEntity(body, u);
         userCoreService.update(u);
     }
@@ -202,9 +287,19 @@ public class UserServiceImpl implements UserService {
      * @return List of UserRoles
      */
     private List<UserRole> toUserRoles(User user, List<UserRoleItemDto> items, boolean strict){
-        Set<Integer> roleIds = items.stream()
-                .map(UserRoleItemDto::getRoleId)
-                .collect(Collectors.toSet());
+        if (CollectionUtil.isEmpty(items)) {
+            return List.of();
+        }
+
+        Map<Integer, UserRoleItemDto> deduplicatedItems = items.stream()
+                .collect(Collectors.toMap(
+                        UserRoleItemDto::getRoleId,
+                        item -> item,
+                        (first, second) -> second,
+                        LinkedHashMap::new
+                ));
+
+        Set<Integer> roleIds = deduplicatedItems.keySet();
         List<Role> roleEntities = roleRepo.findAllById(roleIds);
         Map<Integer, Role> roleMap = roleEntities.stream()
                 .collect(Collectors.toMap(Role::getId, r -> r));
@@ -213,10 +308,10 @@ public class UserServiceImpl implements UserService {
             List<Integer> notFounds = roleIds.stream()
                     .filter(id -> !roleMap.containsKey(id))
                     .toList();
-            throw new BizException(BaseResponseCode.ROLE_NOT_FOUND_WITH_ARGS, notFounds);
+            throw new UserAdminException(BaseResponseCode.ROLE_NOT_FOUND_WITH_ARGS, notFounds);
         }
 
-        return items.stream()
+        return deduplicatedItems.values().stream()
                 .filter(item -> roleMap.containsKey(item.getRoleId()))
                 .map(item ->{
                     UserRole userRole = new UserRole();
@@ -225,5 +320,42 @@ public class UserServiceImpl implements UserService {
                     userRole.setExpiresAt(item.getExpiresAt() == null ? null : Instant.from(item.getExpiresAt()));
                     return userRole;
                 }).toList();
+    }
+
+    private List<UserPermission> toUserPerms(User user, List<UserPermItemDto> items, boolean strict) {
+        if (CollectionUtil.isEmpty(items)) {
+            return List.of();
+        }
+
+        Map<Integer, UserPermItemDto> deduplicatedItems = items.stream()
+                .collect(Collectors.toMap(
+                        UserPermItemDto::getPermissionId,
+                        item -> item,
+                        (ignored, second) -> second,
+                        LinkedHashMap::new
+                ));
+
+        Set<Integer> permissionIds = deduplicatedItems.keySet();
+        List<Permission> permissionEntities = permissionRepo.findAllById(permissionIds);
+        Map<Integer, Permission> permissionMap = permissionEntities.stream()
+                .collect(Collectors.toMap(Permission::getId, p -> p));
+
+        if (strict && permissionIds.size() != permissionEntities.size()) {
+            List<Integer> notFounds = permissionIds.stream()
+                    .filter(pid -> !permissionMap.containsKey(pid))
+                    .toList();
+            throw new PermException(BaseResponseCode.PERMISSION_NOT_FOUND_ARGS, notFounds);
+        }
+
+        return deduplicatedItems.values().stream()
+                .filter(item -> permissionMap.containsKey(item.getPermissionId()))
+                .map(item -> {
+                    UserPermission userPerm = new UserPermission();
+                    userPerm.setUser(user);
+                    userPerm.setPermission(permissionMap.get(item.getPermissionId()));
+                    userPerm.setExpiresAt(item.getExpiresAt() == null ? null : Instant.from(item.getExpiresAt()));
+                    return userPerm;
+                })
+                .toList();
     }
 }

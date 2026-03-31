@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { readonly } from 'vue';
 import {computed, ref} from 'vue';
 import {TagNavItemType} from "~/types/ui/tagNav";
 export const useTagStore = defineStore('tagStore', ()=>{
@@ -15,9 +14,11 @@ export const useTagStore = defineStore('tagStore', ()=>{
             cache.value.add(tag.name)
             tags.value.push(tag)
         }else{
-            cache.value.delete(tag.name)
-            cache.value.add(tag.name)
-            tags.value.push(tag)
+            const index = tags.value.findIndex((currentTag) => currentTag.name === tag.name)
+            if (index !== -1) {
+                // Keep tag unique by name; refresh latest route params/meta in-place.
+                tags.value[index] = tag
+            }
         }
     }
 
@@ -26,14 +27,14 @@ export const useTagStore = defineStore('tagStore', ()=>{
      * @param tagName
      */
     const removeTag = (tagName: string) => {
-        if(cache.value.has(tagName)) {
-            cache.value.delete(tagName)
-            tags.value.splice(tags.value.findIndex(tag => tag.name === tagName),1)
-        }
+        if(!cache.value.has(tagName)) return
+        tags.value = tags.value.filter((tag) => tag.name !== tagName)
+        cache.value = new Set(tags.value.map((tag) => tag.name))
     }
 
     const updateTags = (updatedTags: TagNavItemType[]) => {
         tags.value = updatedTags
+        cache.value = new Set(updatedTags.map((tag) => tag.name))
     }
 
     const hasTag = (name: string):boolean => cache.value.has(name)

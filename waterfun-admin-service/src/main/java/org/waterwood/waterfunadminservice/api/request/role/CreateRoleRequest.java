@@ -21,4 +21,6 @@ public class CreateRoleRequest implements Serializable {
     @Size(max = 255)
     private String description;
     private Integer parentId;
+    @Size(max = 50)
+    private String code;
 }

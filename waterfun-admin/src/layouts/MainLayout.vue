@@ -98,6 +98,7 @@ watch(()=>tagStore.getTags,
               class="tag-nav"
               v-model="activeTags"
               :tag-list="tagList"
+              @order-updated="handleOrderUpdated"
               @tag-removed="handleRemoveTag"
           />
         </div>

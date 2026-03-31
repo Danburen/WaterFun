@@ -44,13 +44,13 @@ export const routes: RouteRecordRaw[] = [
                 path: 'role',
                 name: 'roleManager',
                 meta: { locale:'system.role'},
-                component: () => import("@/views/System/RoleManagerView.vue")
+                component: () => import("~/views/System/role/RoleList.vue")
             },
             {
                 path: 'permission',
                 name: 'permissionManager',
                 meta: { locale:'system.permission' },
-                component: () => import("@/views/System/PermManagerView.vue")
+                component: () => import("~/views/System/perm/PermList.vue")
             }
         ]
     },

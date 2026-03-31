@@ -16,8 +16,10 @@ import java.time.Instant;
 @NoArgsConstructor
 public class RoleResp implements Serializable {
     private Integer id;
+    private String code;
     private String name;
     private String description;
     private Integer parentId;
     private Instant createdAt;
+    private Instant updatedAt;
 }

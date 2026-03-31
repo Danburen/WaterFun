@@ -1,21 +1,23 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence.utils;
 
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
+import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.entity.Role;
-import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.waterfunservicecore.entity.user.UserRole;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class RoleSpec{
-    public static Specification<Role> of(String name, Integer parentId){
+    public static Specification<Role> of(String name, String code, Integer parentId){
         return (root, query, criteriaBuilder) -> {
             List<Predicate> preds = new ArrayList<>();
-            if(name != null){
+            if(StringUtil.isNotBlank(name)){
                 preds.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
+            }
+
+            if(StringUtil.isNotBlank(code)){
+                preds.add(criteriaBuilder.like(root.get("code"), "%" + code + "%"));
             }
 
             if(parentId != null){

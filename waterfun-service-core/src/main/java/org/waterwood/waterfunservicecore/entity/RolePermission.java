@@ -34,7 +34,7 @@ public class RolePermission {
     @ColumnDefault("CURRENT_TIMESTAMP")
     @CreationTimestamp
     @Column(name = "created_at")
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @Column(name = "update_at")
     @UpdateTimestamp

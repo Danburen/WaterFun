@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Data
@@ -13,5 +14,5 @@ public class UserRoleItemDto implements Serializable {
     @NotNull
     private int roleId;
     @Future
-    private LocalDate expiresAt;
+    private Instant expiresAt;
 }

@@ -4,10 +4,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
-import org.waterwood.waterfunadminservice.api.request.role.RolePermItemDTO;
+import org.waterwood.api.TO.BatchResult;
+import org.waterwood.waterfunadminservice.api.request.role.*;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
+import org.waterwood.waterfunservicecore.entity.user.User;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface RoleService {
@@ -35,16 +38,19 @@ public interface RoleService {
     Role getRole(int id);
 
     /**
-     * Add a role, the role must not exist
-     * @param entity role
+     * Add a role, the role must not existsWithUniqueIdentify
+     *
+     * @param req role
      */
-    Role addRole(Role entity);
+    Role addRole(CreateRoleRequest req);
 
     /**
      * Update role, the role ID must be set
-     * @param role  role
+     *
+     * @param id
+     * @param req role
      */
-    Role updateRole(Role role);
+    Role fullUpdateRole(int id, UpdateRoleRequest req);
 
     /**
      * Delete role
@@ -54,23 +60,70 @@ public interface RoleService {
 
     /**
      * Assign one or more permissions to a role
-     * @param id role ID
+     *
+     * @param id            role ID
      * @param permissionIds permission IDs
+     * @return batch result
      */
-    void assignPerms(int id, List<RolePermItemDTO> permissionIds);
+    BatchResult assignPerms(int id, List<RolePermItemDTO> permissionIds);
 
     /**
      * Update role permissions for a role
      * @param id role ID
      * @param permsDto  permission
      */
-    void replaceAllRolePerms(int id, List<RolePermItemDTO> permsDto);
+     BatchResult replaceAllRolePerms(int id, List<RolePermItemDTO> permsDto);
 
     /**
-     * Add or update and remove permissions for a role
-     * @param id role ID
-     * @param updates list of updates
-     * @param deletePermIds list of permission id which needs to be deleted
+     * List the permissions of a role with pagination
+     *
+     * @param id the role id
+     * @return page of permissions
      */
-    void changeRolePerms(int id, List<RolePermItemDTO> updates, List<Integer> deletePermIds);
+    List<Permission> listRolePerms(int id);
+
+    /**
+     * Assign role to user
+     *
+     * @param id       role ID
+     * @param userIds  the request body
+     * @param expireAt role expire time ,if set null, will never expire
+     * @return Batch Result
+     */
+    BatchResult assignUsers(int id, List<Long> userIds, Instant expireAt);
+
+    /**
+     * List users of a role with pagination
+     * @param id role id
+     * @param pageable pageable
+     * @return page of user
+     */
+    Page<User> getRoleUsers(int id, Pageable pageable);
+
+    /**
+     * Remove users role which have target roles
+     *
+     * @param id                the role id
+     * @param removeRoleUserIds target user ids
+     * @return batch result
+     */
+    BatchResult removeRoleUsers(int id, List<Long> removeRoleUserIds);
+
+    /**
+     * Remove a role's permissions
+     *
+     * @param id      the role id
+     * @param permIds target permission ids
+     * @return batch result
+     */
+    BatchResult removeRolePerms(int id, List<Integer> permIds);
+
+    /**
+     * Batch replacing users of a role, the users will be replaced by the given user list, and the old users will be removed
+     * @param id the role id
+     * @param userUids user uids
+     * @param expiresAt role expire time ,if set null, will never expire
+     * @return batch processing result
+     */
+    BatchResult replaceUserRoles(int id, List<Long> userUids, Instant expiresAt);
 }

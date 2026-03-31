@@ -3,9 +3,9 @@ package org.waterwood.common.jpa;
 import org.waterwood.common.constratin.UniquenessChecker;
 
 public interface CodeUniquenessChecker extends UniquenessChecker {
-    boolean existsTagByCode(String slug);
+    boolean existsByCode(String code);
 
-    default boolean exist(String value){
-        return existsTagByCode(value);
+    default boolean existsWithUniqueIdentify(String value){
+        return existsByCode(value);
     }
 }

@@ -1,8 +1,9 @@
 package org.waterwood.waterfunadminservice.service.user;
 
-import jakarta.validation.Valid;
+import org.waterwood.api.TO.BatchResult;
 import org.waterwood.waterfunadminservice.api.request.user.UserDatumUpdateAReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserInfoAUpdateReq;
+import org.waterwood.waterfunadminservice.api.request.user.UserPermItemDto;
 import org.waterwood.waterfunadminservice.api.request.user.UserProfileUpdateAReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserRoleItemDto;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
@@ -48,19 +49,34 @@ public interface UserService {
     void assignRoles(long id, List<UserRoleItemDto> userRoleItemDtos);
 
     /**
+     * Assign direct permissions to user (idempotent upsert semantics).
+     * @param id user id
+     * @param userPermItemDtos list of permission item dto
+     */
+    void assignPermissions(long id, List<UserPermItemDto> userPermItemDtos);
+
+    /**
+     * Remove one or more roles from user.
+     * @param id user id
+     * @param roleIds target role ids
+     * @return batch result
+     */
+    BatchResult removeRoles(long id, List<Integer> roleIds);
+
+    /**
+     * Remove one or more direct permissions from user.
+     * @param id user id
+     * @param permissionIds target permission ids
+     * @return batch result
+     */
+    BatchResult removePermissions(long id, List<Integer> permissionIds);
+
+    /**
      * Replace all roles to user
      * @param id user id
      * @param userRoleItemDtos list of user role item dto.
      */
     void replace(long id, List<UserRoleItemDto> userRoleItemDtos);
-
-    /**
-     * Patch user roles
-     * @param id user id
-     * @param adds list of user role item to add or update
-     * @param deletePermIds list of permission id to delete
-     */
-    void change(long id, List<UserRoleItemDto> adds, List<Integer> deletePermIds);
 
     /**
      * Get user detail info
@@ -79,14 +95,14 @@ public interface UserService {
     /**
      * Update user profile
      * @param uid user id
-     * @param body user profile update request body
+     * @param body user profile fullUpdate request body
      */
     void updateUserProfile(long uid, UserProfileUpdateAReq body);
 
     /**
      * Update user datum
      * @param uid user id
-     * @param body user datum update request body
+     * @param body user datum fullUpdate request body
      */
     void updateUserDatum(long uid, UserDatumUpdateAReq body);
 }

@@ -25,7 +25,7 @@ public enum BaseResponseCode implements ResponseCode {
     VALIDATION_ERROR("general.validation_error"),
     RESOURCE_NOT_FOUND("general.resource_not_found"),
     PARENT_NOT_FOUND("general.parent_not_found"),
-
+    PARENT_MUST_DIFFERENT("general.parent_must_diff"),
     // Validation
     USERNAME_EMPTY_OR_INVALID("user.validation.username_invalid"),
     PASSWORD_EMPTY_OR_INVALID("user.validation.password_invalid"),
@@ -41,7 +41,7 @@ public enum BaseResponseCode implements ResponseCode {
     VERIFY_CODE_INVALID("verify.code.invalid"),
     CAPTCHA_INVALID("verify.captcha.incorrect"),
     USER_ALREADY_EXISTS("user.verify.already_exists"),
-    USER_NOT_FOUND("user.verify.not_found"),
+    USER_NOT_FOUND("user.not_found"),
     EMAIL_INVALID("email.verify.invalid"),
     EMAIL_NOT_FOUND("email.not.found"),
     VERIFY_TARGET_UNSUPPORTED("verify.target.unsupported"),
@@ -50,15 +50,16 @@ public enum BaseResponseCode implements ResponseCode {
 
 
     // Role & Permissions
-    ROLE_NOT_FOUND("permission.role.not_found"),
-    ROLE_NOT_FOUND_WITH_ARGS("permission.role.not_found.args"),
+    ROLE_NOT_FOUND("role.not_found"),
+    ROLE_NOT_FOUND_WITH_ARGS("role.not_found.args"),
 
-    ROLE_ALREADY_EXISTS("permission.role.already_exists"),
-    ROLE_ALREADY_EXISTS_WITH_ARGS("permission.role.already_exists.args"),
+    ROLE_ALREADY_EXISTS("role.already_exists"),
+    ROLE_ALREADY_EXISTS_WITH_ARGS("role.already_exists.args"),
 
-    PERMISSION_NOT_FOUND("permission.permission.not_found"),
-    PERMISSION_ALREADY_EXISTS("permission.permission.already_exists"),
-    PERMISSION_ALREADY_EXISTS_WITH_ARGS("permission.permission.already_exists.args"),
+    PERMISSION_NOT_FOUND("permission.not_found"),
+    PERMISSION_NOT_FOUND_ARGS("permission.not_found.args"),
+    PERMISSION_ALREADY_EXISTS("permission.already_exists"),
+    PERMISSION_ALREADY_EXISTS_WITH_ARGS("permission.already_exists.args"),
 
     // System
     REDUNDANT_OPERATION("system.redundant_operation"),
@@ -85,7 +86,8 @@ public enum BaseResponseCode implements ResponseCode {
     OLD_PASSWORD_INCORRECT("user.verify.old_password_incorrect" ),
     NEED_FILE_TYPE("valid.file_type_required"),
     USER_ROLE_NOT_FOUND("user.role.not_found"),
-    USER_PERMISSION_NOT_FOUND("user.permission.not_found");
+    USER_PERMISSION_NOT_FOUND("user.permission.not_found"),
+    USER_NOT_FOUND_WITH_ARGS("user.not_found.args");
     private final String code;
     // private final String defaultMessage;
 
