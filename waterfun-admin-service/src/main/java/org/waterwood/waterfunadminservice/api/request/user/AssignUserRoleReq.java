@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 public class AssignUserRoleReq {
     @NotNull
-    List<UserRoleItemDto> userRoleItemDtos;
+    List<UserRoleItemDto> userRoles;
 }

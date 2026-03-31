@@ -9,7 +9,6 @@ import java.io.Serializable;
 
 @Data
 public class CreatePermRequest implements Serializable {
-    @NotBlank
     @Size(max = 50)
     private String code;
     @NotBlank

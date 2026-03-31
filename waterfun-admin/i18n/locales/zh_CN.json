@@ -16,22 +16,26 @@
     "post": {
       "title": "文章管理",
       "list": "文章列表"
-    },
-    "user": {
-      "title": "用户管理",
-      "list": "用户列表",
-      "edit": "编辑用户"
-    },
-    "detail": "详情"
+    }
   },
+  "detail": "详情",
   "btn": {
     "create": "新增",
     "delete": "删除",
     "update": "修改",
     "export": "导出"
   },
+  "role": {
+    "title": "角色管理",
+    "list": "角色列表",
+    "edit": "编辑角色",
+    "create": "创建角色"
+  },
   "user": {
-    "profile": "个人中心"
+    "profile": "个人中心",
+    "title": "用户管理",
+    "list": "用户列表",
+    "edit": "编辑用户"
   },
   "operation": {
     "changePassword": "修改密码"

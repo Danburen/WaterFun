@@ -21,16 +21,23 @@ import java.util.Set;
 public class GatewayUserContextFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String userUid = request.getHeader("X-User-Id");
+    protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String userUid = request.getHeader("X-User-Uid");
         if(StringUtil.isBlank(userUid)) {
             filterChain.doFilter(request, response);
+            return;
         }
 
         AuthContext authContext = new AuthContext();
         authContext.setUserUid(Long.valueOf(userUid));
         authContext.setRoles(parseRoles(request.getHeader("X-User-Roles")));
-        authContext.setJti(request.getHeader("X-Token-Jti"));
+
+        String jti = request.getHeader("X-Token-Jti");
+        if(StringUtil.isBlank(jti)){
+            jti = request.getHeader("X-User-Jti");
+        }
+
+        authContext.setJti(jti);
         authContext.setDid(request.getHeader("X-User-Did"));
         // TODO: ADD PERMISSIONS INJECTION
         UserCtxHolder.set(authContext);

@@ -9,5 +9,5 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class UpdateRolePermReq implements Serializable {
-    private List<RolePermItemDTO> permsDto;
+    private List<RolePermItemDTO> perms;
 }

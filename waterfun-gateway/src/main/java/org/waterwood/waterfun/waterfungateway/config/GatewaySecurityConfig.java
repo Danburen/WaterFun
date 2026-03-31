@@ -40,6 +40,7 @@ public class GatewaySecurityConfig {
                 )
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/api/auth/**").permitAll()
+                        .pathMatchers("/api/admin/auth/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .build();

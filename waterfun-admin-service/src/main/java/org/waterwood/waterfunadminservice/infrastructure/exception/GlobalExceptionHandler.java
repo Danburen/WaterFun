@@ -146,7 +146,7 @@ public class GlobalExceptionHandler {
      * @param ex auth exception
      * @return the {@link ResponseEntity} of {@link ErrorResponse} body segment {@link}
      */
-//    @ExceptionHandler(AuthException.class)
+    @ExceptionHandler(AuthException.class)
     public ResponseEntity<?> handleAuthException(AuthException ex){
         ErrorResponse response = new ErrorResponse(
                 ex.getErrorCode(),
@@ -158,6 +158,20 @@ public class GlobalExceptionHandler {
                 new Date()
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(BizException.class)
+    public ResponseEntity<?> handleBizException(BizException ex){
+        ErrorResponse response = new ErrorResponse(
+                ex.getErrorCode(),
+                msgSrc.getMessage(ex.getMessage(),
+                        ex.getParams(),
+                        "error",
+                        LOCALE),
+                null,
+                new Date()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     /**

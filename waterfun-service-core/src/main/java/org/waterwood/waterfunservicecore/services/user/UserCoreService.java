@@ -55,14 +55,6 @@ public interface UserCoreService {
     Page<Role> listRoles(long uid, String roleName, Integer roleParent, Pageable pageable);
 
     /**
-     * Get user role
-     * @param uid user id
-     * @param id role id
-     * @return role
-     */
-    Role getUserRole(long uid, int id);
-
-    /**
      * List user permissions
      * @param uid user id
      * @param name permission name

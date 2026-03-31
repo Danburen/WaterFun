@@ -11,5 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class AssignRolePermReq implements Serializable {
     @NotNull
-    private List<RolePermItemDTO> permsDto;
+    private List<RolePermItemDTO> perms;
 }

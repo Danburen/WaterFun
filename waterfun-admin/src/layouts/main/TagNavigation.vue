@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {TagNavItemType} from "@/types/ui/tagNav.js";
-import {ref, computed, onMounted, onUnmounted, watch, type Ref, type ComputedRef} from 'vue'
+import {ref, computed, onMounted, onUnmounted, watch} from 'vue'
 import router from "@/router/index.js";
 const tagNavContainer = ref();
 const activeTagName = ref('');
@@ -14,7 +14,9 @@ const props = defineProps<{
   modelValue: string;
 }>()
 
-const localOrder = ref(props.tagList.map(tag => tag.name))
+const buildUniqueOrder = (tagList: TagNavItemType[]) => [...new Set(tagList.map((tag) => tag.name))]
+
+const localOrder = ref(buildUniqueOrder(props.tagList))
 
 const emit = defineEmits(['orderUpdated','tagRemoved','tagClick']);
 
@@ -72,7 +74,7 @@ const handleTouchMove = (e) => {
 /*Drag*/
 const handleDragOver = (e: DragEvent) => {
   e.preventDefault()
-  if (! dragIndex) return
+  if (dragIndex.value === null) return
   const container = tagNavContainer.value
   const containerRect = container.getBoundingClientRect()
   const x = e.clientX - containerRect.left + container.scrollLeft
@@ -86,7 +88,7 @@ const handleDragOver = (e: DragEvent) => {
     accumulatedWidth += tagWidthWithGap
   })
   dragPlaceholderIndex.value =
-        Math.max(0,Math.min(newIndex, props.tagList.length)) // ensure not below zero or ubound
+        Math.max(0,Math.min(newIndex, localOrder.value.length)) // ensure not below zero or ubound
 }
 
 const handleDrop = () => {
@@ -103,9 +105,9 @@ const handleDrop = () => {
   }
   const newOrder = [...localOrder.value]
   const [draggedItem] = newOrder.splice(dragIndex.value, 1)
-  newOrder.splice(dragPlaceholderIndex.value,0 ,draggedItem)
+  newOrder.splice(target,0 ,draggedItem)
   localOrder.value = newOrder
-  emit('orderUpdated',newOrder)
+  emit('orderUpdated',{ from: source, to: target })
   dragIndex.value = null
   dragPlaceholderIndex.value = null
 }
@@ -138,7 +140,7 @@ onUnmounted(() => {
 watch(
     () => props.tagList,
     (newList) => {
-      localOrder.value = newList.map(tag => tag.name);
+      localOrder.value = buildUniqueOrder(newList);
       activeTagName.value = props.modelValue;
     },
     { immediate: true, deep: true }
@@ -151,7 +153,7 @@ watch(()=> props.modelValue,
 
 <template>
     <div class="tag-container no-scroll-bar" :style="{ gap: `${tagGap || 6}px` }" ref="tagNavContainer">
-      <template v-for="(tag, index) in sortedTags" :key="index">
+      <template v-for="(tag, index) in sortedTags" :key="tag.name">
         <div
             v-if="dragPlaceholderIndex === index"
             class="tag-placeholder"

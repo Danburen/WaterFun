@@ -120,19 +120,6 @@ public class UserCoreServiceImpl implements UserCoreService {
     }
 
     @Override
-    public Role getUserRole(long uid, int id) {
-        if(! userRoleRepo.existsById(uid)){
-            throw new BizException(BaseResponseCode.USER_NOT_FOUND);
-        }
-        if(! roleRepo.existsById(id)){
-            throw new BizException(BaseResponseCode.ROLE_NOT_FOUND);
-        }
-        return userRoleRepo.findByUserUidAndRoleId(uid, id)
-                .orElseThrow(() -> new BizException(BaseResponseCode.USER_ROLE_NOT_FOUND))
-                .getRole();
-    }
-
-    @Override
     public Page<Permission> listPermissions(long uid, String name, String code, String resource, PermissionType type, Integer parentId, Pageable pageable) {
         return userPermRepo.findAll(UserPermSpec.of(uid, name, code, resource, type, parentId), pageable)
                 .map(UserPermission::getPermission);
