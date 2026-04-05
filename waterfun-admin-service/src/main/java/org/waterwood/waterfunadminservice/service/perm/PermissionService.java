@@ -4,11 +4,12 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.waterwood.api.TO.BatchResult;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunadminservice.api.request.perm.CreatePermRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.UpdatePermRequest;
+import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
 import java.util.List;
@@ -65,11 +66,15 @@ public interface PermissionService {
 
     /**
      * List a permission's users
-     * @param id permission id
+     *
+     * @param id       permission id
+     * @param userUid target user uid
+     * @param username username
+     * @param nickname nickname
      * @param pageable pageable
      * @return page of users
      */
-    Page<User> listPermUsers(int id, Pageable pageable);
+    Page<AssignedUserRes> listPermUsers(int id, Long userUid, String username, String nickname, Pageable pageable);
 
     /**
      * Batch replace a permission's users, the old user-permission relations will be removed
@@ -87,4 +92,10 @@ public interface PermissionService {
      * @return batch processing result
      */
     BatchResult removePermUsers(int id, @NotNull List<Long> userUids);
+
+    /**
+     * List all permission options
+     * @return List of OptionVO
+     */
+    List<OptionVO<Integer>> getAllPermOptions();
 }

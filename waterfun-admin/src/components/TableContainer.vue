@@ -3,12 +3,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import {Pagination} from "~/types";
+import i18n from "../utils/i18n";
+import {useI18n} from "vue-i18n";
 
+
+const { t } = useI18n();
 // Props
 const props = withDefaults(defineProps<{
   title: string;
-  showAddButton?: boolean;
-  addButtonText?: string;
+  showAddBtn?: boolean;
+  showRemoveBtn?: boolean;
+  disableDelete?: boolean;
   showPagination?: boolean;
   pagination?: Pagination;
   total?: number;
@@ -16,9 +21,10 @@ const props = withDefaults(defineProps<{
   currentPage?: number;
   pageSizes?: number[];
 }>(), {
-  showAddButton: false,
-  addButtonText: 'btn.create',
+  showAddBtn: false,
   showPagination: true,
+  showRemoveBtn: true,
+  disableDelete: true,
   pagination: {
     size: 10,
     number: 1,
@@ -33,6 +39,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   add: [];
+  remove: [];
   'update:pageSize': [size: number];
   'update:currentPage': [page: number];
   change: [];
@@ -55,54 +62,52 @@ const localCurrentPage = computed({
 
 </script>
 <template>
-  <div class="base-list-container">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <div class="header-left">
-            <h3>{{ title }}</h3>
-          </div>
-          <div class="header-right">
-            <slot name="action-buttons">
-              <el-button v-if="showAddButton" type="primary" @click="$emit('add')">
-                {{ addButtonText }}
-              </el-button>
-            </slot>
-          </div>
-        </div>
-      </template>
-
-      <div class="card-content">
-        <slot></slot>
-      </div>
-
-      <div v-if="showPagination" class="pagination-container">
-        <el-pagination
+  <CardContainer :title="title">
+    <div class="operation-bar">
+      <slot name="action-buttons">
+        <el-button v-if="showAddBtn" type="primary" size="small" @click="$emit('add')">
+          {{ t('btn.create') }}
+        </el-button>
+        <el-button v-if="showRemoveBtn" :disabled="disableDelete" type="danger" size="small" @click="$emit('remove')">
+          {{ t('btn.delete') }}
+        </el-button>
+      </slot>
+    </div>
+    <slot></slot>
+    <div v-if="showPagination" class="pagination-container">
+      <el-pagination
           v-model:current-page="localCurrentPage"
           v-model:page-size="localPageSize"
           :page-sizes="pageSizes"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
-        />
-      </div>
-    </el-card>
-  </div>
+      />
+    </div>
+  </CardContainer>
 </template>
 
 <style scoped>
-.base-list-container {
+.table-container {
+  border: 1px solid #ccc;
+  box-shadow: #ccc 2px 2px 12px;
+  border-radius: 4px;
   width: 100%;
 }
 
-.card-header {
+.table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0;
+  padding: 10px;
 }
-
 .header-left {
   flex: 1;
+}
+
+.header-divider {
+  height: 1px;
+  background-color: #ccc;
+  margin: 0; /* 控制边距 */
 }
 
 .header-left h3 {
@@ -117,13 +122,17 @@ const localCurrentPage = computed({
   gap: 10px;
 }
 
-.card-content {
-  padding: 20px 0;
+.table-content {
+  padding: 15px;
 }
 
 .pagination-container {
-  margin-top: 20px;
+  margin-top: 10px;
   text-align: center;
   padding: 0 20px 20px 20px;
+}
+
+.operation-bar {
+  margin-bottom: 10px;
 }
 </style>

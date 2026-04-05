@@ -9,23 +9,22 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.waterwood.api.TO.BatchResult;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.api.enums.PermissionType;
 import org.waterwood.waterfunadminservice.api.request.perm.CreatePermRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.UpdatePermRequest;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunadminservice.api.request.perm.assignPermToUsersReq;
 import org.waterwood.waterfunadminservice.api.request.perm.removePermUsersReq;
-import org.waterwood.waterfunadminservice.api.response.PermissionResp;
-import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
-import org.waterwood.waterfunadminservice.api.response.user.UserInfoARes;
-import org.waterwood.waterfunadminservice.infrastructure.mapper.UserAdminMapper;
-import org.waterwood.waterfunadminservice.infrastructure.mapper.UserMapper;
+import org.waterwood.waterfunadminservice.api.response.perm.PermissionResp;
+import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.PermissionMapper;
-import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.PermSpec;
 import org.waterwood.waterfunadminservice.service.perm.PermissionService;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -35,8 +34,6 @@ import org.waterwood.waterfunadminservice.service.perm.PermissionService;
 public class PermissionController {
     private final PermissionService permissionService;
     private final PermissionMapper permissionMapper;
-    private final UserAdminMapper userAdminMapper;
-    private final UserMapper userMapper;
 
     @GetMapping("/list")
     public ApiResponse<Page<PermissionResp>> listPermissions(
@@ -50,6 +47,12 @@ public class PermissionController {
         Page<PermissionResp> perms = permissionService.listPermissions(spec, pageable)
                 .map(permissionMapper::toPermissionResp);
         return ApiResponse.success(perms);
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<PermissionResp> getPermission(@PathVariable int id) {
+        Permission permission = permissionService.getPermission(id);
+        return ApiResponse.success(permissionMapper.toPermissionResp(permission));
     }
 
     @PostMapping
@@ -71,10 +74,12 @@ public class PermissionController {
     }
 
     @GetMapping("/{id}/users")
-    public ApiResponse<Page<UserInfoARes>> getPermUsers(@PathVariable int id,
-                                                        @PageableDefault(page = 0, size = 10) Pageable pageable){
-        Page<User> users = permissionService.listPermUsers(id, pageable);
-        return ApiResponse.success(users.map(userMapper::toUserInfoARes));
+    public ApiResponse<Page<AssignedUserRes>> listPermUsers(@PathVariable int id,
+                                                            @RequestParam(required = false) Long userUid,
+                                                            @RequestParam(required = false) String username,
+                                                            @RequestParam(required = false) String nickname,
+                                                            @PageableDefault Pageable pageable){
+        return ApiResponse.success(permissionService.listPermUsers(id, userUid, username, nickname, pageable));
     }
 
     @PostMapping("/{id}/users")
@@ -95,6 +100,13 @@ public class PermissionController {
     public ApiResponse<BatchResult> deletePermUsers(@PathVariable int id, @RequestBody @Valid removePermUsersReq body){
         return ApiResponse.success(
                 permissionService.removePermUsers(id, body.getUserUids())
+        );
+    }
+
+    @GetMapping("/options")
+    public ApiResponse<List<OptionVO<Integer>>> getPermOptions(){
+        return ApiResponse.success(
+                permissionService.getAllPermOptions()
         );
     }
 }

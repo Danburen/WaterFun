@@ -21,4 +21,7 @@ public class CreatePermRequest implements Serializable {
     @Size(max = 255)
     private String resource;
     private Integer parentId;
+    private Integer orderWeight;
+    private Boolean isSystem;
+
 }

@@ -25,4 +25,6 @@ public class UpdateRoleRequest implements Serializable {
     @Size(max = 255)
     private String description;
     private Integer parentId;
+    private Integer orderWeight;
+    private Boolean isSystem;
 }

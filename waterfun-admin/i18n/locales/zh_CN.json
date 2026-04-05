@@ -1,4 +1,32 @@
 {
+  "error": {
+    "fetch": "获取数据失败"
+  },
+  "none": {
+    "title": "无",
+    "description": "暂无数据"
+  },
+  "yes": {
+    "title": "是"
+  },
+  "no": {
+    "title": "否"
+  },
+  "query": {
+    "placeholder": "请输入搜索内容",
+    "search": "搜索",
+    "title": "查询"
+  },
+  "reset": {
+    "title": "重置",
+    "confirm": "确定要重置吗？",
+    "message": "重置后将清空所有输入内容"
+  },
+  "order": {
+    "title": "排序",
+    "asc": "升序",
+    "desc": "降序"
+  },
   "nav": {
     "dashboard": "仪表盘",
     "system": {
@@ -29,16 +57,196 @@
     "title": "角色管理",
     "list": "角色列表",
     "edit": "编辑角色",
-    "create": "创建角色"
+    "create": "创建角色",
+    "detail": "角色详情",
+    "name": "角色名称",
+    "code": "角色编码",
+    "description": "角色描述",
+    "weight": "排序权重",
+    "isSystem": "系统角色",
+    "parentId": "父级角色ID",
+    "basicInfo": "基础信息",
+    "permissionConfig": "权限配置",
+    "assignedPermissions": "已分配权限",
+    "assignedUsers": "已分配用户",
+    "input": {
+      "name": "请输入角色名称",
+      "code": "请输入角色编码",
+      "parentId": "请选择父级角色",
+      "description": "请输入角色描述"
+    },
+    "validate": {
+      "name": "请输入角色名称",
+      "code": "请输入角色编码",
+      "nameLength": "角色名称长度需在 2-64 个字符",
+      "codeLength": "角色编码长度需在 2-64 个字符"
+    },
+    "confirm": {
+      "delete": "确定删除该角色吗？"
+    },
+    "success": {
+      "create": "角色创建成功",
+      "update": "角色更新成功",
+      "delete": "角色删除成功"
+    },
+    "error": {
+      "fetch": "获取角色信息失败",
+      "save": "保存角色失败",
+      "delete": "删除角色失败",
+      "invalidId": "无效的角色 ID",
+      "fetchPermissions": "获取角色权限失败",
+      "fetchUsers": "获取角色用户失败"
+    }
+  },
+  "permission": {
+    "title": "权限管理",
+    "list": "权限列表",
+    "edit": "编辑权限",
+    "create": "创建权限",
+    "detail": "权限详情",
+    "name": "权限名称",
+    "code": "权限编码",
+    "type": {
+      "title": "权限类型",
+      "menu": "菜单",
+      "button": "按钮",
+      "api": "接口",
+      "data": "数据",
+      "other": "其他"
+    },
+    "resource": "资源标识",
+    "description": "权限描述",
+    "weight": "排序权重",
+    "isSystem": "系统权限",
+    "parentId": "父级权限ID",
+    "assignedUsers": "已分配用户",
+    "input": {
+      "name": "请输入权限名称",
+      "code": "请输入权限编码",
+      "resource": "请输入资源标识",
+      "parentId": "请选择父级权限",
+      "description": "请输入权限描述"
+    },
+    "validate": {
+      "name": "请输入权限名称",
+      "nameLength": "权限名称长度需在 2-50 个字符",
+      "codeLength": "权限编码长度需在 2-50 个字符",
+      "resource": "请输入资源标识",
+      "resourceLength": "资源标识长度不能超过 255 个字符"
+    },
+    "confirm": {
+      "delete": "确定删除该权限吗？"
+    },
+    "success": {
+      "create": "权限创建成功",
+      "update": "权限更新成功",
+      "delete": "权限删除成功"
+    },
+    "error": {
+      "fetch": "获取权限信息失败",
+      "save": "保存权限失败",
+      "delete": "删除权限失败",
+      "invalidId": "无效的权限 ID",
+      "fetchUsers": "获取权限用户失败"
+    }
+  },
+  "create": {
+    "time": "创建时间",
+    "by": "创建人"
+  },
+  "update": {
+    "time": "更新时间",
+    "by": "更新人"
   },
   "user": {
     "profile": "个人中心",
     "title": "用户管理",
     "list": "用户列表",
-    "edit": "编辑用户"
+    "detail": "用户详情",
+    "edit": "编辑用户",
+    "uid": "用户ID",
+    "username": "用户名",
+    "nickname": "昵称",
+    "status": "用户状态",
+    "avatar": "头像",
+    "lastActiveAt": "最后活跃",
+    "basicInfo": "基本信息",
+    "profileInfo": "档案信息",
+    "contactInfo": "联系方式",
+    "counterInfo": "统计数据",
+    "authInfo": "角色与权限",
+    "bio": "简介",
+    "gender": "性别",
+    "birthDate": "生日",
+    "residence": "居住地",
+    "email": "邮箱",
+    "phone": "手机号",
+    "level": "等级",
+    "exp": "经验值",
+    "followerCnt": "粉丝数",
+    "followingCnt": "关注数",
+    "likeCnt": "获赞数",
+    "postCnt": "帖子数",
+    "input": {
+      "username": "请输入用户名",
+      "nickname": "请输入昵称",
+      "avatar": "请输入头像URL",
+      "bio": "请输入个人简介",
+      "birthDate": "请选择生日",
+      "residence": "请输入居住地",
+      "email": "请输入邮箱",
+      "phone": "请输入手机号"
+    },
+    "genderMap": {
+      "male": "男",
+      "female": "女",
+      "other": "其他",
+      "unknown": "保密"
+    },
+    "statusMap": {
+      "active": "正常",
+      "suspended": "暂停",
+      "deactivated": "停用",
+      "deleted": "删除"
+    },
+    "confirm": {
+      "delete": "确定删除该用户吗？"
+    },
+    "success": {
+      "updateInfo": "基本信息更新成功",
+      "updateProfile": "档案信息更新成功",
+      "updateDatum": "联系方式更新成功",
+      "delete": "用户删除成功"
+    },
+    "error": {
+      "fetchList": "获取用户列表失败",
+      "fetchDetail": "获取用户详情失败",
+      "invalidId": "无效的用户ID",
+      "saveInfo": "保存基本信息失败",
+      "saveProfile": "保存档案信息失败",
+      "saveDatum": "保存联系方式失败",
+      "delete": "删除用户失败"
+    },
+    "todo": {
+      "detail": "用户详情页暂未实现"
+    }
   },
   "operation": {
-    "changePassword": "修改密码"
+    "changePassword": "修改密码",
+    "edit": "编辑",
+    "delete": "删除",
+    "export": "导出",
+    "more": "更多",
+    "title": "操作"
+  },
+  "cancel": {
+    "title": "取消"
+  },
+  "save": {
+    "title": "保存"
+  },
+  "back": {
+    "title": "返回"
   },
   "auth": {
     "btn": {

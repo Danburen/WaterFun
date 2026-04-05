@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.*;
+import org.waterwood.api.VO.ToOptionVO;
 import org.waterwood.api.enums.PermissionType;
 
 import java.time.Instant;
@@ -15,7 +16,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "permission")
 @NoArgsConstructor
-public class Permission {
+public class Permission implements ToOptionVO<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -51,5 +52,13 @@ public class Permission {
     @Column(name = "update_at")
     @UpdateTimestamp
     private Instant updateAt;
+
+    @ColumnDefault("1")
+    @Column(name = "order_weight")
+    private Integer orderWeight = 1;
+
+    @ColumnDefault("'0'")
+    @Column(name = "is_system", columnDefinition = "tinyint UNSIGNED")
+    private Boolean isSystem = false;
 
 }

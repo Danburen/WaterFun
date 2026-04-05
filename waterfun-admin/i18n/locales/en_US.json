@@ -2,5 +2,223 @@
   "navigation": {
     "manager": "System Manager",
     "statusMonitor": "System Monitor"
+  },
+  "error": {
+    "fetch": "Failed to fetch data"
+  },
+  "none": {
+    "title": "None"
+  },
+  "yes": {
+    "title": "Yes"
+  },
+  "no": {
+    "title": "No"
+  },
+  "query": {
+    "title": "Search"
+  },
+  "reset": {
+    "title": "Reset"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "system": {
+      "title": "System",
+      "user": "Users",
+      "role": "Roles",
+      "permission": "Permissions"
+    }
+  },
+  "btn": {
+    "create": "Create",
+    "delete": "Delete"
+  },
+  "permission": {
+    "title": "Permission Management",
+    "list": "Permission List",
+    "edit": "Edit Permission",
+    "create": "Create Permission",
+    "detail": "Permission Detail",
+    "name": "Name",
+    "code": "Code",
+    "type": {
+      "title": "Type",
+      "menu": "Menu",
+      "button": "Button",
+      "api": "API",
+      "data": "Data",
+      "other": "Other"
+    },
+    "resource": "Resource",
+    "description": "Description",
+    "weight": "Weight",
+    "isSystem": "System",
+    "parentId": "Parent Permission",
+    "assignedUsers": "Assigned Users",
+    "input": {
+      "name": "Please input permission name",
+      "code": "Please input permission code",
+      "resource": "Please input resource",
+      "parentId": "Please select parent permission",
+      "description": "Please input description"
+    },
+    "validate": {
+      "name": "Please input permission name",
+      "nameLength": "Permission name length must be 2-50",
+      "codeLength": "Permission code length must be 2-50",
+      "resource": "Please input resource",
+      "resourceLength": "Resource length must be <= 255"
+    },
+    "confirm": {
+      "delete": "Are you sure to delete this permission?"
+    },
+    "success": {
+      "create": "Permission created",
+      "update": "Permission updated",
+      "delete": "Permission deleted"
+    },
+    "error": {
+      "fetch": "Failed to fetch permission",
+      "save": "Failed to save permission",
+      "delete": "Failed to delete permission",
+      "invalidId": "Invalid permission ID",
+      "fetchUsers": "Failed to load permission users"
+    }
+  },
+  "role": {
+    "title": "Role Management",
+    "list": "Role List",
+    "edit": "Edit Role",
+    "create": "Create Role",
+    "detail": "Role Detail",
+    "name": "Role Name",
+    "code": "Role Code",
+    "description": "Description",
+    "weight": "Weight",
+    "isSystem": "System Role",
+    "parentId": "Parent Role",
+    "basicInfo": "Basic Info",
+    "permissionConfig": "Permission Config",
+    "assignedPermissions": "Assigned Permissions",
+    "assignedUsers": "Assigned Users",
+    "confirm": {
+      "delete": "Are you sure to delete this role?"
+    },
+    "input": {
+      "name": "Please input role name",
+      "code": "Please input role code",
+      "parentId": "Please select parent role",
+      "description": "Please input role description"
+    },
+    "validate": {
+      "name": "Please input role name",
+      "code": "Please input role code",
+      "nameLength": "Role name length must be 2-64",
+      "codeLength": "Role code length must be 2-64"
+    },
+    "success": {
+      "create": "Role created",
+      "update": "Role updated",
+      "delete": "Role deleted"
+    },
+    "error": {
+      "fetch": "Failed to fetch role",
+      "save": "Failed to save role",
+      "delete": "Failed to delete role",
+      "invalidId": "Invalid role ID",
+      "fetchPermissions": "Failed to load role permissions",
+      "fetchUsers": "Failed to load role users"
+    }
+  },
+  "operation": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "title": "Operation",
+    "more": "More"
+  },
+  "cancel": {
+    "title": "Cancel"
+  },
+  "save": {
+    "title": "Save"
+  },
+  "back": {
+    "title": "Back"
+  },
+  "create": {
+    "time": "Created At"
+  },
+  "user": {
+    "title": "User Management",
+    "list": "User List",
+    "detail": "User Detail",
+    "edit": "Edit User",
+    "uid": "UID",
+    "username": "Username",
+    "nickname": "Nickname",
+    "status": "User Status",
+    "avatar": "Avatar",
+    "lastActiveAt": "Last Active At",
+    "basicInfo": "Basic Info",
+    "profileInfo": "Profile Info",
+    "contactInfo": "Contact Info",
+    "counterInfo": "Statistics",
+    "authInfo": "Roles & Permissions",
+    "bio": "Bio",
+    "gender": "Gender",
+    "birthDate": "Birth Date",
+    "residence": "Residence",
+    "email": "Email",
+    "phone": "Phone",
+    "level": "Level",
+    "exp": "Experience",
+    "followerCnt": "Followers",
+    "followingCnt": "Following",
+    "likeCnt": "Likes",
+    "postCnt": "Posts",
+    "input": {
+      "username": "Please input username",
+      "nickname": "Please input nickname",
+      "avatar": "Please input avatar URL",
+      "bio": "Please input bio",
+      "birthDate": "Please select birth date",
+      "residence": "Please input residence",
+      "email": "Please input email",
+      "phone": "Please input phone"
+    },
+    "genderMap": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "unknown": "Unknown"
+    },
+    "statusMap": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "deactivated": "Deactivated",
+      "deleted": "Deleted"
+    },
+    "confirm": {
+      "delete": "Are you sure to delete this user?"
+    },
+    "success": {
+      "updateInfo": "Basic info updated",
+      "updateProfile": "Profile updated",
+      "updateDatum": "Contact info updated",
+      "delete": "User deleted"
+    },
+    "error": {
+      "fetchList": "Failed to fetch user list",
+      "fetchDetail": "Failed to fetch user detail",
+      "invalidId": "Invalid user ID",
+      "saveInfo": "Failed to save basic info",
+      "saveProfile": "Failed to save profile",
+      "saveDatum": "Failed to save contact info",
+      "delete": "Failed to delete user"
+    },
+    "todo": {
+      "detail": "User detail page is not implemented yet"
+    }
   }
 }

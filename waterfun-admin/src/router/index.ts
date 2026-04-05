@@ -1,4 +1,4 @@
-import {createRouter, createMemoryHistory, createWebHistory, RouteRecordRaw} from "vue-router";
+import {createRouter, createWebHistory, RouteRecordRaw} from "vue-router";
 export const routes: RouteRecordRaw[] = [
     {
         path: '/', redirect: '/dashboard',
@@ -28,15 +28,15 @@ export const routes: RouteRecordRaw[] = [
                 path: 'user',
                 name: 'userManager',
                 meta: { locale:'system.user' },
-                component: () => import("@/views/System/user/UserManagerView.vue")
+                component: () => import("@/views/System/user/UserList.vue")
             },
             {
-                path: 'user/:uid/edit',
-                name: 'userEdit',
-                component: () => import('@/views/System/user/UserEdit.vue'),
+                path: 'user/:uid',
+                name: 'userDetail',
+                component: () => import('@/views/System/user/UserDetail.vue'),
                 props: true,
-                meta: { 
-                    locale: 'user.edit',
+                meta: {
+                    locale: 'user.detail',
                     isDetail: true,
                 }
             },
@@ -47,10 +47,30 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import("~/views/System/role/RoleList.vue")
             },
             {
+                path: 'role/:id',
+                name: 'roleDetail',
+                component: () => import('~/views/System/role/RoleDetail.vue'),
+                props: true,
+                meta: {
+                    locale: 'role.detail',
+                    isDetail: true,
+                }
+            },
+            {
                 path: 'permission',
                 name: 'permissionManager',
                 meta: { locale:'system.permission' },
                 component: () => import("~/views/System/perm/PermList.vue")
+            },
+            {
+                path: 'permission/:id',
+                name: 'permissionDetail',
+                component: () => import('~/views/System/perm/PermDetail.vue'),
+                props: true,
+                meta: {
+                    locale: 'permission.detail',
+                    isDetail: true,
+                }
             }
         ]
     },

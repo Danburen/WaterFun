@@ -23,4 +23,6 @@ public class CreateRoleRequest implements Serializable {
     private Integer parentId;
     @Size(max = 50)
     private String code;
+    private Integer orderWeight;
+    private Boolean isSystem;
 }

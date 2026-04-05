@@ -4,7 +4,7 @@ package org.waterwood.waterfunadminservice.infrastructure.mapper;
 import org.mapstruct.*;
 import org.waterwood.waterfunadminservice.api.request.perm.CreatePermRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.UpdatePermRequest;
-import org.waterwood.waterfunadminservice.api.response.PermissionResp;
+import org.waterwood.waterfunadminservice.api.response.perm.PermissionResp;
 import org.waterwood.waterfunservicecore.entity.Permission;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,

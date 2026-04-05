@@ -18,8 +18,10 @@ public class RoleResp implements Serializable {
     private Integer id;
     private String code;
     private String name;
+    private Integer orderWeight;
     private String description;
     private Integer parentId;
+    private Boolean isSystem;
     private Instant createdAt;
     private Instant updatedAt;
 }
