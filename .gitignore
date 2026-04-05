@@ -10,3 +10,10 @@ node_modules
 pnpm-lock.yaml
 *.sql
 !*.example.sql
+
+*.application.properties
+*.application.yml
+!*.example.application.properties
+!*.example.application.yml
+application-*.yml
+application-*.properties
