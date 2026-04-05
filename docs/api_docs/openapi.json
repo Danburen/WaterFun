@@ -1,0 +1,3243 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "API Documentation",
+    "version" : "1.0"
+  },
+  "paths" : {
+    "/api/post/tag" : {
+      "get" : {
+        "summary" : "getTags",
+        "description" : "getTags",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "array",
+                      "description" : "",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "id" : {
+                            "type" : "integer",
+                            "description" : "",
+                            "format" : "int64"
+                          },
+                          "name" : {
+                            "type" : "string",
+                            "description" : ""
+                          },
+                          "slug" : {
+                            "type" : "string",
+                            "description" : ""
+                          },
+                          "description" : {
+                            "type" : "string",
+                            "description" : ""
+                          },
+                          "usageCount" : {
+                            "type" : "integer",
+                            "description" : "",
+                            "format" : "int64"
+                          },
+                          "createdAt" : {
+                            "type" : "object",
+                            "properties" : {
+                              "seconds" : {
+                                "type" : "integer",
+                                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                "format" : "int64"
+                              },
+                              "nanos" : {
+                                "type" : "integer",
+                                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                              }
+                            },
+                            "description" : ""
+                          },
+                          "updateAt" : {
+                            "type" : "object",
+                            "properties" : {
+                              "seconds" : {
+                                "type" : "integer",
+                                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                "format" : "int64"
+                              },
+                              "nanos" : {
+                                "type" : "integer",
+                                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                              }
+                            },
+                            "description" : ""
+                          }
+                        },
+                        "description" : "DTO for{@link Tag}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "summary" : "updateTag",
+        "description" : "updateTag",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "id" ],
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "integer",
+                    "description" : "",
+                    "format" : "int64"
+                  },
+                  "name" : {
+                    "maxLength" : 50,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "description" : {
+                    "type" : "string",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "addTag",
+        "description" : "addTag",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "name" ],
+                "type" : "object",
+                "properties" : {
+                  "name" : {
+                    "maxLength" : 50,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "description" : {
+                    "maxLength" : 50,
+                    "type" : "string",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/tag/{id}" : {
+      "get" : {
+        "summary" : "getTag",
+        "description" : "getTag",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "id" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "name" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "slug" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "description" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "usageCount" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "createdAt" : {
+                          "type" : "object",
+                          "properties" : {
+                            "seconds" : {
+                              "type" : "integer",
+                              "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                              "format" : "int64"
+                            },
+                            "nanos" : {
+                              "type" : "integer",
+                              "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                            }
+                          },
+                          "description" : ""
+                        },
+                        "updateAt" : {
+                          "type" : "object",
+                          "properties" : {
+                            "seconds" : {
+                              "type" : "integer",
+                              "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                              "format" : "int64"
+                            },
+                            "nanos" : {
+                              "type" : "integer",
+                              "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                            }
+                          },
+                          "description" : ""
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "deleteTag",
+        "description" : "deleteTag",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh-access-token" : {
+      "post" : {
+        "summary" : "refreshAccessToken",
+        "description" : "refreshAccessToken",
+        "parameters" : [ {
+          "name" : "dfp",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "accessToken" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "exp" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/captcha" : {
+      "get" : {
+        "summary" : "getCaptcha",
+        "description" : "getCaptcha",
+        "responses" : {
+          "200" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    },
+    "/api/auth/csrf-token" : {
+      "get" : {
+        "summary" : "getCsrfToken",
+        "description" : "getCsrfToken",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/send-sms-code" : {
+      "post" : {
+        "summary" : "sendSmsCode",
+        "description" : "sendSmsCode",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "phoneNumber" ],
+                "type" : "object",
+                "properties" : {
+                  "phoneNumber" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "purpose" : {
+                    "type" : "string",
+                    "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, RESET_PASSWORD=RESET_PASSWORD}",
+                    "enum" : [ "LOGIN", "REGISTER", "RESET_PASSWORD" ]
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/send-email-code" : {
+      "post" : {
+        "summary" : "sendEmailCode",
+        "description" : "sendEmailCode",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "email" ],
+                "type" : "object",
+                "properties" : {
+                  "email" : {
+                    "type" : "string",
+                    "description" : "",
+                    "format" : "email"
+                  },
+                  "purpose" : {
+                    "type" : "string",
+                    "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, RESET_PASSWORD=RESET_PASSWORD}",
+                    "enum" : [ "LOGIN", "REGISTER", "RESET_PASSWORD" ]
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login/password" : {
+      "post" : {
+        "summary" : "loginByPassword",
+        "description" : "loginByPassword",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "captcha", "deviceFp", "password", "username" ],
+                "type" : "object",
+                "properties" : {
+                  "username" : {
+                    "pattern" : "^[0-9a-zA-Z_]+$",
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "password" : {
+                    "maxLength" : 20,
+                    "minLength" : 8,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "captcha" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "deviceFp" : {
+                    "type" : "string",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "accessToken" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "exp" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login/sms" : {
+      "post" : {
+        "summary" : "loginBySms",
+        "description" : "loginBySms",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "deviceFp", "phoneNumber", "smsCode" ],
+                "type" : "object",
+                "properties" : {
+                  "phoneNumber" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "smsCode" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "deviceFp" : {
+                    "type" : "string",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "accessToken" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "exp" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login/email" : {
+      "post" : {
+        "summary" : "loginByEmail",
+        "description" : "loginByEmail",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "email" : {
+                    "type" : "string",
+                    "description" : "",
+                    "format" : "email"
+                  },
+                  "emailCode" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "deviceFp" : {
+                    "type" : "string",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "accessToken" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "exp" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register" : {
+      "post" : {
+        "summary" : "register",
+        "description" : "register",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "deviceFp", "username" ],
+                "type" : "object",
+                "properties" : {
+                  "phone" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "username" : {
+                    "pattern" : "^[0-9a-zA-Z_]+$",
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "smsCode" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "deviceFp" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "password" : {
+                    "pattern" : "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "email" : {
+                    "type" : "string",
+                    "description" : "",
+                    "format" : "email"
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "accessToken" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "exp" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout" : {
+      "post" : {
+        "summary" : "logout",
+        "description" : "logout",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "string",
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post" : {
+      "post" : {
+        "summary" : "addPost",
+        "description" : "addPost",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "content", "title" ],
+                "type" : "object",
+                "properties" : {
+                  "title" : {
+                    "maxLength" : 32,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "subtitle" : {
+                    "maxLength" : 64,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "content" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "summary" : {
+                    "maxLength" : 500,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "coverImg" : {
+                    "maxLength" : 255,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "status" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "tagIds" : {
+                    "type" : "array",
+                    "description" : "",
+                    "items" : {
+                      "type" : "integer"
+                    }
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/list" : {
+      "get" : {
+        "summary" : "*",
+        "description" : "*",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "page number",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false,
+            "default" : "1"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "page size",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false,
+            "default" : "10"
+          }
+        }, {
+          "name" : "categoryId",
+          "in" : "query",
+          "description" : "category id",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        }, {
+          "name" : "tagIds",
+          "in" : "query",
+          "description" : "tag ids belong to the post",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "nullable" : false,
+            "items" : {
+              "type" : "integer"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "page of posts",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "content" : {
+                          "type" : "array",
+                          "description" : "",
+                          "items" : {
+                            "type" : "object",
+                            "properties" : {
+                              "title" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "subtitle" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "content" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "summary" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "coverImg" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "status" : {
+                                "type" : "string",
+                                "description" : "{DRAFT=DRAFT, PENDING=PENDING, PUBLISHED=PUBLISHED, REJECTED=REJECTED, DELETED=DELETED}",
+                                "enum" : [ "DRAFT", "PENDING", "PUBLISHED", "REJECTED", "DELETED" ]
+                              },
+                              "visibility" : {
+                                "type" : "string",
+                                "description" : "{PUBLIC=PUBLIC, PRIVATE=PRIVATE, FANS_ONLY=FANS_ONLY}",
+                                "enum" : [ "PUBLIC", "PRIVATE", "FANS_ONLY" ]
+                              },
+                              "categoryId" : {
+                                "type" : "integer",
+                                "description" : ""
+                              },
+                              "tagIds" : {
+                                "type" : "array",
+                                "description" : "",
+                                "items" : {
+                                  "type" : "integer"
+                                }
+                              },
+                              "viewCount" : {
+                                "type" : "integer",
+                                "description" : "",
+                                "format" : "int64"
+                              },
+                              "likeCount" : {
+                                "type" : "integer",
+                                "description" : "",
+                                "format" : "int64"
+                              },
+                              "commentCount" : {
+                                "type" : "integer",
+                                "description" : "",
+                                "format" : "int64"
+                              },
+                              "collectCount" : {
+                                "type" : "integer",
+                                "description" : "",
+                                "format" : "int64"
+                              },
+                              "slug" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "publishedAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              },
+                              "createdAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              },
+                              "updatedAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              }
+                            },
+                            "description" : "DTO for{@link Post}"
+                          }
+                        },
+                        "pageable" : {
+                          "type" : "object",
+                          "properties" : {
+                            "paged" : {
+                              "type" : "boolean"
+                            },
+                            "unpaged" : {
+                              "type" : "boolean"
+                            },
+                            "pageNumber" : {
+                              "type" : "integer"
+                            },
+                            "pageSize" : {
+                              "type" : "integer"
+                            },
+                            "offset" : {
+                              "type" : "integer",
+                              "format" : "int64"
+                            },
+                            "sort" : {
+                              "type" : "array",
+                              "items" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "direction" : {
+                                    "type" : "string",
+                                    "description" : "{ASC=ASC, DESC=DESC}",
+                                    "enum" : [ "ASC", "DESC" ]
+                                  },
+                                  "property" : {
+                                    "type" : "string",
+                                    "description" : ""
+                                  },
+                                  "ignoreCase" : {
+                                    "type" : "boolean",
+                                    "description" : ""
+                                  },
+                                  "nullHandling" : {
+                                    "type" : "string",
+                                    "description" : "{NATIVE=NATIVE, NULLS_FIRST=NULLS_FIRST, NULLS_LAST=NULLS_LAST}",
+                                    "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+                                  },
+                                  "ascending" : {
+                                    "type" : "boolean"
+                                  },
+                                  "descending" : {
+                                    "type" : "boolean"
+                                  }
+                                },
+                                "description" : "org.springframework.data.domain.Sort"
+                              }
+                            }
+                          },
+                          "description" : ""
+                        },
+                        "total" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "empty" : {
+                          "type" : "boolean"
+                        },
+                        "number" : {
+                          "type" : "integer"
+                        },
+                        "size" : {
+                          "type" : "integer"
+                        },
+                        "numberOfElements" : {
+                          "type" : "integer"
+                        },
+                        "sort" : {
+                          "type" : "array",
+                          "items" : {
+                            "type" : "object",
+                            "properties" : {
+                              "direction" : {
+                                "type" : "string",
+                                "description" : "{ASC=ASC, DESC=DESC}",
+                                "enum" : [ "ASC", "DESC" ]
+                              },
+                              "property" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "ignoreCase" : {
+                                "type" : "boolean",
+                                "description" : ""
+                              },
+                              "nullHandling" : {
+                                "type" : "string",
+                                "description" : "{NATIVE=NATIVE, NULLS_FIRST=NULLS_FIRST, NULLS_LAST=NULLS_LAST}",
+                                "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+                              },
+                              "ascending" : {
+                                "type" : "boolean"
+                              },
+                              "descending" : {
+                                "type" : "boolean"
+                              }
+                            },
+                            "description" : "org.springframework.data.domain.Sort"
+                          }
+                        },
+                        "first" : {
+                          "type" : "boolean"
+                        },
+                        "last" : {
+                          "type" : "boolean"
+                        },
+                        "totalPages" : {
+                          "type" : "integer"
+                        },
+                        "totalElements" : {
+                          "type" : "integer",
+                          "format" : "int64"
+                        }
+                      },
+                      "description" : ""
+                    }
+                  },
+                  "description" : "page of posts"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/me/list" : {
+      "get" : {
+        "summary" : "listMyPosts",
+        "description" : "listMyPosts",
+        "parameters" : [ {
+          "name" : "page",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false,
+            "default" : "1"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false,
+            "default" : "10"
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : " DRAFT :DRAFT\nPENDING :PENDING\nPUBLISHED :PUBLISHED\nREJECTED :REJECTED\nDELETED :DELETED",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        }, {
+          "name" : "visibility",
+          "in" : "query",
+          "description" : " PUBLIC :PUBLIC\nPRIVATE :PRIVATE\nFANS_ONLY :FANS_ONLY",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        }, {
+          "name" : "categoryId",
+          "in" : "query",
+          "description" : "",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        }, {
+          "name" : "tagIds",
+          "in" : "query",
+          "description" : "",
+          "required" : false,
+          "schema" : {
+            "type" : "array",
+            "nullable" : false,
+            "items" : {
+              "type" : "integer"
+            }
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "content" : {
+                          "type" : "array",
+                          "description" : "",
+                          "items" : {
+                            "type" : "object",
+                            "properties" : {
+                              "title" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "subtitle" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "content" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "summary" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "coverImg" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "status" : {
+                                "type" : "string",
+                                "description" : "{DRAFT=DRAFT, PENDING=PENDING, PUBLISHED=PUBLISHED, REJECTED=REJECTED, DELETED=DELETED}",
+                                "enum" : [ "DRAFT", "PENDING", "PUBLISHED", "REJECTED", "DELETED" ]
+                              },
+                              "visibility" : {
+                                "type" : "string",
+                                "description" : "{PUBLIC=PUBLIC, PRIVATE=PRIVATE, FANS_ONLY=FANS_ONLY}",
+                                "enum" : [ "PUBLIC", "PRIVATE", "FANS_ONLY" ]
+                              },
+                              "categoryId" : {
+                                "type" : "integer",
+                                "description" : ""
+                              },
+                              "tagIds" : {
+                                "type" : "array",
+                                "description" : "",
+                                "items" : {
+                                  "type" : "integer"
+                                }
+                              },
+                              "viewCount" : {
+                                "type" : "integer",
+                                "description" : "",
+                                "format" : "int64"
+                              },
+                              "likeCount" : {
+                                "type" : "integer",
+                                "description" : "",
+                                "format" : "int64"
+                              },
+                              "commentCount" : {
+                                "type" : "integer",
+                                "description" : "",
+                                "format" : "int64"
+                              },
+                              "collectCount" : {
+                                "type" : "integer",
+                                "description" : "",
+                                "format" : "int64"
+                              },
+                              "slug" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "publishedAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              },
+                              "createdAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              },
+                              "updatedAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              }
+                            },
+                            "description" : "DTO for{@link Post}"
+                          }
+                        },
+                        "pageable" : {
+                          "type" : "object",
+                          "properties" : {
+                            "paged" : {
+                              "type" : "boolean"
+                            },
+                            "unpaged" : {
+                              "type" : "boolean"
+                            },
+                            "pageNumber" : {
+                              "type" : "integer"
+                            },
+                            "pageSize" : {
+                              "type" : "integer"
+                            },
+                            "offset" : {
+                              "type" : "integer",
+                              "format" : "int64"
+                            },
+                            "sort" : {
+                              "type" : "array",
+                              "items" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "direction" : {
+                                    "type" : "string",
+                                    "description" : "{ASC=ASC, DESC=DESC}",
+                                    "enum" : [ "ASC", "DESC" ]
+                                  },
+                                  "property" : {
+                                    "type" : "string",
+                                    "description" : ""
+                                  },
+                                  "ignoreCase" : {
+                                    "type" : "boolean",
+                                    "description" : ""
+                                  },
+                                  "nullHandling" : {
+                                    "type" : "string",
+                                    "description" : "{NATIVE=NATIVE, NULLS_FIRST=NULLS_FIRST, NULLS_LAST=NULLS_LAST}",
+                                    "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+                                  },
+                                  "ascending" : {
+                                    "type" : "boolean"
+                                  },
+                                  "descending" : {
+                                    "type" : "boolean"
+                                  }
+                                },
+                                "description" : "org.springframework.data.domain.Sort"
+                              }
+                            }
+                          },
+                          "description" : ""
+                        },
+                        "total" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "empty" : {
+                          "type" : "boolean"
+                        },
+                        "number" : {
+                          "type" : "integer"
+                        },
+                        "size" : {
+                          "type" : "integer"
+                        },
+                        "numberOfElements" : {
+                          "type" : "integer"
+                        },
+                        "sort" : {
+                          "type" : "array",
+                          "items" : {
+                            "type" : "object",
+                            "properties" : {
+                              "direction" : {
+                                "type" : "string",
+                                "description" : "{ASC=ASC, DESC=DESC}",
+                                "enum" : [ "ASC", "DESC" ]
+                              },
+                              "property" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "ignoreCase" : {
+                                "type" : "boolean",
+                                "description" : ""
+                              },
+                              "nullHandling" : {
+                                "type" : "string",
+                                "description" : "{NATIVE=NATIVE, NULLS_FIRST=NULLS_FIRST, NULLS_LAST=NULLS_LAST}",
+                                "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+                              },
+                              "ascending" : {
+                                "type" : "boolean"
+                              },
+                              "descending" : {
+                                "type" : "boolean"
+                              }
+                            },
+                            "description" : "org.springframework.data.domain.Sort"
+                          }
+                        },
+                        "first" : {
+                          "type" : "boolean"
+                        },
+                        "last" : {
+                          "type" : "boolean"
+                        },
+                        "totalPages" : {
+                          "type" : "integer"
+                        },
+                        "totalElements" : {
+                          "type" : "integer",
+                          "format" : "int64"
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/{id}" : {
+      "delete" : {
+        "summary" : "deletePost",
+        "description" : "deletePost",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "summary" : "updatePost",
+        "description" : "updatePost",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "content", "title" ],
+                "type" : "object",
+                "properties" : {
+                  "title" : {
+                    "maxLength" : 32,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "subtitle" : {
+                    "maxLength" : 64,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "content" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "summary" : {
+                    "maxLength" : 500,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "coverImg" : {
+                    "maxLength" : 255,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "visibility" : {
+                    "type" : "string",
+                    "description" : "{PUBLIC=PUBLIC, PRIVATE=PRIVATE, FANS_ONLY=FANS_ONLY}",
+                    "enum" : [ "PUBLIC", "PRIVATE", "FANS_ONLY" ]
+                  },
+                  "categoryId" : {
+                    "type" : "integer",
+                    "description" : ""
+                  },
+                  "tagIds" : {
+                    "type" : "array",
+                    "description" : "",
+                    "items" : {
+                      "type" : "integer"
+                    }
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/userInfo" : {
+      "get" : {
+        "summary" : "getUserInfo",
+        "description" : "getUserInfo",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "uid" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "username" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "accountStatus" : {
+                          "type" : "string",
+                          "description" : "{ACTIVE=ACTIVE, SUSPENDED=SUSPENDED, DEACTIVATED=DEACTIVATED, DELETED=DELETED}",
+                          "enum" : [ "ACTIVE", "SUSPENDED", "DEACTIVATED", "DELETED" ]
+                        },
+                        "createdAt" : {
+                          "type" : "object",
+                          "properties" : {
+                            "seconds" : {
+                              "type" : "integer",
+                              "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                              "format" : "int64"
+                            },
+                            "nanos" : {
+                              "type" : "integer",
+                              "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                            }
+                          },
+                          "description" : ""
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/updateProfile" : {
+      "put" : {
+        "summary" : "updateProfile",
+        "description" : "updateProfile",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "nickname" : {
+                    "maxLength" : 12,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "avatarUrl" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "bio" : {
+                    "maxLength" : 500,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "gender" : {
+                    "type" : "string",
+                    "description" : "{MALE=MALE, FEMALE=FEMALE, UNKNOWN=UNKNOWN, OTHER=OTHER}",
+                    "enum" : [ "MALE", "FEMALE", "UNKNOWN", "OTHER" ]
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/profile" : {
+      "get" : {
+        "summary" : "getProfile",
+        "description" : "getProfile",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "nickname" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "avatarUrl" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "bio" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "gender" : {
+                          "type" : "string",
+                          "description" : "{MALE=MALE, FEMALE=FEMALE, UNKNOWN=UNKNOWN, OTHER=OTHER}",
+                          "enum" : [ "MALE", "FEMALE", "UNKNOWN", "OTHER" ]
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/avatar/upload" : {
+      "get" : {
+        "summary" : "updateAvatar",
+        "description" : "updateAvatar",
+        "parameters" : [ {
+          "name" : "suffix",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "key" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "url" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "method" : {
+                          "type" : "string",
+                          "description" : "{GET=GET, POST=POST, PUT=PUT, DELETE=DELETE, PATCH=PATCH}",
+                          "enum" : [ "GET", "POST", "PUT", "DELETE", "PATCH" ]
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/avatar/uploaded" : {
+      "post" : {
+        "summary" : "avatarUploaded",
+        "description" : "avatarUploaded",
+        "parameters" : [ {
+          "name" : "path",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "previewUrl" : {
+                          "type" : "string",
+                          "description" : ""
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/updatePwd" : {
+      "patch" : {
+        "summary" : "updatePwd",
+        "description" : "updatePwd",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "confirmPwd", "newPwd", "oldPwd" ],
+                "type" : "object",
+                "properties" : {
+                  "oldPwd" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "newPwd" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "confirmPwd" : {
+                    "type" : "string",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/permissions" : {
+      "get" : {
+        "summary" : "getPermissions",
+        "description" : "getPermissions",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "array",
+                      "description" : "",
+                      "items" : {
+                        "type" : "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/category" : {
+      "get" : {
+        "summary" : "getCategories",
+        "description" : "getCategories",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "array",
+                      "description" : "",
+                      "items" : {
+                        "required" : [ "createdAt", "id", "name", "slug", "updateAt" ],
+                        "type" : "object",
+                        "properties" : {
+                          "id" : {
+                            "type" : "integer",
+                            "description" : "",
+                            "format" : "int64"
+                          },
+                          "name" : {
+                            "maxLength" : 50,
+                            "type" : "string",
+                            "description" : ""
+                          },
+                          "slug" : {
+                            "maxLength" : 50,
+                            "type" : "string",
+                            "description" : ""
+                          },
+                          "description" : {
+                            "type" : "string",
+                            "description" : ""
+                          },
+                          "parentId" : {
+                            "type" : "integer",
+                            "description" : "",
+                            "format" : "int64"
+                          },
+                          "sortOrder" : {
+                            "type" : "integer",
+                            "description" : ""
+                          },
+                          "isActive" : {
+                            "type" : "boolean",
+                            "description" : ""
+                          },
+                          "updateAt" : {
+                            "type" : "object",
+                            "properties" : {
+                              "seconds" : {
+                                "type" : "integer",
+                                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                "format" : "int64"
+                              },
+                              "nanos" : {
+                                "type" : "integer",
+                                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                              }
+                            },
+                            "description" : ""
+                          },
+                          "createdAt" : {
+                            "type" : "object",
+                            "properties" : {
+                              "seconds" : {
+                                "type" : "integer",
+                                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                "format" : "int64"
+                              },
+                              "nanos" : {
+                                "type" : "integer",
+                                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                              }
+                            },
+                            "description" : ""
+                          }
+                        },
+                        "description" : "Response DTO for{@link Category}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "summary" : "updateCategory",
+        "description" : "updateCategory",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "id" ],
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "integer",
+                    "description" : "",
+                    "format" : "int64"
+                  },
+                  "name" : {
+                    "maxLength" : 50,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "slug" : {
+                    "maxLength" : 50,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "description" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "parentId" : {
+                    "type" : "integer",
+                    "description" : "",
+                    "format" : "int64"
+                  },
+                  "sortOrder" : {
+                    "type" : "integer",
+                    "description" : ""
+                  },
+                  "isActive" : {
+                    "type" : "boolean",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "addCategory",
+        "description" : "addCategory",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "name" ],
+                "type" : "object",
+                "properties" : {
+                  "name" : {
+                    "maxLength" : 50,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "description" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "parentId" : {
+                    "type" : "integer",
+                    "description" : "",
+                    "format" : "int64"
+                  },
+                  "sortOrder" : {
+                    "type" : "integer",
+                    "description" : ""
+                  },
+                  "isActive" : {
+                    "type" : "boolean",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "deleteCategory",
+        "description" : "deleteCategory",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/category/{id}" : {
+      "get" : {
+        "summary" : "getCategory",
+        "description" : "getCategory",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "required" : [ "createdAt", "id", "name", "slug", "updateAt" ],
+                      "type" : "object",
+                      "properties" : {
+                        "id" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "name" : {
+                          "maxLength" : 50,
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "slug" : {
+                          "maxLength" : 50,
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "description" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "parentId" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "sortOrder" : {
+                          "type" : "integer",
+                          "description" : ""
+                        },
+                        "isActive" : {
+                          "type" : "boolean",
+                          "description" : ""
+                        },
+                        "updateAt" : {
+                          "type" : "object",
+                          "properties" : {
+                            "seconds" : {
+                              "type" : "integer",
+                              "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                              "format" : "int64"
+                            },
+                            "nanos" : {
+                              "type" : "integer",
+                              "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                            }
+                          },
+                          "description" : ""
+                        },
+                        "createdAt" : {
+                          "type" : "object",
+                          "properties" : {
+                            "seconds" : {
+                              "type" : "integer",
+                              "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                              "format" : "int64"
+                            },
+                            "nanos" : {
+                              "type" : "integer",
+                              "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                            }
+                          },
+                          "description" : ""
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/resource/legal/{type}/{lang}/{fileName}" : {
+      "get" : {
+        "summary" : "getLegalResource",
+        "description" : "getLegalResource",
+        "parameters" : [ {
+          "name" : "type",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "lang",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "fileName",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : { }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/sales-data" : {
+      "get" : {
+        "summary" : "getSalesData",
+        "description" : "getSalesData",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "productName" : {
+                        "type" : "string",
+                        "description" : ""
+                      },
+                      "salesAmount" : {
+                        "type" : "integer",
+                        "description" : ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "addSalesData",
+        "description" : "addSalesData",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "productName" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "salesAmount" : {
+                    "type" : "integer",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    },
+    "/upload" : {
+      "post" : {
+        "summary" : "upload",
+        "description" : "upload",
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "file" : {
+                    "type" : "string",
+                    "description" : "",
+                    "format" : "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required" : false
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upload/policy" : {
+      "get" : {
+        "summary" : "policy",
+        "description" : "policy",
+        "parameters" : [ {
+          "name" : "suffix",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "key" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "url" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "method" : {
+                          "type" : "string",
+                          "description" : "{GET=GET, POST=POST, PUT=PUT, DELETE=DELETE, PATCH=PATCH}",
+                          "enum" : [ "GET", "POST", "PUT", "DELETE", "PATCH" ]
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "java.time.Instant" : {
+        "type" : "object",
+        "properties" : {
+          "seconds" : {
+            "type" : "integer",
+            "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+            "format" : "int64"
+          },
+          "nanos" : {
+            "type" : "integer",
+            "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+          }
+        },
+        "description" : ""
+      },
+      "DTO for{@link Tag}" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "slug" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "description" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "usageCount" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          },
+          "createdAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              }
+            },
+            "description" : ""
+          },
+          "updateAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              }
+            },
+            "description" : ""
+          }
+        },
+        "description" : ""
+      },
+      "org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData" : {
+        "type" : "object",
+        "properties" : {
+          "accessToken" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "exp" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          }
+        },
+        "description" : ""
+      },
+      "DTO for{@link Post}" : {
+        "type" : "object",
+        "properties" : {
+          "title" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "subtitle" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "content" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "summary" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "coverImg" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "{DRAFT=DRAFT, PENDING=PENDING, PUBLISHED=PUBLISHED, REJECTED=REJECTED, DELETED=DELETED}",
+            "enum" : [ "DRAFT", "PENDING", "PUBLISHED", "REJECTED", "DELETED" ]
+          },
+          "visibility" : {
+            "type" : "string",
+            "description" : "{PUBLIC=PUBLIC, PRIVATE=PRIVATE, FANS_ONLY=FANS_ONLY}",
+            "enum" : [ "PUBLIC", "PRIVATE", "FANS_ONLY" ]
+          },
+          "categoryId" : {
+            "type" : "integer",
+            "description" : ""
+          },
+          "tagIds" : {
+            "type" : "array",
+            "description" : "",
+            "items" : {
+              "type" : "integer"
+            }
+          },
+          "viewCount" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          },
+          "likeCount" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          },
+          "commentCount" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          },
+          "collectCount" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          },
+          "slug" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "publishedAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              },
+              "epochSecond" : {
+                "type" : "integer",
+                "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                "format" : "int64"
+              },
+              "nano" : {
+                "type" : "integer",
+                "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+              }
+            },
+            "description" : ""
+          },
+          "createdAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              },
+              "epochSecond" : {
+                "type" : "integer",
+                "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                "format" : "int64"
+              },
+              "nano" : {
+                "type" : "integer",
+                "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+              }
+            },
+            "description" : ""
+          },
+          "updatedAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              },
+              "epochSecond" : {
+                "type" : "integer",
+                "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                "format" : "int64"
+              },
+              "nano" : {
+                "type" : "integer",
+                "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+              }
+            },
+            "description" : ""
+          }
+        },
+        "description" : "DTO for{@link Post}"
+      },
+      "org.springframework.data.domain.Sort" : {
+        "type" : "object",
+        "properties" : {
+          "direction" : {
+            "type" : "string",
+            "description" : "{ASC=ASC, DESC=DESC}",
+            "enum" : [ "ASC", "DESC" ]
+          },
+          "property" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "ignoreCase" : {
+            "type" : "boolean",
+            "description" : ""
+          },
+          "nullHandling" : {
+            "type" : "string",
+            "description" : "{NATIVE=NATIVE, NULLS_FIRST=NULLS_FIRST, NULLS_LAST=NULLS_LAST}",
+            "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+          },
+          "ascending" : {
+            "type" : "boolean"
+          },
+          "descending" : {
+            "type" : "boolean"
+          }
+        },
+        "description" : "org.springframework.data.domain.Sort"
+      },
+      "org.springframework.data.domain.Pageable" : {
+        "type" : "object",
+        "properties" : {
+          "paged" : {
+            "type" : "boolean"
+          },
+          "unpaged" : {
+            "type" : "boolean"
+          },
+          "pageNumber" : {
+            "type" : "integer"
+          },
+          "pageSize" : {
+            "type" : "integer"
+          },
+          "offset" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "sort" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "direction" : {
+                  "type" : "string",
+                  "description" : "{ASC=ASC, DESC=DESC}",
+                  "enum" : [ "ASC", "DESC" ]
+                },
+                "property" : {
+                  "type" : "string",
+                  "description" : ""
+                },
+                "ignoreCase" : {
+                  "type" : "boolean",
+                  "description" : ""
+                },
+                "nullHandling" : {
+                  "type" : "string",
+                  "description" : "{NATIVE=NATIVE, NULLS_FIRST=NULLS_FIRST, NULLS_LAST=NULLS_LAST}",
+                  "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+                },
+                "ascending" : {
+                  "type" : "boolean"
+                },
+                "descending" : {
+                  "type" : "boolean"
+                }
+              },
+              "description" : "org.springframework.data.domain.Sort"
+            }
+          }
+        },
+        "description" : ""
+      },
+      "DTO for{@link User}" : {
+        "type" : "object",
+        "properties" : {
+          "uid" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "username" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "accountStatus" : {
+            "type" : "string",
+            "description" : "{ACTIVE=ACTIVE, SUSPENDED=SUSPENDED, DEACTIVATED=DEACTIVATED, DELETED=DELETED}",
+            "enum" : [ "ACTIVE", "SUSPENDED", "DEACTIVATED", "DELETED" ]
+          },
+          "createdAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              }
+            },
+            "description" : ""
+          }
+        },
+        "description" : ""
+      },
+      "DTO for{@link UserProfile}" : {
+        "type" : "object",
+        "properties" : {
+          "nickname" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "avatarUrl" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "bio" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "gender" : {
+            "type" : "string",
+            "description" : "{MALE=MALE, FEMALE=FEMALE, UNKNOWN=UNKNOWN, OTHER=OTHER}",
+            "enum" : [ "MALE", "FEMALE", "UNKNOWN", "OTHER" ]
+          }
+        },
+        "description" : ""
+      },
+      "File upload response dto for file upload sign to cloud temporary storage." : {
+        "type" : "object",
+        "properties" : {
+          "key" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "url" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "method" : {
+            "type" : "string",
+            "description" : "{GET=GET, POST=POST, PUT=PUT, DELETE=DELETE, PATCH=PATCH}",
+            "enum" : [ "GET", "POST", "PUT", "DELETE", "PATCH" ]
+          }
+        },
+        "description" : ""
+      },
+      "org.waterwood.waterfunservicecore.api.resp.CloudResourceViewResp" : {
+        "type" : "object",
+        "properties" : {
+          "previewUrl" : {
+            "type" : "string",
+            "description" : ""
+          }
+        },
+        "description" : ""
+      },
+      "Response DTO for{@link Category}" : {
+        "required" : [ "createdAt", "id", "name", "slug", "updateAt" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          },
+          "name" : {
+            "maxLength" : 50,
+            "type" : "string",
+            "description" : ""
+          },
+          "slug" : {
+            "maxLength" : 50,
+            "type" : "string",
+            "description" : ""
+          },
+          "description" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "parentId" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          },
+          "sortOrder" : {
+            "type" : "integer",
+            "description" : ""
+          },
+          "isActive" : {
+            "type" : "boolean",
+            "description" : ""
+          },
+          "updateAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              }
+            },
+            "description" : ""
+          },
+          "createdAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              }
+            },
+            "description" : ""
+          }
+        },
+        "description" : ""
+      }
+    }
+  }
+}

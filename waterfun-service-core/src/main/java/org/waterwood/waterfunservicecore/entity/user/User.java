@@ -7,7 +7,10 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
+import org.waterwood.api.VO.OptionVO;
+import org.waterwood.api.VO.ToOptionVO;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -80,6 +83,10 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserCounter userCounter;
+
+    public OptionVO<Long> toOptionVO(){
+        return OptionVO.of(this.uid, this.nickname, this.nickname, ! this.accountStatus.equals(AccountStatus.ACTIVE));
+    }
 }
 
 

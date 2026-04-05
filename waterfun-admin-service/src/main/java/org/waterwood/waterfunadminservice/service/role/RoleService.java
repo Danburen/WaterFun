@@ -4,11 +4,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
-import org.waterwood.api.TO.BatchResult;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunadminservice.api.request.role.*;
+import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
+import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
-import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
 import java.util.List;
@@ -77,10 +79,14 @@ public interface RoleService {
     /**
      * List the permissions of a role with pagination
      *
-     * @param id the role id
+     * @param id       the role id
+     * @param permId   permission Id
+     * @param code     permission code
+     * @param name     permission name
+     * @param pageable pageable
      * @return page of permissions
      */
-    List<Permission> listRolePerms(int id);
+    Page<AssignedPermissionRes> getRolePerms(int id, Integer permId, String code, String name, Pageable pageable);
 
     /**
      * Assign role to user
@@ -94,11 +100,15 @@ public interface RoleService {
 
     /**
      * List users of a role with pagination
-     * @param id role id
+     *
+     * @param id       role id
+     * @param userUid user UID
+     * @param username username
+     * @param nickname nickname
      * @param pageable pageable
      * @return page of user
      */
-    Page<User> getRoleUsers(int id, Pageable pageable);
+    Page<AssignedUserRes> getRoleUsers(int id, Long userUid, String username, String nickname, Pageable pageable);
 
     /**
      * Remove users role which have target roles
@@ -126,4 +136,11 @@ public interface RoleService {
      * @return batch processing result
      */
     BatchResult replaceUserRoles(int id, List<Long> userUids, Instant expiresAt);
+
+    /**
+     * Get all role ids.
+     *
+     * @return list of role ids
+     */
+    List<OptionVO<Integer>> getAllRoleOptions();
 }

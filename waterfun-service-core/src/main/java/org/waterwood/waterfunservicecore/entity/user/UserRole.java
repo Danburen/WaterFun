@@ -7,8 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.waterwood.waterfunservicecore.api.DictOption;
-import org.waterwood.waterfunservicecore.api.ToDictOption;
+import org.waterwood.api.VO.ToExpirableDictOption;
 import org.waterwood.waterfunservicecore.entity.Role;
 
 import java.time.Instant;
@@ -17,7 +16,7 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "user_role")
-public class UserRole implements ToDictOption {
+public class UserRole implements ToExpirableDictOption<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

@@ -8,18 +8,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.waterwood.api.TO.BatchResult;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunadminservice.api.request.role.*;
 import org.waterwood.api.ApiResponse;
-import org.waterwood.waterfunadminservice.api.response.PermissionResp;
-import org.waterwood.waterfunadminservice.api.response.user.UserInfoARes;
-import org.waterwood.waterfunadminservice.infrastructure.mapper.PermissionMapper;
-import org.waterwood.waterfunadminservice.infrastructure.mapper.UserMapper;
-import org.waterwood.waterfunservicecore.entity.Permission;
+import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
+import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunservicecore.entity.Role;
 import org.waterwood.waterfunadminservice.api.response.role.RoleResp;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
-import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.RoleSpec;
 import org.waterwood.waterfunadminservice.service.role.RoleService;
 
@@ -34,8 +31,6 @@ import java.util.List;
 @PreAuthorize("isAuthenticated()")
 public class RoleController {
     private final RoleMapper roleMapper;
-    private final PermissionMapper permissionMapper;
-    private final UserMapper userMapper;
     private final RoleService roleService;
 
     @GetMapping("/list")
@@ -43,7 +38,7 @@ public class RoleController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String code,
             @RequestParam(required = false) Integer parentId,
-            @PageableDefault(page = 0, size = 10) Pageable pageable
+            @PageableDefault() Pageable pageable
     ){
 
         Specification<Role> spec = RoleSpec.of(name, code, parentId);
@@ -84,18 +79,10 @@ public class RoleController {
     }
 
     @PutMapping("/{id}/permissions")
-    public ApiResponse<BatchResult> updatePermissions(@PathVariable int id, @RequestBody UpdateRolePermReq body){
+    public ApiResponse<BatchResult> putPermissions(@PathVariable int id, @RequestBody UpdateRolePermReq body){
         return ApiResponse.success(
                 roleService.replaceAllRolePerms(id, body.getPerms())
         );
-    }
-
-    @GetMapping("/{id}/permissions")
-    public ApiResponse<List<PermissionResp>> listRolePerms(@PathVariable int id){
-        List<Permission> perms = roleService.listRolePerms(id);
-        return ApiResponse.success(perms.stream()
-                .map(permissionMapper::toPermissionResp)
-                .toList());
     }
 
     @DeleteMapping("/{id}/permissions")
@@ -104,12 +91,22 @@ public class RoleController {
     }
 
     @GetMapping("/{id}/users")
-    public ApiResponse<Page<UserInfoARes>> getRoleUsers(@PathVariable int id,
-                                                        @PageableDefault(page = 0, size = 10) Pageable pageable){
-        Page<User> users = roleService.getRoleUsers(id, pageable);
-        return ApiResponse.success(users.map(userMapper::toUserInfoARes));
+    public ApiResponse<Page<AssignedUserRes>> listRoleUsers(@PathVariable int id,
+                                                            @RequestParam(required = false) Long userUid,
+                                                            @RequestParam(required = false) String username,
+                                                            @RequestParam(required = false) String nickname,
+                                                            @PageableDefault() Pageable pageable){
+        return ApiResponse.success(roleService.getRoleUsers(id, userUid, username, nickname, pageable));
     }
 
+    @GetMapping("/{id}/permissions")
+    public ApiResponse<Page<AssignedPermissionRes>> getRolePerms(@PathVariable int id,
+                                                                 @RequestParam(required = false) Integer permId,
+                                                                 @RequestParam(required = false) String code,
+                                                                 @RequestParam(required = false) String name,
+                                                                 @PageableDefault Pageable pageable){
+        return ApiResponse.success(roleService.getRolePerms(id, permId, code, name, pageable));
+    }
     @PostMapping("/{id}/users")
     public ApiResponse<BatchResult> assignUserRoles(@PathVariable int id, @RequestBody AssignUserToRoleReq req){
         return ApiResponse.success(roleService.assignUsers(id, req.getUserUids(), req.getExpiresAt()));
@@ -124,6 +121,13 @@ public class RoleController {
     public ApiResponse<BatchResult> deleteUserRoles(@PathVariable int id, @RequestBody RemoveRoleUsersReq req){
         return ApiResponse.success(
                 roleService.removeRoleUsers(id, req.getUserIds())
+        );
+    }
+
+    @GetMapping("/options")
+    public ApiResponse<List<OptionVO<Integer>>> listRoleOptions(){
+        return ApiResponse.success(
+                roleService.getAllRoleOptions()
         );
     }
 }

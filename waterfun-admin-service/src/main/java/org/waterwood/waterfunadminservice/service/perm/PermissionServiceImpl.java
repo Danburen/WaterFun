@@ -9,11 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.api.TO.BatchResult;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.ExpirableOptionVO;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunadminservice.api.request.perm.CreatePermRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.UpdatePermRequest;
+import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunadminservice.infrastructure.exception.PermException;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.PermissionMapper;
 import org.waterwood.waterfunservicecore.entity.Permission;
@@ -60,6 +63,8 @@ public class PermissionServiceImpl implements PermissionService {
         perm.setParent(req.getParentId() == null ? null : getPermission(req.getParentId()));
         perm.setType(req.getType());
         perm.setResource(req.getResource());
+        perm.setOrderWeight(req.getOrderWeight() == null ? 1 : req.getOrderWeight());
+        perm.setIsSystem(Boolean.TRUE.equals(req.getIsSystem()));
         return permissionRepo.save(perm);
     }
 
@@ -122,9 +127,18 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Page<User> listPermUsers(int id, Pageable pageable) {
-        return userPermRepo.findByPermissionId(id, pageable)
-                .map(UserPermission::getUser);
+    public Page<AssignedUserRes> listPermUsers(int id, Long userUid, String username, String nickname, Pageable pageable) {
+        Page<UserPermission> res = userPermRepo.listPermUsers(id, userUid, username, nickname, pageable);
+        return res.map(up -> {
+            AssignedUserRes assign = new AssignedUserRes();
+            assign.setAssignedAt(up.getCreatedAt());
+            assign.setExpiresAt(up.getExpiresAt());
+            User u = up.getUser();
+            assign.setUserUid(u.getUid());
+            assign.setNickname(u.getNickname());
+            assign.setUsername(u.getUsername());
+            return assign;
+        });
     }
 
     @Override
@@ -138,6 +152,13 @@ public class PermissionServiceImpl implements PermissionService {
     public BatchResult removePermUsers(int id, @NotNull List<Long> userUids) {
         int removed = userPermRepo.deleteByPermissionIdAndUserUidIn(id, userUids);
         return BatchResult.of(userUids.size(), removed);
+    }
+
+    @Override
+    public List<OptionVO<Integer>> getAllPermOptions() {
+        return permissionRepo.findAll().stream()
+                .map(Permission::toOption)
+                .toList();
     }
 
     private void updatePerm(Permission perm, @Nullable Integer parentId, @Nullable String code, @Nullable String name) {

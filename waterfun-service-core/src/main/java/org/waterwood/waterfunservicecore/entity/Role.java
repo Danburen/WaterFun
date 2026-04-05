@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.*;
-import org.waterwood.waterfunservicecore.api.DictOption;
+import org.waterwood.api.VO.ToOptionVO;
 
 import java.time.Instant;
 
@@ -17,7 +17,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "role")
 @NoArgsConstructor
-public class Role {
+public class Role implements ToOptionVO<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -47,6 +47,14 @@ public class Role {
     @NotNull
     @Column(name = "code", nullable = false, length = 50)
     private String code;
+
+    @ColumnDefault("1")
+    @Column(name = "order_weight")
+    private Integer orderWeight = 0;
+
+    @ColumnDefault("'0'")
+    @Column(name = "is_system", columnDefinition = "tinyint UNSIGNED")
+    private Boolean isSystem = false;
 
     public Role(String name, String description) {
         this.name = name;

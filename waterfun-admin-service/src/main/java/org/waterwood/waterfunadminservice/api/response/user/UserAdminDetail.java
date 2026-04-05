@@ -3,7 +3,7 @@ package org.waterwood.waterfunadminservice.api.response.user;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.waterfunservicecore.api.DictOption;
+import org.waterwood.api.VO.ExpirableOptionVO;
 import org.waterwood.waterfunservicecore.api.resp.AccountResp;
 
 import java.io.Serializable;
@@ -17,6 +17,6 @@ public class UserAdminDetail implements Serializable {
     private UserProfileRes profile;
     private UserCounterARes counter;
     private AccountResp maskedData;
-    private Set<DictOption> roles;
-    private Set<DictOption> permissions;
+    private Set<ExpirableOptionVO<Integer>> roles;
+    private Set<ExpirableOptionVO<Integer>> permissions;
 }

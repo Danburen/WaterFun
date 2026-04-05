@@ -1,0 +1,3019 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Admin",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/api/admin/role/list": {
+      "get": {
+        "summary": "listRoles",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageRoleResp"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "10": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "11": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "12": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "13": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "id": 0,
+                            "code": "",
+                            "name": "",
+                            "description": "",
+                            "parentId": 0,
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/role/{id}": {
+      "get": {
+        "summary": "getRole",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRoleResp"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "10": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "11": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "12": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "13": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "id": 0,
+                        "code": "",
+                        "name": "",
+                        "description": "",
+                        "parentId": 0,
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "updatedAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "updateRole",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 1,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleRequest",
+                "description": ""
+              },
+              "example": {
+                "name": "test modify",
+                "code": "modify code",
+                "description": "2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                },
+                "example": {
+                  "code": "",
+                  "message": "",
+                  "data": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "deleteRole",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "10": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "11": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "12": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "13": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/role": {
+      "post": {
+        "summary": "addRole",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "10": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "11": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "12": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "13": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/role/{id}/permissions": {
+      "post": {
+        "summary": "assignPermissions",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 1,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRolePermReq",
+                "description": ""
+              },
+              "example": {
+                "perms": [
+                  {
+                    "permissionId": 1,
+                    "expiresAt": null
+                  },
+                  {
+                    "permissionId": 1,
+                    "expiresAt": null
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                },
+                "example": {
+                  "code": "",
+                  "message": "",
+                  "data": {
+                    "requested": 0,
+                    "success": 0,
+                    "ignored": 0,
+                    "failed": 0,
+                    "ignoredIds": [
+                      0
+                    ],
+                    "failedIds": [
+                      0
+                    ],
+                    "message": ""
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "updatePermissions",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRolePermReq",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "10": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "11": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "12": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "13": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "requested": 0,
+                        "success": 0,
+                        "ignored": 0,
+                        "failed": 0,
+                        "ignoredIds": [
+                          0
+                        ],
+                        "failedIds": [
+                          0
+                        ],
+                        "message": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "listRolePerms",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListPermissionResp"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        {
+                          "id": 0,
+                          "code": "",
+                          "name": "",
+                          "description": "",
+                          "type": "",
+                          "resource": "",
+                          "parentId": 0,
+                          "createdAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        {
+                          "id": 0,
+                          "code": "",
+                          "name": "",
+                          "description": "",
+                          "type": "",
+                          "resource": "",
+                          "parentId": 0,
+                          "createdAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        {
+                          "id": 0,
+                          "code": "",
+                          "name": "",
+                          "description": "",
+                          "type": "",
+                          "resource": "",
+                          "parentId": 0,
+                          "createdAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        {
+                          "id": 0,
+                          "code": "",
+                          "name": "",
+                          "description": "",
+                          "type": "",
+                          "resource": "",
+                          "parentId": 0,
+                          "createdAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "deleteRolePerms",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteRolePermsReq",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "requested": 0,
+                        "success": 0,
+                        "ignored": 0,
+                        "failed": 0,
+                        "ignoredIds": [
+                          0
+                        ],
+                        "failedIds": [
+                          0
+                        ],
+                        "message": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/role/{id}/users": {
+      "get": {
+        "summary": "getRoleUsers",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserInfoARes"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "uid": 0,
+                            "username": "",
+                            "accountStatus": "",
+                            "statusChangedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "nickname": "",
+                            "avatarUrl": "",
+                            "lastActiveAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "content": [
+                          {
+                            "uid": 0,
+                            "username": "",
+                            "accountStatus": "",
+                            "statusChangedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "updatedAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "createdAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            },
+                            "nickname": "",
+                            "avatarUrl": "",
+                            "lastActiveAt": {
+                              "seconds": 0,
+                              "nanos": 0,
+                              "epochSecond": 0,
+                              "nano": 0
+                            }
+                          }
+                        ],
+                        "pageable": {
+                          "paged": false,
+                          "unpaged": false,
+                          "pageNumber": 0,
+                          "pageSize": 0,
+                          "offset": 0,
+                          "sort": [
+                            {
+                              "direction": "",
+                              "property": "",
+                              "ignoreCase": false,
+                              "nullHandling": "",
+                              "ascending": false,
+                              "descending": false
+                            }
+                          ]
+                        },
+                        "total": 0,
+                        "empty": false,
+                        "number": 0,
+                        "size": 0,
+                        "numberOfElements": 0,
+                        "sort": [
+                          {
+                            "direction": "",
+                            "property": "",
+                            "ignoreCase": false,
+                            "nullHandling": "",
+                            "ascending": false,
+                            "descending": false
+                          }
+                        ],
+                        "first": false,
+                        "last": false,
+                        "totalPages": 0,
+                        "totalElements": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "putUserRoles",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUserToRoleReq",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "requested": 0,
+                        "success": 0,
+                        "ignored": 0,
+                        "failed": 0,
+                        "ignoredIds": [
+                          0
+                        ],
+                        "failedIds": [
+                          0
+                        ],
+                        "message": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "deleteUserRoles",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveRoleUsersReq",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "requested": 0,
+                        "success": 0,
+                        "ignored": 0,
+                        "failed": 0,
+                        "ignoredIds": [
+                          0
+                        ],
+                        "failedIds": [
+                          0
+                        ],
+                        "message": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "assignUserRoles",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUserToRoleReq",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                },
+                "example": {
+                  "code": "",
+                  "message": "",
+                  "data": {
+                    "requested": 0,
+                    "success": 0,
+                    "ignored": 0,
+                    "failed": 0,
+                    "ignoredIds": [
+                      0
+                    ],
+                    "failedIds": [
+                      0
+                    ],
+                    "message": ""
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Instant": {
+        "type": "object",
+        "properties": {
+          "seconds": {
+            "type": "integer",
+            "description": "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+            "format": "int64"
+          },
+          "nanos": {
+            "type": "integer",
+            "description": "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+          }
+        }
+      },
+      "RoleResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": ""
+          },
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "name": {
+            "type": "string",
+            "description": ""
+          },
+          "description": {
+            "type": "string",
+            "description": ""
+          },
+          "parentId": {
+            "type": "integer",
+            "description": ""
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          }
+        }
+      },
+      "Sort": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "ASC",
+              "DESC"
+            ]
+          },
+          "property": {
+            "type": "string",
+            "description": ""
+          },
+          "ignoreCase": {
+            "type": "boolean",
+            "description": ""
+          },
+          "nullHandling": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "NATIVE",
+              "NULLS_FIRST",
+              "NULLS_LAST"
+            ]
+          },
+          "ascending": {
+            "type": "boolean",
+            "description": "Returns whether sorting for this property shall be ascending."
+          },
+          "descending": {
+            "type": "boolean",
+            "description": "Returns whether sorting for this property shall be descending."
+          }
+        }
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "paged": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Pageable} contains pagination information."
+          },
+          "unpaged": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Pageable} does not contain pagination information."
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "Returns the page to be returned."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "Returns the number of items to be returned."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Returns the offset to be taken according to the underlying page and page size.",
+            "format": "int64"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sort",
+              "description": "org.springframework.data.domain.Sort"
+            },
+            "description": "Returns the sorting parameters."
+          }
+        }
+      },
+      "PageRoleResp": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleResp",
+              "description": "DTO for{@link Role}"
+            },
+            "description": ""
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/Pageable",
+            "description": ""
+          },
+          "total": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "empty": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Streamable} is empty."
+          },
+          "number": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "numberOfElements": {
+            "type": "integer"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sort",
+              "description": "org.springframework.data.domain.Sort"
+            }
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponsePageRoleResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageRoleResp",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseRoleResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/RoleResp",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "description": "",
+            "type": "null"
+          }
+        }
+      },
+      "CreateRoleRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "",
+            "maxLength": 50
+          },
+          "description": {
+            "type": "string",
+            "description": "",
+            "maxLength": 255
+          },
+          "parentId": {
+            "type": "integer",
+            "description": ""
+          },
+          "code": {
+            "type": "string",
+            "description": "",
+            "maxLength": 50
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateRoleRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "",
+            "maxLength": 50
+          },
+          "code": {
+            "type": "string",
+            "description": "",
+            "maxLength": 50
+          },
+          "description": {
+            "type": "string",
+            "description": "",
+            "maxLength": 255
+          },
+          "parentId": {
+            "type": "integer",
+            "description": ""
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "RolePermItemDTO": {
+        "type": "object",
+        "properties": {
+          "permissionId": {
+            "type": "integer",
+            "description": ""
+          },
+          "expiresAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          }
+        },
+        "required": [
+          "permissionId"
+        ]
+      },
+      "AssignRolePermReq": {
+        "type": "object",
+        "properties": {
+          "perms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RolePermItemDTO",
+              "description": "org.waterwood.waterfunadminservice.api.request.role.RolePermItemDTO"
+            },
+            "description": ""
+          }
+        },
+        "required": [
+          "perms"
+        ]
+      },
+      "UpdateRolePermReq": {
+        "type": "object",
+        "properties": {
+          "perms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RolePermItemDTO",
+              "description": "org.waterwood.waterfunadminservice.api.request.role.RolePermItemDTO"
+            },
+            "description": ""
+          }
+        }
+      },
+      "UserInfoARes": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string",
+            "description": ""
+          },
+          "accountStatus": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED",
+              "DELETED"
+            ]
+          },
+          "statusChangedAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          },
+          "nickname": {
+            "type": "string",
+            "description": ""
+          },
+          "avatarUrl": {
+            "type": "string",
+            "description": ""
+          },
+          "lastActiveAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          }
+        }
+      },
+      "PageUserInfoARes": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserInfoARes",
+              "description": "DTO for{@link User}"
+            },
+            "description": ""
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/Pageable",
+            "description": ""
+          },
+          "total": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "empty": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Streamable} is empty."
+          },
+          "number": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "numberOfElements": {
+            "type": "integer"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sort",
+              "description": "org.springframework.data.domain.Sort"
+            }
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponsePageUserInfoARes": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageUserInfoARes",
+            "description": ""
+          }
+        }
+      },
+      "PermissionResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": ""
+          },
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "name": {
+            "type": "string",
+            "description": ""
+          },
+          "description": {
+            "type": "string",
+            "description": ""
+          },
+          "type": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "MENU",
+              "BUTTON",
+              "API",
+              "DATA",
+              "OTHER"
+            ]
+          },
+          "resource": {
+            "type": "string",
+            "description": ""
+          },
+          "parentId": {
+            "type": "integer",
+            "description": ""
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseListPermissionResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionResp",
+              "description": "DTO for{@link org.waterwood.waterfunservicecore.entity.Permission}"
+            },
+            "description": ""
+          }
+        }
+      },
+      "DeleteRolePermsReq": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          }
+        }
+      },
+      "AssignUserToRoleReq": {
+        "type": "object",
+        "properties": {
+          "userUids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          },
+          "expiresAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          }
+        }
+      },
+      "RemoveRoleUsersReq": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          }
+        }
+      },
+      "BatchResult": {
+        "type": "object",
+        "properties": {
+          "requested": {
+            "type": "integer",
+            "description": ""
+          },
+          "success": {
+            "type": "integer",
+            "description": ""
+          },
+          "ignored": {
+            "type": "integer",
+            "description": ""
+          },
+          "failed": {
+            "type": "integer",
+            "description": ""
+          },
+          "ignoredIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          },
+          "failedIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseBatchResult": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/BatchResult",
+            "description": ""
+          }
+        }
+      }
+    },
+    "responses": {},
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "servers": [],
+  "security": []
+}

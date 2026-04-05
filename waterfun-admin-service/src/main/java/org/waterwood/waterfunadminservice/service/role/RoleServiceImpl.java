@@ -9,10 +9,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.api.TO.BatchResult;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunadminservice.api.request.role.*;
+import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
+import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunadminservice.infrastructure.exception.RoleException;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
 import org.waterwood.waterfunservicecore.entity.Permission;
@@ -73,6 +76,8 @@ public class RoleServiceImpl implements RoleService {
                 getRole(body.getParentId()));
         role.setDescription(body.getDescription());
         role.setCode(identifierGenerator.fromCode(body.getCode(), body.getName(), roleRepo));
+        role.setOrderWeight(body.getOrderWeight() == null ? 0 : body.getOrderWeight());
+        role.setIsSystem(Boolean.TRUE.equals(body.getIsSystem()));
         return roleRepo.save(role);
     }
 
@@ -84,14 +89,9 @@ public class RoleServiceImpl implements RoleService {
         return roleRepo.save(role);
     }
 
-    @Override
-    public List<Permission> listRolePerms(int id) {
-        return rolePermRepo.findAllById(id)
-                .stream()
-                .map(RolePermission::getPermission)
-                .toList();
-    }
 
+
+    @Transactional
     @Override
     public BatchResult assignUsers(int id, List<Long> userIds, Instant expireAt) {
         Role role = getRole(id);
@@ -136,11 +136,36 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Page<User> getRoleUsers(int id, Pageable pageable) {
-        return userRoleRepo.findByRoleId(id, pageable)
-                .map(UserRole::getUser);
+    public Page<AssignedUserRes> getRoleUsers(int id, Long userUid, String username, String nickname, Pageable pageable) {
+        Page<UserRole> res = userRoleRepo.listRoleUsers(id, userUid, username, nickname, pageable);
+        return res.map(ur -> {
+            AssignedUserRes assign = new AssignedUserRes();
+            assign.setAssignedAt(ur.getCreatedAt());
+            assign.setExpiresAt(ur.getExpiresAt());
+            User user = ur.getUser();
+            assign.setUserUid(user.getUid());
+            assign.setUsername(user.getUsername());
+            assign.setNickname(user.getNickname());
+            return assign;
+        });
     }
 
+    @Override
+    public Page<AssignedPermissionRes> getRolePerms(int id, Integer permId, String code, String name, Pageable pageable) {
+        Page<RolePermission> res = rolePermRepo.listRolePerms(id, permId, name, code, pageable);
+        return res.map(rp -> {
+            AssignedPermissionRes assign = new AssignedPermissionRes();
+            assign.setAssignedAt(rp.getCreatedAt());
+            assign.setExpiresAt(rp.getExpiresAt());
+            Permission perm = rp.getPermission();
+            assign.setId(perm.getId());
+            assign.setName(perm.getName());
+            assign.setCode(perm.getCode());
+            return assign;
+        });
+    }
+
+    @Transactional
     @Override
     public BatchResult removeRoleUsers(int id, List<Long> removeRoleUserUids) {
         int removes = 0;
@@ -150,6 +175,7 @@ public class RoleServiceImpl implements RoleService {
         return BatchResult.of( removeRoleUserUids.size(), removes);
     }
 
+    @Transactional
     @Override
     public BatchResult removeRolePerms(int id, List<Integer> permIds) {
         int removes = 0;
@@ -159,11 +185,18 @@ public class RoleServiceImpl implements RoleService {
         return BatchResult.of(permIds.size(), removes);
     }
 
+    @Transactional
     @Override
     public BatchResult replaceUserRoles(int id, List<Long> userUids, Instant expiresAt) {
         int removes = userRoleRepo.deleteByRoleId(id);
         BatchResult replaces = assignUsers(id, userUids, expiresAt);
         return BatchResult.of(userUids.size(), replaces.getSuccess() + removes);
+    }
+
+    @Override
+    public List<OptionVO<Integer>> getAllRoleOptions() {
+        return roleRepo.findAll().stream()
+                .map(Role::toOption).toList();
     }
 
     private void updateRole(Role role,@Nullable Integer parentId,@Nullable String code, @Nullable String name) {

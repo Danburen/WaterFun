@@ -2,6 +2,7 @@ import axios from 'axios'
 import { translate } from "@/utils/translator";
 import { getErrorMessage } from "~/utils/errorMessage";
 import { useAuthStore } from "~/stores/authStore";
+import {ApiRes} from "@waterfun/web-core/src/types";
 
 declare module 'axios' {
     interface AxiosRequestConfig {
@@ -18,7 +19,7 @@ const service = axios.create({
     baseURL: import.meta.env.VITE_API_BASE,
     timeout: 5000,
     withCredentials: true //allow credentials and cookies
-})
+}) as ApiRes
 
 // request interceptors
 service.interceptors.request.use(
@@ -106,4 +107,5 @@ function getCsrfToken() {
         .find(row => row.startsWith("XSRF-TOKEN="))?.split("=")[1];
 }
 
-export default service
+
+export default service;

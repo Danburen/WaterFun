@@ -7,24 +7,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import org.waterwood.api.TO.BatchResult;
-import org.waterwood.api.enums.PermissionType;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunadminservice.api.request.user.*;
 import org.waterwood.api.ApiResponse;
-import org.waterwood.waterfunadminservice.api.response.PermissionResp;
+import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
+import org.waterwood.waterfunadminservice.api.response.role.AssignedRoleRes;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
-import org.waterwood.waterfunadminservice.api.response.role.RoleResp;
 import org.waterwood.waterfunadminservice.api.response.user.UserInfoARes;
-import org.waterwood.waterfunadminservice.infrastructure.mapper.PermissionMapper;
-import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserAdminMapper;
 import org.waterwood.waterfunadminservice.service.user.UserService;
-import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.waterfunservicecore.entity.Role;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
 import java.time.Instant;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,8 +29,6 @@ import java.time.Instant;
 public class UserAdminController {
     private final UserService userService;
     private final UserCoreService userCoreService;
-    private final RoleMapper roleMapper;
-    private final PermissionMapper permissionMapper;
     private final UserAdminMapper userAdminMapper;
 
     @Operation(summary = "List users")
@@ -44,7 +39,7 @@ public class UserAdminController {
             @RequestParam(required = false) String accountStatus,
             @RequestParam(required = false) Instant createdStart,
             @RequestParam(required = false) Instant createdEnd,
-            @PageableDefault(page = 0, size = 10) Pageable pageable){
+            @PageableDefault Pageable pageable){
         Page<User> users = userCoreService.listUsers(username, nickname, accountStatus, createdStart, createdEnd, pageable);
         return ApiResponse.success(
                 users.map(userAdminMapper::toDto)
@@ -56,6 +51,13 @@ public class UserAdminController {
     public ApiResponse<UserAdminDetail> getUserDetail(@PathVariable long uid){
        UserAdminDetail detail = userService.getUserDetail(uid);
        return ApiResponse.success(detail);
+    }
+
+    @Operation(summary = "Delete user")
+    @DeleteMapping("/{uid}")
+    public ApiResponse<Void> deleteUser(@PathVariable long uid){
+        userService.deleteUser(uid);
+        return ApiResponse.success();
     }
 
     @Operation(summary = "Assign roles to user")
@@ -76,9 +78,9 @@ public class UserAdminController {
     }
 
     @Operation(summary = "Remove single role from user")
-    @DeleteMapping("/{uid}/role")
-    public ApiResponse<BatchResult> removeSingleRoleFromUser(@PathVariable long uid, @Valid @RequestBody RemoveSingleUserRoleReq body){
-        return ApiResponse.success(userService.removeRoles(uid, java.util.List.of(body.getRoleId())));
+    @DeleteMapping("/{uid}/role/{roleId}")
+    public ApiResponse<BatchResult> removeSingleRoleFromUser(@PathVariable long uid, @PathVariable int roleId){
+        return ApiResponse.success(userService.removeRoles(uid, List.of(roleId)));
     }
 
     @Operation(summary = "Full Replace roles of user")
@@ -90,34 +92,22 @@ public class UserAdminController {
 
     @Operation(summary = "List user roles")
     @GetMapping("/{uid}/roles")
-    public ApiResponse<Page<RoleResp>> listUserRoles(@PathVariable long uid,
-                                                     @RequestParam(required = false) String roleName,
-                                                     @RequestParam(required = false) Integer roleParent,
-                                                     @PageableDefault(page = 0, size = 10) Pageable pageable){
-        Page<Role> roles = userCoreService.listRoles(uid, roleName, roleParent, pageable);
-        return ApiResponse.success(
-                roles.map(
-                        roleMapper::toRoleResp
-                )
-        );
+    public ApiResponse<Page<AssignedRoleRes>> listUserRoles(@PathVariable long uid,
+                                                            @RequestParam(required = false) Integer roleId,
+                                                            @RequestParam(required = false) String name,
+                                                            @RequestParam(required = false) String code,
+                                                            @PageableDefault Pageable pageable){
+        return ApiResponse.success(userService.listAssignedRoles(uid, roleId, code, name, pageable));
     }
 
     @Operation(summary = "List user permissions")
     @GetMapping("/{uid}/permissions")
-    public ApiResponse<Page<PermissionResp>> listUserPermissions(@PathVariable long uid,
-                                                                 @RequestParam(required = false) String name,
-                                                                 @RequestParam(required = false) String code,
-                                                                 @RequestParam(required = false) String resource,
-                                                                 @RequestParam(required = false) PermissionType type,
-                                                                 @RequestParam(required = false) Integer parentId,
-                                                                 @PageableDefault(page = 0, size = 10) Pageable pageable){
-        Page<Permission> permissions = userCoreService.listPermissions(uid, name, code, resource, type, parentId, pageable);
-        return ApiResponse.success(
-                permissions.map(
-                        permissionMapper::toPermissionResp
-                )
-        );
-
+    public ApiResponse<Page<AssignedPermissionRes>> listUserPermissions(@PathVariable long uid,
+                                                                        @RequestParam(required = false) Integer permId,
+                                                                        @RequestParam(required = false) String name,
+                                                                        @RequestParam(required = false) String code,
+                                                                        @PageableDefault Pageable pageable){
+        return ApiResponse.success(userService.listAssignedPermissions(uid, permId, name, code, pageable));
     }
 
     @Operation(summary = "Assign direct permissions to user")
@@ -138,9 +128,9 @@ public class UserAdminController {
     }
 
     @Operation(summary = "Remove single direct permission from user")
-    @DeleteMapping("/{uid}/permission")
-    public ApiResponse<BatchResult> removeSinglePermFromUser(@PathVariable long uid, @Valid @RequestBody RemoveSingleUserPermReq body){
-        return ApiResponse.success(userService.removePermissions(uid, java.util.List.of(body.getPermissionId())));
+    @DeleteMapping("/{uid}/permission/{permissionId}")
+    public ApiResponse<BatchResult> removeSinglePermFromUser(@PathVariable long uid, @PathVariable int permissionId){
+        return ApiResponse.success(userService.removePermissions(uid, List.of(permissionId)));
     }
 
     @Operation(summary = "Batch remove roles from user")
@@ -176,5 +166,11 @@ public class UserAdminController {
         return ApiResponse.success();
     }
 
+    @GetMapping("/options")
+    public ApiResponse<List<OptionVO<Long>>> getUserOptions() {
+        return ApiResponse.success(
+                userService.getAllUserOptions()
+        );
+    }
 
 }

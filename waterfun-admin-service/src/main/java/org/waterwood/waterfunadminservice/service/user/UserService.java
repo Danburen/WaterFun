@@ -1,11 +1,16 @@
 package org.waterwood.waterfunadminservice.service.user;
 
-import org.waterwood.api.TO.BatchResult;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunadminservice.api.request.user.UserDatumUpdateAReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserInfoAUpdateReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserPermItemDto;
 import org.waterwood.waterfunadminservice.api.request.user.UserProfileUpdateAReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserRoleItemDto;
+import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
+import org.waterwood.waterfunadminservice.api.response.role.AssignedRoleRes;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.common.exceptions.BizException;
@@ -71,6 +76,10 @@ public interface UserService {
      */
     BatchResult removePermissions(long id, List<Integer> permissionIds);
 
+    Page<AssignedRoleRes> listAssignedRoles(long uid, Integer roleId, String code, String name, Pageable pageable);
+
+    Page<AssignedPermissionRes> listAssignedPermissions(long uid, Integer permId, String name, String code, Pageable pageable);
+
     /**
      * Replace all roles to user
      * @param id user id
@@ -105,4 +114,11 @@ public interface UserService {
      * @param body user datum fullUpdate request body
      */
     void updateUserDatum(long uid, UserDatumUpdateAReq body);
+
+    /**
+     * Get all user options for select, the option's value which id is user uid, name is username,
+     *
+     * @return option list
+     */
+    List<OptionVO<Long>> getAllUserOptions();
 }

@@ -68,3 +68,22 @@
 .default-border-top {
     border-top: 1px solid var(--default-gray);
 }
+
+.default-search-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+}
+
+.default-search-params {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 16px;
+    flex: 1;
+    min-width: 0;
+}
+
+.default-search-buttons {
+    min-width: 100px;
+}

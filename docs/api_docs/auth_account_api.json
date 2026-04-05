@@ -1,0 +1,643 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "API Documentation",
+    "version" : "1.0"
+  },
+  "paths" : {
+    "/api/auth/account" : {
+      "get" : {
+        "summary" : "get",
+        "description" : "get",
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "phoneMasked" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "emailMasked" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "phoneVerified" : {
+                          "type" : "boolean",
+                          "description" : ""
+                        },
+                        "emailVerified" : {
+                          "type" : "boolean",
+                          "description" : ""
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/password/reset" : {
+      "post" : {
+        "summary" : "重置密码",
+        "description" : "重置密码",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "confirmPwd", "newPwd", "oldPwd", "verify" ],
+                "type" : "object",
+                "properties" : {
+                  "oldPwd" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "newPwd" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "confirmPwd" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "verify" : {
+                    "required" : [ "channel", "code", "scene" ],
+                    "type" : "object",
+                    "properties" : {
+                      "channel" : {
+                        "type" : "string",
+                        "description" : "{SMS=SMS, EMAIL=EMAIL}",
+                        "enum" : [ "SMS", "EMAIL" ]
+                      },
+                      "code" : {
+                        "type" : "string",
+                        "description" : ""
+                      },
+                      "scene" : {
+                        "type" : "string",
+                        "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, SET_PASSWORD=SET_PASSWORD, RESET_PASSWORD=RESET_PASSWORD, CHANGE_EMAIL=CHANGE_EMAIL, CHANGE_PHONE=CHANGE_PHONE, ACTIVATE=ACTIVATE, VERIFY=VERIFY, BIND_EMAIL=BIND_EMAIL}",
+                        "enum" : [ "LOGIN", "REGISTER", "SET_PASSWORD", "RESET_PASSWORD", "CHANGE_EMAIL", "CHANGE_PHONE", "ACTIVATE", "VERIFY", "BIND_EMAIL" ]
+                      },
+                      "deviceFp" : {
+                        "type" : "string",
+                        "description" : ""
+                      }
+                    },
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/password/set" : {
+      "post" : {
+        "summary" : "设置密码",
+        "description" : "设置密码",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "confirmPwd", "newPwd", "verify" ],
+                "type" : "object",
+                "properties" : {
+                  "newPwd" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "confirmPwd" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "verify" : {
+                    "required" : [ "channel", "code", "scene" ],
+                    "type" : "object",
+                    "properties" : {
+                      "channel" : {
+                        "type" : "string",
+                        "description" : "{SMS=SMS, EMAIL=EMAIL}",
+                        "enum" : [ "SMS", "EMAIL" ]
+                      },
+                      "code" : {
+                        "type" : "string",
+                        "description" : ""
+                      },
+                      "scene" : {
+                        "type" : "string",
+                        "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, SET_PASSWORD=SET_PASSWORD, RESET_PASSWORD=RESET_PASSWORD, CHANGE_EMAIL=CHANGE_EMAIL, CHANGE_PHONE=CHANGE_PHONE, ACTIVATE=ACTIVATE, VERIFY=VERIFY, BIND_EMAIL=BIND_EMAIL}",
+                        "enum" : [ "LOGIN", "REGISTER", "SET_PASSWORD", "RESET_PASSWORD", "CHANGE_EMAIL", "CHANGE_PHONE", "ACTIVATE", "VERIFY", "BIND_EMAIL" ]
+                      },
+                      "deviceFp" : {
+                        "type" : "string",
+                        "description" : ""
+                      }
+                    },
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/email/bind" : {
+      "post" : {
+        "summary" : "绑定邮箱",
+        "description" : "绑定邮箱",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "verify" ],
+                "type" : "object",
+                "properties" : {
+                  "email" : {
+                    "type" : "string",
+                    "description" : "",
+                    "format" : "email"
+                  },
+                  "verify" : {
+                    "required" : [ "channel", "code", "scene" ],
+                    "type" : "object",
+                    "properties" : {
+                      "channel" : {
+                        "type" : "string",
+                        "description" : "{SMS=SMS, EMAIL=EMAIL}",
+                        "enum" : [ "SMS", "EMAIL" ]
+                      },
+                      "code" : {
+                        "type" : "string",
+                        "description" : ""
+                      },
+                      "scene" : {
+                        "type" : "string",
+                        "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, SET_PASSWORD=SET_PASSWORD, RESET_PASSWORD=RESET_PASSWORD, CHANGE_EMAIL=CHANGE_EMAIL, CHANGE_PHONE=CHANGE_PHONE, ACTIVATE=ACTIVATE, VERIFY=VERIFY, BIND_EMAIL=BIND_EMAIL}",
+                        "enum" : [ "LOGIN", "REGISTER", "SET_PASSWORD", "RESET_PASSWORD", "CHANGE_EMAIL", "CHANGE_PHONE", "ACTIVATE", "VERIFY", "BIND_EMAIL" ]
+                      },
+                      "deviceFp" : {
+                        "type" : "string",
+                        "description" : ""
+                      }
+                    },
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/email/activate" : {
+      "post" : {
+        "summary" : "激活邮箱",
+        "description" : "激活邮箱",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "verify" ],
+                "type" : "object",
+                "properties" : {
+                  "email" : {
+                    "type" : "string",
+                    "description" : "",
+                    "format" : "email"
+                  },
+                  "verify" : {
+                    "required" : [ "channel", "code", "scene" ],
+                    "type" : "object",
+                    "properties" : {
+                      "channel" : {
+                        "type" : "string",
+                        "description" : "{SMS=SMS, EMAIL=EMAIL}",
+                        "enum" : [ "SMS", "EMAIL" ]
+                      },
+                      "code" : {
+                        "type" : "string",
+                        "description" : ""
+                      },
+                      "scene" : {
+                        "type" : "string",
+                        "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, SET_PASSWORD=SET_PASSWORD, RESET_PASSWORD=RESET_PASSWORD, CHANGE_EMAIL=CHANGE_EMAIL, CHANGE_PHONE=CHANGE_PHONE, ACTIVATE=ACTIVATE, VERIFY=VERIFY, BIND_EMAIL=BIND_EMAIL}",
+                        "enum" : [ "LOGIN", "REGISTER", "SET_PASSWORD", "RESET_PASSWORD", "CHANGE_EMAIL", "CHANGE_PHONE", "ACTIVATE", "VERIFY", "BIND_EMAIL" ]
+                      },
+                      "deviceFp" : {
+                        "type" : "string",
+                        "description" : ""
+                      }
+                    },
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/email/change" : {
+      "post" : {
+        "summary" : "修改邮箱",
+        "description" : "修改邮箱",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "verify" ],
+                "type" : "object",
+                "properties" : {
+                  "email" : {
+                    "type" : "string",
+                    "description" : "",
+                    "format" : "email"
+                  },
+                  "verify" : {
+                    "required" : [ "channel", "code", "scene" ],
+                    "type" : "object",
+                    "properties" : {
+                      "channel" : {
+                        "type" : "string",
+                        "description" : "{SMS=SMS, EMAIL=EMAIL}",
+                        "enum" : [ "SMS", "EMAIL" ]
+                      },
+                      "code" : {
+                        "type" : "string",
+                        "description" : ""
+                      },
+                      "scene" : {
+                        "type" : "string",
+                        "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, SET_PASSWORD=SET_PASSWORD, RESET_PASSWORD=RESET_PASSWORD, CHANGE_EMAIL=CHANGE_EMAIL, CHANGE_PHONE=CHANGE_PHONE, ACTIVATE=ACTIVATE, VERIFY=VERIFY, BIND_EMAIL=BIND_EMAIL}",
+                        "enum" : [ "LOGIN", "REGISTER", "SET_PASSWORD", "RESET_PASSWORD", "CHANGE_EMAIL", "CHANGE_PHONE", "ACTIVATE", "VERIFY", "BIND_EMAIL" ]
+                      },
+                      "deviceFp" : {
+                        "type" : "string",
+                        "description" : ""
+                      }
+                    },
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/phone/change" : {
+      "post" : {
+        "summary" : "修改手机号",
+        "description" : "修改手机号",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "phone", "verify" ],
+                "type" : "object",
+                "properties" : {
+                  "phone" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "verify" : {
+                    "required" : [ "channel", "code", "scene" ],
+                    "type" : "object",
+                    "properties" : {
+                      "channel" : {
+                        "type" : "string",
+                        "description" : "{SMS=SMS, EMAIL=EMAIL}",
+                        "enum" : [ "SMS", "EMAIL" ]
+                      },
+                      "code" : {
+                        "type" : "string",
+                        "description" : ""
+                      },
+                      "scene" : {
+                        "type" : "string",
+                        "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, SET_PASSWORD=SET_PASSWORD, RESET_PASSWORD=RESET_PASSWORD, CHANGE_EMAIL=CHANGE_EMAIL, CHANGE_PHONE=CHANGE_PHONE, ACTIVATE=ACTIVATE, VERIFY=VERIFY, BIND_EMAIL=BIND_EMAIL}",
+                        "enum" : [ "LOGIN", "REGISTER", "SET_PASSWORD", "RESET_PASSWORD", "CHANGE_EMAIL", "CHANGE_PHONE", "ACTIVATE", "VERIFY", "BIND_EMAIL" ]
+                      },
+                      "deviceFp" : {
+                        "type" : "string",
+                        "description" : ""
+                      }
+                    },
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/phone/activate" : {
+      "post" : {
+        "summary" : "激活手机号",
+        "description" : "激活手机号",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "phone", "verify" ],
+                "type" : "object",
+                "properties" : {
+                  "phone" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "verify" : {
+                    "required" : [ "channel", "code", "scene" ],
+                    "type" : "object",
+                    "properties" : {
+                      "channel" : {
+                        "type" : "string",
+                        "description" : "{SMS=SMS, EMAIL=EMAIL}",
+                        "enum" : [ "SMS", "EMAIL" ]
+                      },
+                      "code" : {
+                        "type" : "string",
+                        "description" : ""
+                      },
+                      "scene" : {
+                        "type" : "string",
+                        "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, SET_PASSWORD=SET_PASSWORD, RESET_PASSWORD=RESET_PASSWORD, CHANGE_EMAIL=CHANGE_EMAIL, CHANGE_PHONE=CHANGE_PHONE, ACTIVATE=ACTIVATE, VERIFY=VERIFY, BIND_EMAIL=BIND_EMAIL}",
+                        "enum" : [ "LOGIN", "REGISTER", "SET_PASSWORD", "RESET_PASSWORD", "CHANGE_EMAIL", "CHANGE_PHONE", "ACTIVATE", "VERIFY", "BIND_EMAIL" ]
+                      },
+                      "deviceFp" : {
+                        "type" : "string",
+                        "description" : ""
+                      }
+                    },
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "org.waterwood.waterfunservicecore.api.resp.AccountDto" : {
+        "type" : "object",
+        "properties" : {
+          "phoneMasked" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "emailMasked" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "phoneVerified" : {
+            "type" : "boolean",
+            "description" : ""
+          },
+          "emailVerified" : {
+            "type" : "boolean",
+            "description" : ""
+          }
+        },
+        "description" : ""
+      },
+      "org.waterwood.waterfunservicecore.api.req.auth.SecurityVerifyCodeDto" : {
+        "required" : [ "channel", "code", "scene" ],
+        "type" : "object",
+        "properties" : {
+          "channel" : {
+            "type" : "string",
+            "description" : "{SMS=SMS, EMAIL=EMAIL}",
+            "enum" : [ "SMS", "EMAIL" ]
+          },
+          "code" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "scene" : {
+            "type" : "string",
+            "description" : "{LOGIN=LOGIN, REGISTER=REGISTER, SET_PASSWORD=SET_PASSWORD, RESET_PASSWORD=RESET_PASSWORD, CHANGE_EMAIL=CHANGE_EMAIL, CHANGE_PHONE=CHANGE_PHONE, ACTIVATE=ACTIVATE, VERIFY=VERIFY, BIND_EMAIL=BIND_EMAIL}",
+            "enum" : [ "LOGIN", "REGISTER", "SET_PASSWORD", "RESET_PASSWORD", "CHANGE_EMAIL", "CHANGE_PHONE", "ACTIVATE", "VERIFY", "BIND_EMAIL" ]
+          },
+          "deviceFp" : {
+            "type" : "string",
+            "description" : ""
+          }
+        },
+        "description" : ""
+      }
+    }
+  }
+}

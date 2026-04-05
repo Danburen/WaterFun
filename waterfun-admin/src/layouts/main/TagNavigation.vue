@@ -18,7 +18,7 @@ const buildUniqueOrder = (tagList: TagNavItemType[]) => [...new Set(tagList.map(
 
 const localOrder = ref(buildUniqueOrder(props.tagList))
 
-const emit = defineEmits(['orderUpdated','tagRemoved','tagClick']);
+const emit = defineEmits(['order-updated','tag-removed','tag-click']);
 
 const sortedTags = computed(() => {
   return [...localOrder.value]
@@ -28,7 +28,7 @@ const sortedTags = computed(() => {
 
 /*Events*/
 const handleClose = (tagName:string) =>{
-  emit('tagRemoved',tagName);
+  emit('tag-removed',tagName);
 }
 
 const handleClick = (tagName:string) => {
@@ -47,7 +47,7 @@ const handleClick = (tagName:string) => {
   } else {
     console.warn('未找到目标tag或tag的to属性为空:', tagName);
   }
-  emit('tagClick',tagName);
+  emit('tag-click',tagName);
 }
 
 /*Control*/
@@ -107,7 +107,7 @@ const handleDrop = () => {
   const [draggedItem] = newOrder.splice(dragIndex.value, 1)
   newOrder.splice(target,0 ,draggedItem)
   localOrder.value = newOrder
-  emit('orderUpdated',{ from: source, to: target })
+  emit('order-updated',{ from: source, to: target })
   dragIndex.value = null
   dragPlaceholderIndex.value = null
 }

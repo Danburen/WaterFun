@@ -1,6 +1,6 @@
 export interface Page<T> {
     content: T[];
-    page: pagination;
+    page: Pagination;
 }
 
 export interface Pagination {

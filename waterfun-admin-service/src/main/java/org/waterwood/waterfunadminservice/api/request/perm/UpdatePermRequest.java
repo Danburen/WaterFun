@@ -19,8 +19,10 @@ public class UpdatePermRequest implements Serializable {
     private int id;
     private String code;
     private String name;
+    private Integer orderWeight;
     private String description;
     private PermissionType type;
     private String resource;
     private Integer parentId;
+    private Boolean isSystem;
 }

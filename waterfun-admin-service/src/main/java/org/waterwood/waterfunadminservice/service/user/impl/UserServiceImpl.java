@@ -2,17 +2,22 @@ package org.waterwood.waterfunadminservice.service.user.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.api.TO.BatchResult;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.waterfunadminservice.api.request.user.UserDatumUpdateAReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserInfoAUpdateReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserPermItemDto;
 import org.waterwood.waterfunadminservice.api.request.user.UserProfileUpdateAReq;
 import org.waterwood.waterfunadminservice.api.request.user.UserRoleItemDto;
+import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
+import org.waterwood.waterfunadminservice.api.response.role.AssignedRoleRes;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
 import org.waterwood.waterfunadminservice.infrastructure.exception.PermException;
 import org.waterwood.waterfunadminservice.infrastructure.exception.UserAdminException;
@@ -20,7 +25,6 @@ import org.waterwood.waterfunadminservice.infrastructure.mapper.UserAdminMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserCounterMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserProfileMapper;
-import org.waterwood.waterfunservicecore.api.ToDictOption;
 import org.waterwood.waterfunservicecore.api.resp.AccountResp;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
@@ -219,6 +223,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<AssignedRoleRes> listAssignedRoles(long uid, Integer roleId, String code, String name, Pageable pageable) {
+        Page<UserRole> res = userRoleRepo.listUserRoles(uid, roleId, code, name, pageable);
+        return res.map(ur -> {
+            AssignedRoleRes a = new AssignedRoleRes();
+            a.setAssignedAt(ur.getCreatedAt());
+            a.setExpiresAt(ur.getExpiresAt());
+            Role r = ur.getRole();
+            a.setId(r.getId());
+            a.setName(r.getName());
+            a.setCode(r.getCode());
+            return a;
+        });
+    }
+
+    @Override
+    public Page<AssignedPermissionRes> listAssignedPermissions(long uid, Integer permId, String name, String code, Pageable pageable) {
+        Page<UserPermission> res = userPermRepo.listUserPerms(uid, permId, name, code, pageable);
+        return res.map(up -> {
+            AssignedPermissionRes a = new AssignedPermissionRes();
+            a.setAssignedAt(up.getCreatedAt());
+            a.setExpiresAt(up.getExpiresAt());
+            Permission p = up.getPermission();
+            a.setId(p.getId());
+            a.setName(p.getName());
+            a.setCode(p.getCode());
+            return a;
+        });
+    }
+
+    @Override
     public UserAdminDetail getUserDetail(long uid) {
         User u = userCoreService.getUser(uid);
         UserProfile p = userProfileCoreService.getUserProfile(uid);
@@ -232,8 +266,8 @@ public class UserServiceImpl implements UserService {
                 userProfileMapper.toResponse(p),
                 userCounterMapper.toDto(c),
                 acc,
-                urs.stream().map(ToDictOption::toDictOption).collect(Collectors.toSet()),
-                ups.stream().map(ToDictOption::toDictOption).collect(Collectors.toSet())
+                urs.stream().map(ur-> ur.getRole().toOption().toExpirableOption(ur.getExpiresAt())).collect(Collectors.toSet()),
+                ups.stream().map(up -> up.getPermission().toOption().toExpirableOption(up.getExpiresAt())).collect(Collectors.toSet())
         );
     }
 
@@ -261,6 +295,13 @@ public class UserServiceImpl implements UserService {
         if(body.getEmail() != null){
             userDatumCoreService.saveNewEmail(uid, body.getEmail(), false);
         }
+    }
+
+    @Override
+    public List<OptionVO<Long>> getAllUserOptions() {
+        return userRepository.findAll().stream()
+                .map(User::toOptionVO)
+                .toList();
     }
 
     @Transactional

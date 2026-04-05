@@ -1,0 +1,4049 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🚀 Spring Launch Monitor Startup Report</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: Inter, Segoe UI, Arial, sans-serif; margin: 24px; background: #0f172a; color: #e2e8f0; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 16px 18px; }
+    h1 { margin: 0 0 12px; font-size: 20px; }
+    .hint { color: #94a3b8; font-size: 12px; margin-bottom: 12px; }
+    details { margin-left: 10px; }
+    details > summary { list-style: none; cursor: pointer; padding: 4px 0; }
+    details > summary::-webkit-details-marker { display: none; }
+    .row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+    .label { font-size: 13px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .metrics { font-size: 12px; color: #93c5fd; }
+    .bar-wrap { height: 16px; border-radius: 4px; background: #1e293b; margin-top: 4px; overflow: hidden; }
+    .bar { height: 100%; background: linear-gradient(90deg, #f97316, #ef4444); }
+    .section-title { margin-top: 18px; margin-bottom: 8px; font-size: 16px; color: #e5e7eb; }
+    .report { background: #0b1220; border: 1px solid #1f2937; border-radius: 8px; padding: 12px; white-space: pre-wrap; line-height: 1.5; color: #d1d5db; }
+    .toolbar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 8px; }
+    .btn { border: 1px solid #334155; background: #1e293b; color: #e2e8f0; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .btn:hover { background: #334155; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🚀 Spring Launch Monitor Startup Report</h1>
+    <div class="section-title">📊 Startup Report</div>
+    <div class="report"><p class="report-total">Total startup time: 11,920 ms</p><h3>📊 Startup phase details:</h3><ul><li><span class="phase-label">Application starting phase</span> <span class="phase-metric">0ms</span> <span class="phase-bar"></span></li><li><span class="phase-label">Application environment prepared phase</span> <span class="phase-metric">661ms</span> <span class="phase-bar">######</span></li><li><span class="phase-label">Application context refreshed phase</span> <span class="phase-metric">11910ms</span> <span class="phase-bar">##################################################</span></li><li><span class="phase-label">Application ready phase</span> <span class="phase-metric">11920ms</span> <span class="phase-bar">##################################################</span></li></ul><h3>🔥 Slowest Top 10 Beans:</h3><ol><li>entityManagerFactory <span class="bean-metric">3103ms</span></li><li>userRepository <span class="bean-metric">828ms</span></li><li>encryptedKeyService <span class="bean-metric">176ms</span></li><li>tomcatServletWebServerFactory <span class="bean-metric">89ms</span></li><li>requestMappingHandlerMapping <span class="bean-metric">56ms</span></li><li>requestMappingHandlerAdapter <span class="bean-metric">55ms</span></li><li>redisConnectionFactory <span class="bean-metric">52ms</span></li><li>userFollowerRepository <span class="bean-metric">36ms</span></li><li>userRoleRepo <span class="bean-metric">23ms</span></li><li>rolePermRepo <span class="bean-metric">16ms</span></li></ol><h3>💡 Optimization suggestions:</h3><ul><li>Total bean initialization time is high (4,574ms); check circular dependencies</li></ul></div></div>
+    <div class="section-title">🔥 Package Flame Tree</div>
+    <div class="toolbar">
+      <button class="btn" type="button" onclick="toggleAll(true)">Expand All</button>
+      <button class="btn" type="button" onclick="toggleAll(false)">Collapse All</button>
+    </div>
+    <div class="hint">Package delay tree is expanded by default. Each bar width is proportional to root total latency.</div>
+    <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">bean-init</div>
+      <div class="metrics">total=4,574ms, self=0ms, beans=644</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:100%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">com</div>
+      <div class="metrics">total=3ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">aliyun</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">dysmsapi20170525</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">nimbusds</div>
+      <div class="metrics">total=1ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jose</div>
+      <div class="metrics">total=1ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jwk</div>
+      <div class="metrics">total=1ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">source</div>
+      <div class="metrics">total=1ms, self=1ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">qcloud</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">cos</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">sun</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jmx</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mbeanserver</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">zaxxer</div>
+      <div class="metrics">total=2ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">hikari</div>
+      <div class="metrics">total=2ms, self=2ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">io</div>
+      <div class="metrics">total=1ms, self=0ms, beans=20</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">github</div>
+      <div class="metrics">total=1ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">danburen</div>
+      <div class="metrics">total=1ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">springlaunchmonitor</div>
+      <div class="metrics">total=1ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">config</div>
+      <div class="metrics">total=1ms, self=1ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">flame</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">spring</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">lettuce</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">core</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">resource</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">micrometer</div>
+      <div class="metrics">total=0ms, self=0ms, beans=15</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">core</div>
+      <div class="metrics">total=0ms, self=0ms, beans=14</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">instrument</div>
+      <div class="metrics">total=0ms, self=0ms, beans=14</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">binder</div>
+      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jvm</div>
+      <div class="metrics">total=0ms, self=0ms, beans=7</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">logging</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">system</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">observation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">simple</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">observation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jakarta</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jdk</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">proxy2</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">org</div>
+      <div class="metrics">total=4,570ms, self=0ms, beans=613</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:100%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mybatis</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">spring</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">boot</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">springframework</div>
+      <div class="metrics">total=4,394ms, self=0ms, beans=544</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:96%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">aop</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">aspectj</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">framework</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">boot</div>
+      <div class="metrics">total=138ms, self=0ms, beans=349</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:3%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">actuate</div>
+      <div class="metrics">total=9ms, self=0ms, beans=63</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=1ms, self=0ms, beans=41</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">audit</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">beans</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">condition</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">context</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">properties</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">endpoint</div>
+      <div class="metrics">total=1ms, self=0ms, beans=19</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">expose</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jackson</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jmx</div>
+      <div class="metrics">total=1ms, self=1ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">env</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">info</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">logging</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">management</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">sbom</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">scheduling</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">exchanges</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mappings</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">server</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">beans</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">context</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">properties</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">endpoint</div>
+      <div class="metrics">total=8ms, self=0ms, beans=12</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">invoke</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">convert</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">invoker</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">cache</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jmx</div>
+      <div class="metrics">total=8ms, self=8ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=6</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">env</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">info</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">logging</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">management</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">sbom</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">scheduling</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mappings</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">admin</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=13ms, self=0ms, beans=34</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">admin</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">aop</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">availability</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">context</div>
+      <div class="metrics">total=13ms, self=13ms, beans=6</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">info</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jmx</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">ssl</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">task</div>
+      <div class="metrics">total=0ms, self=0ms, beans=12</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">format</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">availability</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">context</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">properties</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">data</div>
+      <div class="metrics">total=2ms, self=0ms, beans=26</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=7</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">metrics</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jdbc</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jpa</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">metrics</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">redis</div>
+      <div class="metrics">total=2ms, self=0ms, beans=11</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=2ms, self=2ms, beans=10</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">health</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">observation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">health</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">health</div>
+      <div class="metrics">total=0ms, self=0ms, beans=29</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">actuate</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">endpoint</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">application</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=18</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">actuate</div>
+      <div class="metrics">total=0ms, self=0ms, beans=10</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">endpoint</div>
+      <div class="metrics">total=0ms, self=0ms, beans=10</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">application</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">contributor</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">registry</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">contributor</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">registry</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">hibernate</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">http</div>
+      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">converter</div>
+      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">info</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jackson</div>
+      <div class="metrics">total=3ms, self=3ms, beans=10</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=7</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jdbc</div>
+      <div class="metrics">total=5ms, self=0ms, beans=27</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=5ms, self=5ms, beans=26</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">health</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">metrics</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">health</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jpa</div>
+      <div class="metrics">total=1ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=1ms, self=1ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">micrometer</div>
+      <div class="metrics">total=0ms, self=0ms, beans=27</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">metrics</div>
+      <div class="metrics">total=0ms, self=0ms, beans=19</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">actuate</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">endpoint</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=15</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">export</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">simple</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jvm</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">logging</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">logback</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">startup</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">system</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">task</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">startup</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">system</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">observation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=8</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=8</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">netty</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">persistence</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">security</div>
+      <div class="metrics">total=0ms, self=0ms, beans=20</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=9</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">actuate</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">oauth2</div>
+      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">client</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">server</div>
+      <div class="metrics">total=0ms, self=0ms, beans=10</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">authorization</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">resource</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=1ms, self=0ms, beans=13</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">actuate</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mappings</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=1ms, self=1ms, beans=8</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">actuate</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mappings</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">filter</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">sql</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">init</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">ssl</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">task</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">thymeleaf</div>
+      <div class="metrics">total=0ms, self=0ms, beans=6</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=6</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">tomcat</div>
+      <div class="metrics">total=91ms, self=0ms, beans=10</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=2ms, self=2ms, beans=8</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">metrics</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">metrics</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=89ms, self=89ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">transaction</div>
+      <div class="metrics">total=0ms, self=0ms, beans=9</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=8</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jta</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">validation</div>
+      <div class="metrics">total=6ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">beanvalidation</div>
+      <div class="metrics">total=6ms, self=6ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=2ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">server</div>
+      <div class="metrics">total=2ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=2ms, self=2ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">webmvc</div>
+      <div class="metrics">total=5ms, self=0ms, beans=29</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">actuate</div>
+      <div class="metrics">total=4ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">endpoint</div>
+      <div class="metrics">total=4ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=4ms, self=4ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mappings</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=1ms, self=1ms, beans=24</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">actuate</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">endpoint</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mappings</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">error</div>
+      <div class="metrics">total=0ms, self=0ms, beans=7</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">error</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">websocket</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">autoconfigure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">context</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">dao</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">data</div>
+      <div class="metrics">total=1,037ms, self=0ms, beans=101</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:23%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">geo</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jdbc</div>
+      <div class="metrics">total=0ms, self=0ms, beans=8</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">core</div>
+      <div class="metrics">total=0ms, self=0ms, beans=7</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">convert</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">dialect</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mapping</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">repository</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">config</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jpa</div>
+      <div class="metrics">total=981ms, self=0ms, beans=34</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:21%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">repository</div>
+      <div class="metrics">total=981ms, self=0ms, beans=33</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:21%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">config</div>
+      <div class="metrics">total=9ms, self=9ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">query</div>
+      <div class="metrics">total=0ms, self=0ms, beans=15</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=972ms, self=972ms, beans=16</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:21%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">util</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">redis</div>
+      <div class="metrics">total=56ms, self=0ms, beans=14</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">connection</div>
+      <div class="metrics">total=52ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">lettuce</div>
+      <div class="metrics">total=52ms, self=52ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">core</div>
+      <div class="metrics">total=4ms, self=4ms, beans=13</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">convert</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">index</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mapping</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">relational</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">repository</div>
+      <div class="metrics">total=0ms, self=0ms, beans=31</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">config</div>
+      <div class="metrics">total=0ms, self=0ms, beans=16</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">core</div>
+      <div class="metrics">total=0ms, self=0ms, beans=15</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=0ms, self=0ms, beans=15</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">config</div>
+      <div class="metrics">total=0ms, self=0ms, beans=8</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jdbc</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">core</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">namedparam</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">simple</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jmx</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">export</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mail</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">javamail</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">orm</div>
+      <div class="metrics">total=3,103ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:68%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jpa</div>
+      <div class="metrics">total=3,103ms, self=3,103ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:68%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">persistenceunit</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">vendor</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">scheduling</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">concurrent</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">security</div>
+      <div class="metrics">total=1ms, self=0ms, beans=41</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">authentication</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">config</div>
+      <div class="metrics">total=1ms, self=0ms, beans=20</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=1ms, self=0ms, beans=20</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">authentication</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">configuration</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">configuration</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=1ms, self=0ms, beans=13</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">builders</div>
+      <div class="metrics">total=1ms, self=1ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">configuration</div>
+      <div class="metrics">total=0ms, self=0ms, beans=10</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">context</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">oauth2</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">server</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">authorization</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">settings</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=16</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">access</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">intercept</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">authentication</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">logout</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">session</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">context</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">header</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">savedrequest</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">csrf</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">util</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">matcher</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servletapi</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">session</div>
+      <div class="metrics">total=0ms, self=0ms, beans=6</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">config</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">http</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">data</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">redis</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">config</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">http</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">http</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">transaction</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">interceptor</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">util</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">validation</div>
+      <div class="metrics">total=4ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">beanvalidation</div>
+      <div class="metrics">total=4ms, self=4ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">web</div>
+      <div class="metrics">total=111ms, self=0ms, beans=24</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">accept</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">filter</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">method</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">multipart</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">servlet</div>
+      <div class="metrics">total=111ms, self=0ms, beans=18</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">function</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">handler</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">i18n</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mvc</div>
+      <div class="metrics">total=111ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">method</div>
+      <div class="metrics">total=111ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">annotation</div>
+      <div class="metrics">total=111ms, self=111ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">resource</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">support</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">view</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">util</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">pattern</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">thymeleaf</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">spring6</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">templateresolver</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">view</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">waterwood</div>
+      <div class="metrics">total=176ms, self=0ms, beans=65</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:4%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">waterfunservice</div>
+      <div class="metrics">total=0ms, self=0ms, beans=27</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">config</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">confirguation</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">controller</div>
+      <div class="metrics">total=0ms, self=0ms, beans=10</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">auth</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">pub</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">infrastructure</div>
+      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">filter</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mapper</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">service</div>
+      <div class="metrics">total=0ms, self=0ms, beans=8</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">account</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">post</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">impl</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">resource</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">user</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">waterfunservicecore</div>
+      <div class="metrics">total=176ms, self=0ms, beans=38</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:4%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">configuration</div>
+      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">infrastructure</div>
+      <div class="metrics">total=176ms, self=0ms, beans=11</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:4%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">aspect</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">mapper</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">security</div>
+      <div class="metrics">total=176ms, self=176ms, beans=4</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:4%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">utils</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">generator</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">services</div>
+      <div class="metrics">total=0ms, self=0ms, beans=22</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">auth</div>
+      <div class="metrics">total=0ms, self=0ms, beans=9</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">code</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">impl</div>
+      <div class="metrics">total=0ms, self=0ms, beans=6</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">email</div>
+      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">sms</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">sys</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">storage</div>
+      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">user</div>
+      <div class="metrics">total=0ms, self=0ms, beans=6</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">sun</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">security</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">rsa</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+<details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">tools</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">jackson</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">databind</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  <details class="tree-node" open>
+  <summary>
+    <div class="row">
+      <div class="label">json</div>
+      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+    </div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
+  </summary>
+  
+</details>
+
+</details>
+
+</details>
+
+</details>
+
+</details>
+
+  </div>
+  <script>
+    function toggleAll(open) {
+      document.querySelectorAll('details.tree-node').forEach(function (item) {
+        item.open = open;
+      });
+    }
+  </script>
+</body>
+</html>
