@@ -4,6 +4,7 @@ import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox } from "element-plus";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
 import {
   deletePermission,
@@ -149,57 +150,61 @@ onMounted(async () => {
 </script>
 
 <template>
-  <TableContainer
-    title="permission.title"
-    showAddBtn
-    :show-remove-btn="false"
-    @add="handleAdd"
-    @change="fetchData"
-    :total="pageOpts.total"
-    v-model:page-size="pageOpts.pageSize"
-    v-model:current-page="pageOpts.currentPage"
-  >
-    <el-form inline class="search-form" :model="searchForm">
-      <el-form-item :label="t('permission.name')">
-        <el-input v-model="searchForm.name" :placeholder="t('permission.input.name')" />
-      </el-form-item>
+  <div class="list-layout">
+    <SearchContainer>
+      <el-form inline class="search-form" :model="searchForm">
+        <el-form-item :label="t('permission.name')">
+          <el-input v-model="searchForm.name" :placeholder="t('permission.input.name')" />
+        </el-form-item>
 
-      <el-form-item :label="t('permission.code')">
-        <el-input v-model="searchForm.code" :placeholder="t('permission.input.code')" />
-      </el-form-item>
+        <el-form-item :label="t('permission.code')">
+          <el-input v-model="searchForm.code" :placeholder="t('permission.input.code')" />
+        </el-form-item>
 
-      <el-form-item :label="t('permission.type.title')">
-        <el-select v-model="searchForm.type" clearable style="width: 140px">
-          <el-option v-for="item in permTypeOptions" :key="item.value" :label="t(item.label)" :value="item.value" />
-        </el-select>
-      </el-form-item>
+        <el-form-item :label="t('permission.type.title')">
+          <el-select v-model="searchForm.type" clearable style="width: 140px">
+            <el-option v-for="item in permTypeOptions" :key="item.value" :label="t(item.label)" :value="item.value" />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item :label="t('permission.resource')">
-        <el-input v-model="searchForm.resource" :placeholder="t('permission.input.resource')" />
-      </el-form-item>
+        <el-form-item :label="t('permission.resource')">
+          <el-input v-model="searchForm.resource" :placeholder="t('permission.input.resource')" />
+        </el-form-item>
 
-      <el-form-item :label="t('permission.parentId')">
-        <el-select
-          v-model="searchForm.parentId"
-          clearable
-          :placeholder="t('permission.input.parentId')"
-          style="width: 180px"
-        >
-          <el-option
-            v-for="item in permOptions"
-            :key="item.id"
-            :label="`${item.id} (${item.name} 【${item.code}】)`"
-            :value="item.id"
-            :disabled="item.disabled || false"
-          />
-        </el-select>
-      </el-form-item>
+        <el-form-item :label="t('permission.parentId')">
+          <el-select
+            v-model="searchForm.parentId"
+            clearable
+            :placeholder="t('permission.input.parentId')"
+            style="width: 180px"
+          >
+            <el-option
+              v-for="item in permOptions"
+              :key="item.id"
+              :label="`${item.id} (${item.name} 【${item.code}】)`"
+              :value="item.id"
+              :disabled="item.disabled || false"
+            />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item>
-        <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
-        <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
-      </el-form-item>
-    </el-form>
+        <el-form-item>
+          <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
+          <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
+        </el-form-item>
+      </el-form>
+    </SearchContainer>
+
+    <TableContainer
+      title="permission.title"
+      showAddBtn
+      :show-remove-btn="false"
+      @add="handleAdd"
+      @change="fetchData"
+      :total="pageOpts.total"
+      v-model:page-size="pageOpts.pageSize"
+      v-model:current-page="pageOpts.currentPage"
+    >
 
     <el-table v-loading="loading" :data="permissionList" border fit highlight-current-row style="width: 100%">
       <el-table-column type="selection" :selectable="selectable" width="55" />
@@ -256,16 +261,27 @@ onMounted(async () => {
       </el-table-column>
     </el-table>
 
-    <PermEditDialog
-      v-model="dialogVisible"
-      :mode="dialogMode"
-      :permission-id="currentPermId"
-      :perm-options="permOptions"
-      :disabled-parent-ids="currentPermId ? [currentPermId] : []"
-      @success="handleDialogSuccess"
-    />
-  </TableContainer>
+      <PermEditDialog
+        v-model="dialogVisible"
+        :mode="dialogMode"
+        :permission-id="currentPermId"
+        :perm-options="permOptions"
+        :disabled-parent-ids="currentPermId ? [currentPermId] : []"
+        @success="handleDialogSuccess"
+      />
+    </TableContainer>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.search-form {
+  margin-bottom: 0;
+}
+
+.list-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+</style>
 

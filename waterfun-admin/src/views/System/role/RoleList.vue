@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
 import {PageOptions} from "~/types";
 import {
@@ -34,6 +35,7 @@ const loading = ref(false);
 const dialogVisible = ref(false);
 const dialogMode = ref<"create" | "edit">("create");
 const currentRoleId = ref<number | null>(null);
+const selectedRoleIds = ref<number[]>([]);
 
 const selectable = (row: RoleResp) => row.isSystem == false;
 
@@ -109,6 +111,42 @@ const handleDelete = async (row: RoleResp) => {
   }
 }
 
+const handleSelectionChange = (rows: RoleResp[]) => {
+  selectedRoleIds.value = rows.map(item => item.id);
+}
+
+const handleBatchDelete = async () => {
+  if (selectedRoleIds.value.length === 0) {
+    return;
+  }
+
+  try {
+    await ElMessageBox.confirm(t("role.confirm.delete"), t("operation.delete"), {
+      type: "warning",
+    });
+
+    const results = await Promise.allSettled(selectedRoleIds.value.map(id => deleteRole(id)));
+    const failedCount = results.filter(item => item.status === "rejected").length;
+    const successCount = results.length - failedCount;
+
+    if (failedCount === 0) {
+      ElMessage.success(t("role.success.delete"));
+    } else if (successCount === 0) {
+      ElMessage.error(t("role.error.delete"));
+    } else {
+      ElMessage.warning(`${t("role.success.delete")} ${successCount}/${results.length}`);
+    }
+
+    selectedRoleIds.value = [];
+    fetchData();
+  } catch (e) {
+    if (e !== "cancel") {
+      console.error(e);
+      ElMessage.error(t("role.error.delete"));
+    }
+  }
+}
+
 const handleDialogSuccess = () => {
   fetchData();
   fetchRoleIds();
@@ -132,39 +170,45 @@ onMounted(() => {
 </script>
 
 <template>
-  <TableContainer
+  <div class="list-layout">
+    <SearchContainer>
+      <el-form inline class="search-form" :model="searchForm">
+        <el-form-item :label="t('role.name')">
+          <el-input :placeholder="t('role.input.name')" v-model="searchForm.name"/>
+        </el-form-item>
+        <el-form-item :label="t('role.code')">
+          <el-input :placeholder="t('role.input.code')" v-model="searchForm.code"/>
+        </el-form-item>
+        <el-form-item :label="t('role.parentId')">
+          <el-select v-model="searchForm.parentId" :placeholder="t('role.input.parentId')" style="width: 150px">
+            <el-option v-for="item in roleOptions"
+                       :key="item.id"
+                       :label="`${item.id} (${item.name} 【${item.code}】)`"
+                       :value="item.id"
+                       :disabled="item.disabled"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
+          <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
+        </el-form-item>
+      </el-form>
+    </SearchContainer>
+
+    <TableContainer
       title="role.title"
       showAddBtn
-      :show-remove-btn="false"
+      :show-remove-btn="true"
+      :disable-delete="selectedRoleIds.length === 0"
       @add="handleAdd"
+      @remove="handleBatchDelete"
       @change="fetchData"
       :total="pageOpts.total"
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
-  >
-    <el-form inline class="search-form" :model="searchForm">
-      <el-form-item :label="t('role.name')">
-        <el-input :placeholder="t('role.input.name')" v-model="searchForm.name"/>
-      </el-form-item>
-      <el-form-item :label="t('role.code')">
-        <el-input :placeholder="t('role.input.code')" v-model="searchForm.code"/>
-      </el-form-item>
-      <el-form-item :label="t('role.parentId')">
-        <el-select v-model="searchForm.parentId" :placeholder="t('role.input.parentId')" style="width: 150px">
-          <el-option v-for="item in roleOptions"
-                     :key="item.id"
-                     :label="`${item.id} (${item.name} 【${item.code}】)`"
-                     :value="item.id"
-                     :disabled="item.disabled"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
-        <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
-      </el-form-item>
-    </el-form>
-    <el-table v-loading="loading" :data="roleList" border fit highlight-current-row style="width: 100%">
+    >
+    <el-table v-loading="loading" :data="roleList" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionChange">
       <el-table-column type="selection" :selectable="selectable" width="55" />
       <el-table-column prop="id" label="ID" width="80">
       </el-table-column>
@@ -191,10 +235,23 @@ onMounted(() => {
           <span>{{ formatISOData(scope.row.createdAt) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('operation.title')" width="150px" fixed="right">
+      <el-table-column :label="t('operation.title')" width="260px" fixed="right">
         <template #default="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ t('operation.edit') }}</el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope.row)">{{ t('operation.delete') }}</el-button>
+          <el-popover placement="bottom" trigger="click" :width="130" popper-style="min-width: auto; padding: 8px;">
+            <template #reference>
+              <el-button size="small" type="success">{{ t("operation.more") }}</el-button>
+            </template>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <el-button size="small" type="primary" plain @click="router.push({ name: 'rolePermissionAssign', params: { id: scope.row.id } })" style="margin: 0; width: 100%;">
+                {{ t("permission.assign") }}
+              </el-button>
+              <el-button size="small" type="primary" plain @click="router.push({ name: 'roleUserAssign', params: { id: scope.row.id } })" style="margin: 0; width: 100%;">
+                {{ t("user.assign") }}
+              </el-button>
+            </div>
+          </el-popover>
         </template>
       </el-table-column>
     </el-table>
@@ -207,9 +264,14 @@ onMounted(() => {
       :disabled-parent-ids="currentRoleId ? [currentRoleId] : []"
       @success="handleDialogSuccess"
     />
-
-  </TableContainer>
+    </TableContainer>
+  </div>
 </template>
 
 <style scoped>
+.list-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 </style>

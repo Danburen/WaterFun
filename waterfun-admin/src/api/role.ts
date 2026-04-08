@@ -56,6 +56,14 @@ export interface ListRolePermsParams {
     code?: string;
 }
 
+export interface ListRoleUsersParams {
+    page?: number;
+    size?: number;
+    userUid?: number;
+    username?: string;
+    nickname?: string;
+}
+
 export interface ExpirableOption<TId extends number | string = number> extends OptionResItem<TId> {
     expiresAt: ISOString;
 }
@@ -169,6 +177,15 @@ export const deleteRolePerms = (id: number, data: DeleteRolePermsReq): Promise<R
     return request.delete<ResBody<BatchResult | null>>(`/role/${id}/permissions`, { data });
 };
 
+export const listRoleUsers = (
+    id: number,
+    params: ListRoleUsersParams = {}
+): PromiseResBody<Page<AssignedUserRes>> => {
+    return request.get<ResBody<Page<AssignedUserRes>>>(`/role/${id}/users`, {
+        params,
+    });
+};
+
 export const getRoleUsers = (
     id: number,
     page: number = 0,
@@ -177,9 +194,7 @@ export const getRoleUsers = (
     username?: string,
     nickname?: string
 ): PromiseResBody<Page<AssignedUserRes>> => {
-    return request.get<ResBody<Page<AssignedUserRes>>>(`/role/${id}/users`, {
-        params: { page, size, userUid, username, nickname },
-    });
+    return listRoleUsers(id, { page, size, userUid, username, nickname });
 };
 
 export const putUserRoles = (id: number, data: AssignUserToRoleReq): Promise<ResBody<BatchResult | null>> => {

@@ -29,13 +29,13 @@ public interface RolePermRepo extends JpaRepository<RolePermission,Integer> {
     Page<RolePermission> findAllByRoleId(int attr0, Pageable attr1);
 
     @Query("SELECT rp FROM RolePermission rp " +
-            "WHERE rp.role.id =: roleId " +
+            "WHERE rp.role.id = :roleId " +
             "AND (:permId IS NULL OR rp.permission.id = :permId) " +
             "AND (:permName IS NULL OR rp.permission.name LIKE %:permName%) " +
             "AND (:permCode IS NULL OR rp.permission.code LIKE %:permCode%) " +
             "ORDER BY rp.createdAt DESC")
     @EntityGraph(attributePaths = "permission")
-    Page<RolePermission> listRolePerms(@Param("roleId") int id,
+    Page<RolePermission> listRolePerms(@Param("roleId") int roleId,
                                        @Param("permId") Integer permId,
                                        @Param("permName") String name,
                                        @Param("permCode") String code,

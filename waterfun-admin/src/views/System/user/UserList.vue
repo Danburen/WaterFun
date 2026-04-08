@@ -3,6 +3,7 @@ import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox } from "element-plus";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
 import { deleteUser, getUserList, type AccountStatus, type UserAdminDto } from "~/api/user";
 import type { PageOptions } from "~/types";
@@ -109,34 +110,38 @@ onMounted(fetchData);
 </script>
 
 <template>
-  <TableContainer
-    title="user.title"
-    :show-remove-btn="false"
-    :total="pageOpts.total"
-    v-model:page-size="pageOpts.pageSize"
-    v-model:current-page="pageOpts.currentPage"
-    @change="fetchData"
-  >
-    <el-form inline :model="searchForm" class="search-form">
-      <el-form-item :label="t('user.username')">
-        <el-input v-model="searchForm.username" :placeholder="t('user.input.username')" />
-      </el-form-item>
-      <el-form-item :label="t('user.nickname')">
-        <el-input v-model="searchForm.nickname" :placeholder="t('user.input.nickname')" />
-      </el-form-item>
-      <el-form-item :label="t('user.status')">
-        <el-select v-model="searchForm.accountStatus" clearable style="width: 150px">
-          <el-option :label="statusLabel('ACTIVE')" value="ACTIVE" />
-          <el-option :label="statusLabel('SUSPENDED')" value="SUSPENDED" />
-          <el-option :label="statusLabel('DEACTIVATED')" value="DEACTIVATED" />
-          <el-option :label="statusLabel('DELETED')" value="DELETED" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleSearch">{{ t("query.title") }}</el-button>
-        <el-button @click="handleReset">{{ t("reset.title") }}</el-button>
-      </el-form-item>
-    </el-form>
+  <div class="list-layout">
+    <SearchContainer>
+      <el-form inline :model="searchForm" class="search-form">
+        <el-form-item :label="t('user.username')">
+          <el-input v-model="searchForm.username" :placeholder="t('user.input.username')" />
+        </el-form-item>
+        <el-form-item :label="t('user.nickname')">
+          <el-input v-model="searchForm.nickname" :placeholder="t('user.input.nickname')" />
+        </el-form-item>
+        <el-form-item :label="t('user.status')">
+          <el-select v-model="searchForm.accountStatus" clearable style="width: 150px">
+            <el-option :label="statusLabel('ACTIVE')" value="ACTIVE" />
+            <el-option :label="statusLabel('SUSPENDED')" value="SUSPENDED" />
+            <el-option :label="statusLabel('DEACTIVATED')" value="DEACTIVATED" />
+            <el-option :label="statusLabel('DELETED')" value="DELETED" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleSearch">{{ t("query.title") }}</el-button>
+          <el-button @click="handleReset">{{ t("reset.title") }}</el-button>
+        </el-form-item>
+      </el-form>
+    </SearchContainer>
+
+    <TableContainer
+      title="user.title"
+      :show-remove-btn="false"
+      :total="pageOpts.total"
+      v-model:page-size="pageOpts.pageSize"
+      v-model:current-page="pageOpts.currentPage"
+      @change="fetchData"
+    >
 
     <el-table v-loading="loading" :data="userList" border fit highlight-current-row style="width: 100%">
       <el-table-column type="selection" :selectable="selectable" width="55" />
@@ -165,21 +170,37 @@ onMounted(fetchData);
           {{ formatISOData(row.createdAt) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('operation.title')" width="170" fixed="right">
+      <el-table-column :label="t('operation.title')" min-width="120" fixed="right">
         <template #default="{ row }">
           <el-button size="small" type="primary" @click="gotoEdit(row.uid)">{{ t("operation.edit") }}</el-button>
           <el-button size="small" type="danger" @click="handleDelete(row.uid)">{{ t("operation.delete") }}</el-button>
+          <el-popover placement="bottom" trigger="click" :width="100" popper-style="min-width: auto; padding: 8px;">
+            <template #reference>
+              <el-button size="small" type="success" style="margin-left: 12px;">{{ t("operation.more") }}</el-button>
+            </template>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <el-button size="small" type="primary" plain @click="router.push({ name: 'userRoleAssign', params: { uid: row.uid } })" style="margin: 0; width: 100%;">{{ t("role.assign") }}</el-button>
+              <el-button size="small" type="primary" plain @click="router.push({ name: 'userPermissionAssign', params: { uid: row.uid } })" style="margin: 0; width: 100%;">{{ t("permission.assign") }}</el-button>
+            </div>
+          </el-popover>
         </template>
       </el-table-column>
     </el-table>
 
-    <UserEditDialog v-model="editDialogVisible" :uid="currentEditUid" @success="handleEditSuccess" />
-  </TableContainer>
+      <UserEditDialog v-model="editDialogVisible" :uid="currentEditUid" @success="handleEditSuccess" />
+    </TableContainer>
+  </div>
 </template>
 
 <style scoped>
 .search-form {
-  margin-bottom: 10px;
+  margin-bottom: 0;
+}
+
+.list-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 </style>
 

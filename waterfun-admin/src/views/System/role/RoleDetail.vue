@@ -6,7 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 import {
   getRole,
   getRoleAllIds,
-  getRoleUsers,
+  listRoleUsers,
   listRolePerms,
   type RoleResp,
 } from "~/api/role";
@@ -84,7 +84,7 @@ const fetchRoleUsersPreview = async () => {
     let page = 0;
     let totalPages = 1;
     while (page < totalPages) {
-      const res = await getRoleUsers(roleId.value, page, 100);
+      const res = await listRoleUsers(roleId.value, { page, size: 100 });
       (res.data.content || []).forEach((item) => {
         all.push({ id: item.userUid, name: `${item.username}${item.nickname ? ` (${item.nickname})` : ""}` });
       });
@@ -101,6 +101,16 @@ const fetchRoleUsersPreview = async () => {
 const openEditDialog = () => {
   if (Number.isNaN(roleId.value)) return;
   editDialogVisible.value = true;
+};
+
+const gotoAssignPermPage = () => {
+  if (Number.isNaN(roleId.value)) return;
+  router.push({ name: "rolePermissionAssign", params: { id: roleId.value } });
+};
+
+const gotoAssignUserPage = () => {
+  if (Number.isNaN(roleId.value)) return;
+  router.push({ name: "roleUserAssign", params: { id: roleId.value } });
 };
 
 const handleEditSuccess = async () => {
@@ -129,6 +139,8 @@ onMounted(async () => {
     <CardContainer title="role.detail">
       <template #header-right>
         <el-button text @click="router.back()">{{ t("back.title") }}</el-button>
+        <el-button type="primary" plain @click="gotoAssignPermPage">{{ t("permission.assign") }}</el-button>
+        <el-button type="primary" plain @click="gotoAssignUserPage">{{ t("user.assign") }}</el-button>
         <el-button type="primary" plain @click="openEditDialog">{{ t("operation.edit") }}</el-button>
       </template>
 

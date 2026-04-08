@@ -87,3 +87,9 @@
 .default-search-buttons {
     min-width: 100px;
 }
+
+.default-table-container {
+  border: 1px solid #ccc;
+  box-shadow: #ccc 2px 2px 12px;
+  border-radius: 4px;
+}

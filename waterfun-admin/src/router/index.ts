@@ -41,6 +41,26 @@ export const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'user/:uid/role-assign',
+                name: 'userRoleAssign',
+                component: () => import('~/views/System/user/UserAssignRole.vue'),
+                props: true,
+                meta: {
+                    locale: 'userAssignRole',
+                    isDetail: true,
+                }
+            },
+            {
+                path: 'user/:uid/permission-assign',
+                name: 'userPermissionAssign',
+                component: () => import('~/views/System/user/UserAssignPerm.vue'),
+                props: true,
+                meta: {
+                    locale: 'userAssignPermission',
+                    isDetail: true,
+                }
+            },
+            {
                 path: 'role',
                 name: 'roleManager',
                 meta: { locale:'system.role'},
@@ -53,6 +73,26 @@ export const routes: RouteRecordRaw[] = [
                 props: true,
                 meta: {
                     locale: 'role.detail',
+                    isDetail: true,
+                }
+            },
+            {
+                path: 'role/:id/permission-assign',
+                name: 'rolePermissionAssign',
+                component: () => import('~/views/System/role/RoleAssignPerm.vue'),
+                props: true,
+                meta: {
+                    locale: 'roleAssignPermission',
+                    isDetail: true,
+                }
+            },
+            {
+                path: 'role/:id/user-assign',
+                name: 'roleUserAssign',
+                component: () => import('~/views/System/role/RoleAssignUser.vue'),
+                props: true,
+                meta: {
+                    locale: 'roleAssignUser',
                     isDetail: true,
                 }
             },
