@@ -9,6 +9,7 @@ const props = withDefaults(
     pageSize?: number;
     currentPage?: number;
     pageSizes?: number[];
+    back?: boolean;
   }>(),
   {
     showPagination: true,
@@ -16,6 +17,7 @@ const props = withDefaults(
     pageSize: 10,
     currentPage: 1,
     pageSizes: () => [10, 20, 50, 100],
+    back: false,
   }
 );
 
@@ -23,6 +25,7 @@ const emit = defineEmits<{
   "update:pageSize": [size: number];
   "update:currentPage": [page: number];
   change: [];
+  back: [];
 }>();
 
 const localPageSize = computed({
@@ -43,7 +46,7 @@ const localCurrentPage = computed({
 </script>
 
 <template>
-  <CardContainer :title="title">
+  <CardContainer :title="title" :back="back" @back="emit('back')">
     <template #header-right>
       <slot name="header-right" />
     </template>

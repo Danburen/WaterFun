@@ -23,6 +23,10 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "userAssignRole": "Assign Roles to User",
+    "userAssignPermission": "Assign Permissions to User",
+    "roleAssignPermission": "Assign Permissions to Role",
+    "roleAssignUser": "Assign Users to Role",
     "system": {
       "title": "System",
       "user": "Users",
@@ -34,7 +38,15 @@
     "create": "Create",
     "delete": "Delete"
   },
+  "assign": {
+    "forTarget": "Assign {item} to {target} ({name})"
+  },
+  "expiresAt": {
+    "title": "Expires At",
+    "placeholder": "Select expiry time (optional)"
+  },
   "permission": {
+    "entity": "Permission",
     "title": "Permission Management",
     "list": "Permission List",
     "edit": "Edit Permission",
@@ -56,6 +68,8 @@
     "isSystem": "System",
     "parentId": "Parent Permission",
     "assignedUsers": "Assigned Users",
+    "select": "Select Permission",
+    "assign": "Assign Permission",
     "input": {
       "name": "Please input permission name",
       "code": "Please input permission code",
@@ -87,6 +101,7 @@
     }
   },
   "role": {
+    "entity": "Role",
     "title": "Role Management",
     "list": "Role List",
     "edit": "Edit Role",
@@ -100,6 +115,9 @@
     "parentId": "Parent Role",
     "basicInfo": "Basic Info",
     "permissionConfig": "Permission Config",
+    "assign": "Assign Role",
+    "select": "Select Role",
+    "assignManage": "Assignment Management",
     "assignedPermissions": "Assigned Permissions",
     "assignedUsers": "Assigned Users",
     "confirm": {
@@ -150,7 +168,10 @@
     "time": "Created At"
   },
   "user": {
+    "entity": "User",
     "title": "User Management",
+    "assign": "Assign User",
+    "select": "Select User",
     "list": "User List",
     "detail": "User Detail",
     "edit": "Edit User",

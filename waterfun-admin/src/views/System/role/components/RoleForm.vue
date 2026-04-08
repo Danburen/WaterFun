@@ -33,7 +33,7 @@ const rules: FormRules<RoleFormModel> = {
     {min: 2, max: 64, message: t("role.validate.nameLength"), trigger: "blur"},
   ],
   code: [
-    {required: true, message: t("role.validate.code"), trigger: "blur"},
+    {required: false, message: t("role.validate.code"), trigger: "blur"},
     {min: 2, max: 64, message: t("role.validate.codeLength"), trigger: "blur"},
   ],
 };

@@ -3,20 +3,28 @@
 import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
-defineProps<{
-  title: string
-}>()
+
+const props = withDefaults(defineProps<{
+  title: string;
+  showTitle?: boolean;
+  titleI18n?: boolean;
+}>(), {
+  showTitle: true,
+  titleI18n: true
+})
 </script>
 
 <template>
   <div class="table-container">
-    <div class="table-header">
+    <div class="header" v-if="props.showTitle">
+      <div class="table-header">
       <div class="header-left">
-        <span>{{ t(title) }}</span>
+        <span>{{ props.titleI18n ? t(title) : title }}</span>
       </div>
         <slot class="header-right" name="header-right"></slot>
+      </div>
+      <div class="header-divider"></div>
     </div>
-    <div class="header-divider"></div>
     <div class="table-content">
       <slot></slot>
     </div>

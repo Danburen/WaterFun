@@ -2,8 +2,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import {Pagination} from "~/types";
-import i18n from "../utils/i18n";
 import {useI18n} from "vue-i18n";
 
 
@@ -11,26 +9,23 @@ const { t } = useI18n();
 // Props
 const props = withDefaults(defineProps<{
   title: string;
+  titleI18n?: boolean;
   showAddBtn?: boolean;
   showRemoveBtn?: boolean;
   disableDelete?: boolean;
   showPagination?: boolean;
-  pagination?: Pagination;
+  showTitle?: boolean;
   total?: number;
   pageSize?: number;
   currentPage?: number;
   pageSizes?: number[];
 }>(), {
+  titleI18n: true,
+  showTitle: true,
   showAddBtn: false,
   showPagination: true,
   showRemoveBtn: true,
   disableDelete: true,
-  pagination: {
-    size: 10,
-    number: 1,
-    totalElements: 0,
-    totalPages: 0,
-  },
   pageSizes: () => [10, 20, 50, 100],
   total: 0,
   pageSize: 10,
@@ -62,7 +57,7 @@ const localCurrentPage = computed({
 
 </script>
 <template>
-  <CardContainer :title="title">
+  <CardContainer :title="title" :title-i18n="titleI18n" :show-title="showTitle">
     <div class="operation-bar">
       <slot name="action-buttons">
         <el-button v-if="showAddBtn" type="primary" size="small" @click="$emit('add')">
@@ -73,6 +68,7 @@ const localCurrentPage = computed({
         </el-button>
       </slot>
     </div>
+    <slot name="search"></slot>
     <slot></slot>
     <div v-if="showPagination" class="pagination-container">
       <el-pagination

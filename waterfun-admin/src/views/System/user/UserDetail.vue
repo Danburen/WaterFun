@@ -29,6 +29,16 @@ const gotoEdit = () => {
   editDialogVisible.value = true;
 };
 
+const gotoAssignRolePage = () => {
+  if (Number.isNaN(uid.value)) return;
+  router.push({ name: "userRoleAssign", params: { uid: uid.value } });
+};
+
+const gotoAssignPermPage = () => {
+  if (Number.isNaN(uid.value)) return;
+  router.push({ name: "userPermissionAssign", params: { uid: uid.value } });
+};
+
 const gotoRoleDetail = (id: number) => {
   router.push({ name: "roleDetail", params: { id } });
 };
@@ -70,6 +80,8 @@ onMounted(async () => {
     <CardContainer title="user.detail">
       <template #header-right>
         <el-button text @click="router.back()">{{ t("back.title") }}</el-button>
+        <el-button type="primary" plain @click="gotoAssignRolePage">{{ t("role.assign") }}</el-button>
+        <el-button type="primary" plain @click="gotoAssignPermPage">{{ t("permission.assign") }}</el-button>
         <el-button type="primary" plain @click="gotoEdit">{{ t("operation.edit") }}</el-button>
       </template>
 

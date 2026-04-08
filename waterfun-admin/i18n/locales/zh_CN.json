@@ -29,6 +29,10 @@
   },
   "nav": {
     "dashboard": "仪表盘",
+    "userAssignRole": "为用户分配角色",
+    "userAssignPermission": "为用户分配权限",
+    "roleAssignPermission": "为角色分配权限",
+    "roleAssignUser": "为角色分配用户",
     "system": {
       "title": "系统管理",
       "user": "用户管理",
@@ -53,7 +57,16 @@
     "update": "修改",
     "export": "导出"
   },
+  "assignment": "指派管理",
+  "assign": {
+    "forTarget": "为{target}({name})指派{item}"
+  },
+  "expiresAt": {
+    "title": "过期时间",
+    "placeholder": "请选择过期时间（可选）"
+  },
   "role": {
+    "entity": "角色",
     "title": "角色管理",
     "list": "角色列表",
     "edit": "编辑角色",
@@ -67,8 +80,10 @@
     "parentId": "父级角色ID",
     "basicInfo": "基础信息",
     "permissionConfig": "权限配置",
-    "assignedPermissions": "已分配权限",
+    "assign": "分配角色",
+    "select": "选择角色",
     "assignedUsers": "已分配用户",
+    "assignedPermissions": "已分配权限",
     "input": {
       "name": "请输入角色名称",
       "code": "请输入角色编码",
@@ -99,6 +114,7 @@
     }
   },
   "permission": {
+    "entity": "权限",
     "title": "权限管理",
     "list": "权限列表",
     "edit": "编辑权限",
@@ -120,6 +136,8 @@
     "isSystem": "系统权限",
     "parentId": "父级权限ID",
     "assignedUsers": "已分配用户",
+    "select": "选择权限",
+    "assign":"分配权限",
     "input": {
       "name": "请输入权限名称",
       "code": "请输入权限编码",
@@ -159,6 +177,7 @@
     "by": "更新人"
   },
   "user": {
+    "entity": "用户",
     "profile": "个人中心",
     "title": "用户管理",
     "list": "用户列表",
@@ -187,6 +206,8 @@
     "followingCnt": "关注数",
     "likeCnt": "获赞数",
     "postCnt": "帖子数",
+    "assign":"分配用户",
+    "select":"选择用户",
     "input": {
       "username": "请输入用户名",
       "nickname": "请输入昵称",
@@ -195,7 +216,8 @@
       "birthDate": "请选择生日",
       "residence": "请输入居住地",
       "email": "请输入邮箱",
-      "phone": "请输入手机号"
+      "phone": "请输入手机号",
+      "uid": "请输入用户ID"
     },
     "genderMap": {
       "male": "男",
