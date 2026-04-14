@@ -14,4 +14,6 @@ public interface TagRepository extends JpaRepository<Tag, Integer>, JpaSpecifica
   List<Tag> findAllByCreatorUid(Long currentUserUid);
 
   List<Integer> findTagIdsByTagsIdIn(Collection<Integer> tagsIds);
+
+    int removeByIdIn(Collection<Integer> ids);
 }

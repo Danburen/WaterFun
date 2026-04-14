@@ -5,11 +5,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.waterwood.api.VO.BatchResult;
+import org.waterwood.api.VO.OptionVO;
+import org.waterwood.utils.CollectionUtil;
+import org.waterwood.waterfunadminservice.api.request.content.DeleteTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.UpdateTagReq;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.TagMapper;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.waterwood.waterfunservicecore.exception.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +36,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void updateTag(Integer id, UpdateTagReq req) {
-        Tag tag = tagRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Tag ID: " + id)
-        );
+        Tag tag = getTag(id);
         tagMapper.partialUpdate(req, tag);
         tagRepository.save(tag);
     }
@@ -41,5 +46,27 @@ public class TagServiceImpl implements TagService {
         return tagRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Tag ID: " + id)
         );
+    }
+
+    @Override
+    public BatchResult deleteTags(DeleteTagsRequest req) {
+        int removed = 0;
+        if(CollectionUtil.isNotEmpty(req.getTagIds())){
+            removed = tagRepository.removeByIdIn(req.getTagIds());
+        }
+        return BatchResult.of(req.getTagIds() == null ? 0 : req.getTagIds().size(), removed);
+    }
+
+    @Override
+    public List<OptionVO<Integer>> getOptions() {
+        return tagRepository.findAll().stream()
+                .filter(t -> ! t.getIsDeleted())
+                .map(t -> {
+                    return OptionVO.<Integer>builder()
+                            .id(t.getId())
+                            .code(t.getSlug())
+                            .name(t.getName())
+                            .build();
+                }).toList();
     }
 }

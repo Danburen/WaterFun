@@ -20,4 +20,8 @@ public interface CategoryMapper {
     Category toEntity(CreateCategoryRequest body);
 
     Category toEntity(UpdateCategoryRequest body);
+
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Category partialUpdate(UpdateCategoryRequest req,@MappingTarget Category category);
 }

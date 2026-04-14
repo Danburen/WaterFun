@@ -17,13 +17,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class UpdateCategoryRequest implements Serializable {
     @NotNull
-    Long id;
+    private Integer id;
     @Size(max = 50)
-    String name;
+    private String name;
     @Size(max = 50)
-    String slug;
-    String description;
-    Long parentId;
-    Integer sortOrder;
-    Boolean isActive;
+    private String slug;
+    private String description;
+    private Integer parentId;
+    private Integer sortOrder;
+    private Boolean isActive;
 }
