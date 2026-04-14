@@ -8,6 +8,7 @@ export type Gender = "MALE" | "FEMALE" | "OTHER" | "UNKNOWN";
 export interface UserAdminDto {
   uid: number;
   username: string;
+  userType: number;
   accountStatus: AccountStatus;
   statusChangedAt: ISOString;
   updatedAt: ISOString;
@@ -121,6 +122,17 @@ export interface BatchResult {
   message: string;
 }
 
+export interface RemoveUsersReq {
+  userUids: number[];
+}
+
+export interface CreateNewUserReq {
+  phone?: string;
+  username: string;
+  password?: string;
+  userType: number;
+}
+
 export const getUserList = (params: ListUserParams = {}): PromiseResBody<Page<UserAdminDto>> => {
   return request.get<ResBody<Page<UserAdminDto>>>("/users/list", { params });
 };
@@ -129,8 +141,17 @@ export const getUserDetail = (uid: number): PromiseResBody<UserDetailDto> => {
   return request.get<ResBody<UserDetailDto>>(`/users/${uid}`);
 };
 
+export const createUser = (data: CreateNewUserReq): PromiseResBody<null> => {
+  return request.post<ResBody<null>>("/users", data);
+};
+
 export const deleteUser = (uid: number): PromiseResBody<null> => {
   return request.delete<ResBody<null>>(`/users/${uid}`);
+};
+
+export const deleteUsers = (userUids: number[]): PromiseResBody<BatchResult> => {
+  const data: RemoveUsersReq = { userUids };
+  return request.delete<ResBody<BatchResult>>("/users", { data });
 };
 
 export const updateUserInfo = (uid: number, data: UserInfoUpdateReq): PromiseResBody<null> => {

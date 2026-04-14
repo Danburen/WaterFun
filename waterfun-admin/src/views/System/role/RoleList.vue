@@ -3,6 +3,7 @@ import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
 import {PageOptions} from "~/types";
 import {
+  deleteRoles,
   deleteRole,
   getRoleAllIds,
   listRoles,
@@ -121,20 +122,19 @@ const handleBatchDelete = async () => {
   }
 
   try {
-    await ElMessageBox.confirm(t("role.confirm.delete"), t("operation.delete"), {
+    await ElMessageBox.confirm(t("role.confirm.batchDelete", { count: selectedRoleIds.value.length }), t("operation.delete"), {
       type: "warning",
     });
 
-    const results = await Promise.allSettled(selectedRoleIds.value.map(id => deleteRole(id)));
-    const failedCount = results.filter(item => item.status === "rejected").length;
-    const successCount = results.length - failedCount;
+    const res = await deleteRoles(selectedRoleIds.value);
+    const result = res.data;
 
-    if (failedCount === 0) {
+    if (result.success === result.requested) {
       ElMessage.success(t("role.success.delete"));
-    } else if (successCount === 0) {
+    } else if (result.success === 0) {
       ElMessage.error(t("role.error.delete"));
     } else {
-      ElMessage.warning(`${t("role.success.delete")} ${successCount}/${results.length}`);
+      ElMessage.warning(`${t("role.success.delete")} ${result.success}/${result.requested}`);
     }
 
     selectedRoleIds.value = [];
@@ -238,7 +238,7 @@ onMounted(() => {
       <el-table-column :label="t('operation.title')" width="260px" fixed="right">
         <template #default="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ t('operation.edit') }}</el-button>
-          <el-button type="danger" size="small" @click="handleDelete(scope.row)">{{ t('operation.delete') }}</el-button>
+          <el-button v-if="! scope.row.isSystem" type="danger" size="small" @click="handleDelete(scope.row)">{{ t('operation.delete') }}</el-button>
           <el-popover placement="bottom" trigger="click" :width="130" popper-style="min-width: auto; padding: 8px;">
             <template #reference>
               <el-button size="small" type="success">{{ t("operation.more") }}</el-button>

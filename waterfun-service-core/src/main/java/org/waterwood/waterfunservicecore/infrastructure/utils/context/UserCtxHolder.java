@@ -15,7 +15,7 @@ public class UserCtxHolder {
         return get().getUserUid();
     }
     /**
-     * Set values to ThreadLocal
+     * Set value to ThreadLocal
      */
     public static void set(AuthContext context){
         THREAD_LOCAL.set(context);

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunadminservice.api.request.perm.CreatePermRequest;
+import org.waterwood.waterfunadminservice.api.request.perm.DeletePermsRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.UpdatePermRequest;
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunservicecore.entity.Permission;
@@ -98,4 +99,11 @@ public interface PermissionService {
      * @return List of OptionVO
      */
     List<OptionVO<Integer>> getAllPermOptions();
+
+    /**
+     * Batch remove permissions
+     * @param req the request body.
+     * @return batch result of the operation.
+     */
+    BatchResult removePerms(DeletePermsRequest req);
 }

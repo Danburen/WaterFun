@@ -102,6 +102,7 @@ export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED" | "DELETED";
 export interface UserInfoARes {
     uid: number;
     username: string;
+    userType: number;
     accountStatus: AccountStatus;
     statusChangedAt: ISOString;
     updatedAt: ISOString;
@@ -130,6 +131,10 @@ export interface BatchResult {
     message: string;
 }
 
+export interface DeleteRolesRequest {
+    roleIds: number[];
+}
+
 export const listRoles = (
     page: number = 0,
     size: number = 10,
@@ -156,6 +161,11 @@ export const updateRole = (id: number, data: UpdateRoleRequest): Promise<ResBody
 
 export const deleteRole = (id: number): Promise<ResBody<null>> => {
     return request.delete<ResBody<null>>(`/role/${id}`);
+};
+
+export const deleteRoles = (roleIds: number[]): Promise<ResBody<BatchResult>> => {
+    const data: DeleteRolesRequest = { roleIds };
+    return request.delete<ResBody<BatchResult>>("/role", { data });
 };
 
 export const assignPermissions = (id: number, data: AssignRolePermReq): Promise<ResBody<BatchResult | null>> => {

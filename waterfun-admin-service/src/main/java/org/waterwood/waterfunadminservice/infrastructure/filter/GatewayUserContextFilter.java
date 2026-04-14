@@ -14,7 +14,10 @@ import org.waterwood.waterfunservicecore.infrastructure.utils.context.AuthContex
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -30,7 +33,6 @@ public class GatewayUserContextFilter extends OncePerRequestFilter {
 
         AuthContext authContext = new AuthContext();
         authContext.setUserUid(Long.valueOf(userUid));
-        authContext.setRoles(parseRoles(request.getHeader("X-User-Roles")));
 
         String jti = request.getHeader("X-Token-Jti");
         if(StringUtil.isBlank(jti)){
@@ -39,7 +41,6 @@ public class GatewayUserContextFilter extends OncePerRequestFilter {
 
         authContext.setJti(jti);
         authContext.setDid(request.getHeader("X-User-Did"));
-        // TODO: ADD PERMISSIONS INJECTION
         UserCtxHolder.set(authContext);
         try {
             filterChain.doFilter(request, response);
@@ -49,9 +50,22 @@ public class GatewayUserContextFilter extends OncePerRequestFilter {
     }
 
     private Set<String> parseRoles(String rolesHeader) {
-        if (rolesHeader == null || rolesHeader.isEmpty()) {
-            return Set.of();
+        if (StringUtil.isBlank(rolesHeader)) {
+            return new HashSet<>();
         }
-        return Set.of(rolesHeader.split(","));
+        return Arrays.stream(rolesHeader.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> parsePermissions(String permsHeader) {
+        if (StringUtil.isBlank(permsHeader)) {
+            return new HashSet<>();
+        }
+        return Arrays.stream(permsHeader.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
     }
 }

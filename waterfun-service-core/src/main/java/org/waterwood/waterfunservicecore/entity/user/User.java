@@ -59,6 +59,10 @@ public class User {
     @Column(name = "last_active_at")
     private Instant lastActiveAt;
 
+    @ColumnDefault("'0'")
+    @Column(name = "user_type", columnDefinition = "tinyint UNSIGNED")
+    private Short userType = 0;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

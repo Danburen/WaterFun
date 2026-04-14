@@ -33,16 +33,12 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
                 .filter(auth -> auth instanceof JwtAuthenticationToken)
                 .cast(JwtAuthenticationToken.class)
                 .map(jwtAuth -> {
-                    Collection<? extends GrantedAuthority> roles = jwtAuth.getAuthorities();
                     Jwt jwt = jwtAuth.getToken();
                     String did = jwt.getClaimAsString("did");
                     String jti = jwt.getClaimAsString("jti");
 
                     ServerHttpRequest.Builder requestBuilder = exchange.getRequest().mutate()
-                            .header("X-User-Uid", jwt.getSubject())
-                            .header("X-User-Roles",
-                                    String.join(",",
-                                            roles.stream().map(GrantedAuthority::getAuthority).toList()));
+                            .header("X-User-Uid", jwt.getSubject());
 
                     if (StringUtil.isNotBlank(did)) {
                         requestBuilder.header("X-User-Did", did);

@@ -29,8 +29,11 @@
   },
   "nav": {
     "dashboard": "仪表盘",
-    "userAssignRole": "为用户分配角色",
-    "userAssignPermission": "为用户分配权限",
+    "user": {
+      "detail": "用户详情",
+      "roleAssign": "为用户分配角色",
+      "permissionAssign": "为用户分配权限"
+    },
     "roleAssignPermission": "为角色分配权限",
     "roleAssignUser": "为角色分配用户",
     "system": {
@@ -97,7 +100,8 @@
       "codeLength": "角色编码长度需在 2-64 个字符"
     },
     "confirm": {
-      "delete": "确定删除该角色吗？"
+      "delete": "确定删除该角色吗？",
+      "batchDelete": "确定删除选中的 {count} 个角色吗？"
     },
     "success": {
       "create": "角色创建成功",
@@ -153,7 +157,8 @@
       "resourceLength": "资源标识长度不能超过 255 个字符"
     },
     "confirm": {
-      "delete": "确定删除该权限吗？"
+      "delete": "确定删除该权限吗？",
+      "batchDelete": "确定删除选中的 {count} 个权限吗？"
     },
     "success": {
       "create": "权限创建成功",
@@ -182,10 +187,12 @@
     "title": "用户管理",
     "list": "用户列表",
     "detail": "用户详情",
+    "create": "创建用户",
     "edit": "编辑用户",
     "uid": "用户ID",
     "username": "用户名",
     "nickname": "昵称",
+    "type": "用户类型",
     "status": "用户状态",
     "avatar": "头像",
     "lastActiveAt": "最后活跃",
@@ -217,6 +224,8 @@
       "residence": "请输入居住地",
       "email": "请输入邮箱",
       "phone": "请输入手机号",
+      "password": "请输入密码",
+      "type": "请选择用户类型",
       "uid": "请输入用户ID"
     },
     "genderMap": {
@@ -231,19 +240,29 @@
       "deactivated": "停用",
       "deleted": "删除"
     },
+    "typeMap": {
+      "normal": "普通用户",
+      "tester": "测试用户",
+      "admin": "管理员",
+      "system": "系统用户",
+      "superAdmin": "超管"
+    },
     "confirm": {
-      "delete": "确定删除该用户吗？"
+      "delete": "确定删除该用户吗？",
+      "batchDelete": "确定删除选中的 {count} 个用户吗？"
     },
     "success": {
+      "create": "用户创建成功",
       "updateInfo": "基本信息更新成功",
       "updateProfile": "档案信息更新成功",
       "updateDatum": "联系方式更新成功",
       "delete": "用户删除成功"
     },
     "error": {
+      "create": "创建用户失败",
       "fetchList": "获取用户列表失败",
       "fetchDetail": "获取用户详情失败",
-      "invalidId": "无效的用户ID",
+      "invalidId": "无效的用户UID",
       "saveInfo": "保存基本信息失败",
       "saveProfile": "保存档案信息失败",
       "saveDatum": "保存联系方式失败",

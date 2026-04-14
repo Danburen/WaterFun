@@ -19,7 +19,7 @@ public interface RoleMapper {
 
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "parent", ignore = true)
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    Role fullUpdate(UpdateRoleRequest updateRoleRequest, @MappingTarget Role role);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Role updateRole(UpdateRoleRequest updateRoleRequest, @MappingTarget Role role);
 
 }

@@ -57,10 +57,10 @@ defineExpose<RoleFormExpose>({
 <template>
   <el-form ref="formRef" :model="localModel" :rules="rules" label-width="110px" status-icon>
     <el-form-item prop="name" :label="t('role.name')">
-      <el-input v-model="localModel.name" :readonly="readonly" :placeholder="t('role.input.name')" />
+      <el-input v-model="localModel.name" :readonly="readonly " :placeholder="t('role.input.name')" />
     </el-form-item>
     <el-form-item prop="code" :label="t('role.code')">
-      <el-input v-model="localModel.code" :readonly="readonly" :placeholder="t('role.input.code')" />
+      <el-input v-model="localModel.code" :readonly="readonly || localModel.isSystem" :placeholder="t('role.input.code')" />
     </el-form-item>
     <el-form-item prop="parentId" :label="t('role.parentId')">
       <el-select

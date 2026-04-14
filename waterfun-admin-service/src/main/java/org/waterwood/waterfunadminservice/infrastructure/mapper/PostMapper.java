@@ -1,15 +1,15 @@
 package org.waterwood.waterfunadminservice.infrastructure.mapper;
 
 import org.mapstruct.*;
-import org.waterwood.waterfunadminservice.api.request.post.CreatePostRequest;
-import org.waterwood.waterfunadminservice.api.request.post.PatchUserPostReq;
-import org.waterwood.waterfunadminservice.api.response.post.PostResponse;
+import org.waterwood.waterfunadminservice.api.request.content.CreatePostRequest;
+import org.waterwood.waterfunadminservice.api.request.content.PatchUserPostReq;
+import org.waterwood.waterfunadminservice.api.response.content.PostResponse;
+import org.waterwood.waterfunadminservice.api.request.content.PutPostReq;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 
 import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
@@ -39,8 +39,13 @@ public interface PostMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Post partialUpdate(PatchUserPostReq patchUserPostReq, @MappingTarget Post post);
 
-    default Set<Integer> tagsToTagIds(Collection<Tag> tags) {
-        return tags.stream().map(Tag::getId).collect(Collectors.toSet());
+    default List<Integer> tagsToTagIds(Collection<Tag> tags) {
+        return tags.stream().map(Tag::getId).toList();
     }
+
+    Post toEntity(PutPostReq putPostReq);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Post partialUpdate(PutPostReq putPostReq, @MappingTarget Post post);
 
 }

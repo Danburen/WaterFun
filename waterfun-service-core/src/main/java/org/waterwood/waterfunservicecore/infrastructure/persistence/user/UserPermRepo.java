@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
-import org.waterwood.waterfunservicecore.entity.user.UserRole;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,8 +47,10 @@ public interface UserPermRepo extends JpaRepository<UserPermission,Long>, JpaSpe
             "ORDER BY up.createdAt DESC")
     @EntityGraph(attributePaths = "permission")
     Page<UserPermission> listUserPerms(@Param("userUid") long uid,
-                                 @Param("permId") int permId,
+                                 @Param("permId") Integer permId,
                                  @Param("name") String name,
                                  @Param("code") String code,
                                  Pageable pageable);
+
+    void deleteByUserUid(Long userUid);
 }

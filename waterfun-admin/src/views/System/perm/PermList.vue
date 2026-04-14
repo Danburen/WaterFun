@@ -7,6 +7,7 @@ import { useRouter } from "vue-router";
 import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
 import {
+  deletePerms,
   deletePermission,
   getPermOptions,
   listPermissions,
@@ -46,6 +47,7 @@ const loading = ref(false);
 const dialogVisible = ref(false);
 const dialogMode = ref<"create" | "edit">("create");
 const currentPermId = ref<number | null>(null);
+const selectedPermIds = ref<number[]>([]);
 
 const permTypeOptions: { label: string; value: PermissionType }[] = [
   { label: "permission.type.menu", value: "MENU" },
@@ -109,6 +111,43 @@ const handleDelete = async (row: PermissionResp) => {
     });
     await deletePermission(row.id);
     ElMessage.success(t("permission.success.delete"));
+    await fetchData();
+  } catch (e) {
+    if (e !== "cancel") {
+      console.error(e);
+      ElMessage.error(t("permission.error.delete"));
+    }
+  }
+};
+
+const handleSelectionChange = (rows: PermissionResp[]) => {
+  selectedPermIds.value = rows.map(item => item.id);
+};
+
+const handleBatchDelete = async () => {
+  if (selectedPermIds.value.length === 0) {
+    return;
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      t("permission.confirm.batchDelete", { count: selectedPermIds.value.length }),
+      t("operation.delete"),
+      { type: "warning" }
+    );
+
+    const res = await deletePerms(selectedPermIds.value);
+    const result = res.data;
+
+    if (result.success === result.requested) {
+      ElMessage.success(t("permission.success.delete"));
+    } else if (result.success === 0) {
+      ElMessage.error(t("permission.error.delete"));
+    } else {
+      ElMessage.warning(`${t("permission.success.delete")} ${result.success}/${result.requested}`);
+    }
+
+    selectedPermIds.value = [];
     await fetchData();
   } catch (e) {
     if (e !== "cancel") {
@@ -198,15 +237,25 @@ onMounted(async () => {
     <TableContainer
       title="permission.title"
       showAddBtn
-      :show-remove-btn="false"
+      :show-remove-btn="true"
+      :disable-delete="selectedPermIds.length === 0"
       @add="handleAdd"
+      @remove="handleBatchDelete"
       @change="fetchData"
       :total="pageOpts.total"
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
     >
 
-    <el-table v-loading="loading" :data="permissionList" border fit highlight-current-row style="width: 100%">
+    <el-table
+      v-loading="loading"
+      :data="permissionList"
+      border
+      fit
+      highlight-current-row
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" :selectable="selectable" width="55" />
       <el-table-column prop="id" label="ID" width="80" />
 

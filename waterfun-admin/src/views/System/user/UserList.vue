@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
-import { deleteUser, getUserList, type AccountStatus, type UserAdminDto } from "~/api/user";
+import { deleteUser, deleteUsers, getUserList, type AccountStatus, type UserAdminDto } from "~/api/user";
 import type { PageOptions } from "~/types";
 import UserEditDialog from "./components/UserEditDialog.vue";
 
@@ -14,9 +14,11 @@ const router = useRouter();
 
 const loading = ref(false);
 const userList = ref<UserAdminDto[]>([]);
+const selectedUserUids = ref<number[]>([]);
 const editDialogVisible = ref(false);
+const dialogMode = ref<"create" | "edit">("edit");
 const currentEditUid = ref<number | null>(null);
-const selectable = (row) => false;
+const selectable = (row: UserAdminDto) => row.userType !== 2 && row.userType !== 3 && row.userType !== 4;
 const searchForm = ref<{
   username: string;
   nickname: string;
@@ -41,6 +43,24 @@ const statusTypeMap: Record<AccountStatus, "success" | "warning" | "danger" | "i
 };
 
 const statusLabel = (status: AccountStatus) => t(`user.statusMap.${status.toLowerCase()}`);
+
+const userTypeTagTypeMap: Record<number, "primary" | "success" | "warning" | "danger" | "info"> = {
+  0: "primary",
+  1: "warning",
+  2: "danger",
+  3: "info",
+  4: "danger",
+};
+
+const userTypeI18nKeyMap: Record<number, string> = {
+  0: "normal",
+  1: "tester",
+  2: "admin",
+  3: "system",
+  4: "superAdmin",
+};
+
+const userTypeLabel = (userType: number) => t(`user.typeMap.${userTypeI18nKeyMap[userType] ?? "normal"}`);
 
 const fetchData = async () => {
   loading.value = true;
@@ -82,7 +102,14 @@ const gotoDetail = (uid: number) => {
 };
 
 const gotoEdit = (uid: number) => {
+  dialogMode.value = "edit";
   currentEditUid.value = uid;
+  editDialogVisible.value = true;
+};
+
+const handleAdd = () => {
+  dialogMode.value = "create";
+  currentEditUid.value = null;
   editDialogVisible.value = true;
 };
 
@@ -93,6 +120,43 @@ const handleDelete = async (uid: number) => {
     });
     await deleteUser(uid);
     ElMessage.success(t("user.success.delete"));
+    fetchData();
+  } catch (e) {
+    if (e !== "cancel") {
+      console.error(e);
+      ElMessage.error(t("user.error.delete"));
+    }
+  }
+};
+
+const handleSelectionChange = (rows: UserAdminDto[]) => {
+  selectedUserUids.value = rows.map(item => item.uid);
+};
+
+const handleBatchDelete = async () => {
+  if (selectedUserUids.value.length === 0) {
+    return;
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      t("user.confirm.batchDelete", { count: selectedUserUids.value.length }),
+      t("operation.delete"),
+      { type: "warning" }
+    );
+
+    const res = await deleteUsers(selectedUserUids.value);
+    const result = res.data;
+
+    if (result.success === result.requested) {
+      ElMessage.success(t("user.success.delete"));
+    } else if (result.success === 0) {
+      ElMessage.error(t("user.error.delete"));
+    } else {
+      ElMessage.warning(`${t("user.success.delete")} ${result.success}/${result.requested}`);
+    }
+
+    selectedUserUids.value = [];
     fetchData();
   } catch (e) {
     if (e !== "cancel") {
@@ -136,14 +200,26 @@ onMounted(fetchData);
 
     <TableContainer
       title="user.title"
-      :show-remove-btn="false"
+      showAddBtn
+      :show-remove-btn="true"
+      :disable-delete="selectedUserUids.length === 0"
       :total="pageOpts.total"
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
+      @add="handleAdd"
+      @remove="handleBatchDelete"
       @change="fetchData"
     >
 
-    <el-table v-loading="loading" :data="userList" border fit highlight-current-row style="width: 100%">
+    <el-table
+      v-loading="loading"
+      :data="userList"
+      border
+      fit
+      highlight-current-row
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" :selectable="selectable" width="55" />
       <el-table-column prop="uid" label="UID" min-width="140" />
       <el-table-column prop="username" :label="t('user.username')">
@@ -156,6 +232,13 @@ onMounted(fetchData);
       <el-table-column prop="nickname" :label="t('user.nickname')" >
         <template #default="{ row }">
           {{ row.nickname || t('none.title') }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="userType" :label="t('user.type')" min-width="120">
+        <template #default="{ row }">
+          <el-tag size="small" :type="userTypeTagTypeMap[row.userType]">
+            {{ userTypeLabel(row.userType) }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="accountStatus" :label="t('user.status')">
@@ -187,7 +270,7 @@ onMounted(fetchData);
       </el-table-column>
     </el-table>
 
-      <UserEditDialog v-model="editDialogVisible" :uid="currentEditUid" @success="handleEditSuccess" />
+      <UserEditDialog v-model="editDialogVisible" :mode="dialogMode" :uid="currentEditUid" @success="handleEditSuccess" />
     </TableContainer>
   </div>
 </template>

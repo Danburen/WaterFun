@@ -13,7 +13,9 @@ import org.waterwood.api.enums.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -22,7 +24,7 @@ import java.util.Set;
 @Table(name = "post")
 public class Post {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -51,12 +53,12 @@ public class Post {
     @ColumnDefault("'DRAFT'")
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private PostStatus status;
+    private PostStatus status = PostStatus.DRAFT;
 
     @ColumnDefault("'PUBLIC'")
     @Column(name = "visibility")
     @Enumerated(EnumType.STRING)
-    private PostVisibility visibility;
+    private PostVisibility visibility = PostVisibility.PUBLIC;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -73,15 +75,15 @@ public class Post {
 
     @ColumnDefault("'0'")
     @Column(name = "like_count", columnDefinition = "int UNSIGNED")
-    private Long likeCount;
+    private Long likeCount = 0L;
 
     @ColumnDefault("'0'")
     @Column(name = "comment_count", columnDefinition = "int UNSIGNED")
-    private Long commentCount;
+    private Long commentCount = 0L;
 
     @ColumnDefault("'0'")
     @Column(name = "collect_count", columnDefinition = "int UNSIGNED")
-    private Long collectCount;
+    private Long collectCount = 0L;
 
     @Size(max = 200)
     @Column(name = "slug", length = 200)
@@ -93,12 +95,12 @@ public class Post {
     @CreationTimestamp
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @UpdateTimestamp
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+    private Instant updatedAt = Instant.now();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -107,11 +109,7 @@ public class Post {
             inverseJoinColumns = @JoinColumn(name = "tag_id", foreignKey = @ForeignKey(name = "fk_post_tag_tag")),
             uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "tag_id"}, name = "uk_post_tag")
     )
-    private Set<Tag> tags = new HashSet<>();
-
-    @NotNull
-    @Column(name = "pid", nullable = false)
-    private Long pid;
+    private List<Tag> tags = new ArrayList<>();
 
     @ColumnDefault("0")
     @Column(name = "is_deleted")

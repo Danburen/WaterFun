@@ -31,31 +31,38 @@ public class SecurityAspect {
     private final RedisHelperHolder redisHelper;
     private final UserCoreService userCoreService;
 
+    @Before("@annotation(rr) || @within(rr)")
+    public void checkRoleUnified(RequireRole rr) {
+        checkRole(rr);
+    }
+
     @Before("@annotation(rr)")
     public void checkRole(RequireRole rr){
         Set<String> roles = getRoles();
-        boolean pass = Arrays.stream(rr.values())
+        boolean pass = Arrays.stream(rr.value())
                 .anyMatch(roles::contains);
         if(!pass){
-            log.info("User {} need roles {} ",UserCtxHolder.getUserUid() ,roles);
-            throw new BizException(BaseResponseCode.HTTP_FORBIDDEN);
+            log.warn("Access denied: uid={}, hasRoles={}, required={}",
+                    UserCtxHolder.getUserUid(), roles, Arrays.toString(rr.value()));
+            throw new BizException(BaseResponseCode.HTTP_FORBIDDEN, 403);
         }
     }
 
     @Before("@annotation(rp)")
     public void checkPermission(RequirePermission rp){
         Set<String> perms = getPermissions();
-        boolean pass = Arrays.stream(rp.values())
+        boolean pass = Arrays.stream(rp.value())
                 .anyMatch(perms::contains);
         if(!pass){
-            log.info("User {} need permissions {} ",UserCtxHolder.getUserUid() ,perms);
-            throw new BizException(BaseResponseCode.HTTP_FORBIDDEN);
+            log.warn("Access denied: uid={}, hasPerms={}, required={}",
+                    UserCtxHolder.getUserUid(), perms, Arrays.toString(rp.value()));
+            throw new BizException(BaseResponseCode.HTTP_FORBIDDEN, 403);
         }
     }
 
     private Set<String> getRoles(){
         long userUid = UserCtxHolder.getUserUid();
-        Set<String> roles = redisHelper.hKeys(UserKeyBuilder.userRole(userUid)).stream()
+        Set<String> roles = redisHelper.sMem(UserKeyBuilder.userRole(userUid)).stream()
                 .map(Object::toString).collect(Collectors.toSet());
         if(roles.isEmpty()){
             roles = miss(userUid).getRoles();
@@ -65,7 +72,7 @@ public class SecurityAspect {
 
     private Set<String> getPermissions(){
         long userUid = UserCtxHolder.getUserUid();
-        Set<String> permissions = redisHelper.hKeys(UserKeyBuilder.userPerm(userUid)).stream()
+        Set<String> permissions = redisHelper.sMem(UserKeyBuilder.userPerm(userUid)).stream()
                 .map(Object::toString).collect(Collectors.toSet());
         if(permissions.isEmpty()){
             permissions = miss(userUid).getPermissions();
@@ -76,15 +83,15 @@ public class SecurityAspect {
     private UserAuthAttrs miss(long userUid){
         UserAuthAttrs attrs = new UserAuthAttrs();
         Set<String> roleNameSet= userCoreService.getRoles(userUid).stream()
-                .map(Role::getName).collect(Collectors.toSet());
-        Set<String> permCodeStream = userCoreService.getUserPermissions(userUid).stream()
+                .map(Role::getCode).collect(Collectors.toSet());
+        Set<String> permCodeSet = userCoreService.getUserPermissions(userUid).stream()
                 .map(Permission::getCode).collect(Collectors.toSet());
         attrs.setRoles(roleNameSet);
-        attrs.setPermissions(permCodeStream);
-        redisHelper.hSet(
-                UserKeyBuilder.userRole(userUid), "role", roleNameSet);
-        redisHelper.hSet(
-                UserKeyBuilder.userPerm(userUid), "perm", permCodeStream);
+        attrs.setPermissions(permCodeSet);
+        redisHelper.sAdd(
+                UserKeyBuilder.userRole(userUid), roleNameSet.toArray(new String[0]));
+        redisHelper.sAdd(
+                UserKeyBuilder.userPerm(userUid), permCodeSet.toArray(new String[0]));
         return attrs;
     }
 

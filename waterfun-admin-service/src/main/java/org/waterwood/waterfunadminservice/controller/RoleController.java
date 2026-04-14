@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
@@ -17,6 +16,7 @@ import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunservicecore.entity.Role;
 import org.waterwood.waterfunadminservice.api.response.role.RoleResp;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.RoleSpec;
 import org.waterwood.waterfunadminservice.service.role.RoleService;
 
@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/role")
-@PreAuthorize("isAuthenticated()")
+@RequireRole("ADMIN")
 public class RoleController {
     private final RoleMapper roleMapper;
     private final RoleService roleService;
@@ -59,9 +59,16 @@ public class RoleController {
         return ApiResponse.success();
     }
 
+    @DeleteMapping
+    public ApiResponse<BatchResult> deleteRoles(@RequestBody DeleteRolesRequest req){
+        return ApiResponse.success(
+                roleService.removeRoles(req)
+        );
+    }
+
     @PutMapping("/{id}")
     public ApiResponse<Void> updateRole(@PathVariable int id, @RequestBody UpdateRoleRequest body){
-        roleService.fullUpdateRole(id, body);
+        roleService.updateRole(id, body);
         return ApiResponse.success();
     }
 

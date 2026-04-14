@@ -1,0 +1,1224 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "默认模块",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/api/user/userInfo": {
+      "get": {
+        "summary": "getUserInfo",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserInfoResponse"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "uid": "",
+                        "username": "",
+                        "accountStatus": "",
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "passwordHash": false
+                      }
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "uid": "",
+                        "username": "",
+                        "accountStatus": "",
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "passwordHash": false
+                      }
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "uid": "",
+                        "username": "",
+                        "accountStatus": "",
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "passwordHash": false
+                      }
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "uid": "",
+                        "username": "",
+                        "accountStatus": "",
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "passwordHash": false
+                      }
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "uid": "",
+                        "username": "",
+                        "accountStatus": "",
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "passwordHash": false
+                      }
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "uid": "",
+                        "username": "",
+                        "accountStatus": "",
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "passwordHash": false
+                      }
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "uid": "",
+                        "username": "",
+                        "accountStatus": "",
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "passwordHash": false
+                      }
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "uid": "",
+                        "username": "",
+                        "accountStatus": "",
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "passwordHash": false
+                      }
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "uid": "",
+                        "username": "",
+                        "nickname": "",
+                        "avatar": {
+                          "url": "",
+                          "expireAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        },
+                        "accountStatus": "",
+                        "createdAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        },
+                        "passwordHash": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/user/updateProfile": {
+      "put": {
+        "summary": "updateProfile",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/user/profile": {
+      "get": {
+        "summary": "getProfile",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserProfileResponse"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "nickname": "",
+                        "avatar": {
+                          "url": "",
+                          "expireAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        },
+                        "bio": "",
+                        "gender": "",
+                        "birthday": "",
+                        "residence": ""
+                      }
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "nickname": "",
+                        "avatar": {
+                          "url": "",
+                          "expireAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        },
+                        "bio": "",
+                        "gender": "",
+                        "birthday": "",
+                        "residence": ""
+                      }
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "nickname": "",
+                        "avatar": {
+                          "url": "",
+                          "expireAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        },
+                        "bio": "",
+                        "gender": "",
+                        "birthday": "",
+                        "residence": ""
+                      }
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "nickname": "",
+                        "avatar": {
+                          "url": "",
+                          "expireAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        },
+                        "bio": "",
+                        "gender": "",
+                        "birthday": "",
+                        "residence": ""
+                      }
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "nickname": "",
+                        "avatar": {
+                          "url": "",
+                          "expireAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        },
+                        "bio": "",
+                        "gender": "",
+                        "birthday": "",
+                        "residence": ""
+                      }
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "nickname": "",
+                        "avatar": {
+                          "url": "",
+                          "expireAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        },
+                        "bio": "",
+                        "gender": "",
+                        "birthday": "",
+                        "residence": ""
+                      }
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "nickname": "",
+                        "avatar": {
+                          "url": "",
+                          "expireAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        },
+                        "bio": "",
+                        "gender": "",
+                        "birthday": "",
+                        "residence": ""
+                      }
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "nickname": "",
+                        "avatar": {
+                          "url": "",
+                          "expireAt": {
+                            "seconds": 0,
+                            "nanos": 0
+                          }
+                        },
+                        "bio": "",
+                        "gender": "",
+                        "birthday": "",
+                        "residence": ""
+                      }
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "bio": "",
+                        "gender": "",
+                        "birthday": "",
+                        "residence": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/user/avatar/upload": {
+      "get": {
+        "summary": "updateAvatar",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "suffix",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePresignedResp"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "key": "",
+                        "url": "",
+                        "method": ""
+                      }
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "key": "",
+                        "url": "",
+                        "method": ""
+                      }
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "key": "",
+                        "url": "",
+                        "method": ""
+                      }
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "key": "",
+                        "url": "",
+                        "method": ""
+                      }
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "key": "",
+                        "url": "",
+                        "method": ""
+                      }
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "key": "",
+                        "url": "",
+                        "method": ""
+                      }
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "key": "",
+                        "url": "",
+                        "method": ""
+                      }
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "key": "",
+                        "url": "",
+                        "method": ""
+                      }
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "key": "",
+                        "url": "",
+                        "method": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/user/avatar": {
+      "get": {
+        "summary": "getAvatar",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "url": "",
+                        "expireAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "url": "",
+                        "expireAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "url": "",
+                        "expireAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "url": "",
+                        "expireAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "url": "",
+                        "expireAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "url": "",
+                        "expireAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "url": "",
+                        "expireAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "url": "",
+                        "expireAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": {
+                        "url": "",
+                        "expireAt": {
+                          "seconds": 0,
+                          "nanos": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/user/avatar/upload/callback": {
+      "post": {
+        "summary": "updateAvatarCallback",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloutPutCallbackReq",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/user/permissions": {
+      "get": {
+        "summary": "getPermissions",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSetString"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        ""
+                      ]
+                    }
+                  },
+                  "2": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        ""
+                      ]
+                    }
+                  },
+                  "3": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        ""
+                      ]
+                    }
+                  },
+                  "4": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        ""
+                      ]
+                    }
+                  },
+                  "5": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        ""
+                      ]
+                    }
+                  },
+                  "6": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        ""
+                      ]
+                    }
+                  },
+                  "7": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        ""
+                      ]
+                    }
+                  },
+                  "8": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        ""
+                      ]
+                    }
+                  },
+                  "9": {
+                    "summary": "成功示例",
+                    "value": {
+                      "code": "",
+                      "message": "",
+                      "data": [
+                        ""
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Instant": {
+        "type": "object",
+        "properties": {
+          "seconds": {
+            "type": "integer",
+            "description": "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+            "format": "int64"
+          },
+          "nanos": {
+            "type": "integer",
+            "description": "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+          }
+        }
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "description": "",
+            "type": "null"
+          }
+        }
+      },
+      "UserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "description": ""
+          },
+          "username": {
+            "type": "string",
+            "description": ""
+          },
+          "nickname": {
+            "type": "string",
+            "description": ""
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp",
+            "description": ""
+          },
+          "accountStatus": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ]
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          },
+          "passwordHash": {
+            "type": "boolean",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseUserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserInfoResponse",
+            "description": ""
+          }
+        }
+      },
+      "UpdateUserProfileRequest": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "description": "",
+            "maxLength": 500
+          },
+          "gender": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthday": {
+            "type": "string",
+            "description": ""
+          },
+          "residence": {
+            "type": "string",
+            "description": "",
+            "maxLength": 50
+          }
+        }
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "description": ""
+          },
+          "gender": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthday": {
+            "type": "string",
+            "description": ""
+          },
+          "residence": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseUserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserProfileResponse",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseSetString": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": ""
+          }
+        }
+      },
+      "CloudResPresignedUrlResp": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": ""
+          },
+          "expireAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseCloudResPresignedUrlResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp",
+            "description": ""
+          }
+        }
+      },
+      "PresignedResp": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "path key with root"
+          },
+          "url": {
+            "type": "string",
+            "description": ""
+          },
+          "method": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE",
+              "PATCH"
+            ]
+          },
+          "token": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponsePresignedResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/PresignedResp",
+            "description": ""
+          }
+        }
+      },
+      "CloutPutCallbackReq": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": ""
+          },
+          "token": {
+            "type": "string",
+            "description": ""
+          }
+        },
+        "required": [
+          "key",
+          "token"
+        ]
+      }
+    },
+    "responses": {},
+    "securitySchemes": {}
+  },
+  "servers": [],
+  "security": []
+}

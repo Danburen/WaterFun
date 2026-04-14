@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.waterwood.waterfunadminservice.infrastructure.filter.GatewayUserContextFilter;
 
 @Configuration
-@EnableWebSecurity
+@Deprecated
 public class SecurityConfig {
 
     private final GatewayUserContextFilter gatewayUserContextFilter;

@@ -9,6 +9,7 @@ public class BizException extends RuntimeException{
     private final String MESSAGE_KEY_PREFIX = "error";
     private final String  errorCode;
     private final Object[] params;
+    private int httpStatus = 400;
     public BizException(String errorCode, String msgKey, Object[] params) {
         super(msgKey);
         this.errorCode = errorCode;
@@ -31,6 +32,20 @@ public class BizException extends RuntimeException{
         super(code.toNoArgsResponse().getCode());
         this.errorCode = code.getCode();
         this.params = null;
+    }
+
+    public BizException(ResponseCode code, int httpStatus) {
+        super(code.toNoArgsResponse().getCode());
+        this.errorCode = code.getCode();
+        this.params = null;
+        this.httpStatus = httpStatus;
+    }
+
+    public BizException(BaseResponseCode code, int httpStatus, Object... params) {
+        super(code.getCode());
+        this.errorCode = code.getCode();
+        this.params = params;
+        this.httpStatus = httpStatus;
     }
 
     public String getFullMessageKey(){

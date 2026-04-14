@@ -14,4 +14,6 @@ public interface UserDatumRepo extends JpaRepository<UserDatum, Long> {
     Optional<UserDatum> findUserDatumByUserUid(Long userUid);
 
     List<UserDatum> findUserDatumByEmailVerifiedFalse();
+
+    void deleteByUserUid(long attr0);
 }

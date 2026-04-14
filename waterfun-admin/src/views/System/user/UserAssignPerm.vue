@@ -162,6 +162,7 @@ onMounted(async () => {
     <TableContainer
       :title="assignTitle"
       :title-i18n="false"
+      showAddBtn
       :total="pageOpts.total"
       :disable-delete="selectedIds.length === 0"
       v-model:page-size="pageOpts.pageSize"
@@ -170,11 +171,6 @@ onMounted(async () => {
       @add="handleAdd"
       @remove="handleRemove"
     >
-      <template #action-buttons>
-        <el-button type="primary" size="small" @click="handleAdd">{{ t('permission.select') }}</el-button>
-        <el-button type="danger" size="small" :disabled="selectedIds.length === 0" @click="handleRemove">{{ t('btn.delete') }}</el-button>
-      </template>
-
       <el-table
         v-loading="loading"
         :data="tableData"

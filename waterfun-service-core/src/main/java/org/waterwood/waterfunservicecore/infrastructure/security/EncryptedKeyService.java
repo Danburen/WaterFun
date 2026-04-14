@@ -20,9 +20,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EncryptedKeyService {
     private static final int MIN_KEY_COUNT = 3;
     private final EncryptionKeyDataRepo encryptionKeyDataRepo;
-    static final int IDX_AES_DATA_KEY   = 0;   // 对称加密
-    static final int IDX_USER_DATA_HMAC = 1;   // 手机号/邮箱做唯一化
-    static final int IDX_VERIFY_HMAC = 2;   // 验证链接签名
+    static final int IDX_AES_DATA_KEY   = 0;   // aes data key
+    static final int IDX_USER_DATA_HMAC = 1;   // phone/email hmac
+    static final int IDX_VERIFY_HMAC = 2;   // verify code hmac
 
     public EncryptedKeyService(EncryptionKeyDataRepo encryptionKeyDataRepo) {
         this.encryptionKeyDataRepo = encryptionKeyDataRepo;

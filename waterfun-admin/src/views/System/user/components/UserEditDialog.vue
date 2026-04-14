@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import {
+  createUser,
   getUserDetail,
   updateUserDatum,
   updateUserInfo,
@@ -12,9 +13,11 @@ import {
 const props = withDefaults(
   defineProps<{
     modelValue: boolean;
+    mode?: "create" | "edit";
     uid?: number | null;
   }>(),
   {
+    mode: "edit",
     uid: null,
   }
 );
@@ -33,15 +36,64 @@ const visible = computed({
   set: (value: boolean) => emit("update:modelValue", value),
 });
 
+const isCreateMode = computed(() => props.mode === "create");
+
+const createFormRef = ref();
+const createForm = reactive<{
+  phone: string;
+  username: string;
+  password: string;
+  userType: number;
+}>({
+  phone: "",
+  username: "",
+  password: "",
+  userType: 0,
+});
+
+const createRules = {
+  phone: [
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+        const phone = (value || "").trim();
+        if (createForm.userType === 0 && !phone) {
+          callback(new Error(t("user.input.phone")));
+          return;
+        }
+        callback();
+      },
+      trigger: "blur",
+    },
+  ],
+  username: [{ required: true, message: t("user.input.username"), trigger: "blur" }],
+  password: [
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+        const password = (value || "").trim();
+        const isOptionalType = createForm.userType === 1 || createForm.userType === 3;
+        if (!isOptionalType && !password) {
+          callback(new Error(t("user.input.password")));
+          return;
+        }
+        callback();
+      },
+      trigger: "blur",
+    },
+  ],
+  userType: [{ required: true, message: t("user.input.type"), trigger: "change" }],
+};
+
 const userInfoForm = reactive<{
   username: string;
   nickname: string;
   avatarUrl: string;
+  userType: number;
   accountStatus: AccountStatus;
 }>({
   username: "",
   nickname: "",
   avatarUrl: "",
+  userType: 0,
   accountStatus: "ACTIVE",
 });
 
@@ -71,10 +123,18 @@ const statusLabel = (status: AccountStatus) => t(`user.statusMap.${status.toLowe
 const genderLabel = (gender: Gender) => t(`user.genderMap.${gender.toLowerCase()}`);
 
 const resetForms = () => {
+  Object.assign(createForm, {
+    phone: "",
+    username: "",
+    password: "",
+    userType: 0,
+  });
+
   Object.assign(userInfoForm, {
     username: "",
     nickname: "",
     avatarUrl: "",
+    userType: 0,
     accountStatus: "ACTIVE",
   });
   Object.assign(userProfileForm, {
@@ -102,6 +162,7 @@ const loadUserData = async () => {
       username: response.data.info.username || "",
       nickname: response.data.info.nickname || "",
       avatarUrl: response.data.info.avatarUrl || "",
+      userType: response.data.info.userType ?? 0,
       accountStatus: response.data.info.accountStatus || "ACTIVE",
     });
 
@@ -129,6 +190,10 @@ watch(
   () => visible.value,
   async (open) => {
     if (!open) return;
+    if (isCreateMode.value) {
+      resetForms();
+      return;
+    }
     if (props.uid == null || Number.isNaN(props.uid)) {
       ElMessage.error(t("user.error.invalidId"));
       visible.value = false;
@@ -145,6 +210,29 @@ watch(
 );
 
 const handleSave = async () => {
+  if (isCreateMode.value) {
+    const valid = await createFormRef.value?.validate?.().catch(() => false);
+    if (!valid) return;
+    submitting.value = true;
+    try {
+      await createUser({
+        phone: createForm.phone?.trim() || undefined,
+        username: createForm.username,
+        password: createForm.password?.trim() || undefined,
+        userType: createForm.userType,
+      });
+      ElMessage.success(t("user.success.create"));
+      visible.value = false;
+      emit("success");
+    } catch (e) {
+      console.error(e);
+      ElMessage.error(t("user.error.create"));
+    } finally {
+      submitting.value = false;
+    }
+    return;
+  }
+
   if (props.uid == null || Number.isNaN(props.uid)) return;
   submitting.value = true;
   try {
@@ -189,11 +277,54 @@ const handleClosed = () => {
 </script>
 
 <template>
-  <el-dialog v-model="visible" :title="t('user.edit')" width="760" destroy-on-close @closed="handleClosed">
-    <div v-loading="loading">
+  <el-dialog
+    v-model="visible"
+    :title="isCreateMode ? t('user.create') : t('user.edit')"
+    width="760"
+    destroy-on-close
+    @closed="handleClosed"
+  >
+    <div v-if="isCreateMode">
+      <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-width="120px" class="form-block">
+        <el-form-item :label="t('user.phone')" prop="phone">
+          <el-input v-model="createForm.phone" :placeholder="t('user.input.phone')" />
+        </el-form-item>
+        <el-form-item :label="t('user.username')" prop="username">
+          <el-input v-model="createForm.username" :placeholder="t('user.input.username')" />
+        </el-form-item>
+        <el-form-item :label="t('auth.password')" prop="password">
+          <el-input
+            v-model="createForm.password"
+            type="password"
+            show-password
+            :placeholder="t('user.input.password')"
+          />
+        </el-form-item>
+        <el-form-item :label="t('user.type')" prop="userType">
+          <el-select v-model="createForm.userType" style="width: 100%">
+            <el-option :label="t('user.typeMap.normal')" :value="0" />
+            <el-option :label="t('user.typeMap.tester')" :value="1" />
+            <el-option :label="t('user.typeMap.admin')" :value="2" />
+            <el-option :label="t('user.typeMap.system')" :value="3" />
+            <el-option :label="t('user.typeMap.superAdmin')" :value="4" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <div v-else v-loading="loading">
       <el-form :model="userInfoForm" label-width="120px" class="form-block">
         <el-form-item :label="t('user.username')">
           <el-input v-model="userInfoForm.username" disabled />
+        </el-form-item>
+        <el-form-item :label="t('user.type')">
+          <el-select v-model="userInfoForm.userType" disabled style="width: 100%">
+            <el-option :label="t('user.typeMap.normal')" :value="0" />
+            <el-option :label="t('user.typeMap.tester')" :value="1" />
+            <el-option :label="t('user.typeMap.admin')" :value="2" />
+            <el-option :label="t('user.typeMap.system')" :value="3" />
+            <el-option :label="t('user.typeMap.superAdmin')" :value="4" />
+          </el-select>
         </el-form-item>
         <el-form-item :label="t('user.nickname')">
           <el-input v-model="userInfoForm.nickname" :placeholder="t('user.input.nickname')" />

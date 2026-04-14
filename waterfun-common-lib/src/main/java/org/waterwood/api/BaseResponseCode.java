@@ -87,7 +87,17 @@ public enum BaseResponseCode implements ResponseCode {
     NEED_FILE_TYPE("valid.file_type_required"),
     USER_ROLE_NOT_FOUND("user.role.not_found"),
     USER_PERMISSION_NOT_FOUND("user.permission.not_found"),
-    USER_NOT_FOUND_WITH_ARGS("user.not_found.args");
+    USER_NOT_FOUND_WITH_ARGS("user.not_found.args"),
+    CAN_NOT_DELETE_SUPER_ADMIN_USER("system.cannot_delete_super_admin_user"),
+    CAN_NOT_DELETE_SYS_ROLE("system.cannot_delete_sys_role"),
+    CAN_NOT_UPDATE_SYS_ROLE_CODE("system.cannot_update_sys_role_code"),
+    CAN_NOT_UNSET_SYS_ROLE("system.cannot_unset_sys_role"),
+    RATE_LIMIT_EXCEEDED("system.rate_limit_exceeded"),
+    INVALID_TOKEN_OR_EXPIRED("system.invalid_token_or_expired"),
+    INVALID_KEY("system.invalid_key"),
+    FILE_TYPE_NOT_ALLOW("system.file_type_not_allow"),
+    COS_UPLOAD_CLIENT_NOT_CONFIGURED("system.cos_upload_client_not_configured"),
+    CLOUD_FILE_NOT_FOUND("system.cloud_file_not_found");
     private final String code;
     // private final String defaultMessage;
 

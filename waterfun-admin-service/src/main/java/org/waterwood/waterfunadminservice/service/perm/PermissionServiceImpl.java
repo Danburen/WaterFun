@@ -8,13 +8,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.VO.BatchResult;
-import org.waterwood.api.VO.ExpirableOptionVO;
 import org.waterwood.api.VO.OptionVO;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunadminservice.api.request.perm.CreatePermRequest;
+import org.waterwood.waterfunadminservice.api.request.perm.DeletePermsRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.UpdatePermRequest;
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunadminservice.infrastructure.exception.PermException;
@@ -72,7 +73,7 @@ public class PermissionServiceImpl implements PermissionService {
     public Permission fullUpdate(int id, UpdatePermRequest req) {
         Permission perm = getPermission(id);
         updatePerm(perm, req.getParentId(), req.getCode(), req.getName());
-        permissionMapper.fullUpdate(req, perm);
+        permissionMapper.update(req, perm);
         return permissionRepo.save(perm);
     }
 
@@ -159,6 +160,13 @@ public class PermissionServiceImpl implements PermissionService {
         return permissionRepo.findAll().stream()
                 .map(Permission::toOption)
                 .toList();
+    }
+
+    @Transactional
+    @Override
+    public BatchResult removePerms(DeletePermsRequest req) {
+        int deleted = permissionRepo.deletePermissionsByIdIn(req.getPermIds());
+        return BatchResult.of(req.getPermIds().size(), deleted);
     }
 
     private void updatePerm(Permission perm, @Nullable Integer parentId, @Nullable String code, @Nullable String name) {

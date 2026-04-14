@@ -69,12 +69,15 @@ public class GatewaySecurityConfig {
 
     @Bean
     public ReactiveJwtAuthenticationConverterAdapter jwtAuthenticationConverter(){
-        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        authoritiesConverter.setAuthorityPrefix("ROLE_");
-        authoritiesConverter.setAuthoritiesClaimName("roles");
+//        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+//        authoritiesConverter.setAuthorityPrefix("ROLE_");
+//        authoritiesConverter.setAuthoritiesClaimName("roles");
 
+//        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+//        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+//        converter.setPrincipalClaimName("sub");
+//        return new ReactiveJwtAuthenticationConverterAdapter(converter);
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
         converter.setPrincipalClaimName("sub");
         return new ReactiveJwtAuthenticationConverterAdapter(converter);
     }
