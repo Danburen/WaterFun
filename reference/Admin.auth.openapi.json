@@ -1,0 +1,373 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Admin",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/api/admin/auth/captcha": {
+      "get": {
+        "summary": "获取图形验证码",
+        "deprecated": false,
+        "description": "获取图形验证码",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/auth/login-by-password": {
+      "post": {
+        "summary": "管理员密码登陆",
+        "deprecated": false,
+        "description": "管理员密码登陆",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PwdLoginReq",
+                "description": ""
+              },
+              "example": {
+                "username": "admin",
+                "password": "admin",
+                "captcha": "3ECO",
+                "deviceFp": "123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoginClientData"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/auth/info": {
+      "post": {
+        "summary": "getCurrentUserInfo",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAdminUserInfoResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/auth/updateProfile": {
+      "put": {
+        "summary": "updateProfile",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/auth/logout": {
+      "post": {
+        "summary": "logout",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LoginClientData": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": ""
+          },
+          "exp": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseLoginClientData": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/LoginClientData",
+            "description": ""
+          }
+        }
+      },
+      "PwdLoginReq": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "",
+            "pattern": "^[0-9a-zA-Z_]+$"
+          },
+          "password": {
+            "type": "string",
+            "description": "",
+            "minLength": 8,
+            "maxLength": 20
+          },
+          "captcha": {
+            "type": "string",
+            "description": ""
+          },
+          "deviceFp": {
+            "type": "string",
+            "description": ""
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "captcha",
+          "deviceFp"
+        ]
+      },
+      "Instant": {
+        "type": "object",
+        "properties": {
+          "seconds": {
+            "type": "integer",
+            "description": "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+            "format": "int64"
+          },
+          "nanos": {
+            "type": "integer",
+            "description": "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+          }
+        }
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "description": "",
+            "type": "null"
+          }
+        }
+      },
+      "CloudResPresignedUrlResp": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": ""
+          },
+          "expireAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          }
+        }
+      },
+      "AdminUserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "description": ""
+          },
+          "username": {
+            "type": "string",
+            "description": ""
+          },
+          "nickname": {
+            "type": "string",
+            "description": ""
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp",
+            "description": ""
+          },
+          "accountStatus": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ]
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          },
+          "passwordHash": {
+            "type": "boolean",
+            "description": ""
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": ""
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": ""
+          },
+          "isAdmin": {
+            "type": "boolean",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseAdminUserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminUserInfoResponse",
+            "description": ""
+          }
+        }
+      },
+      "UpdateUserProfileRequest": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "description": "",
+            "maxLength": 500
+          },
+          "gender": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthday": {
+            "type": "string",
+            "description": ""
+          },
+          "residence": {
+            "type": "string",
+            "description": "",
+            "maxLength": 50
+          }
+        }
+      }
+    },
+    "responses": {},
+    "securitySchemes": {}
+  },
+  "servers": [],
+  "security": []
+}

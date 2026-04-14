@@ -16,8 +16,9 @@ import org.waterwood.waterfunadminservice.api.response.role.AssignedRoleRes;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
 import org.waterwood.waterfunadminservice.api.response.user.UserInfoARes;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserAdminMapper;
-import org.waterwood.waterfunadminservice.service.user.UserService;
+import org.waterwood.waterfunadminservice.service.user.UserAdminService;
 import org.waterwood.waterfunservicecore.entity.user.User;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
 import java.time.Instant;
@@ -26,8 +27,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/users")
+@RequireRole("ADMIN")
 public class UserAdminController {
-    private final UserService userService;
+    private final UserAdminService userAdminService;
     private final UserCoreService userCoreService;
     private final UserAdminMapper userAdminMapper;
 
@@ -46,24 +48,37 @@ public class UserAdminController {
         );
     }
 
+    @PostMapping
+    public ApiResponse<Void> createUser(@RequestBody CreateNewUserReq req){
+        userAdminService.createUser(req);
+        return ApiResponse.success();
+    }
+
     @Operation(summary = "Get user detail")
     @GetMapping("/{uid}")
     public ApiResponse<UserAdminDetail> getUserDetail(@PathVariable long uid){
-       UserAdminDetail detail = userService.getUserDetail(uid);
+       UserAdminDetail detail = userAdminService.getUserDetail(uid);
        return ApiResponse.success(detail);
     }
 
     @Operation(summary = "Delete user")
     @DeleteMapping("/{uid}")
     public ApiResponse<Void> deleteUser(@PathVariable long uid){
-        userService.deleteUser(uid);
+        userAdminService.deleteUser(uid);
         return ApiResponse.success();
+    }
+
+    @DeleteMapping
+    public ApiResponse<BatchResult> deleteUsers(@RequestBody RemoveUsersReq req){
+        return ApiResponse.success(
+                userAdminService.batchDeleteUsers(req.getUserUids())
+        );
     }
 
     @Operation(summary = "Assign roles to user")
     @PostMapping("/{uid}/roles")
     public ApiResponse<Void> assignRoleToUser(@PathVariable long uid, @Valid @RequestBody AssignUserRoleReq body){
-        userService.assignRoles(uid, body.getUserRoles());
+        userAdminService.assignRoles(uid, body.getUserRoles());
         return ApiResponse.success();
     }
 
@@ -73,20 +88,20 @@ public class UserAdminController {
         UserRoleItemDto item = new UserRoleItemDto();
         item.setRoleId(body.getRoleId());
         item.setExpiresAt(body.getExpiresAt());
-        userService.assignRoles(uid, java.util.List.of(item));
+        userAdminService.assignRoles(uid, java.util.List.of(item));
         return ApiResponse.success();
     }
 
     @Operation(summary = "Remove single role from user")
     @DeleteMapping("/{uid}/role/{roleId}")
     public ApiResponse<BatchResult> removeSingleRoleFromUser(@PathVariable long uid, @PathVariable int roleId){
-        return ApiResponse.success(userService.removeRoles(uid, List.of(roleId)));
+        return ApiResponse.success(userAdminService.removeRoles(uid, List.of(roleId)));
     }
 
     @Operation(summary = "Full Replace roles of user")
     @PutMapping("/{uid}/roles")
     public ApiResponse<Void> updateRoleToUser(@PathVariable long uid, @Valid @RequestBody UpdateUserRoleReq body){
-        userService.replace(uid, body.getUserRoleItemDtos());
+        userAdminService.replace(uid, body.getUserRoleItemDtos());
         return ApiResponse.success();
     }
 
@@ -97,7 +112,7 @@ public class UserAdminController {
                                                             @RequestParam(required = false) String name,
                                                             @RequestParam(required = false) String code,
                                                             @PageableDefault Pageable pageable){
-        return ApiResponse.success(userService.listAssignedRoles(uid, roleId, code, name, pageable));
+        return ApiResponse.success(userAdminService.listAssignedRoles(uid, roleId, code, name, pageable));
     }
 
     @Operation(summary = "List user permissions")
@@ -107,13 +122,13 @@ public class UserAdminController {
                                                                         @RequestParam(required = false) String name,
                                                                         @RequestParam(required = false) String code,
                                                                         @PageableDefault Pageable pageable){
-        return ApiResponse.success(userService.listAssignedPermissions(uid, permId, name, code, pageable));
+        return ApiResponse.success(userAdminService.listAssignedPermissions(uid, permId, name, code, pageable));
     }
 
     @Operation(summary = "Assign direct permissions to user")
     @PostMapping("/{uid}/permissions")
     public ApiResponse<Void> assignPermsToUser(@PathVariable long uid, @Valid @RequestBody AssignUserPermReq body){
-        userService.assignPermissions(uid, body.getUserPermissions());
+        userAdminService.assignPermissions(uid, body.getUserPermissions());
         return ApiResponse.success();
     }
 
@@ -123,53 +138,53 @@ public class UserAdminController {
         UserPermItemDto item = new UserPermItemDto();
         item.setPermissionId(body.getPermissionId());
         item.setExpiresAt(body.getExpiresAt());
-        userService.assignPermissions(uid, java.util.List.of(item));
+        userAdminService.assignPermissions(uid, java.util.List.of(item));
         return ApiResponse.success();
     }
 
     @Operation(summary = "Remove single direct permission from user")
     @DeleteMapping("/{uid}/permission/{permissionId}")
     public ApiResponse<BatchResult> removeSinglePermFromUser(@PathVariable long uid, @PathVariable int permissionId){
-        return ApiResponse.success(userService.removePermissions(uid, List.of(permissionId)));
+        return ApiResponse.success(userAdminService.removePermissions(uid, List.of(permissionId)));
     }
 
     @Operation(summary = "Batch remove roles from user")
     @DeleteMapping("/{uid}/roles")
     public ApiResponse<BatchResult> removeRolesFromUser(@PathVariable long uid, @Valid @RequestBody RemoveUserRolesReq body){
-        return ApiResponse.success(userService.removeRoles(uid, body.getRoleIds()));
+        return ApiResponse.success(userAdminService.removeRoles(uid, body.getRoleIds()));
     }
 
     @Operation(summary = "Batch remove direct permissions from user")
     @DeleteMapping("/{uid}/permissions")
     public ApiResponse<BatchResult> removePermsFromUser(@PathVariable long uid, @Valid @RequestBody RemoveUserPermsReq body){
-        return ApiResponse.success(userService.removePermissions(uid, body.getPermissionIds()));
+        return ApiResponse.success(userAdminService.removePermissions(uid, body.getPermissionIds()));
     }
 
     @Operation(summary = "Update user info")
     @PutMapping("/{uid}/info")
     public ApiResponse<Void> updateUserInfo(@PathVariable long uid, @Valid @RequestBody UserInfoAUpdateReq body){
-        userService.updateUserInfo(uid, body);
+        userAdminService.updateUserInfo(uid, body);
         return ApiResponse.success();
     }
 
     @Operation(summary = "Update user profile")
     @PutMapping("/{uid}/profile")
     public ApiResponse<Void> updateUserProfile(@PathVariable long uid, @Valid @RequestBody UserProfileUpdateAReq body){
-        userService.updateUserProfile(uid, body);
+        userAdminService.updateUserProfile(uid, body);
         return ApiResponse.success();
     }
 
     @Operation(summary = "Update user datum")
     @PutMapping("/{uid}/datum")
     public ApiResponse<Void> updateUserDatum(@PathVariable long uid, @Valid @RequestBody UserDatumUpdateAReq body){
-        userService.updateUserDatum(uid, body);
+        userAdminService.updateUserDatum(uid, body);
         return ApiResponse.success();
     }
 
     @GetMapping("/options")
     public ApiResponse<List<OptionVO<Long>>> getUserOptions() {
         return ApiResponse.success(
-                userService.getAllUserOptions()
+                userAdminService.getAllUserOptions()
         );
     }
 

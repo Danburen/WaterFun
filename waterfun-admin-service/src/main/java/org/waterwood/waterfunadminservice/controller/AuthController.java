@@ -7,14 +7,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
+import org.waterwood.waterfunadminservice.api.response.user.AdminUserInfoResponse;
+import org.waterwood.waterfunadminservice.service.auth.AuthService;
+import org.waterwood.waterfunadminservice.service.auth.UserService;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
+import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
-import org.waterwood.waterfunservicecore.services.auth.AuthService;
+import org.waterwood.waterfunservicecore.services.auth.AuthCoreService;
 import org.waterwood.waterfunservicecore.services.auth.CaptchaService;
 import org.waterwood.waterfunservicecore.services.auth.LineCaptchaResult;
 import org.waterwood.waterfunservicecore.services.auth.LoginService;
+import org.waterwood.waterfunservicecore.services.user.UserCoreService;
+import org.waterwood.waterfunservicecore.services.user.UserProfileCoreService;
 
 import java.io.IOException;
 
@@ -24,12 +30,20 @@ public class AuthController {
 
     private final CaptchaService captchaService;
     private final LoginService loginService;
+    private final AuthCoreService authCoreService;
+    private final UserCoreService userCoreService;
     private final AuthService authService;
+    private final UserService userService;
+    private final UserProfileCoreService userProfileCoreService;
 
-    public AuthController(CaptchaService captchaService, LoginService loginService, AuthService authService) {
+    public AuthController(CaptchaService captchaService, LoginService loginService, AuthCoreService authCoreService, UserCoreService userCoreService, AuthService authService, UserService userService, UserProfileCoreService userProfileCoreService) {
         this.captchaService = captchaService;
         this.loginService = loginService;
+        this.authCoreService = authCoreService;
+        this.userCoreService = userCoreService;
         this.authService = authService;
+        this.userService = userService;
+        this.userProfileCoreService = userProfileCoreService;
     }
 
     @Operation(summary = "获取图形验证码")
@@ -53,8 +67,29 @@ public class AuthController {
     @Operation(summary = "管理员密码登陆")
     @PostMapping("/login-by-password")
     public ApiResponse<LoginClientData> loginByPassword(@Valid @RequestBody PwdLoginReq body, HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        User user = loginService.login(body, CookieUtil.getCookieValue(cookies, "ADMIN_CAPTCHA_KEY"));
-        return authService.BuildLoginResponse(response, user,body.getDeviceFp());
+        return ApiResponse.success(
+                authService.loginByPwd(body, request, response)
+        );
+    }
+
+    @PostMapping("/info")
+    public ApiResponse<AdminUserInfoResponse> getCurrentUserInfo(){
+        return ApiResponse.success(
+            userService.getCurrentAdminUserInfo()
+        );
+    }
+
+    @PutMapping("/updateProfile")
+    public ApiResponse<Void> updateProfile(@RequestBody @Valid UpdateUserProfileRequest body){
+        userProfileCoreService.updateProfileByDto(body);
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestBody String deviceFp, HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = CookieUtil.getCookieValue(request.getCookies(),"REFRESH_TOKEN");
+        boolean  result = loginService.logout(refreshToken, deviceFp);
+        if(result) CookieUtil.cleanTokenCookie(response);
+        return ApiResponse.success();
     }
 }

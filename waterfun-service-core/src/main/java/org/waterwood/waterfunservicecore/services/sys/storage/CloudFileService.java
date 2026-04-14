@@ -1,6 +1,8 @@
 package org.waterwood.waterfunservicecore.services.sys.storage;
 
-import org.waterwood.waterfunservicecore.api.resp.PostPolicyResp;
+import org.waterwood.common.CloudStorageRootKey;
+import org.waterwood.common.io.SimpleCloudObject;
+import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 
 import java.io.InputStream;
@@ -16,6 +18,7 @@ public interface CloudFileService {
      * @param size file size
      * @param contentType file content type
      */
+    @Deprecated
     void uploadFile(String key, InputStream stream, long size, String contentType);
 
     /**
@@ -40,14 +43,15 @@ public interface CloudFileService {
     CloudResPresignedUrlResp getReadPublicUrlCached(String path, Serializable bizId, CloudResType resType);
 
 
-    PostPolicyResp buildUploadPutPolicy(String path);
+    PresignedResp buildPutPolicyWithBiz(CloudStorageRootKey keyRoot, String path, Serializable bizIdx);
+
     /**
      * Remove file from cloud storage
      * @param key the key of the file
      */
     void removeFile(String key);
 
-    void removeUploadsFile(String path);
+    void removeFile(CloudStorageRootKey rootKey, String path);
 
     /**
      * Batch get file from cloud storage
@@ -67,4 +71,15 @@ public interface CloudFileService {
     List<CloudResPresignedUrlResp> batchGetReadPublicUrlCached(List<String> paths, List<String> bizIds, Duration dur,CloudResType cloudResType);
 
     String getCachedRedisKey(Serializable bizId, CloudResType resType, CloudResOperationType operationType);
+
+    String buildCosKey(CloudStorageRootKey root, String... keys);
+
+    /**
+     * Detect cloud file type by file's magic number, and check if the file type is matched with asserted cloud file type.
+     * @param fullKeyPath   cloud file key full path
+     * @param cloudFileType asserted cloud file type.
+     * @return simple object contains cloud file info, such as content type and size with key.
+     * @throws org.waterwood.common.exceptions.BizException if the cloud file type is not matched.
+     */
+    SimpleCloudObject detectAndAssertCloudFile(String fullKeyPath, CloudFileType cloudFileType);
 }

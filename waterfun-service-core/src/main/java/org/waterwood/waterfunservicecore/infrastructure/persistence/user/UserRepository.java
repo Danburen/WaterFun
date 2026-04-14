@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,4 +26,8 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
                     "where u.uid in :userUids and c.visible = 1"
     )
     List<User> findAllVisibleUsersByIds(@Param("userUids") List<Long> userUids);
+
+    boolean deleteUserByUid(Long uid);
+
+    int deleteUserByUidIn(Collection<Long> uids);
 }

@@ -9,8 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.entity.user.*;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepo;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
 import org.waterwood.common.exceptions.AuthException;
@@ -24,7 +22,6 @@ import org.waterwood.utils.StringUtil;
 import org.waterwood.utils.UidGenerator;
 import org.waterwood.waterfunservicecore.services.auth.RegisterService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
-import org.waterwood.waterfunservicecore.services.sms.SmsCodeService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,17 +30,14 @@ import java.time.Instant;
 @Service
 @RequiredArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
-    private final AuthServiceImpl authService;
+    private final AuthCoreServiceImpl authService;
     private final UserRepository userRepo;
     private final UserDatumRepo userDatumRepo;
     private final EncryptedKeyService encryptedKeyService;
     private final UidGenerator uidGenerator;
-    private final SmsCodeService smsCodeService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    private final UserProfileRepo userProfileRepo;
     private final VerificationService verificationService;
-    private final UserCounterRepository userCounterRepository;
 
     @Value("${expire.email.unverified-expire-hours:24}")
     private Long emailUnverifiedExpireHours;

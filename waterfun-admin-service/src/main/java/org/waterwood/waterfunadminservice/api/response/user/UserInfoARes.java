@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
 import org.waterwood.waterfunservicecore.entity.user.AccountStatus;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
@@ -20,6 +21,7 @@ public class UserInfoARes implements Serializable {
     private Long uid;
     private String username;
     private AccountStatus accountStatus;
+    private Short userType;
     private Instant statusChangedAt;
     private Instant updatedAt;
     private Instant createdAt;

@@ -25,4 +25,6 @@ public interface UserFollowerRepository extends JpaRepository<UserFollower, Long
             "where uf.follower.uid = :uid " +
             "order by uf.createdAt desc")
     Page<UserFollower> fetchFollowings(@Param("uid") Long uid, Pageable pageable);
+
+    void deleteByUserUid(Long userUid);
 }

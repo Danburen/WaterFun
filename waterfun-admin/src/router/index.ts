@@ -46,7 +46,7 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import('~/views/System/user/UserAssignRole.vue'),
                 props: true,
                 meta: {
-                    locale: 'userAssignRole',
+                    locale: 'user.roleAssign',
                     isDetail: true,
                 }
             },
@@ -56,7 +56,7 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import('~/views/System/user/UserAssignPerm.vue'),
                 props: true,
                 meta: {
-                    locale: 'userAssignPermission',
+                    locale: 'user.permissionAssign',
                     isDetail: true,
                 }
             },

@@ -5,11 +5,12 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
+import org.waterwood.common.CloudStorageRootKey;
 import org.waterwood.common.KeyConstants;
 import org.waterwood.common.exceptions.BizException;
 import org.waterwood.utils.PathUtil;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
-import org.waterwood.waterfunservicecore.api.resp.PostPolicyResp;
+import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
@@ -67,15 +68,14 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
 
     @Transactional
     @Override
-    public PostPolicyResp getUploadPolicyAndSaveAvatar(long userUid, String fileSuffix) {
+    public PresignedResp getUploadPolicyAndSaveAvatar(long userUid, String fileSuffix) {
         if(fileSuffix == null){
             throw new BizException(BaseResponseCode.NEED_FILE_TYPE);
         }
         String avatarPath = PathUtil.getUniquePathFile(fileSuffix);
         User u = userCoreService.getUser(userUid);
-        cloudFileService.removeUploadsFile(
-                PathUtil.buildPath(KeyConstants.AVATAR, u.getAvatarUrl())
-        );
+        cloudFileService.removeFile( CloudStorageRootKey.UPLOADS,
+                PathUtil.buildPath(KeyConstants.AVATAR, u.getAvatarUrl()));
         // clean the cache
         redisHelper.del(
                 cloudFileService.getCachedRedisKey(
@@ -87,10 +87,10 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
 
         u.setAvatarUrl(avatarPath);
         userRepository.save(u);
-        return cloudFileService.buildUploadPutPolicy(PathUtil.buildPath(
+        return cloudFileService.buildPutPolicyWithBiz(CloudStorageRootKey.UPLOADS, PathUtil.buildPath(
                 KeyConstants.AVATAR,
                 avatarPath
-        ));
+        ), String.valueOf(userUid));
     }
 
     @Override

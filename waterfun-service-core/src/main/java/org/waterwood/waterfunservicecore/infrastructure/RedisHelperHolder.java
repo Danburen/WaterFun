@@ -42,7 +42,7 @@ public interface RedisHelperHolder {
     /**
      * Redis pipeline mget
      * @param keys redis keys
-     * @return redis values
+     * @return redis value
      */
     List<String> mget(List<String> keys);
 
@@ -50,4 +50,10 @@ public interface RedisHelperHolder {
 
     boolean hasKey(String key);
     List<Boolean> hasKeys(List<String> keys);
+
+    /**
+     * Get a value and then delete it from redis.
+     * @param redisKey target redis key
+     */
+    String getAndDel(String redisKey);
 }

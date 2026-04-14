@@ -6,9 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
@@ -37,8 +35,12 @@ public class Category {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "parent_id", columnDefinition = "int UNSIGNED")
-    private Integer parentId;
+//    @Column(name = "parent_id", columnDefinition = "int UNSIGNED")
+//    private Integer parentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "parent_id")
+    private Category parent;
 
     @ColumnDefault("0")
     @Column(name = "sort_order")

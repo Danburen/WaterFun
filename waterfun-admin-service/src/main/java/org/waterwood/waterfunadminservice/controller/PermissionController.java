@@ -12,15 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
 import org.waterwood.api.enums.PermissionType;
-import org.waterwood.waterfunadminservice.api.request.perm.CreatePermRequest;
-import org.waterwood.waterfunadminservice.api.request.perm.UpdatePermRequest;
+import org.waterwood.waterfunadminservice.api.request.perm.*;
 import org.waterwood.api.ApiResponse;
-import org.waterwood.waterfunadminservice.api.request.perm.assignPermToUsersReq;
-import org.waterwood.waterfunadminservice.api.request.perm.removePermUsersReq;
 import org.waterwood.waterfunadminservice.api.response.perm.PermissionResp;
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.PermissionMapper;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.PermSpec;
 import org.waterwood.waterfunadminservice.service.perm.PermissionService;
 
@@ -30,7 +28,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/permission")
-@PreAuthorize("isAuthenticated()")
+@RequireRole("ADMIN")
 public class PermissionController {
     private final PermissionService permissionService;
     private final PermissionMapper permissionMapper;
@@ -59,6 +57,13 @@ public class PermissionController {
     public ApiResponse<Void> addPermission(@RequestBody @Valid CreatePermRequest  body){
         permissionService.addPermission(body);
         return ApiResponse.success();
+    }
+
+    @DeleteMapping
+    public ApiResponse<BatchResult> deletePerms(@RequestBody DeletePermsRequest req) {
+        return ApiResponse.success(
+                permissionService.removePerms(req)
+        );
     }
 
     @PutMapping("/{id}")

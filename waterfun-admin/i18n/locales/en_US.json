@@ -85,7 +85,8 @@
       "resourceLength": "Resource length must be <= 255"
     },
     "confirm": {
-      "delete": "Are you sure to delete this permission?"
+      "delete": "Are you sure to delete this permission?",
+      "batchDelete": "Are you sure to delete {count} selected permissions?"
     },
     "success": {
       "create": "Permission created",
@@ -121,7 +122,8 @@
     "assignedPermissions": "Assigned Permissions",
     "assignedUsers": "Assigned Users",
     "confirm": {
-      "delete": "Are you sure to delete this role?"
+      "delete": "Are you sure to delete this role?",
+      "batchDelete": "Are you sure to delete {count} selected roles?"
     },
     "input": {
       "name": "Please input role name",
@@ -174,10 +176,12 @@
     "select": "Select User",
     "list": "User List",
     "detail": "User Detail",
+    "create": "Create User",
     "edit": "Edit User",
     "uid": "UID",
     "username": "Username",
     "nickname": "Nickname",
+    "type": "User Type",
     "status": "User Status",
     "avatar": "Avatar",
     "lastActiveAt": "Last Active At",
@@ -206,7 +210,9 @@
       "birthDate": "Please select birth date",
       "residence": "Please input residence",
       "email": "Please input email",
-      "phone": "Please input phone"
+      "phone": "Please input phone",
+      "password": "Please input password",
+      "type": "Please select user type"
     },
     "genderMap": {
       "male": "Male",
@@ -220,16 +226,26 @@
       "deactivated": "Deactivated",
       "deleted": "Deleted"
     },
+    "typeMap": {
+      "normal": "Normal",
+      "tester": "Tester",
+      "admin": "Admin",
+      "system": "System",
+      "superAdmin": "Super Admin"
+    },
     "confirm": {
-      "delete": "Are you sure to delete this user?"
+      "delete": "Are you sure to delete this user?",
+      "batchDelete": "Are you sure to delete {count} selected users?"
     },
     "success": {
+      "create": "User created",
       "updateInfo": "Basic info updated",
       "updateProfile": "Profile updated",
       "updateDatum": "Contact info updated",
       "delete": "User deleted"
     },
     "error": {
+      "create": "Failed to create user",
       "fetchList": "Failed to fetch user list",
       "fetchDetail": "Failed to fetch user detail",
       "invalidId": "Invalid user ID",

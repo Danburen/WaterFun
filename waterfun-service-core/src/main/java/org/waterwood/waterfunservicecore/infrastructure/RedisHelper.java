@@ -126,4 +126,11 @@ public class RedisHelper implements RedisHelperHolder {
     public List<Boolean> hasKeys(List<String> keys) {
         return mget(keys).stream().map(Objects::nonNull).toList();
     }
+
+    @Override
+    public String getAndDel(String redisKey) {
+        String val =  getValue(redisKey);
+        del(redisKey);
+        return val;
+    }
 }

@@ -20,8 +20,8 @@ public interface PermissionMapper {
 
     @Mapping(target = "parent", ignore = true)
     @Mapping(target = "code", ignore = true)
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    Permission fullUpdate(UpdatePermRequest updatePermRequest, @MappingTarget Permission entity);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Permission update(UpdatePermRequest updatePermRequest, @MappingTarget Permission entity);
 
     @Mapping(source = "parent.id", target = "parentId")
     UpdatePermRequest toPermUpdateRequest(Permission permission);

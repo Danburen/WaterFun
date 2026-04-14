@@ -52,7 +52,7 @@ public interface RoleService {
      * @param id
      * @param req role
      */
-    Role fullUpdateRole(int id, UpdateRoleRequest req);
+    Role updateRole(int id, UpdateRoleRequest req);
 
     /**
      * Delete role
@@ -143,4 +143,11 @@ public interface RoleService {
      * @return list of role ids
      */
     List<OptionVO<Integer>> getAllRoleOptions();
+
+    /**
+     * Batch remove roles
+     * @param req request body
+     * @return batch result of the operation.
+     */
+    BatchResult removeRoles(DeleteRolesRequest req);
 }

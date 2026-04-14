@@ -59,14 +59,13 @@ const localCurrentPage = computed({
 <template>
   <CardContainer :title="title" :title-i18n="titleI18n" :show-title="showTitle">
     <div class="operation-bar">
-      <slot name="action-buttons">
-        <el-button v-if="showAddBtn" type="primary" size="small" @click="$emit('add')">
-          {{ t('btn.create') }}
-        </el-button>
-        <el-button v-if="showRemoveBtn" :disabled="disableDelete" type="danger" size="small" @click="$emit('remove')">
-          {{ t('btn.delete') }}
-        </el-button>
-      </slot>
+      <el-button v-if="showAddBtn" type="primary" size="small" @click="$emit('add')">
+        {{ t('btn.create') }}
+      </el-button>
+      <el-button v-if="showRemoveBtn" :disabled="disableDelete" type="danger" size="small" @click="$emit('remove')">
+        {{ t('btn.delete') }}
+      </el-button>
+      <slot name="action-buttons" />
     </div>
     <slot name="search"></slot>
     <slot></slot>
@@ -129,6 +128,10 @@ const localCurrentPage = computed({
 }
 
 .operation-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   margin-bottom: 10px;
 }
 </style>

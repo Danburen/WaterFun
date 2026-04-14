@@ -2,7 +2,7 @@ package org.waterwood.waterfunservicecore.services.user;
 
 import org.jetbrains.annotations.Nullable;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
-import org.waterwood.waterfunservicecore.api.resp.PostPolicyResp;
+import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
 
@@ -26,7 +26,7 @@ public interface UserProfileCoreService {
      */
     UserProfile getUserProfile(Long userUid);
 
-    PostPolicyResp getUploadPolicyAndSaveAvatar(long userUid, String fileSuffix);
+    PresignedResp getUploadPolicyAndSaveAvatar(long userUid, String fileSuffix);
 
     /**
      * Get the User Avatar

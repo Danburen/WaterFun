@@ -12,7 +12,7 @@ import java.util.Base64;
 
 public final class HashUtil {
     private static final SecureRandom secureRandom = new SecureRandom();
-    private static final Snowflake SNOW = Snowflake.getInstance();
+    private static final Snowflake SNOW = Snowflake.of(0, 0);
     private static final ThreadLocal<MessageDigest> MD5_DIGEST = ThreadLocal.withInitial(() -> {
         try {
             return MessageDigest.getInstance("MD5");

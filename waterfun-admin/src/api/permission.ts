@@ -101,6 +101,10 @@ export interface RemovePermUsersReq {
   userUids?: number[];
 }
 
+export interface DeletePermsRequest {
+  permIds: number[];
+}
+
 export const listPermissions = (
   params: ListPermissionParams = {}
 ): PromiseResBody<Page<PermissionResp>> => {
@@ -121,6 +125,11 @@ export const updatePermission = (id: number, data: UpdatePermRequest): PromiseRe
 
 export const deletePermission = (id: number): PromiseResBody<null> => {
   return request.delete<ResBody<null>>(`/permission/${id}`);
+};
+
+export const deletePerms = (permIds: number[]): PromiseResBody<BatchResult> => {
+  const data: DeletePermsRequest = { permIds };
+  return request.delete<ResBody<BatchResult>>("/permission", { data });
 };
 
 export const getPermUsers = (

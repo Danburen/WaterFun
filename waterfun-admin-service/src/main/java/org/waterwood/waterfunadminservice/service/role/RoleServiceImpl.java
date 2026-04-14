@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
+import org.waterwood.common.exceptions.BizException;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunadminservice.api.request.role.*;
@@ -82,10 +83,18 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Role fullUpdateRole(int id, UpdateRoleRequest req) {
+    public Role updateRole(int id, UpdateRoleRequest req) {
         Role role = getRole(id);
+                if(role.getIsSystem()){
+            if(! role.getCode().equals(req.getCode())){
+                throw new RoleException(BaseResponseCode.CAN_NOT_UPDATE_SYS_ROLE_CODE, role.getId());
+            }
+            if(req.getIsSystem() != null){
+                throw new RoleException(BaseResponseCode.CAN_NOT_UNSET_SYS_ROLE, role.getId());
+            }
+        }
         updateRole(role, req.getParentId(), req.getCode(), req.getName());
-        roleMapper.fullUpdate(req, role);
+        roleMapper.updateRole(req, role);
         return roleRepo.save(role);
     }
 
@@ -132,7 +141,7 @@ public class RoleServiceImpl implements RoleService {
             }
             success = updates.size() + inserts.size();
         }
-        return BatchResult.of(userIds.size(), success);
+        return BatchResult.of(userIds == null ?  0 : userIds.size(), success);
     }
 
     @Override
@@ -199,6 +208,13 @@ public class RoleServiceImpl implements RoleService {
                 .map(Role::toOption).toList();
     }
 
+    @Transactional
+    @Override
+    public BatchResult removeRoles(DeleteRolesRequest req) {
+        int deletes = roleRepo.deleteByIdWithNonSysIn(req.getRoleIds());
+        return BatchResult.of(req.getRoleIds().size(), deletes);
+    }
+
     private void updateRole(Role role,@Nullable Integer parentId,@Nullable String code, @Nullable String name) {
         if(parentId != null) {
             if(parentId.equals(role.getId()))
@@ -214,6 +230,10 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void deleteRole(int id) {
+        Role r = roleRepo.findById(id).orElse(null);
+        if(r != null && r.getIsSystem()) {
+            throw new BizException(BaseResponseCode.CAN_NOT_DELETE_SYS_ROLE);
+        }
         roleRepo.deleteById(id);
     }
 
@@ -278,7 +298,7 @@ public class RoleServiceImpl implements RoleService {
             return Collections.emptyList();
         }
         List<RolePermItemDTO> distinctItems = items.stream().distinct().toList();
-        log.info("Assigning permissions to role {}, total: {}, distinct: {}", role.getId(), items.size(), distinctItems.size());
+//        log.info("Assigning permissions to role {}, total: {}, distinct: {}", role.getId(), items.size(), distinctItems.size());
         List<Permission> perms = permissionRepo.findAllById(
                 distinctItems.stream()
                         .map(RolePermItemDTO::getPermissionId)
@@ -291,7 +311,7 @@ public class RoleServiceImpl implements RoleService {
                 .map(dto -> {
                     Permission permission = permMap.get(dto.getPermissionId());
                     if (permission == null) {
-                        log.warn("Permission not found, skip assignment. roleId={}, permissionId={}", role.getId(), dto.getPermissionId());
+//                        log.warn("Permission not found, skip assignment. roleId={}, permissionId={}", role.getId(), dto.getPermissionId());
                         return null;
                     }
                     RolePermission rolePerm = new RolePermission();

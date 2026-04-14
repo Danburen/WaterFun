@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
                 String msg = msgSrc.getMessage(
                         "validation.enum.not_support",
                         new Object[]{field, value, availableValues},
-                        "Invalid values for field {0}, values {1} is not one of {2}",
+                        "Invalid value for field {0}, value {1} is not one of {2}",
                         LOCALE
                 );
                 ErrorResponse res = new ErrorResponse(BaseResponseCode.VALIDATION_ERROR.getCode(), msg);
@@ -171,25 +171,6 @@ public class GlobalExceptionHandler {
                 null,
                 new Date()
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
-
-    /**
-     * Handle auth exception
-     * @param ex auth exception
-     * @return the {@link ResponseEntity} of {@link ErrorResponse} body segment {@link}
-     */
-//    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<?> handleBusinessException(BizException ex){
-        ErrorResponse response = new ErrorResponse(
-                ex.getErrorCode(),
-                msgSrc.getMessage(ex.getMessage(),
-                        ex.getParams(),
-                        "error",
-                        LOCALE),
-                null,
-                new Date()
-        );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(ex.getHttpStatus()).body(response);
     }
 }
