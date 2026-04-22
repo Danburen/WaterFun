@@ -98,7 +98,7 @@ public class UserAdminController {
         return ApiResponse.success(userAdminService.removeRoles(uid, List.of(roleId)));
     }
 
-    @Operation(summary = "Full Replace roles of user")
+    @Operation(summary = "Full Replace roles ofPending user")
     @PutMapping("/{uid}/roles")
     public ApiResponse<Void> updateRoleToUser(@PathVariable long uid, @Valid @RequestBody UpdateUserRoleReq body){
         userAdminService.replace(uid, body.getUserRoleItemDtos());

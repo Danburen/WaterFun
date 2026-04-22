@@ -63,7 +63,7 @@ public final class CookieUtil {
      * Get target cookie value by key from a cookies array.
      * @param cookies cookies array
      * @param key target cookie key
-     * @return the value of the target cookie, or null if not found
+     * @return the value ofPending the target cookie, or null if not found
      */
     public @Nullable static String getCookieValue(Cookie[] cookies, String key) {
         if(cookies == null) return null;

@@ -7,12 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.waterwood.common.exceptions.ServiceException;
-import org.waterwood.waterfunservicecore.api.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.utils.JsonUtil;
 import org.waterwood.waterfunservicecore.configuration.AliyunSmsConfig;
-
-import static com.aliyun.teautil.Common.toJSONString;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;

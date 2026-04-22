@@ -9,7 +9,7 @@ import { useI18n } from "vue-i18n";
 const props = withDefaults(
   defineProps<{
     modelValue: boolean;
-    disabledUserUids?: number[];
+    disabledUserUids?: string[];
   }>(),
   {
     disabledUserUids: () => [],
@@ -18,7 +18,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
-  confirm: [ids: number[]];
+  confirm: [ids: string[]];
 }>();
 
 const { t } = useI18n();
@@ -30,7 +30,7 @@ const visible = computed({
 
 const loading = ref(false);
 const tableData = ref<UserAdminDto[]>([]);
-const selectedIds = ref<number[]>([]);
+const selectedIds = ref<string[]>([]);
 
 const searchForm = ref<{
   username: string;
@@ -134,8 +134,8 @@ watch(
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
-            <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
+            <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
+            <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
           </el-form-item>
         </el-form>
       </SearchContainer>
@@ -162,14 +162,14 @@ watch(
           <el-table-column prop="uid" label="UID" min-width="120" />
           <el-table-column prop="username" :label="t('user.username')" min-width="180" />
           <el-table-column prop="nickname" :label="t('user.nickname')" min-width="180">
-            <template #default="{ row }">{{ row.nickname || t('none.title') }}</template>
+            <template #default="{ row }">{{ row.nickname || t('common.none.title') }}</template>
           </el-table-column>
           <el-table-column prop="accountStatus" :label="t('user.status')" width="140">
             <template #default="{ row }">
               <el-tag size="small" :type="statusTypeMap[row.accountStatus]">{{ statusLabel(row.accountStatus) }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createdAt" :label="t('create.time')" min-width="170">
+          <el-table-column prop="createdAt" :label="t('common.time.create')" min-width="170">
             <template #default="{ row }">{{ formatISOData(row.createdAt) }}</template>
           </el-table-column>
         </el-table>
@@ -181,8 +181,8 @@ watch(
     </div>
 
     <template #footer>
-      <el-button @click="visible = false">{{ t('cancel.title') }}</el-button>
-      <el-button type="primary" :disabled="selectedIds.length === 0" @click="handleConfirm">{{ t('save.title') }}</el-button>
+      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
+      <el-button type="primary" :disabled="selectedIds.length === 0" @click="handleConfirm">{{ t('common.action.save') }}</el-button>
     </template>
   </el-dialog>
 </template>
@@ -202,3 +202,4 @@ watch(
   padding-top: 4px;
 }
 </style>
+

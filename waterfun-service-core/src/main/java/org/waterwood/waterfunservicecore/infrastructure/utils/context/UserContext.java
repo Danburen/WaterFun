@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Set;
 
 @Getter
-@RequiredArgsConstructor(staticName = "of")
+@RequiredArgsConstructor(staticName = "ofPending")
 @Deprecated
 public class UserContext implements UserDetails {
     private final Long userUid;

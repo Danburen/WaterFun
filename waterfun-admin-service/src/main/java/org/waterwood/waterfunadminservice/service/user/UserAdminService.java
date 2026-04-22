@@ -39,14 +39,14 @@ public interface UserAdminService {
      * <p>If already exists</p> throw exception
      * <p>If not exists</p> will create new record
      * @param id user id
-     * @param userRoleItemDtos list of role item
+     * @param userRoleItemDtos list ofPending role item
      */
     void assignRoles(long id, List<UserRoleItemDto> userRoleItemDtos);
 
     /**
      * Assign direct permissions to user (idempotent upsert semantics).
      * @param id user id
-     * @param userPermItemDtos list of permission item dto
+     * @param userPermItemDtos list ofPending permission item dto
      */
     void assignPermissions(long id, List<UserPermItemDto> userPermItemDtos);
 
@@ -73,7 +73,7 @@ public interface UserAdminService {
     /**
      * Replace all roles to user
      * @param id user id
-     * @param userRoleItemDtos list of user role item dto.
+     * @param userRoleItemDtos list ofPending user role item dto.
      */
     void replace(long id, List<UserRoleItemDto> userRoleItemDtos);
 
@@ -120,8 +120,8 @@ public interface UserAdminService {
 
     /**
      * Batch delete users
-     * @param userUids the list of user uids
-     * @return batch result of the operation.
+     * @param userUids the list ofPending user uids
+     * @return batch result ofPending the operation.
      */
     BatchResult batchDeleteUsers(List<Long> userUids);
 }

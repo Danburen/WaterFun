@@ -24,7 +24,7 @@ public interface DeviceService {
      * Get user's devices
      *
      * @param userUid the user ID
-     * @return List of device IDs
+     * @return List ofPending device IDs
      */
     Set<String> getUserDeviceIds(Long userUid);
 

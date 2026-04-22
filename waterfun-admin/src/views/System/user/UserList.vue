@@ -14,10 +14,10 @@ const router = useRouter();
 
 const loading = ref(false);
 const userList = ref<UserAdminDto[]>([]);
-const selectedUserUids = ref<number[]>([]);
+const selectedUserUids = ref<string[]>([]);
 const editDialogVisible = ref(false);
 const dialogMode = ref<"create" | "edit">("edit");
-const currentEditUid = ref<number | null>(null);
+const currentEditUid = ref<string | null>(null);
 const selectable = (row: UserAdminDto) => row.userType !== 2 && row.userType !== 3 && row.userType !== 4;
 const searchForm = ref<{
   username: string;
@@ -97,13 +97,13 @@ const handleReset = () => {
   fetchData();
 };
 
-const gotoDetail = (uid: number) => {
-  router.push({ name: "userDetail", params: { uid } });
+const gotoDetail = (uid: string) => {
+  router.push({ name: "userDetail", params: { uid: String(uid) } });
 };
 
-const gotoEdit = (uid: number) => {
+const gotoEdit = (uid: string) => {
   dialogMode.value = "edit";
-  currentEditUid.value = uid;
+  currentEditUid.value = String(uid);
   editDialogVisible.value = true;
 };
 
@@ -113,9 +113,9 @@ const handleAdd = () => {
   editDialogVisible.value = true;
 };
 
-const handleDelete = async (uid: number) => {
+const handleDelete = async (uid: string) => {
   try {
-    await ElMessageBox.confirm(t("user.confirm.delete"), t("operation.delete"), {
+    await ElMessageBox.confirm(t("user.confirm.delete"), t("common.action.delete"), {
       type: "warning",
     });
     await deleteUser(uid);
@@ -141,7 +141,7 @@ const handleBatchDelete = async () => {
   try {
     await ElMessageBox.confirm(
       t("user.confirm.batchDelete", { count: selectedUserUids.value.length }),
-      t("operation.delete"),
+      t("common.action.delete"),
       { type: "warning" }
     );
 
@@ -192,8 +192,8 @@ onMounted(fetchData);
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t("query.title") }}</el-button>
-          <el-button @click="handleReset">{{ t("reset.title") }}</el-button>
+          <el-button type="primary" @click="handleSearch">{{ t("common.query.title") }}</el-button>
+          <el-button @click="handleReset">{{ t("common.reset.title") }}</el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
@@ -231,7 +231,7 @@ onMounted(fetchData);
       </el-table-column>
       <el-table-column prop="nickname" :label="t('user.nickname')" >
         <template #default="{ row }">
-          {{ row.nickname || t('none.title') }}
+          {{ row.nickname || t('common.none.title') }}
         </template>
       </el-table-column>
       <el-table-column prop="userType" :label="t('user.type')" min-width="120">
@@ -248,22 +248,22 @@ onMounted(fetchData);
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createdAt" :label="t('create.time')">
+      <el-table-column prop="createdAt" :label="t('common.time.create')">
         <template #default="{ row }">
           {{ formatISOData(row.createdAt) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('operation.title')" min-width="120" fixed="right">
+      <el-table-column :label="t('common.operation.title')" min-width="120" fixed="right">
         <template #default="{ row }">
-          <el-button size="small" type="primary" @click="gotoEdit(row.uid)">{{ t("operation.edit") }}</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(row.uid)">{{ t("operation.delete") }}</el-button>
+          <el-button size="small" type="primary" @click="gotoEdit(row.uid)">{{ t("common.action.edit") }}</el-button>
+          <el-button size="small" type="danger" @click="handleDelete(row.uid)">{{ t("common.action.delete") }}</el-button>
           <el-popover placement="bottom" trigger="click" :width="100" popper-style="min-width: auto; padding: 8px;">
             <template #reference>
-              <el-button size="small" type="success" style="margin-left: 12px;">{{ t("operation.more") }}</el-button>
+              <el-button size="small" type="success" style="margin-left: 12px;">{{ t("common.action.more") }}</el-button>
             </template>
             <div style="display: flex; flex-direction: column; gap: 8px;">
-              <el-button size="small" type="primary" plain @click="router.push({ name: 'userRoleAssign', params: { uid: row.uid } })" style="margin: 0; width: 100%;">{{ t("role.assign") }}</el-button>
-              <el-button size="small" type="primary" plain @click="router.push({ name: 'userPermissionAssign', params: { uid: row.uid } })" style="margin: 0; width: 100%;">{{ t("permission.assign") }}</el-button>
+              <el-button size="small" type="primary" plain @click="router.push({ name: 'userRoleAssign', params: { uid: String(row.uid) } })" style="margin: 0; width: 100%;">{{ t("role.assign") }}</el-button>
+              <el-button size="small" type="primary" plain @click="router.push({ name: 'userPermissionAssign', params: { uid: String(row.uid) } })" style="margin: 0; width: 100%;">{{ t("permission.assign") }}</el-button>
             </div>
           </el-popover>
         </template>
@@ -286,4 +286,5 @@ onMounted(fetchData);
   gap: 12px;
 }
 </style>
+
 

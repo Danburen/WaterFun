@@ -18,7 +18,8 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
-const uid = computed(() => Number(route.params.uid));
+const uid = computed(() => String(route.params.uid ?? ""));
+const isValidUid = computed(() => /^\d+$/.test(uid.value));
 const userName = ref("");
 
 const loading = ref(false);
@@ -48,7 +49,7 @@ const assignTitle = computed(() =>
 );
 
 const fetchUserBase = async () => {
-  if (Number.isNaN(uid.value)) {
+  if (!isValidUid.value) {
     ElMessage.error(t("user.error.invalidId"));
     router.back();
     return;
@@ -63,7 +64,7 @@ const fetchUserBase = async () => {
 };
 
 const fetchData = async () => {
-  if (Number.isNaN(uid.value)) return;
+  if (!isValidUid.value) return;
   loading.value = true;
   try {
     const res = await listUserRoles(
@@ -85,12 +86,12 @@ const fetchData = async () => {
 };
 
 const handleAdd = () => {
-  if (Number.isNaN(uid.value)) return;
+  if (!isValidUid.value) return;
   pickerDialogVisible.value = true;
 };
 
 const handleConfirmAddRoles = async (ids: number[]) => {
-  if (ids.length === 0 || Number.isNaN(uid.value)) return;
+  if (ids.length === 0 || !isValidUid.value) return;
   const expiresAt = assignExpiresAt.value ? assignExpiresAt.value.toISOString() : undefined;
   try {
     await assignUserRoles(
@@ -107,7 +108,7 @@ const handleConfirmAddRoles = async (ids: number[]) => {
 };
 
 const handleRemove = async () => {
-  if (selectedIds.value.length === 0 || Number.isNaN(uid.value)) return;
+  if (selectedIds.value.length === 0 || !isValidUid.value) return;
   try {
     await removeUserRoles(uid.value, selectedIds.value);
     selectedIds.value = [];
@@ -153,8 +154,8 @@ onMounted(async () => {
           <el-input v-model="searchForm.code" :placeholder="t('role.input.code')" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
+          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
+          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
@@ -183,11 +184,11 @@ onMounted(async () => {
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" :label="t('role.name')" />
         <el-table-column prop="code" :label="t('role.code')" />
-        <el-table-column prop="assignedAt" :label="t('create.time')">
+        <el-table-column prop="assignedAt" :label="t('common.time.create')">
           <template #default="{ row }">{{ formatISOData(row.assignedAt) }}</template>
         </el-table-column>
         <el-table-column prop="expiresAt" :label="t('expiresAt.title')">
-          <template #default="{ row }">{{ row.expiresAt ? formatISOData(row.expiresAt) : t('none.title') }}</template>
+          <template #default="{ row }">{{ row.expiresAt ? formatISOData(row.expiresAt) : t('common.none.title') }}</template>
         </el-table-column>
       </el-table>
     </TableContainer>
@@ -224,3 +225,4 @@ onMounted(async () => {
   width: 100%;
 }
 </style>
+

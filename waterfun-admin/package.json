@@ -15,6 +15,7 @@
     "@waterfun/web-core": "workspace:*",
     "axios": "1.13.5",
     "echarts": "^6.0.0",
+    "json-bigint": "^1.0.0",
     "vue": "^3.5.18",
     "vue-echarts": "^8.0.1",
     "vue-i18n": "^11.1.11",

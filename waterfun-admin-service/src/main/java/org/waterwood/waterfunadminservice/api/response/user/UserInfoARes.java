@@ -1,10 +1,8 @@
 package org.waterwood.waterfunadminservice.api.response.user;
 
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
 import org.waterwood.waterfunservicecore.entity.user.AccountStatus;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
@@ -26,6 +24,6 @@ public class UserInfoARes implements Serializable {
     private Instant updatedAt;
     private Instant createdAt;
     private String nickname;
-    private String avatarUrl;
+    private String avatar;
     private Instant lastActiveAt;
 }

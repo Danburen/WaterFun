@@ -44,7 +44,7 @@ public class RsaJwtUtil {
     /**
      * Parses the JWT tokenValue and returns the claims.
      * This will validateAndRemove the tokenValue signature and expiration first.
-     * @param JwToken the JWT tokenValue to parse
+     * @param JwToken the JWT tokenValue to parseLongBiz
      * @return Claims Instance
      * @throws JwtException if the tokenValue is invalid or expired
      */

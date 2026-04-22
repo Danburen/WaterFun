@@ -106,7 +106,7 @@ const handleEdit = (row: PermissionResp) => {
 
 const handleDelete = async (row: PermissionResp) => {
   try {
-    await ElMessageBox.confirm(t("permission.confirm.delete"), t("operation.delete"), {
+    await ElMessageBox.confirm(t("permission.confirm.delete"), t("common.action.delete"), {
       type: "warning",
     });
     await deletePermission(row.id);
@@ -132,7 +132,7 @@ const handleBatchDelete = async () => {
   try {
     await ElMessageBox.confirm(
       t("permission.confirm.batchDelete", { count: selectedPermIds.value.length }),
-      t("operation.delete"),
+      t("common.action.delete"),
       { type: "warning" }
     );
 
@@ -228,8 +228,8 @@ onMounted(async () => {
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
+          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
+          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
@@ -280,7 +280,7 @@ onMounted(async () => {
           <el-link v-if="row.parentId != null" type="primary" :underline="false" @click="gotoDetail(row.parentId)">
             {{ row.parentId }}
           </el-link>
-          <span v-else>{{ t('none.title') }}</span>
+          <span v-else>{{ t('common.none.title') }}</span>
         </template>
       </el-table-column>
 
@@ -289,23 +289,23 @@ onMounted(async () => {
       <el-table-column prop="isSystem" :label="t('permission.isSystem')" width="100">
         <template #default="{ row }">
           <el-tag size="small" :type="row.isSystem ? 'warning' : 'info'">
-            {{ row.isSystem ? t('yes.title') : t('no.title') }}
+            {{ row.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
           </el-tag>
         </template>
       </el-table-column>
 
       <el-table-column prop="description" :label="t('permission.description')" min-width="180" show-overflow-tooltip />
 
-      <el-table-column prop="createdAt" :label="t('create.time')" min-width="170">
+      <el-table-column prop="createdAt" :label="t('common.time.create')" min-width="170">
         <template #default="{ row }">
           <span>{{ formatISOData(row.createdAt) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="t('operation.title')" width="150" fixed="right">
+      <el-table-column :label="t('common.operation.title')" width="150" fixed="right">
         <template #default="scope">
-          <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ t('operation.edit') }}</el-button>
-          <el-button type="danger" size="small" @click="handleDelete(scope.row)">{{ t('operation.delete') }}</el-button>
+          <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ t('common.action.edit') }}</el-button>
+          <el-button type="danger" size="small" @click="handleDelete(scope.row)">{{ t('common.action.delete') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -333,4 +333,5 @@ onMounted(async () => {
   gap: 12px;
 }
 </style>
+
 

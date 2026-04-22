@@ -19,4 +19,5 @@ public final class KeyConstants {
     public static final String UPLOADS = "uploads";
     public static final String TEMP = "temp";
     public static final String TOKEN = "token";
+    public static final String IMAGE = "img";
 }

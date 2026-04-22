@@ -8,9 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 import org.waterwood.api.VO.OptionVO;
-import org.waterwood.api.VO.ToOptionVO;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -52,9 +50,9 @@ public class User {
     @Column(name = "nickname", length = 12)
     private String nickname;
 
-    @Size(max = 255)
-    @Column(name = "avatar_url")
-    private String avatarUrl;
+    @Size(max = 64)
+    @Column(name = "avatar")
+    private String avatar;
 
     @Column(name = "last_active_at")
     private Instant lastActiveAt;

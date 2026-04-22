@@ -14,14 +14,14 @@ public interface UserProfileService {
     /**
      * Get the target User Profile
      *
-     * @param userId the id of the target User
-     * @return the entity of{@link UserProfile}
+     * @param userId the id ofPending the target User
+     * @return the entity ofPending{@link UserProfile}
      */
     UserProfile getUserProfile(Long userId);
 
     /**
      * Get current User Profile
-     * @return the entity of{@link UserProfile}
+     * @return the entity ofPending{@link UserProfile}
      */
     UserProfile getUserProfile();
 

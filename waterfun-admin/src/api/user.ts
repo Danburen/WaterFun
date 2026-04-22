@@ -1,12 +1,13 @@
-import type { ISOString, OptionResItem, PromiseResBody, ResBody } from "@waterfun/web-core/src/types/api/response";
+import type { ISOString, OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED" | "DELETED";
 export type Gender = "MALE" | "FEMALE" | "OTHER" | "UNKNOWN";
+export type Uid = string;
 
 export interface UserAdminDto {
-  uid: number;
+  uid: Uid;
   username: string;
   userType: number;
   accountStatus: AccountStatus;
@@ -123,7 +124,7 @@ export interface BatchResult {
 }
 
 export interface RemoveUsersReq {
-  userUids: number[];
+  userUids: Uid[];
 }
 
 export interface CreateNewUserReq {
@@ -134,84 +135,84 @@ export interface CreateNewUserReq {
 }
 
 export const getUserList = (params: ListUserParams = {}): PromiseResBody<Page<UserAdminDto>> => {
-  return request.get<ResBody<Page<UserAdminDto>>>("/users/list", { params });
+  return request.get<Page<UserAdminDto>>("/users/list", { params });
 };
 
-export const getUserDetail = (uid: number): PromiseResBody<UserDetailDto> => {
-  return request.get<ResBody<UserDetailDto>>(`/users/${uid}`);
+export const getUserDetail = (uid: Uid | number): PromiseResBody<UserDetailDto> => {
+  return request.get<UserDetailDto>(`/users/${String(uid)}`);
 };
 
 export const createUser = (data: CreateNewUserReq): PromiseResBody<null> => {
-  return request.post<ResBody<null>>("/users", data);
+  return request.post<null>("/users", data);
 };
 
-export const deleteUser = (uid: number): PromiseResBody<null> => {
-  return request.delete<ResBody<null>>(`/users/${uid}`);
+export const deleteUser = (uid: Uid | number): PromiseResBody<null> => {
+  return request.delete<null>(`/users/${String(uid)}`);
 };
 
-export const deleteUsers = (userUids: number[]): PromiseResBody<BatchResult> => {
-  const data: RemoveUsersReq = { userUids };
-  return request.delete<ResBody<BatchResult>>("/users", { data });
+export const deleteUsers = (userUids: Array<Uid | number>): PromiseResBody<BatchResult> => {
+  const data: RemoveUsersReq = { userUids: userUids.map((uid) => String(uid)) };
+  return request.delete<BatchResult>("/users", { data });
 };
 
-export const updateUserInfo = (uid: number, data: UserInfoUpdateReq): PromiseResBody<null> => {
-  return request.put<ResBody<null>>(`/users/${uid}/info`, data);
+export const updateUserInfo = (uid: Uid | number, data: UserInfoUpdateReq): PromiseResBody<null> => {
+  return request.put<null>(`/users/${String(uid)}/info`, data);
 };
 
-export const updateUserProfile = (uid: number, data: UserProfileUpdateReq): PromiseResBody<null> => {
-  return request.put<ResBody<null>>(`/users/${uid}/profile`, data);
+export const updateUserProfile = (uid: Uid | number, data: UserProfileUpdateReq): PromiseResBody<null> => {
+  return request.put<null>(`/users/${String(uid)}/profile`, data);
 };
 
-export const updateUserDatum = (uid: number, data: UserDatumUpdateReq): PromiseResBody<null> => {
-  return request.put<ResBody<null>>(`/users/${uid}/datum`, data);
+export const updateUserDatum = (uid: Uid | number, data: UserDatumUpdateReq): PromiseResBody<null> => {
+  return request.put<null>(`/users/${String(uid)}/datum`, data);
 };
 
 export const listUserRoles = (
-  uid: number,
+  uid: Uid | number,
   page: number = 0,
   size: number = 10,
   roleId?: number,
   name?: string,
   code?: string
 ): PromiseResBody<Page<AssignedRoleRes>> => {
-  return request.get<ResBody<Page<AssignedRoleRes>>>(`/users/${uid}/roles`, {
+  return request.get<Page<AssignedRoleRes>>(`/users/${String(uid)}/roles`, {
     params: { page, size, roleId, name, code },
   });
 };
 
 export const listUserPermissions = (
-  uid: number,
+  uid: Uid | number,
   page: number = 0,
   size: number = 10,
   permId?: number,
   name?: string,
   code?: string
 ): PromiseResBody<Page<AssignedPermissionRes>> => {
-  return request.get<ResBody<Page<AssignedPermissionRes>>>(`/users/${uid}/permissions`, {
+  return request.get<Page<AssignedPermissionRes>>(`/users/${String(uid)}/permissions`, {
     params: { page, size, permId, name, code },
   });
 };
 
-export const assignUserRoles = (uid: number, userRoles: UserRoleItemDto[]): PromiseResBody<null> => {
-  return request.post<ResBody<null>>(`/users/${uid}/roles`, { userRoles });
+export const assignUserRoles = (uid: Uid | number, userRoles: UserRoleItemDto[]): PromiseResBody<null> => {
+  return request.post<null>(`/users/${String(uid)}/roles`, { userRoles });
 };
 
-export const replaceUserRoles = (uid: number, userRoleItemDtos: UserRoleItemDto[]): PromiseResBody<null> => {
-  return request.put<ResBody<null>>(`/users/${uid}/roles`, { userRoleItemDtos });
+export const replaceUserRoles = (uid: Uid | number, userRoleItemDtos: UserRoleItemDto[]): PromiseResBody<null> => {
+  return request.put<null>(`/users/${String(uid)}/roles`, { userRoleItemDtos });
 };
 
-export const removeUserRoles = (uid: number, roleIds: number[]): PromiseResBody<BatchResult> => {
-  return request.delete<ResBody<BatchResult>>(`/users/${uid}/roles`, { data: { roleIds } });
+export const removeUserRoles = (uid: Uid | number, roleIds: number[]): PromiseResBody<BatchResult> => {
+  return request.delete<BatchResult>(`/users/${String(uid)}/roles`, { data: { roleIds } });
 };
 
-export const assignUserPermissions = (uid: number, userPermissions: UserPermItemDto[]): PromiseResBody<null> => {
-  return request.post<ResBody<null>>(`/users/${uid}/permissions`, { userPermissions });
+export const assignUserPermissions = (uid: Uid | number, userPermissions: UserPermItemDto[]): PromiseResBody<null> => {
+  return request.post<null>(`/users/${String(uid)}/permissions`, { userPermissions });
 };
 
-export const removeUserPermissions = (uid: number, permissionIds: number[]): PromiseResBody<BatchResult> => {
-  return request.delete<ResBody<BatchResult>>(`/users/${uid}/permissions`, { data: { permissionIds } });
+export const removeUserPermissions = (uid: Uid | number, permissionIds: number[]): PromiseResBody<BatchResult> => {
+  return request.delete<BatchResult>(`/users/${String(uid)}/permissions`, { data: { permissionIds } });
 };
 
-export const getUserOptions = (): PromiseResBody<OptionResItem<number>[]> => {
-  return request.get<ResBody<OptionResItem<number>[]>>("/users/options");
+export const getUserOptions = (): PromiseResBody<OptionResItem<Uid>[]> => {
+  return request.get<OptionResItem<Uid>[]>("/users/options");
 };

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunadminservice.api.request.content.CreateTagRequest;
 import org.waterwood.waterfunadminservice.api.request.content.DeleteTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.UpdateTagReq;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
@@ -13,10 +14,16 @@ import java.util.List;
 
 public interface TagService {
     /**
+     * Create a new tag.
+     * @param req create request body
+     */
+    void createTag(CreateTagRequest req);
+
+    /**
      * List tags by specification and pageable.
      * @param spec specification
      * @param pageable pageable
-     * @return page of tags
+     * @return page ofPending tags
      */
     Page<Tag> list(Specification<Tag> spec, Pageable pageable);
 
@@ -50,7 +57,7 @@ public interface TagService {
 
     /**
      * Get the tag options
-     * @return list of optionVOs
+     * @return list ofPending optionVOs
      */
     List<OptionVO<Integer>> getOptions();
 }

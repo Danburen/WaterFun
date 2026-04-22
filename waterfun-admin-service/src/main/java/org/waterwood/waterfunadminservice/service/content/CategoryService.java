@@ -1,12 +1,12 @@
 package org.waterwood.waterfunadminservice.service.content;
 
 
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunadminservice.api.request.content.CreateCategoryRequest;
 import org.waterwood.waterfunadminservice.api.request.content.RemoveCategoriesRequest;
 import org.waterwood.waterfunadminservice.api.request.content.UpdateCategoryRequest;
 import org.waterwood.waterfunservicecore.entity.post.Category;
@@ -15,10 +15,16 @@ import java.util.List;
 
 public interface CategoryService {
     /**
+     * Create a category.
+     * @param req request body
+     */
+    void create(CreateCategoryRequest req);
+
+    /**
      * List categories.
-     * @param spec specification of category
+     * @param spec specification ofPending category
      * @param pageable pageable
-     * @return page of categories
+     * @return page ofPending categories
      */
     Page<Category> list(Specification<Category> spec, Pageable pageable);
 
@@ -53,8 +59,8 @@ public interface CategoryService {
     BatchResult deleteCategories(RemoveCategoriesRequest req);
 
     /**
-     * Get the list of categories OptionVO
-     * @return list of categories OptionVO
+     * Get the list ofPending categories OptionVO
+     * @return list ofPending categories OptionVO
      */
     List<OptionVO<Integer>> getOptions();
 

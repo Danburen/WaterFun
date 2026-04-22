@@ -50,8 +50,8 @@ public class AuthCoreServiceImpl implements AuthCoreService {
     }
 
     /**
-     * Return the api response of refresh access tokenValue operation.
-     * <p>for future extension or refactor , we temporarily use api response instead of OpResult</p>
+     * Return the api response ofPending refresh access tokenValue operation.
+     * <p>for future extension or refactor , we temporarily use api response instead ofPending OpResult</p>
      *
      * @param refreshToken refresh tokenValue
      * @return ServiceResult type Token result that contains tokenValue and expirations.

@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     /**
      * Handle runtime exception
      * @param ex runtime exception
-     * @return the {@link ResponseEntity} of {@link ErrorResponse}
+     * @return the {@link ResponseEntity} ofPending {@link ErrorResponse}
      */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
      * Handle request body validation.
      * e.g. {@link RequestBody}
      * @param ex validation exception
-     * @return the {@link ResponseEntity} of {@link ErrorResponse} body segment {@link HttpStatus} 400.
+     * @return the {@link ResponseEntity} ofPending {@link ErrorResponse} body segment {@link HttpStatus} 400.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex){
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
     /**
      * Validate the parameter constraint e.g.{@link NotBlank} in {@link RequestParam}
      * @param ex constraint violation exception
-     * @return the {@link ResponseEntity} of {@link ErrorResponse} body segment {@link HttpStatus} 400.
+     * @return the {@link ResponseEntity} ofPending {@link ErrorResponse} body segment {@link HttpStatus} 400.
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex){
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
                 String msg = msgSrc.getMessage(
                         "validation.enum.not_support",
                         new Object[]{field, value, availableValues},
-                        "Invalid value for field {0}, value {1} is not one of {2}",
+                        "Invalid value for field {0}, value {1} is not one ofPending {2}",
                         LOCALE
                 );
                 ErrorResponse res = new ErrorResponse(BaseResponseCode.VALIDATION_ERROR.getCode(), msg);
@@ -144,7 +144,7 @@ public class GlobalExceptionHandler {
     /**
      * Handle auth exception
      * @param ex auth exception
-     * @return the {@link ResponseEntity} of {@link ErrorResponse} body segment {@link}
+     * @return the {@link ResponseEntity} ofPending {@link ErrorResponse} body segment {@link}
      */
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<?> handleAuthException(AuthException ex){

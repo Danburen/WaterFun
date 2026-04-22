@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotation to validate that the field of a class at least one field is not null
+ * The annotation to validate that the field ofPending a class at least one field is not null
  *
  * @author Danburen
  */

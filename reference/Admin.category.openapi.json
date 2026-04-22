@@ -1,0 +1,624 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Admin",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/api/admin/categorys/list": {
+      "get": {
+        "summary": "list",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "creatorId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "seconds",
+            "in": "query",
+            "description": "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+            "required": false,
+            "example": [],
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "nanos",
+            "in": "query",
+            "description": "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999.",
+            "required": false,
+            "example": [],
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageCategoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/categorys": {
+      "delete": {
+        "summary": "deleteCategories",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveCategoriesRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/categorys/{id}": {
+      "get": {
+        "summary": "get",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCategoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "delete": {
+        "summary": "delete",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "put": {
+        "summary": "update",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/categorys/options": {
+      "get": {
+        "summary": "getOptions",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOInteger"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Instant": {
+        "type": "object",
+        "properties": {
+          "seconds": {
+            "type": "integer",
+            "description": "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+            "format": "int64"
+          },
+          "nanos": {
+            "type": "integer",
+            "description": "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+          }
+        }
+      },
+      "Sort": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "ASC",
+              "DESC"
+            ]
+          },
+          "property": {
+            "type": "string",
+            "description": ""
+          },
+          "ignoreCase": {
+            "type": "boolean",
+            "description": ""
+          },
+          "nullHandling": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "NATIVE",
+              "NULLS_FIRST",
+              "NULLS_LAST"
+            ]
+          },
+          "ascending": {
+            "type": "boolean",
+            "description": "Returns whether sorting for this property shall be ascending."
+          },
+          "descending": {
+            "type": "boolean",
+            "description": "Returns whether sorting for this property shall be descending."
+          }
+        }
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "paged": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Pageable} contains pagination information."
+          },
+          "unpaged": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Pageable} does not contain pagination information."
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "Returns the page to be returned."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "Returns the number of items to be returned."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Returns the offset to be taken according to the underlying page and page size.",
+            "format": "int64"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sort",
+              "description": "org.springframework.data.domain.Sort"
+            },
+            "description": "Returns the sorting parameters."
+          }
+        }
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "description": "",
+            "type": "null"
+          }
+        }
+      },
+      "BatchResult": {
+        "type": "object",
+        "properties": {
+          "requested": {
+            "type": "integer",
+            "description": ""
+          },
+          "success": {
+            "type": "integer",
+            "description": ""
+          },
+          "ignored": {
+            "type": "integer",
+            "description": ""
+          },
+          "failed": {
+            "type": "integer",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseBatchResult": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/BatchResult",
+            "description": ""
+          }
+        }
+      },
+      "OptionVOInteger": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": ""
+          },
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "name": {
+            "type": "string",
+            "description": ""
+          },
+          "disabled": {
+            "type": "boolean",
+            "description": "",
+            "default": false
+          }
+        }
+      },
+      "ApiResponseListOptionVOInteger": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOInteger"
+            },
+            "description": ""
+          }
+        }
+      },
+      "CategoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": ""
+          },
+          "name": {
+            "type": "string",
+            "description": ""
+          },
+          "slug": {
+            "type": "string",
+            "description": ""
+          },
+          "description": {
+            "type": "string",
+            "description": ""
+          },
+          "parentId": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "description": ""
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": ""
+          },
+          "creatorId": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "updateAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          }
+        }
+      },
+      "PageCategoryResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryResponse",
+              "description": "Response DTO for{@link Category}"
+            },
+            "description": ""
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/Pageable",
+            "description": ""
+          },
+          "total": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "empty": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Streamable} is empty."
+          },
+          "number": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "numberOfElements": {
+            "type": "integer"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sort",
+              "description": "org.springframework.data.domain.Sort"
+            }
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponsePageCategoryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageCategoryResponse",
+            "description": ""
+          }
+        }
+      },
+      "RemoveCategoriesRequest": {
+        "type": "object",
+        "properties": {
+          "categoryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseCategoryResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/CategoryResponse",
+            "description": ""
+          }
+        }
+      },
+      "UpdateCategoryRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": ""
+          },
+          "name": {
+            "type": "string",
+            "description": "",
+            "maxLength": 50
+          },
+          "slug": {
+            "type": "string",
+            "description": "",
+            "maxLength": 50
+          },
+          "description": {
+            "type": "string",
+            "description": ""
+          },
+          "parentId": {
+            "type": "integer",
+            "description": ""
+          },
+          "sortOrder": {
+            "type": "integer",
+            "description": ""
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": ""
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    "responses": {},
+    "securitySchemes": {}
+  },
+  "servers": [],
+  "security": []
+}

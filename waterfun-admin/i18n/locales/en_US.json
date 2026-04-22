@@ -6,20 +6,51 @@
   "error": {
     "fetch": "Failed to fetch data"
   },
-  "none": {
-    "title": "None"
-  },
-  "yes": {
-    "title": "Yes"
-  },
-  "no": {
-    "title": "No"
-  },
-  "query": {
-    "title": "Search"
-  },
-  "reset": {
-    "title": "Reset"
+  "common": {
+    "none": {
+      "title": "None",
+      "description": "No data"
+    },
+    "boolean": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "query": {
+      "placeholder": "Please input search content",
+      "search": "Search",
+      "title": "Search"
+    },
+    "reset": {
+      "title": "Reset",
+      "confirm": "Are you sure to reset?",
+      "message": "Reset will clear all input fields"
+    },
+    "order": {
+      "title": "Sort",
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "action": {
+      "create": "Create",
+      "delete": "Delete",
+      "edit": "Edit",
+      "update": "Update",
+      "export": "Export",
+      "more": "More",
+      "save": "Save",
+      "cancel": "Cancel",
+      "back": "Back",
+      "changePassword": "Change Password"
+    },
+    "operation": {
+      "title": "Operation"
+    },
+    "time": {
+      "create": "Created At",
+      "update": "Updated At",
+      "createBy": "Created By",
+      "updateBy": "Updated By"
+    }
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -32,11 +63,27 @@
       "user": "Users",
       "role": "Roles",
       "permission": "Permissions"
+    },
+    "content": {
+      "title": "Content",
+      "post": {
+        "title": "Posts",
+        "detail": "Post Detail"
+      },
+      "tag": {
+        "title": "Tags",
+        "detail": "Tag Detail"
+      },
+      "category": {
+        "title": "Categories",
+        "detail": "Category Detail"
+      }
+    },
+    "moderation": {
+      "title": "Moderation",
+      "workbench": "Content Moderation Workbench",
+      "resourceDetail": "Moderation Resource Detail"
     }
-  },
-  "btn": {
-    "create": "Create",
-    "delete": "Delete"
   },
   "assign": {
     "forTarget": "Assign {item} to {target} ({name})"
@@ -151,23 +198,132 @@
       "fetchUsers": "Failed to load role users"
     }
   },
-  "operation": {
-    "edit": "Edit",
-    "delete": "Delete",
-    "title": "Operation",
-    "more": "More"
-  },
-  "cancel": {
-    "title": "Cancel"
-  },
-  "save": {
-    "title": "Save"
-  },
-  "back": {
-    "title": "Back"
-  },
-  "create": {
-    "time": "Created At"
+  "content": {
+    "post": {
+      "create": "Create Post",
+      "edit": "Edit Post",
+      "detail": "Post Detail",
+      "title": "Post List",
+      "field": {
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "content": "Content",
+        "summary": "Summary",
+        "coverImg": "Cover Image",
+        "status": "Status",
+        "visibility": "Visibility",
+        "categoryId": "Category ID",
+        "authorId": "Author ID",
+        "tagIds": "Tags",
+        "slug": "Unique Identifier"
+      },
+      "input": {
+        "title": "Please input title",
+        "subtitle": "Please input subtitle",
+        "content": "Please input content",
+        "summary": "Please input summary",
+        "coverImg": "Please input cover image URL",
+        "authorId": "Please select author",
+        "categoryId": "Please select category",
+        "tagIds": "Please select tags",
+        "slug": "Please input unique identifier"
+      },
+      "status": {
+        "draft": "Draft",
+        "pending": "Pending",
+        "published": "Published",
+        "rejected": "Rejected",
+        "archived": "Archived"
+      },
+      "visibility": {
+        "public": "Public",
+        "private": "Private",
+        "fansOnly": "Fans Only"
+      },
+      "confirm": {
+        "delete": "Are you sure to delete this post?",
+        "batchDelete": "Are you sure to delete {count} selected posts?"
+      },
+      "success": {
+        "create": "Post created",
+        "update": "Post updated",
+        "delete": "Post deleted"
+      },
+      "error": {
+        "create": "Failed to create post",
+        "save": "Failed to save post",
+        "delete": "Failed to delete post",
+        "fetchDetail": "Failed to fetch post detail",
+        "invalidId": "Invalid post ID"
+      }
+    },
+    "tag": {
+      "create": "Create Tag",
+      "edit": "Edit Tag",
+      "detail": "Tag Detail",
+      "title": "Tag List",
+      "field": {
+        "name": "Name",
+        "slug": "Unique Identifier",
+        "usageCount": "Usage Count",
+        "creatorId": "Creator ID"
+      },
+      "input": {
+        "name": "Please input tag name",
+        "slug": "Please input unique identifier"
+      },
+      "confirm": {
+        "delete": "Are you sure to delete this tag?",
+        "batchDelete": "Are you sure to delete {count} selected tags?"
+      },
+      "success": {
+        "create": "Tag created",
+        "update": "Tag updated",
+        "delete": "Tag deleted"
+      },
+      "error": {
+        "create": "Failed to create tag",
+        "save": "Failed to save tag",
+        "delete": "Failed to delete tag",
+        "fetchDetail": "Failed to fetch tag detail",
+        "invalidId": "Invalid tag ID"
+      }
+    },
+    "category": {
+      "create": "Create Category",
+      "edit": "Edit Category",
+      "detail": "Category Detail",
+      "title": "Category List",
+      "field": {
+        "name": "Name",
+        "slug": "Unique Identifier",
+        "parentId": "Parent ID",
+        "sortOrder": "Sort",
+        "creatorId": "Creator ID",
+        "isActive": "Active",
+        "description": "Description"
+      },
+      "input": {
+        "name": "Please input category name",
+        "slug": "Please input unique identifier"
+      },
+      "confirm": {
+        "delete": "Are you sure to delete this category?",
+        "batchDelete": "Are you sure to delete {count} selected categories?"
+      },
+      "success": {
+        "create": "Category created",
+        "update": "Category updated",
+        "delete": "Category deleted"
+      },
+      "error": {
+        "create": "Failed to create category",
+        "save": "Failed to save category",
+        "delete": "Failed to delete category",
+        "fetchDetail": "Failed to fetch category detail",
+        "invalidId": "Invalid category ID"
+      }
+    }
   },
   "user": {
     "entity": "User",
@@ -256,6 +412,79 @@
     },
     "todo": {
       "detail": "User detail page is not implemented yet"
+    }
+  },
+  "moderation": {
+    "title": "Moderation",
+    "workbench": "Content Moderation Workbench",
+    "resourceDetail": "Moderation Resource Detail",
+    "field": {
+      "taskType": "Task Type",
+      "taskId": "Task ID",
+      "targetId": "Target ID",
+      "submitterId": "Submitter ID",
+      "submitAt": "Submitted At",
+      "status": "Status",
+      "auditorId": "Auditor ID",
+      "auditAt": "Audited At",
+      "mimeType": "MIME Type",
+      "fileSize": "File Size",
+      "resourceKey": "Resource Key",
+      "content": "Content",
+      "rejectType": "Reject Type",
+      "rejectReason": "Reject Reason"
+    },
+    "input": {
+      "taskId": "Please input task ID",
+      "submitterId": "Please input submitter ID",
+      "auditorId": "Please input auditor ID",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "rejectReason": "Please input reject reason (optional)"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "taskType": {
+      "image": "Image",
+      "text": "Text",
+      "rich": "Rich Text",
+      "url": "URL",
+      "file": "File"
+    },
+    "rejectType": {
+      "violation_of_guidelines": "Violation of Guidelines",
+      "inappropriate_content": "Inappropriate Content",
+      "advertisement": "Advertisement",
+      "violence": "Violence",
+      "sensitive": "Sensitive Content",
+      "other": "Other"
+    },
+    "action": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "openOriginal": "Open Original",
+      "batchApprove": "Batch Approve",
+      "batchReject": "Batch Reject"
+    },
+    "dialog": {
+      "rejectTitle": "Reject Moderation Task"
+    },
+    "confirm": {
+      "approve": "Approve this moderation task?",
+      "approveResource": "Approve this moderation resource?",
+      "batchApprove": "Approve {count} selected moderation tasks?"
+    },
+    "success": {
+      "approve": "Approved successfully",
+      "reject": "Rejected successfully"
+    },
+    "error": {
+      "fetch": "Failed to fetch moderation tasks",
+      "approve": "Failed to approve moderation task",
+      "reject": "Failed to reject moderation task"
     }
   }
 }

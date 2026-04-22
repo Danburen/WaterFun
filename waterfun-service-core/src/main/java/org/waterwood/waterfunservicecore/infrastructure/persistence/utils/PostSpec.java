@@ -81,7 +81,7 @@ public final class PostSpec {
                 Subquery<Long> hitCountSub = query.subquery(Long.class);
                 Root<Post> subRoot = hitCountSub.from(Post.class);
                 Join<Post, Tag> subTag = subRoot.join("tags");
-                // order with hit counts of tags instead of normal order.
+                // order with hit counts ofPending tags instead ofPending normal order.
                 hitCountSub.select(cb.count(subTag.get("id")))
                         .where(
                                 cb.equal(subRoot.get("id"), root.get("id")),

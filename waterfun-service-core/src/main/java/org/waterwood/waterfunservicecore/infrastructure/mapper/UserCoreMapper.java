@@ -7,8 +7,10 @@ import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface UserCoreMapper {
+    @Mapping(target = "avatar", ignore = true)
     UserInfoResponse toUserInfoResponse(User user);
 
+    @Mapping(target = "avatar", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserInfoResponse userInfoResponse, @MappingTarget User user);
 

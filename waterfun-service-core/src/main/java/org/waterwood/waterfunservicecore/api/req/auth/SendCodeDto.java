@@ -2,11 +2,10 @@ package org.waterwood.waterfunservicecore.api.req.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.waterfunservicecore.api.VerifyChannel;
-import org.waterwood.waterfunservicecore.api.VerifyScene;
+import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 
 @Data
 @NoArgsConstructor

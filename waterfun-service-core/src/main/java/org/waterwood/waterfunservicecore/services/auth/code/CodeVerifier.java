@@ -1,8 +1,7 @@
 package org.waterwood.waterfunservicecore.services.auth.code;
 
-import org.jetbrains.annotations.Nullable;
-import org.waterwood.waterfunservicecore.api.VerifyChannel;
-import org.waterwood.waterfunservicecore.api.VerifyScene;
+import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 
 public interface CodeVerifier {
     Object generateVerifyCode();

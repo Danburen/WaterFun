@@ -128,7 +128,7 @@ public final class EncryptionHelper {
 
     /**
      * Use GCM_AES Type encryption cipher encrypt data to encrypted data
-     * @param original original of data
+     * @param original original ofPending data
      * @param key key for encryption
      * @return combined encrypted data segment init vector
      */

@@ -12,6 +12,7 @@ import org.waterwood.utils.PathUtil;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
+import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelper;
@@ -22,8 +23,6 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRep
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudResOperationType;
-import org.waterwood.waterfunservicecore.services.sys.storage.CloudResType;
-import org.waterwood.waterfunservicecore.utils.FilePathKey;
 
 import java.util.List;
 
@@ -75,17 +74,17 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
         String avatarPath = PathUtil.getUniquePathFile(fileSuffix);
         User u = userCoreService.getUser(userUid);
         cloudFileService.removeFile( CloudStorageRootKey.UPLOADS,
-                PathUtil.buildPath(KeyConstants.AVATAR, u.getAvatarUrl()));
+                PathUtil.buildPath(KeyConstants.AVATAR, u.getAvatar()));
         // clean the cache
         redisHelper.del(
                 cloudFileService.getCachedRedisKey(
                         userUid,
-                        CloudResType.AVATAR,
+                        MediaResourceType.USER_AVATAR,
                         CloudResOperationType.WRITE
                 )
         );
 
-        u.setAvatarUrl(avatarPath);
+        u.setAvatar(avatarPath);
         userRepository.save(u);
         return cloudFileService.buildPutPolicyWithBiz(CloudStorageRootKey.UPLOADS, PathUtil.buildPath(
                 KeyConstants.AVATAR,
@@ -96,20 +95,19 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     @Override
     public @Nullable CloudResPresignedUrlResp getUserAvatar(long userUid) {
         User u = userCoreService.getUser(userUid);
-        if(u.getAvatarUrl() == null){
+        if(u.getAvatar() == null){
             return null;
         }
-        return cloudFileService.getReadPublicUrlCached(
-                FilePathKey.UPLOAD_IMG_PATH + u.getAvatarUrl(),
-                String.valueOf(userUid),
-                CloudResType.AVATAR);
+        return cloudFileService.getReadUrlCached(CloudStorageRootKey.UPLOADS,
+                PathUtil.buildPath(KeyConstants.AVATAR, u.getAvatar()),
+                String.valueOf(userUid), MediaResourceType.USER_AVATAR);
     }
 
     @Override
     public List<CloudResPresignedUrlResp> listUserAvatars(List<Long> userUids) {
         List<User> users = userRepository.findAllVisibleUsersByIds(userUids);
         List<String> paths = users.stream().map(
-                User::getAvatarUrl
+                User::getAvatar
         ).toList();
         List<String> bizIds = users.stream().map(
                 u -> String.valueOf(u.getUid())
@@ -117,7 +115,7 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
         return cloudFileService.batchGetReadPublicUrlCached(
                 paths,
                 bizIds,
-                CloudResType.AVATAR
+                MediaResourceType.USER_AVATAR
         );
     }
 

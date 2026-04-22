@@ -60,10 +60,10 @@ const localCurrentPage = computed({
   <CardContainer :title="title" :title-i18n="titleI18n" :show-title="showTitle">
     <div class="operation-bar">
       <el-button v-if="showAddBtn" type="primary" size="small" @click="$emit('add')">
-        {{ t('btn.create') }}
+        {{ t('common.action.create') }}
       </el-button>
       <el-button v-if="showRemoveBtn" :disabled="disableDelete" type="danger" size="small" @click="$emit('remove')">
-        {{ t('btn.delete') }}
+        {{ t('common.action.delete') }}
       </el-button>
       <slot name="action-buttons" />
     </div>

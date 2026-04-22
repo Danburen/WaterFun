@@ -73,7 +73,7 @@ public interface PermissionService {
      * @param username username
      * @param nickname nickname
      * @param pageable pageable
-     * @return page of users
+     * @return page ofPending users
      */
     Page<AssignedUserRes> listPermUsers(int id, Long userUid, String username, String nickname, Pageable pageable);
 
@@ -96,14 +96,14 @@ public interface PermissionService {
 
     /**
      * List all permission options
-     * @return List of OptionVO
+     * @return List ofPending OptionVO
      */
     List<OptionVO<Integer>> getAllPermOptions();
 
     /**
      * Batch remove permissions
      * @param req the request body.
-     * @return batch result of the operation.
+     * @return batch result ofPending the operation.
      */
     BatchResult removePerms(DeletePermsRequest req);
 }

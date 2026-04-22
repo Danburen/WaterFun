@@ -10,7 +10,7 @@ public interface EmailService {
      * by choosing <b>base template</b> segment <b>content template</b>
      * @param to send to whom
      * @param from form whom
-     * @param subject subject of email
+     * @param subject subject ofPending email
      * @param baseTemplate baseTemplate
      * @param contentTemplate content Template
      * @param data data to inject into context
@@ -21,9 +21,9 @@ public interface EmailService {
      * Send raw html email
      * @param to the target
      * @param from from target
-     * @param subject subject of email
+     * @param subject subject ofPending email
      * @param html raw html.
-     * @return the result of email send
+     * @return the result ofPending email send
      */
     CodeResult sendHtmlEmail(String to, String from, String subject, String html);
 
@@ -31,9 +31,9 @@ public interface EmailService {
      * Send simple text email
      * @param to target
      * @param from from target
-     * @param subject subject of email
+     * @param subject subject ofPending email
      * @param text text
-     * @return the result of email send
+     * @return the result ofPending email send
      */
     CodeResult sendSimpleEmail(String to, String from, String subject, String text);
 }

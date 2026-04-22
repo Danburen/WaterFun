@@ -131,9 +131,10 @@ const handleClosed = () => {
       :disabled-parent-ids="disabledParentIds"
     />
     <template #footer>
-      <el-button @click="visible = false">{{ t('cancel.title') }}</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('save.title') }}</el-button>
+      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
+      <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('common.action.save') }}</el-button>
     </template>
   </el-dialog>
 </template>
+
 

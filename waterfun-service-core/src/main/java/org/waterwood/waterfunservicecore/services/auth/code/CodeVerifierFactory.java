@@ -1,9 +1,8 @@
 package org.waterwood.waterfunservicecore.services.auth.code;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import org.waterwood.waterfunservicecore.api.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 
 import java.util.List;
 import java.util.Map;

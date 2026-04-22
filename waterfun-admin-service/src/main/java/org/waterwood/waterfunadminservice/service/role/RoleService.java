@@ -28,7 +28,7 @@ public interface RoleService {
      * List all the roles
      * @param spec  specification
      * @param pageable pageable
-     * @return Page of role
+     * @return Page ofPending role
      */
     Page<Role> listRoles(Specification<Role> spec, Pageable pageable);
 
@@ -77,14 +77,14 @@ public interface RoleService {
      BatchResult replaceAllRolePerms(int id, List<RolePermItemDTO> permsDto);
 
     /**
-     * List the permissions of a role with pagination
+     * List the permissions ofPending a role with pagination
      *
      * @param id       the role id
      * @param permId   permission Id
      * @param code     permission code
      * @param name     permission name
      * @param pageable pageable
-     * @return page of permissions
+     * @return page ofPending permissions
      */
     Page<AssignedPermissionRes> getRolePerms(int id, Integer permId, String code, String name, Pageable pageable);
 
@@ -99,14 +99,14 @@ public interface RoleService {
     BatchResult assignUsers(int id, List<Long> userIds, Instant expireAt);
 
     /**
-     * List users of a role with pagination
+     * List users ofPending a role with pagination
      *
      * @param id       role id
      * @param userUid user UID
      * @param username username
      * @param nickname nickname
      * @param pageable pageable
-     * @return page of user
+     * @return page ofPending user
      */
     Page<AssignedUserRes> getRoleUsers(int id, Long userUid, String username, String nickname, Pageable pageable);
 
@@ -129,7 +129,7 @@ public interface RoleService {
     BatchResult removeRolePerms(int id, List<Integer> permIds);
 
     /**
-     * Batch replacing users of a role, the users will be replaced by the given user list, and the old users will be removed
+     * Batch replacing users ofPending a role, the users will be replaced by the given user list, and the old users will be removed
      * @param id the role id
      * @param userUids user uids
      * @param expiresAt role expire time ,if set null, will never expire
@@ -140,14 +140,14 @@ public interface RoleService {
     /**
      * Get all role ids.
      *
-     * @return list of role ids
+     * @return list ofPending role ids
      */
     List<OptionVO<Integer>> getAllRoleOptions();
 
     /**
      * Batch remove roles
      * @param req request body
-     * @return batch result of the operation.
+     * @return batch result ofPending the operation.
      */
     BatchResult removeRoles(DeleteRolesRequest req);
 }

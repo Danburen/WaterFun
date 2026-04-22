@@ -59,7 +59,7 @@ export interface ListRolePermsParams {
 export interface ListRoleUsersParams {
     page?: number;
     size?: number;
-    userUid?: number;
+    userUid?: string;
     username?: string;
     nickname?: string;
 }
@@ -77,7 +77,7 @@ export interface AssignedPermissionRes {
 }
 
 export interface AssignedUserRes {
-    userUid: number;
+    userUid: string;
     username: string;
     nickname: string;
     assignedAt: ISOString;
@@ -100,7 +100,7 @@ export interface PermissionResp {
 export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED" | "DELETED";
 
 export interface UserInfoARes {
-    uid: number;
+    uid: string;
     username: string;
     userType: number;
     accountStatus: AccountStatus;
@@ -113,12 +113,12 @@ export interface UserInfoARes {
 }
 
 export interface AssignUserToRoleReq {
-    userUids?: number[];
+    userUids?: string[];
     expiresAt?: ISOString;
 }
 
 export interface RemoveRoleUsersReq {
-    userIds?: number[];
+    userIds?: string[];
 }
 
 export interface BatchResult {
@@ -200,7 +200,7 @@ export const getRoleUsers = (
     id: number,
     page: number = 0,
     size: number = 10,
-    userUid?: number,
+    userUid?: string,
     username?: string,
     nickname?: string
 ): PromiseResBody<Page<AssignedUserRes>> => {

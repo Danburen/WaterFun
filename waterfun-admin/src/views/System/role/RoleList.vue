@@ -98,7 +98,7 @@ const handleEdit = async (row: RoleResp) => {
 
 const handleDelete = async (row: RoleResp) => {
   try {
-    await ElMessageBox.confirm(t("role.confirm.delete"), t("operation.delete"), {
+    await ElMessageBox.confirm(t("role.confirm.delete"), t("common.action.delete"), {
       type: "warning",
     });
     await deleteRole(row.id);
@@ -122,7 +122,7 @@ const handleBatchDelete = async () => {
   }
 
   try {
-    await ElMessageBox.confirm(t("role.confirm.batchDelete", { count: selectedRoleIds.value.length }), t("operation.delete"), {
+    await ElMessageBox.confirm(t("role.confirm.batchDelete", { count: selectedRoleIds.value.length }), t("common.action.delete"), {
       type: "warning",
     });
 
@@ -159,7 +159,7 @@ const gotoDetail = (id: number) => {
 const getParentRoleName = (parentId: number | null | undefined) => {
   if (parentId == null) return "";
   const option = roleOptions.value.find((r) => r.id === parentId);
-  return option?.name || t("none.title");
+  return option?.name || t("common.none.title");
 };
 
 
@@ -190,8 +190,8 @@ onMounted(() => {
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
+          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
+          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
@@ -225,23 +225,23 @@ onMounted(() => {
           <el-link v-if="row.parentId != null" type="primary" :underline="false" @click="gotoDetail(row.parentId)">
             {{ row.parentId }} ({{ getParentRoleName(row.parentId) }})
           </el-link>
-          <span v-else>{{ t('none.title') }}</span>
+          <span v-else>{{ t('common.none.title') }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="orderWeight" sortable :label="t('order.title')" width="80px"></el-table-column>
       <el-table-column prop="description" :label="t('role.description')"/>
-      <el-table-column prop="createdAt" sortable column-key="date" :label="t('create.time')">
+      <el-table-column prop="createdAt" sortable column-key="date" :label="t('common.time.create')">
         <template #default="scope">
           <span>{{ formatISOData(scope.row.createdAt) }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('operation.title')" width="260px" fixed="right">
+      <el-table-column :label="t('common.operation.title')" width="260px" fixed="right">
         <template #default="scope">
-          <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ t('operation.edit') }}</el-button>
-          <el-button v-if="! scope.row.isSystem" type="danger" size="small" @click="handleDelete(scope.row)">{{ t('operation.delete') }}</el-button>
+          <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ t('common.action.edit') }}</el-button>
+          <el-button v-if="! scope.row.isSystem" type="danger" size="small" @click="handleDelete(scope.row)">{{ t('common.action.delete') }}</el-button>
           <el-popover placement="bottom" trigger="click" :width="130" popper-style="min-width: auto; padding: 8px;">
             <template #reference>
-              <el-button size="small" type="success">{{ t("operation.more") }}</el-button>
+              <el-button size="small" type="success">{{ t("common.action.more") }}</el-button>
             </template>
             <div style="display: flex; flex-direction: column; gap: 8px;">
               <el-button size="small" type="primary" plain @click="router.push({ name: 'rolePermissionAssign', params: { id: scope.row.id } })" style="margin: 0; width: 100%;">

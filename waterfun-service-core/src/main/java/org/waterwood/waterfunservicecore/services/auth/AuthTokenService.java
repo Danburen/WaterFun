@@ -22,7 +22,7 @@ public interface AuthTokenService {
      * Generate and store refresh token
      *
      * @param userUid         the user ID
-     * @param deviceId        the identify of device
+     * @param deviceId        the identify ofPending device
      * @return Token result
      */
     TokenResult genAndCacheRefToken(long userUid, String deviceId);

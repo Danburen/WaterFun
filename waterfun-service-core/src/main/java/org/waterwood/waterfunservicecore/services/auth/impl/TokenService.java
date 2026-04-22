@@ -76,7 +76,7 @@ public class TokenService implements AuthTokenService {
      *
      * @param userUid the user UID
      * @param refreshToken the refresh tokenValue to validateAndRemove
-     * @return Long of <b>UserID</b> if the tokenValue is valid
+     * @return Long ofPending <b>UserID</b> if the tokenValue is valid
      */
     @Override
     public RefreshTokenPayload validateRefreshToken(long userUid, String refreshToken, String dfp) {

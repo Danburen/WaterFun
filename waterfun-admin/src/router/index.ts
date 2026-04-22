@@ -138,16 +138,82 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/System/GlobalViewMonitorView.vue')
             }
         ]
-    },{
-        path: '/post',
+    },
+    {
+        path: '/moderation',
         component: () => import('@/layouts/EmptyLayout.vue'),
-        meta: { locale: 'post.title' ,icon: 'el-Document' },
+        meta: { locale: 'moderation.title', icon: 'el-Check' },
         children: [
             {
-                path: 'list',
-                name: 'postList',
-                meta: { locale: 'post.list' },
-                component: () => import("@/views/Post/Post.vue")
+                path: 'workbench',
+                name: 'moderationWorkbench',
+                meta: { locale: 'moderation.workbench' },
+                component: () => import('@/views/Moderation/ContentModerationWorkbench.vue')
+            },
+            {
+                path: 'resources/:resourceId',
+                name: 'moderationResourceDetail',
+                component: () => import('@/views/Moderation/ModerationResourceDetail.vue'),
+                props: true,
+                meta: {
+                    locale: 'moderation.resourceDetail',
+                    isDetail: true,
+                }
+            }
+        ]
+    },
+    {
+        path: '/content',
+        component: () => import('@/layouts/EmptyLayout.vue'),
+        meta: { locale: 'content.title', icon: 'el-Document' },
+        children: [
+            {
+                path: 'post',
+                name: 'contentPostList',
+                meta: { locale: 'content.post.title' },
+                component: () => import('@/views/Content/PostList.vue')
+            },
+            {
+                path: 'post/:id',
+                name: 'contentPostDetail',
+                component: () => import('@/views/Content/PostDetail.vue'),
+                props: true,
+                meta: {
+                    locale: 'content.post.detail',
+                    isDetail: true,
+                }
+            },
+            {
+                path: 'tag',
+                name: 'contentTagList',
+                meta: { locale: 'content.tag.title' },
+                component: () => import('@/views/Content/TagList.vue')
+            },
+            {
+                path: 'tag/:id',
+                name: 'contentTagDetail',
+                component: () => import('@/views/Content/TagDetail.vue'),
+                props: true,
+                meta: {
+                    locale: 'content.tag.detail',
+                    isDetail: true,
+                }
+            },
+            {
+                path: 'category',
+                name: 'contentCategoryList',
+                meta: { locale: 'content.category.title' },
+                component: () => import('@/views/Content/CategoryList.vue')
+            },
+            {
+                path: 'category/:id',
+                name: 'contentCategoryDetail',
+                component: () => import('@/views/Content/CategoryDetail.vue'),
+                props: true,
+                meta: {
+                    locale: 'content.category.detail',
+                    isDetail: true,
+                }
             }
         ]
     }

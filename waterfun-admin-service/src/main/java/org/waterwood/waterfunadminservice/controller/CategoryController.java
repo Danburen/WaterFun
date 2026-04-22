@@ -6,11 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunadminservice.api.request.content.CreateCategoryRequest;
 import org.waterwood.waterfunadminservice.api.request.content.RemoveCategoriesRequest;
 import org.waterwood.waterfunadminservice.api.request.content.UpdateCategoryRequest;
 import org.waterwood.waterfunadminservice.api.response.content.CategoryResponse;
@@ -22,12 +22,18 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.Catego
 import java.time.Instant;
 import java.util.List;
 
-@Service
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/categorys")
+@RequestMapping("/api/admin/categories")
 public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
+
+    @PostMapping
+    public ApiResponse<Void> create(@RequestBody @Valid CreateCategoryRequest req) {
+        categoryService.create(req);
+        return ApiResponse.success();
+    }
 
     @GetMapping("/list")
     public ApiResponse<Page<CategoryResponse>> list(@RequestParam(required = false) String name,
@@ -65,7 +71,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Void> update(@PathVariable Integer id, @RequestBody UpdateCategoryRequest req) {
+    public ApiResponse<Void> update(@PathVariable Integer id, @RequestBody @Valid UpdateCategoryRequest req) {
         categoryService.update(id, req);
         return ApiResponse.success();
     }

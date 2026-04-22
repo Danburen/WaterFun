@@ -26,7 +26,7 @@ import java.util.*;
  * "user:[userUid]:device:[deviceId] -> jti" store the basic one-token-one-device relations
  * "user:[userUid]:devices -> set(deviceId)" store all the user's devices
  * "user:[userUid]:device:[deviceId]:last_active -> timestamp(string)" store single
- * - user's single device's last active time, used for clean up of zombie devices
+ * - user's single device's last active time, used for clean up ofPending zombie devices
  *
  */
 public class DeviceServiceImpl implements DeviceService {
