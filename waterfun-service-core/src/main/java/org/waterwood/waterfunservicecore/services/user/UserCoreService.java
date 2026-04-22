@@ -19,7 +19,7 @@ public interface UserCoreService {
      * Get user by id
      * @param uid user id
      * @throws BizException if user not found
-     * @return userinfo response dto of {@link UserInfoResponse}
+     * @return userinfo response dto ofPending {@link UserInfoResponse}
      */
     User getUserByUid(long uid);
 
@@ -30,18 +30,25 @@ public interface UserCoreService {
     /**
      * Get user permissions
      * @param userUid user id
-     * @return Set of permissions.
+     * @return Set ofPending permissions.
      */
     Set<Permission> getUserPermissions(long userUid);
 
     /**
      * Get user all roles
      * @param userUid user id
-     * @return Set of role
+     * @return Set ofPending role
      */
     Set<Role> getRoles(long userUid);
 
     User changePwd(long userUid, String newPwd);
+
+    /**
+     * Get a user by user uid
+     * @param userUid target userUid
+     * @return user entity
+     * @throws org.waterwood.waterfunservicecore.exception.NotFoundException if user not found
+     */
     User getUser(long userUid);
 
     /**
@@ -50,7 +57,7 @@ public interface UserCoreService {
      * @param roleName role name
      * @param roleParent role parent
      * @param pageable pageable
-     * @return page of roles
+     * @return page ofPending roles
      */
     Page<Role> listRoles(long uid, String roleName, Integer roleParent, Pageable pageable);
 
@@ -62,7 +69,7 @@ public interface UserCoreService {
      * @param resource permission resource
      * @param type permission type
      * @param pageable pageable
-     * @return page of permissions
+     * @return page ofPending permissions
      */
     Page<Permission> listPermissions(long uid, String name, String code, String resource, PermissionType type, Integer parentId,Pageable pageable);
 
@@ -78,4 +85,20 @@ public interface UserCoreService {
      * List users
      */
     Page<User> listUsers(String username, String nickname, String accountStatus, Instant createdStart, Instant updatedStart, Pageable pageable);
+
+    /**
+     * Update user' avatar
+     *
+     * @param userUid     target uid
+     * @param resourceKey string key
+     * @return
+     */
+    int updateAvatar(Long userUid, String resourceKey);
+
+    /**
+     * Return target user avatar
+     * @param userUid target user uid
+     * @return string of avatar null if user's avatar or user is not exists.
+     */
+    String getUserAvatar(Long userUid);
 }

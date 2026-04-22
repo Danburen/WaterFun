@@ -16,8 +16,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateCategoryRequest implements Serializable {
-    @NotNull
-    private Integer id;
     @Size(max = 50)
     private String name;
     @Size(max = 50)

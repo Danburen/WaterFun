@@ -6,9 +6,9 @@ import java.util.Set;
 
 public interface UserPermissionCoreService {
     /**
-     * Get the entity of userPermission by a user uid
+     * Get the entity ofPending userPermission by a user uid
      * @param uid target user uid
-     * @return set of userPermissions
+     * @return set ofPending userPermissions
      */
     Set<UserPermission> getUserPermission(long uid);
 }

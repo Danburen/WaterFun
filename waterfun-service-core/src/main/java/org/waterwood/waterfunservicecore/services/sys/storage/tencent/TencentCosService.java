@@ -24,6 +24,7 @@ import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.api.HttpMethod;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
+import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
 import org.waterwood.waterfunservicecore.services.sys.CloudKeyBuilder;
 import org.waterwood.waterfunservicecore.services.sys.storage.*;
 
@@ -78,7 +79,12 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public CloudResPresignedUrlResp getReadPublicUrlCached(String path, Serializable bizId, Duration dur, CloudResType resType) {
+    public CloudResPresignedUrlResp getReadUrlCached(CloudStorageRootKey root, String path, Serializable bizId, Duration dur, MediaResourceType resType) {
+       return getReadUrlCached(buildCosKey(root, path), bizId, dur, resType);
+    }
+
+    @Override
+    public CloudResPresignedUrlResp getReadUrlCached(String fullPath, Serializable bizId, Duration dur, MediaResourceType resType) {
         String cacheKey = getCachedRedisKey(
                 bizId,
                 resType,
@@ -91,7 +97,7 @@ public class TencentCosService implements CloudFileService {
             expiration = Date.from(Instant.now().plus(dur));
             url = cosClient.generatePresignedUrl(
                     bucketName,
-                    buildCosKey(CloudStorageRootKey.UPLOADS, path),
+                    fullPath,
                     expiration,
                     HttpMethodName.GET).toString();
             redisHelper.set(cacheKey, url, dur.minusSeconds(safetyMarge));
@@ -107,8 +113,13 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public CloudResPresignedUrlResp getReadPublicUrlCached(String path, Serializable bizId, CloudResType resType) {
-        return getReadPublicUrlCached(path, bizId, Duration.ofSeconds(defaultExpires), resType);
+    public CloudResPresignedUrlResp getReadUrlCached(CloudStorageRootKey root, String path, Serializable bizId, MediaResourceType resType) {
+        return getReadUrlCached(root, path, bizId, Duration.ofSeconds(defaultExpires), resType);
+    }
+
+    @Override
+    public CloudResPresignedUrlResp getReadUrlCached(String fullPath, Serializable bizId, MediaResourceType resType) {
+        return getReadUrlCached(fullPath, bizId, Duration.ofSeconds(defaultExpires), resType);
     }
 
     @Override
@@ -127,7 +138,7 @@ public class TencentCosService implements CloudFileService {
                     Duration.ofSeconds(uploadTokenExpires)
             );
             return new PresignedResp(
-                    keyPath,
+                    path,
                     url.toString(),
                     HttpMethod.PUT,
                     uuidKey
@@ -139,9 +150,7 @@ public class TencentCosService implements CloudFileService {
 
     @Override
     public void removeFile(String key) {
-        if(StringUtil.isNotBlank(key)){
-            cosClient.deleteObject(bucketName, PathUtil.buildPath(bizPrefix, key));
-        }
+        cosClient.deleteObject(bucketName, key);
     }
 
     @Override
@@ -150,12 +159,12 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public List<CloudResPresignedUrlResp> batchGetReadPublicUrlCached(List<String> paths, List<String> bizIds, Duration dur, CloudResType cloudResType) {
+    public List<CloudResPresignedUrlResp> batchGetReadPublicUrlCached(List<String> paths, List<String> bizIds, Duration dur, MediaResourceType cloudResType) {
         List<String> keys = IntStream.range(0, paths.size())
                 .mapToObj(i -> RedisKeyBuilder.buildKey(
                         CloudKeyBuilder.fs(),
                         CloudResOperationType.READ.getKey(),
-                        cloudResType.getLocalCase(),
+                        cloudResType.toLowerCase(),
                         bizIds.get(i)))
                 .toList();
         List<String> cached = redisHelper.mget(keys);
@@ -179,17 +188,17 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public String getCachedRedisKey(Serializable bizId, CloudResType resType, CloudResOperationType operationType) {
+    public String getCachedRedisKey(Serializable bizId, MediaResourceType resType, CloudResOperationType operationType) {
         return RedisKeyBuilder.buildKey(
                 CloudKeyBuilder.fs(),
                 operationType.getKey(),
-                resType.getLocalCase(),
+                resType.toLowerCase(),
                 bizId.toString()
         );
     }
 
     @Override
-    public List<CloudResPresignedUrlResp> batchGetReadPublicUrlCached(List<String> paths, List<String> bizIds, CloudResType cloudResType) {
+    public List<CloudResPresignedUrlResp> batchGetReadPublicUrlCached(List<String> paths, List<String> bizIds, MediaResourceType cloudResType) {
         return batchGetReadPublicUrlCached(paths, bizIds, Duration.ofSeconds(defaultExpires), cloudResType);
     }
 
@@ -199,17 +208,28 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public SimpleCloudObject detectAndAssertCloudFile(String fullKeyPath, CloudFileType cloudFileType) {
-        String suffix = PathUtil.getSuffix(fullKeyPath);
+    public SimpleCloudObject detectAndAssertCloudFile(CloudStorageRootKey root, String KeyPath, CloudFileType cloudFileType) {
+        String suffix = PathUtil.getSuffix(KeyPath);
+        String fullPath = buildCosKey(root, KeyPath);
         if(!cloudFileType.matchSuffix(suffix)){
             throw new BizException(BaseResponseCode.FILE_TYPE_NOT_ALLOW, suffix, cloudFileType.getAllowFileExtensions());
         }
-        SimpleCloudObject object = cloudFileTypeDetector.detectByMagicNumber(fullKeyPath);
-        ContentType contentType = ContentType.getByMimeType(object.getType());
+        SimpleCloudObject object = new SimpleCloudObject();
+        object.setKey(KeyPath);
+        object.setFileMeta(cloudFileTypeDetector.detectByMagicNumber(fullPath));
+        ContentType contentType = ContentType.getByMimeType(object.getFileMeta().getMimeType());
 //        log.info(contentType.getMimeType());
         if(! cloudFileType.matchContentType(contentType.getMimeType())){
             throw new BizException(BaseResponseCode.FILE_TYPE_NOT_ALLOW, contentType.getMimeType(), cloudFileType.name());
         }
         return object;
+    }
+
+    @Override
+    public void copyFileAndRemoveOld(CloudStorageRootKey originalRoot, String originPath, CloudStorageRootKey targetRoot, String targetPath) {
+        String originFullPath = buildCosKey(originalRoot, originPath);
+        String targetFullPath = buildCosKey(targetRoot, targetPath);
+        cosClient.copyObject(bucketName, originFullPath, bucketName, targetFullPath);
+        removeFile(originFullPath);
     }
 }

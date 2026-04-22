@@ -15,6 +15,7 @@ import org.waterwood.waterfunservicecore.entity.RolePermission;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
 import org.waterwood.waterfunservicecore.entity.user.UserRole;
+import org.waterwood.waterfunservicecore.exception.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RolePermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
@@ -107,7 +108,7 @@ public class UserCoreServiceImpl implements UserCoreService {
     @Override
     public User getUser(long userUid){
         return userRepository.findUserByUid(userUid)
-                .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException("User UID: " + userUid));
     }
 
     @Override
@@ -142,6 +143,16 @@ public class UserCoreServiceImpl implements UserCoreService {
     public Page<User> listUsers(String username, String nickname, String accountStatus, Instant createdStart, Instant createdEnd, Pageable pageable) {
         Specification<User> spec = UserSpec.of(username, nickname, accountStatus, createdStart, createdEnd);
         return userRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public int updateAvatar(Long userUid, String avatar) {
+        return userRepository.updateAvatar(userUid, avatar);
+    }
+
+    @Override
+    public String getUserAvatar(Long userUid) {
+        return userRepository.getUserAvatarByUid(userUid);
     }
 
     private List<Permission> getRolePermissions(int roleId){

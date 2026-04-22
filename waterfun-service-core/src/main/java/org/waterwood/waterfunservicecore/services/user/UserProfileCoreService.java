@@ -21,7 +21,7 @@ public interface UserProfileCoreService {
     /**
      * Get the target User Profile
      *
-     * @param userUid the id of the target User
+     * @param userUid the id ofPending the target User
      * @return the entity
      */
     UserProfile getUserProfile(Long userUid);

@@ -18,9 +18,17 @@ import java.io.Serializable;
 public class CreateCategoryRequest implements Serializable {
     @Size(max = 50)
     @NotBlank
-    String name;
-    String description;
-    Long parentId;
-    Integer sortOrder;
-    Boolean isActive;
+    private String name;
+
+    @Size(max = 50)
+    private String slug;
+
+    @Size(max = 500)
+    private String description;
+
+    private Integer parentId;
+
+    private Integer sortOrder;
+
+    private Boolean isActive;
 }

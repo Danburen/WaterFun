@@ -7,7 +7,9 @@ import org.waterwood.waterfunadminservice.api.response.content.TagResponse;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.mapstruct.*;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface TagMapper {
     Tag toEntity(TagResponse tagResponse);
 

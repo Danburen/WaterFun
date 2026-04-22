@@ -58,8 +58,8 @@ const gotoPermissionDetail = (id: number) => {
   router.push({ name: "permissionDetail", params: { id } });
 };
 
-const gotoUserDetail = (uid: number) => {
-  router.push({ name: "userDetail", params: { uid } });
+const gotoUserDetail = (uid: string) => {
+  router.push({ name: "userDetail", params: { uid: String(uid) } });
 };
 
 const fetchPermUsersPreview = async () => {
@@ -96,18 +96,18 @@ onMounted(async () => {
   <div class="perm-detail" v-loading="loading">
     <CardContainer title="permission.detail">
       <template #header-right>
-        <el-button text @click="router.back()">{{ t("back.title") }}</el-button>
-        <el-button type="primary" plain @click="openEditDialog">{{ t("operation.edit") }}</el-button>
+        <el-button text @click="router.back()">{{ t("common.action.back") }}</el-button>
+        <el-button type="primary" plain @click="openEditDialog">{{ t("common.action.edit") }}</el-button>
       </template>
 
       <el-descriptions v-if="permissionDetail" :column="2" border>
         <el-descriptions-item label="ID">{{ permissionDetail.id }}</el-descriptions-item>
         <el-descriptions-item :label="t('permission.name')">{{ permissionDetail.name }}</el-descriptions-item>
-        <el-descriptions-item :label="t('permission.code')">{{ permissionDetail.code || t('none.title') }}</el-descriptions-item>
+        <el-descriptions-item :label="t('permission.code')">{{ permissionDetail.code || t('common.none.title') }}</el-descriptions-item>
         <el-descriptions-item :label="t('permission.type.title')">
           {{ t(`permission.type.${permissionDetail.type.toLowerCase()}`) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.resource')">{{ permissionDetail.resource || t('none.title') }}</el-descriptions-item>
+        <el-descriptions-item :label="t('permission.resource')">{{ permissionDetail.resource || t('common.none.title') }}</el-descriptions-item>
         <el-descriptions-item :label="t('permission.parentId')">
           <el-link
             v-if="permissionDetail.parentId != null"
@@ -117,21 +117,21 @@ onMounted(async () => {
           >
             {{ permissionDetail.parentId }}
           </el-link>
-          <span v-else>{{ t('none.title') }}</span>
+          <span v-else>{{ t('common.none.title') }}</span>
         </el-descriptions-item>
         <el-descriptions-item :label="t('permission.weight')">
-          {{ permissionDetail.orderWeight ?? t('none.title') }}
+          {{ permissionDetail.orderWeight ?? t('common.none.title') }}
         </el-descriptions-item>
         <el-descriptions-item :label="t('permission.isSystem')">
           <el-tag size="small" :type="permissionDetail.isSystem ? 'warning' : 'info'">
-            {{ permissionDetail.isSystem ? t('yes.title') : t('no.title') }}
+            {{ permissionDetail.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="t('permission.description')">
-          {{ permissionDetail.description || t('none.title') }}
+          {{ permissionDetail.description || t('common.none.title') }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('create.time')">{{ formatISOData(permissionDetail.createdAt) }}</el-descriptions-item>
-        <el-descriptions-item :label="t('update.time')">{{ formatISOData(permissionDetail.updatedAt) }}</el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.create')">{{ formatISOData(permissionDetail.createdAt) }}</el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.update')">{{ formatISOData(permissionDetail.updatedAt) }}</el-descriptions-item>
       </el-descriptions>
     </CardContainer>
 
@@ -142,7 +142,7 @@ onMounted(async () => {
             <el-col v-for="item in assignedUserOptions" :key="`user-${item.id}`" :xs="24" :sm="12" :md="8" :lg="6" class="option-col">
               <el-link type="primary" :underline="false" @click="gotoUserDetail(item.id)">{{ item.name }}</el-link>
             </el-col>
-            <el-col v-if="assignedUserOptions.length === 0" :span="24">{{ t('none.description') }}</el-col>
+            <el-col v-if="assignedUserOptions.length === 0" :span="24">{{ t('common.none.description') }}</el-col>
           </el-row>
         </el-collapse-item>
       </el-collapse>
@@ -164,4 +164,5 @@ onMounted(async () => {
   margin-bottom: 8px;
 }
 </style>
+
 

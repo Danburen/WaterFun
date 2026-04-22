@@ -27,11 +27,10 @@ public class PostTag {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

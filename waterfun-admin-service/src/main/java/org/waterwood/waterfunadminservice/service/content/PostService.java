@@ -12,10 +12,10 @@ import org.waterwood.waterfunservicecore.entity.post.Post;
 
 public interface PostService {
     /**
-     * List posts of target author for user.
-     * @param spec specification of post
+     * List posts ofPending target author for user.
+     * @param spec specification ofPending post
      * @param pageable pageable
-     * @return Page of Posts
+     * @return Page ofPending Posts
      */
     Page<Post> listPosts(Specification<Post> spec, Pageable pageable);
 
@@ -51,7 +51,7 @@ public interface PostService {
      *
      * @param id  target post id
      * @param req request body
-     * @return batch result of the operation
+     * @return batch result ofPending the operation
      */
     BatchResult assignTags(Long id, AssignTagsRequest req);
 
@@ -60,14 +60,14 @@ public interface PostService {
      *
      * @param id  target post id
      * @param req requset body
-     * @return batch result of the operation
+     * @return batch result ofPending the operation
      */
     BatchResult replaceTags(Long id, AssignTagsRequest req);
 
     /**
      * Batch delete posts
      * @param req request body
-     * @return batch result of the operation
+     * @return batch result ofPending the operation
      */
     BatchResult deletePosts(DeletePostRequest req);
 
@@ -75,7 +75,7 @@ public interface PostService {
      * Batch delete post tags
      * @param id target post id
      * @param req tagIds to be removed
-     * @return batch result of the operation
+     * @return batch result ofPending the operation
      */
     BatchResult deletePostTags(Long id, AssignTagsRequest req);
 }

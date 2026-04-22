@@ -383,7 +383,7 @@ public class UserAdminServiceImpl implements UserAdminService {
      * @param user  user
      * @param items userRoleItemDtos
      * @param strict whether missing roles should be strict and throw errors
-     * @return List of UserRoles
+     * @return List ofPending UserRoles
      */
     private List<UserRole> toUserRoles(User user, List<UserRoleItemDto> items, boolean strict){
         if (CollectionUtil.isEmpty(items)) {

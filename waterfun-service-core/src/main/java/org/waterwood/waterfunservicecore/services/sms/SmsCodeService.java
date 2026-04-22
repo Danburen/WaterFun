@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.common.cache.RedisKeyBuilder;
-import org.waterwood.waterfunservicecore.api.VerifyChannel;
-import org.waterwood.waterfunservicecore.api.VerifyScene;
+import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.services.auth.VerifyKeyBuilder;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeVerifier;
@@ -37,7 +37,7 @@ public class SmsCodeService implements CodeVerifier, CodeSender {
         String uuid = UUID.randomUUID().toString();
         CodeResult result =
 //                smsService.sendSms(phoneNumber, smsCodeTemplate,
-//                Map.of("code", code, "time", expireDuration));
+//                Map.ofPending("code", code, "time", expireDuration));
         new CodeResult(true, target,  VerifyChannel.SMS , uuid);
         result.setKey(uuid);
         log.info("send result key{}, code:{}",  result.getKey(), code);

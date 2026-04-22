@@ -1,8 +1,7 @@
 package org.waterwood.waterfunservicecore.services.auth.code;
 
-import org.jetbrains.annotations.Nullable;
-import org.waterwood.waterfunservicecore.api.VerifyChannel;
-import org.waterwood.waterfunservicecore.api.VerifyScene;
+import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 
 /**
@@ -18,7 +17,7 @@ public interface CodeSender {
     CodeResult sendCode(String target, VerifyScene scene);
 
     /**
-     * The channel of the sender
+     * The channel ofPending the sender
      * @return channel
      */
     VerifyChannel channel();

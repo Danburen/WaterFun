@@ -22,12 +22,12 @@ const roleName = ref("");
 
 const loading = ref(false);
 const tableData = ref<AssignedUserRes[]>([]);
-const selectedIds = ref<number[]>([]);
+const selectedIds = ref<string[]>([]);
 const pickerDialogVisible = ref(false);
 const assignExpiresAt = ref<Date | null>(null);
 
 const searchForm = ref({
-  userUid: undefined as number | undefined,
+  userUid: undefined as string | undefined,
   username: "",
   nickname: "",
 });
@@ -87,7 +87,7 @@ const handleAdd = () => {
   pickerDialogVisible.value = true;
 };
 
-const handleConfirmAddUsers = async (ids: number[]) => {
+const handleConfirmAddUsers = async (ids: string[]) => {
   if (ids.length === 0 || Number.isNaN(roleId.value)) return;
   const expiresAt = assignExpiresAt.value ? assignExpiresAt.value.toISOString() : undefined;
   try {
@@ -148,8 +148,8 @@ onMounted(async () => {
           <el-input v-model="searchForm.nickname" :placeholder="t('user.input.nickname')" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
+          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
+          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
@@ -213,3 +213,4 @@ onMounted(async () => {
   width: 100%;
 }
 </style>
+

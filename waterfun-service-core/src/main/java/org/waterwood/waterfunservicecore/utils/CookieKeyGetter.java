@@ -1,7 +1,7 @@
 package org.waterwood.waterfunservicecore.utils;
 
 import jakarta.servlet.http.Cookie;
-import org.waterwood.waterfunservicecore.api.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 
 public class CookieKeyGetter {

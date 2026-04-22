@@ -59,7 +59,7 @@ export interface UpdatePermRequest {
 export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED" | "DELETED";
 
 export interface UserInfoARes {
-  uid: number;
+  uid: string;
   username: string;
   accountStatus: AccountStatus;
   statusChangedAt: ISOString;
@@ -85,7 +85,7 @@ export interface ExpirableOption<TId extends number | string = number> extends O
 }
 
 export interface AssignedUserRes {
-  userUid: number;
+  userUid: string;
   username: string;
   nickname: string;
   assignedAt: ISOString;
@@ -93,12 +93,12 @@ export interface AssignedUserRes {
 }
 
 export interface AssignPermToUsersReq {
-  ids?: number[];
+  ids?: string[];
   expiresAt?: ISOString;
 }
 
 export interface RemovePermUsersReq {
-  userUids?: number[];
+  userUids?: string[];
 }
 
 export interface DeletePermsRequest {
@@ -136,7 +136,7 @@ export const getPermUsers = (
   id: number,
   page: number = 0,
   size: number = 10,
-  userUid?: number,
+  userUid?: string,
   username?: string,
   nickname?: string
 ): PromiseResBody<Page<AssignedUserRes>> => {

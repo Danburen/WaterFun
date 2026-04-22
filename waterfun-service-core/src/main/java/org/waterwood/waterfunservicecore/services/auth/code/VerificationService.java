@@ -1,7 +1,7 @@
 package org.waterwood.waterfunservicecore.services.auth.code;
 
-import org.waterwood.waterfunservicecore.api.VerifyChannel;
-import org.waterwood.waterfunservicecore.api.VerifyScene;
+import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.req.auth.SecurityVerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
@@ -41,7 +41,7 @@ public interface VerificationService {
      * @param target target
      * @param scene  scene
      * @param channel channel
-     * @param key key of the code
+     * @param key key ofPending the code
      * @param code  code
      * @throws BizException if code is invalid
      */
@@ -52,7 +52,7 @@ public interface VerificationService {
     /**
      * Verify code segment point target, will check the scene whether is the same as the scene
      * <b>Usually used for checking the user whether is the account owner</b> segment <b>whatever</b> channel.
-     * @param verifyCodeKey key of the code
+     * @param verifyCodeKey key ofPending the code
      * @param verifyBody verify body
      * @param scene target scene
      */
@@ -61,7 +61,7 @@ public interface VerificationService {
     /**
      * Verify code segment point target, will check the scene whether is the same as the scene
      * <b>Usually used for verify the new binding target</b> segment <b>target</b>channel.
-     * @param verifyCodeKey key of the code
+     * @param verifyCodeKey key ofPending the code
      * @param verifyBody verify body
      * @param scene target scene
      * @param allowChannels target channel

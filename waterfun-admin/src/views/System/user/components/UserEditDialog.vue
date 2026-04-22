@@ -14,7 +14,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: boolean;
     mode?: "create" | "edit";
-    uid?: number | null;
+    uid?: string | null;
   }>(),
   {
     mode: "edit",
@@ -121,6 +121,7 @@ const datumInitial = reactive({
 
 const statusLabel = (status: AccountStatus) => t(`user.statusMap.${status.toLowerCase()}`);
 const genderLabel = (gender: Gender) => t(`user.genderMap.${gender.toLowerCase()}`);
+const isValidUid = computed(() => props.uid != null && /^\d+$/.test(props.uid));
 
 const resetForms = () => {
   Object.assign(createForm, {
@@ -154,10 +155,10 @@ const resetForms = () => {
 };
 
 const loadUserData = async () => {
-  if (props.uid == null || Number.isNaN(props.uid)) return;
+  if (!isValidUid.value) return;
   loading.value = true;
   try {
-    const response = await getUserDetail(props.uid);
+    const response = await getUserDetail(props.uid as string);
     Object.assign(userInfoForm, {
       username: response.data.info.username || "",
       nickname: response.data.info.nickname || "",
@@ -194,7 +195,7 @@ watch(
       resetForms();
       return;
     }
-    if (props.uid == null || Number.isNaN(props.uid)) {
+    if (!isValidUid.value) {
       ElMessage.error(t("user.error.invalidId"));
       visible.value = false;
       return;
@@ -233,23 +234,24 @@ const handleSave = async () => {
     return;
   }
 
-  if (props.uid == null || Number.isNaN(props.uid)) return;
+  if (!isValidUid.value) return;
   submitting.value = true;
   try {
+    const uid = props.uid as string;
     await Promise.all([
-      updateUserInfo(props.uid, {
+      updateUserInfo(uid, {
         username: userInfoForm.username,
         nickname: userInfoForm.nickname || undefined,
         avatarUrl: userInfoForm.avatarUrl || undefined,
         accountStatus: userInfoForm.accountStatus,
       }),
-      updateUserProfile(props.uid, {
+      updateUserProfile(uid, {
         bio: userProfileForm.bio || undefined,
         gender: userProfileForm.gender,
         birthDate: userProfileForm.birthDate || undefined,
         residence: userProfileForm.residence || undefined,
       }),
-      updateUserDatum(props.uid, {
+      updateUserDatum(uid, {
         email:
           userDatumForm.email && userDatumForm.email !== datumInitial.email
             ? userDatumForm.email
@@ -383,8 +385,8 @@ const handleClosed = () => {
     </div>
 
     <template #footer>
-      <el-button @click="visible = false">{{ t('cancel.title') }}</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('save.title') }}</el-button>
+      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
+      <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('common.action.save') }}</el-button>
     </template>
   </el-dialog>
 </template>
@@ -394,4 +396,5 @@ const handleClosed = () => {
   padding-right: 12px;
 }
 </style>
+
 

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FileMeta {
-    private String originalName;
+    private String etag;
     private long size;
     private String mimeType;
 }

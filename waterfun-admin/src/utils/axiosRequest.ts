@@ -1,4 +1,5 @@
 import axios from 'axios'
+import JSONBig from 'json-bigint';
 import { translate } from "@/utils/translator";
 import { getErrorMessage } from "~/utils/errorMessage";
 import { useAuthStore } from "~/stores/authStore";
@@ -15,10 +16,23 @@ declare module 'axios' {
 }
 const CSRF_SKIP_LIST: string[] = import.meta.env.VITE_CSRF_SKIP_LIST?.split(',') || [];
 const AUTH_SKIP_LIST: string[] = import.meta.env.VITE_AUTH_SKIP_LIST?.split(',') || [];
+const jsonBig = JSONBig({ storeAsString: true });
+
+const parseResponseWithBigInt = (data: unknown) => {
+    if (typeof data !== 'string' || data.length === 0) return data;
+    try {
+        return jsonBig.parse(data);
+    } catch {
+        // Fallback for non-JSON payloads (e.g. HTML/text)
+        return data;
+    }
+};
+
 const service = axios.create({
     baseURL: import.meta.env.VITE_API_BASE,
     timeout: 5000,
-    withCredentials: true //allow credentials and cookies
+    withCredentials: true, //allow credentials and cookies
+    transformResponse: [parseResponseWithBigInt]
 }) as ApiRes
 
 // request interceptors

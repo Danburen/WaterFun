@@ -6,11 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunadminservice.api.request.content.CreateTagRequest;
 import org.waterwood.waterfunadminservice.api.request.content.DeleteTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.UpdateTagReq;
 import org.waterwood.waterfunadminservice.api.response.content.TagResponse;
@@ -22,12 +22,18 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.TagSpe
 import java.time.Instant;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/tags")
 public class TagController {
     private final TagService tagService;
     private final TagMapper tagMapper;
+
+    @PostMapping
+    public ApiResponse<Void> createTag(@RequestBody @Valid CreateTagRequest req) {
+        tagService.createTag(req);
+        return ApiResponse.success();
+    }
 
     @GetMapping("/list")
     public ApiResponse<Page<TagResponse>> listTags(@RequestParam(required = false) String name,

@@ -1,0 +1,879 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Admin",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/api/admin/posts/list": {
+      "get": {
+        "summary": "listPosts",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": " DRAFT :DRAFT\nPENDING :PENDING\nPUBLISHED :PUBLISHED\nREJECTED :REJECTED\nARCHIVED :ARCHIVED",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "authorId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tagIds",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "slug",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePostResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/posts/id": {
+      "get": {
+        "summary": "getPostById",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/posts/{id}": {
+      "delete": {
+        "summary": "deletePostById",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "put": {
+        "summary": "putPost",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutPostReq",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/posts": {
+      "delete": {
+        "summary": "deletePosts",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletePostRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "summary": "createPost",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/posts/{id}/tags": {
+      "post": {
+        "summary": "assignTags",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTagsRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "put": {
+        "summary": "replacePostTags",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTagsRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "delete": {
+        "summary": "deleteTags",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTagsRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Instant": {
+        "type": "object",
+        "properties": {
+          "seconds": {
+            "type": "integer",
+            "description": "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+            "format": "int64"
+          },
+          "nanos": {
+            "type": "integer",
+            "description": "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+          }
+        }
+      },
+      "Sort": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "ASC",
+              "DESC"
+            ]
+          },
+          "property": {
+            "type": "string",
+            "description": ""
+          },
+          "ignoreCase": {
+            "type": "boolean",
+            "description": ""
+          },
+          "nullHandling": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "NATIVE",
+              "NULLS_FIRST",
+              "NULLS_LAST"
+            ]
+          },
+          "ascending": {
+            "type": "boolean",
+            "description": "Returns whether sorting for this property shall be ascending."
+          },
+          "descending": {
+            "type": "boolean",
+            "description": "Returns whether sorting for this property shall be descending."
+          }
+        }
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "paged": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Pageable} contains pagination information."
+          },
+          "unpaged": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Pageable} does not contain pagination information."
+          },
+          "pageNumber": {
+            "type": "integer",
+            "description": "Returns the page to be returned."
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "Returns the number of items to be returned."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Returns the offset to be taken according to the underlying page and page size.",
+            "format": "int64"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sort",
+              "description": "org.springframework.data.domain.Sort"
+            },
+            "description": "Returns the sorting parameters."
+          }
+        }
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "description": "",
+            "type": "null"
+          }
+        }
+      },
+      "BatchResult": {
+        "type": "object",
+        "properties": {
+          "requested": {
+            "type": "integer",
+            "description": ""
+          },
+          "success": {
+            "type": "integer",
+            "description": ""
+          },
+          "ignored": {
+            "type": "integer",
+            "description": ""
+          },
+          "failed": {
+            "type": "integer",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponseBatchResult": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/BatchResult",
+            "description": ""
+          }
+        }
+      },
+      "PostResponse": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "description": ""
+          },
+          "content": {
+            "type": "string",
+            "description": ""
+          },
+          "summary": {
+            "type": "string",
+            "description": ""
+          },
+          "coverImg": {
+            "type": "string",
+            "description": ""
+          },
+          "status": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "DRAFT",
+              "PENDING",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "FANS_ONLY"
+            ]
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": ""
+          },
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          },
+          "viewCount": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "collectCount": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "slug": {
+            "type": "string",
+            "description": ""
+          },
+          "publishedAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Instant",
+            "description": ""
+          }
+        }
+      },
+      "PagePostResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostResponse",
+              "description": "DTO for{@link Post}"
+            },
+            "description": ""
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/Pageable",
+            "description": ""
+          },
+          "total": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "empty": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Streamable} is empty."
+          },
+          "number": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "numberOfElements": {
+            "type": "integer"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sort",
+              "description": "org.springframework.data.domain.Sort"
+            }
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponsePagePostResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/PagePostResponse",
+            "description": ""
+          }
+        }
+      },
+      "ApiResponsePostResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/PostResponse",
+            "description": ""
+          }
+        }
+      },
+      "DeletePostRequest": {
+        "type": "object",
+        "properties": {
+          "postIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          }
+        }
+      },
+      "PutPostReq": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "",
+            "maxLength": 32
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "",
+            "maxLength": 64
+          },
+          "content": {
+            "type": "string",
+            "description": ""
+          },
+          "summary": {
+            "type": "string",
+            "description": "",
+            "maxLength": 500
+          },
+          "coverImg": {
+            "type": "string",
+            "description": "",
+            "maxLength": 255
+          },
+          "status": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "DRAFT",
+              "PENDING",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ],
+            "default": "PostStatus.DRAFT"
+          },
+          "visibility": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "FANS_ONLY"
+            ],
+            "default": "PostVisibility.PUBLIC"
+          },
+          "authorId": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "slug": {
+            "type": "string",
+            "description": "",
+            "maxLength": 200
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": ""
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ]
+      },
+      "CreatePostRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "",
+            "maxLength": 32
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "",
+            "maxLength": 64
+          },
+          "content": {
+            "type": "string",
+            "description": ""
+          },
+          "summary": {
+            "type": "string",
+            "description": "",
+            "maxLength": 500
+          },
+          "coverImg": {
+            "type": "string",
+            "description": "",
+            "maxLength": 255
+          },
+          "status": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "DRAFT",
+              "PENDING",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "FANS_ONLY"
+            ]
+          },
+          "authorId": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": ""
+          },
+          "slug": {
+            "type": "string",
+            "description": ""
+          },
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          }
+        },
+        "required": [
+          "title",
+          "content",
+          "status",
+          "visibility",
+          "authorId",
+          "categoryId"
+        ]
+      },
+      "AssignTagsRequest": {
+        "type": "object",
+        "properties": {
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "responses": {},
+    "securitySchemes": {}
+  },
+  "servers": [],
+  "security": []
+}

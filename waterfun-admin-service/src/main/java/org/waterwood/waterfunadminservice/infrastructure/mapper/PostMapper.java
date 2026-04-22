@@ -27,6 +27,7 @@ public interface PostMapper {
     Post toEntity(PostResponse postResponse);
 
     @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "authorId", source = "author.uid")
     @Mapping(target = "tagIds",
             expression = "java(tagsToTagIds(post.getTags()))")
     PostResponse toPostResponseDto(Post post);

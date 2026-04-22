@@ -10,7 +10,7 @@ public interface SmsService {
      * @param phoneNumber target
      * @param templateCode template code
      * @param params params place to template
-     * @return Optional String of the response
+     * @return Optional String ofPending the response
      */
     CodeResult sendSms(String phoneNumber, String templateCode, Map<String, Object> params);
 }

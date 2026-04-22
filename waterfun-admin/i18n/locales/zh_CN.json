@@ -2,30 +2,51 @@
   "error": {
     "fetch": "获取数据失败"
   },
-  "none": {
-    "title": "无",
-    "description": "暂无数据"
-  },
-  "yes": {
-    "title": "是"
-  },
-  "no": {
-    "title": "否"
-  },
-  "query": {
-    "placeholder": "请输入搜索内容",
-    "search": "搜索",
-    "title": "查询"
-  },
-  "reset": {
-    "title": "重置",
-    "confirm": "确定要重置吗？",
-    "message": "重置后将清空所有输入内容"
-  },
-  "order": {
-    "title": "排序",
-    "asc": "升序",
-    "desc": "降序"
+  "common": {
+    "none": {
+      "title": "无",
+      "description": "暂无数据"
+    },
+    "boolean": {
+      "yes": "是",
+      "no": "否"
+    },
+    "query": {
+      "placeholder": "请输入搜索内容",
+      "search": "搜索",
+      "title": "查询"
+    },
+    "reset": {
+      "title": "重置",
+      "confirm": "确定要重置吗？",
+      "message": "重置后将清空所有输入内容"
+    },
+    "order": {
+      "title": "排序",
+      "asc": "升序",
+      "desc": "降序"
+    },
+    "action": {
+      "create": "新增",
+      "delete": "删除",
+      "edit": "编辑",
+      "update": "修改",
+      "export": "导出",
+      "more": "更多",
+      "save": "保存",
+      "cancel": "取消",
+      "back": "返回",
+      "changePassword": "修改密码"
+    },
+    "operation": {
+      "title": "操作"
+    },
+    "time": {
+      "create": "创建时间",
+      "update": "更新时间",
+      "createBy": "创建人",
+      "updateBy": "更新人"
+    }
   },
   "nav": {
     "dashboard": "仪表盘",
@@ -48,18 +69,28 @@
       "online": "在线用户",
       "status": "系统监控"
     },
-    "post": {
-      "title": "文章管理",
-      "list": "文章列表"
+    "content": {
+      "title": "内容管理",
+      "post": {
+        "title": "文章管理",
+        "detail": "文章详情"
+      },
+      "tag": {
+        "title": "标签管理",
+        "detail": "标签详情"
+      },
+      "category": {
+        "title": "分类管理",
+        "detail": "分类详情"
+      }
+    },
+    "moderation": {
+      "title": "审核管理",
+      "workbench": "内容审核工作台",
+      "resourceDetail": "审核资源详情"
     }
   },
   "detail": "详情",
-  "btn": {
-    "create": "新增",
-    "delete": "删除",
-    "update": "修改",
-    "export": "导出"
-  },
   "assignment": "指派管理",
   "assign": {
     "forTarget": "为{target}({name})指派{item}"
@@ -173,14 +204,6 @@
       "fetchUsers": "获取权限用户失败"
     }
   },
-  "create": {
-    "time": "创建时间",
-    "by": "创建人"
-  },
-  "update": {
-    "time": "更新时间",
-    "by": "更新人"
-  },
   "user": {
     "entity": "用户",
     "profile": "个人中心",
@@ -272,22 +295,207 @@
       "detail": "用户详情页暂未实现"
     }
   },
-  "operation": {
-    "changePassword": "修改密码",
-    "edit": "编辑",
-    "delete": "删除",
-    "export": "导出",
-    "more": "更多",
-    "title": "操作"
+  "content": {
+    "post": {
+      "create": "新增文章",
+      "edit": "编辑文章",
+      "detail": "文章详情",
+      "title": "文章列表",
+      "field": {
+        "title": "标题",
+        "subtitle": "副标题",
+        "content": "内容",
+        "summary": "摘要",
+        "coverImg": "封面图",
+        "status": "状态",
+        "visibility": "可见性",
+        "categoryId": "分类ID",
+        "authorId": "作者ID",
+        "tagIds": "标签",
+        "slug": "唯一标识符"
+      },
+      "input": {
+        "title": "请输入标题",
+        "subtitle": "请输入副标题",
+        "content": "请输入内容",
+        "summary": "请输入摘要",
+        "coverImg": "请输入封面图URL",
+        "authorId": "请选择作者",
+        "categoryId": "请选择分类",
+        "tagIds": "请选择标签",
+        "slug": "请输入唯一标识符"
+      },
+      "status": {
+        "draft": "草稿",
+        "pending": "待审核",
+        "published": "已发布",
+        "rejected": "已驳回",
+        "archived": "已归档"
+      },
+      "visibility": {
+        "public": "公开",
+        "private": "私密",
+        "fansOnly": "仅粉丝可见"
+      },
+      "confirm": {
+        "delete": "确定删除该文章吗？",
+        "batchDelete": "确定删除选中的 {count} 篇文章吗？"
+      },
+      "success": {
+        "create": "文章创建成功",
+        "update": "文章更新成功",
+        "delete": "文章删除成功"
+      },
+      "error": {
+        "create": "文章创建失败",
+        "save": "文章保存失败",
+        "delete": "文章删除失败",
+        "fetchDetail": "获取文章详情失败",
+        "invalidId": "无效的文章ID"
+      }
+    },
+    "tag": {
+      "create": "新增标签",
+      "edit": "编辑标签",
+      "detail": "标签详情",
+      "title": "标签列表",
+      "field": {
+        "name": "标签名",
+        "slug": "唯一标识符",
+        "usageCount": "使用次数",
+        "creatorId": "创建人ID",
+        "description": "描述"
+      },
+      "input": {
+        "name": "请输入标签名",
+        "slug": "请输入唯一标识符",
+        "description": "请输入描述"
+      },
+      "confirm": {
+        "delete": "确定删除该标签吗？",
+        "batchDelete": "确定删除选中的 {count} 个标签吗？"
+      },
+      "success": {
+        "create": "标签创建成功",
+        "update": "标签更新成功",
+        "delete": "标签删除成功"
+      },
+      "error": {
+        "create": "标签创建失败",
+        "save": "标签保存失败",
+        "delete": "标签删除失败",
+        "fetchDetail": "获取标签详情失败",
+        "invalidId": "无效的标签ID"
+      }
+    },
+    "category": {
+      "create": "新增分类",
+      "edit": "编辑分类",
+      "detail": "分类详情",
+      "title": "分类列表",
+      "field": {
+        "name": "分类名",
+        "slug": "唯一标识符",
+        "parentId": "父级ID",
+        "sortOrder": "排序",
+        "creatorId": "创建人ID",
+        "isActive": "是否启用",
+        "description": "描述"
+      },
+      "input": {
+        "name": "请输入分类名",
+        "slug": "请输入唯一标识符"
+      },
+      "confirm": {
+        "delete": "确定删除该分类吗？",
+        "batchDelete": "确定删除选中的 {count} 个分类吗？"
+      },
+      "success": {
+        "create": "分类创建成功",
+        "update": "分类更新成功",
+        "delete": "分类删除成功"
+      },
+      "error": {
+        "create": "分类创建失败",
+        "save": "分类保存失败",
+        "delete": "分类删除失败",
+        "fetchDetail": "获取分类详情失败",
+        "invalidId": "无效的分类ID"
+      }
+    }
   },
-  "cancel": {
-    "title": "取消"
-  },
-  "save": {
-    "title": "保存"
-  },
-  "back": {
-    "title": "返回"
+  "moderation": {
+    "title": "审核管理",
+    "workbench": "内容审核工作台",
+    "resourceDetail": "审核资源详情",
+    "field": {
+      "taskType": "任务类型",
+      "taskId": "任务ID",
+      "targetId": "目标ID",
+      "submitterId": "提交人ID",
+      "submitAt": "提交时间",
+      "status": "审核状态",
+      "auditorId": "审核人ID",
+      "auditAt": "审核时间",
+      "mimeType": "MIME类型",
+      "fileSize": "文件大小",
+      "resourceKey": "资源Key",
+      "content": "审核内容",
+      "rejectType": "驳回类型",
+      "rejectReason": "驳回原因"
+    },
+    "input": {
+      "taskId": "请输入任务ID",
+      "submitterId": "请输入提交人ID",
+      "auditorId": "请输入审核人ID",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "rejectReason": "请输入驳回原因（可选）"
+    },
+    "status": {
+      "pending": "待审核",
+      "approved": "已通过",
+      "rejected": "已驳回"
+    },
+    "taskType": {
+      "image": "图片",
+      "text": "文本",
+      "rich": "富文本",
+      "url": "链接",
+      "file": "文件"
+    },
+    "rejectType": {
+      "violation_of_guidelines": "违反平台规范",
+      "inappropriate_content": "不当内容",
+      "advertisement": "广告",
+      "violence": "暴力",
+      "sensitive": "敏感内容",
+      "other": "其他"
+    },
+    "action": {
+      "approve": "通过",
+      "reject": "驳回",
+      "openOriginal": "打开原图",
+      "batchApprove": "批量通过",
+      "batchReject": "批量驳回"
+    },
+    "dialog": {
+      "rejectTitle": "驳回审核任务"
+    },
+    "confirm": {
+      "approve": "确定通过该审核任务吗？",
+      "approveResource": "确定通过该审核资源吗？",
+      "batchApprove": "确定通过选中的 {count} 个审核任务吗？"
+    },
+    "success": {
+      "approve": "审核通过成功",
+      "reject": "审核驳回成功"
+    },
+    "error": {
+      "fetch": "获取审核任务失败",
+      "approve": "审核通过失败",
+      "reject": "审核驳回失败"
+    }
   },
   "auth": {
     "btn": {

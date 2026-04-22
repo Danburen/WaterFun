@@ -55,7 +55,7 @@ public class AuthController {
         cookie.setPath("/");
         cookie.setMaxAge(120);
         response.addCookie(cookie);
-        // set the header of response
+        // set the header ofPending response
         response.setContentType("image/jpeg");
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");

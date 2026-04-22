@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Collection;
 
 @Data
 @NoArgsConstructor
@@ -19,13 +19,6 @@ public class BatchResult {
     private int ignored;
     private int failed;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Integer> ignoredIds;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Integer> failedIds;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private String message;
-
     public static BatchResult of(int requested, int success) {
         return BatchResult.builder()
                 .requested(requested)
@@ -35,6 +28,17 @@ public class BatchResult {
     }
 
     public static BatchResult empty() {
-        return new BatchResult(0, 0, 0, 0, null, null, null);
+        return new BatchResult(0, 0, 0, 0);
     }
- }
+
+    public static <T> BatchResult ofNullable(Collection<T> collection, int success) {
+        if(collection != null && !collection.isEmpty()) {
+            if (success < 0 || success > collection.size()) {
+                throw new IllegalArgumentException(
+                        "success must be between 0 and " + collection.size() + ", got: " + success);
+            }
+            return new BatchResult(collection.size(), success, collection.size() - success, 0);
+        }
+        return BatchResult.empty();
+    }
+}

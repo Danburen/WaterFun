@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.exceptions.BizException;
 import org.waterwood.common.exceptions.ServiceException;
-import org.waterwood.common.io.SimpleCloudObject;
+import org.waterwood.common.io.FileMeta;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileTypeDetector;
 
 import java.io.IOException;
@@ -62,17 +62,17 @@ public class TencentFileTypeDetectService implements CloudFileTypeDetector {
 
 
     @Override
-    public SimpleCloudObject detectByMagicNumber(String fullCloudFilePathKey) {
+    public FileMeta detectByMagicNumber(String fullCloudFilePathKey) {
         GetObjectRequest rangeRequest = new GetObjectRequest(bucketName, fullCloudFilePathKey);
         rangeRequest.setRange(0, 15);  // bytes=0-15
         try (COSObject cosObject = cosClient.getObject(rangeRequest);
              InputStream is = cosObject.getObjectContent()) {
             long totalSize = cosObject.getObjectMetadata().getInstanceLength();
             byte[] header = is.readNBytes(16);
-            return new SimpleCloudObject(
-                    fullCloudFilePathKey,
-                    matchMagicNumber(header),
-                    totalSize
+            return new FileMeta(
+                    cosObject.getObjectMetadata().getETag(),
+                    totalSize,
+                    matchMagicNumber(header)
             );
 
         } catch (CosServiceException e) {
@@ -93,7 +93,7 @@ public class TencentFileTypeDetectService implements CloudFileTypeDetector {
         for (Map.Entry<String, List<byte[]>> entry : MAGIC_NUMBERS.entrySet()) {
             for (byte[] magic : entry.getValue()) {
                 if (isStartsWithMagicNumber(header, magic)) {
-                    // WebP Specification：check byte of 8-11 whether is "WEBP"
+                    // WebP Specification：check byte ofPending 8-11 whether is "WEBP"
                     if ("image/webp".equals(entry.getKey())) {
                         if (header.length >= 12 &&
                                 header[8] == 0x57 && header[9] == 0x45 &&

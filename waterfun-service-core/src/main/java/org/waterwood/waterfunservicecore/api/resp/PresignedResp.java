@@ -13,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class PresignedResp implements Serializable {
     /**
-     * path key with root
+     * path key without prefix
      */
     private String key;
     private String url;

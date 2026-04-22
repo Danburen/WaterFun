@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public final class PathUtil {
     public static String getUniquePathFile(String fileSuffix) {
-        String uuid = UUID.randomUUID().toString();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
         return DateUtil.today().replace("-", "/") + "/" + uuid + "." + fileSuffix;
     }
 

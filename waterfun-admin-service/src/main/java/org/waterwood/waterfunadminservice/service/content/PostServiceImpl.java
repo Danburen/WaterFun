@@ -14,7 +14,6 @@ import org.waterwood.waterfunadminservice.api.request.content.AssignTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.CreatePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.PutPostReq;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.PostMapper;
-import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.PostTag;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
-    private final RoleMapper roleMapper;
     private final PostMapper postMapper;
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
@@ -57,8 +55,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void deletePostById(Long id) {
-       postRepository.deleteById(id);
+        postTagRepository.deleteByPostId(id);
+        int removed = postRepository.deleteByIdIn(List.of(id));
+        if (removed == 0) {
+            throw new NotFoundException("Post ID: " + id);
+        }
     }
 
     @Transactional
@@ -84,6 +87,10 @@ public class PostServiceImpl implements PostService {
         Post p = postMapper.toEntity(req);
         p.setId(ContentIdGenerator.nextPostId());
         p.setSlug(identifierGenerator.fromSlug(req.getSlug(), req.getTitle(), postRepository));
+        User author = userRepository.findById(req.getAuthorId()).orElseThrow(
+                () -> new NotFoundException("User ID: " + req.getAuthorId())
+        );
+        p.setAuthor(author);
         categoryRepository.findById(req.getCategoryId()).map(c -> {
             p.setCategory(c);
             return c;
@@ -91,19 +98,22 @@ public class PostServiceImpl implements PostService {
         postRepository.save(p);
 
         if(CollectionUtil.isNotEmpty(req.getTagIds())) {
-            List<Tag> tags = tagRepository.findAllById(req.getTagIds());
+            List<Integer> distinctTagIds = req.getTagIds().stream().distinct().toList();
+            List<Tag> tags = tagRepository.findAllById(distinctTagIds);
             if(CollectionUtil.isNotEmpty(tags)) {
                 p.setTags(tags);
-                tags.forEach(t -> {
+                List<PostTag> postTags = tags.stream().map(t -> {
                     PostTag pt = new PostTag();
                     pt.setPost(p);
                     pt.setTag(t);
-                    postTagRepository.save(pt);
-                });
+                    return pt;
+                }).toList();
+                postTagRepository.saveAll(postTags);
             }
         }
     }
 
+    @Transactional
     @Override
     public BatchResult assignTags(Long postId, AssignTagsRequest req) {
         int success = 0;
@@ -130,6 +140,7 @@ public class PostServiceImpl implements PostService {
         return BatchResult.of(req.getTagIds() == null ? 0 : req.getTagIds().size(), success);
     }
 
+    @Transactional
     @Override
     public BatchResult replaceTags(Long id, AssignTagsRequest req) {
         int removed = postTagRepository.deleteByPostId(id);
@@ -137,15 +148,21 @@ public class PostServiceImpl implements PostService {
         return BatchResult.of(req.getTagIds() == null ? 0 : req.getTagIds().size(), removed + adds.getSuccess());
     }
 
+    @Transactional
     @Override
     public BatchResult deletePosts(DeletePostRequest req) {
         int removed = 0;
         if(CollectionUtil.isNotEmpty(req.getPostIds())) {
-             removed = postRepository.deleteByIdIn(req.getPostIds());
+            List<Long> distinctIds = req.getPostIds().stream().distinct().toList();
+            for (Long postId : distinctIds) {
+                postTagRepository.deleteByPostId(postId);
+                removed += postRepository.deleteByIdIn(List.of(postId));
+            }
         }
-        return BatchResult.of(req.getPostIds() == null ? 0 : req.getPostIds().size(), removed);
+        return BatchResult.ofNullable(req.getPostIds(), removed);
     }
 
+    @Transactional
     @Override
     public BatchResult deletePostTags(Long id, AssignTagsRequest req) {
         int removed = 0;

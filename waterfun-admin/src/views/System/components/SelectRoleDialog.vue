@@ -132,8 +132,8 @@ watch(
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handleSearch">{{ t('query.title') }}</el-button>
-            <el-button @click="handleReset">{{ t('reset.title') }}</el-button>
+            <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
+            <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
           </el-form-item>
         </el-form>
       </SearchContainer>
@@ -162,10 +162,10 @@ watch(
           <el-table-column prop="code" :label="t('role.code')" min-width="180" />
           <el-table-column prop="parentId" :label="t('role.parentId')" width="120">
             <template #default="{ row }">
-              <span>{{ row.parentId ?? t('none.title') }}</span>
+              <span>{{ row.parentId ?? t('common.none.title') }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="createdAt" :label="t('create.time')" min-width="170">
+          <el-table-column prop="createdAt" :label="t('common.time.create')" min-width="170">
             <template #default="{ row }">{{ formatISOData(row.createdAt) }}</template>
           </el-table-column>
         </el-table>
@@ -177,8 +177,8 @@ watch(
     </div>
 
     <template #footer>
-      <el-button @click="visible = false">{{ t('cancel.title') }}</el-button>
-      <el-button type="primary" :disabled="selectedIds.length === 0" @click="handleConfirm">{{ t('save.title') }}</el-button>
+      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
+      <el-button type="primary" :disabled="selectedIds.length === 0" @click="handleConfirm">{{ t('common.action.save') }}</el-button>
     </template>
   </el-dialog>
 </template>
@@ -194,3 +194,4 @@ watch(
   padding-top: 4px;
 }
 </style>
+
