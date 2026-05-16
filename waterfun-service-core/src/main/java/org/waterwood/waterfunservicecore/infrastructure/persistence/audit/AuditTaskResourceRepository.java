@@ -3,7 +3,7 @@ package org.waterwood.waterfunservicecore.infrastructure.persistence.audit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.audit.resource.AuditTaskResource;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
 
 import java.util.Collection;
 import java.util.List;

@@ -46,14 +46,21 @@ const localCurrentPage = computed({
 </script>
 
 <template>
-  <CardContainer :title="title" :back="back" @back="emit('back')">
+  <CardContainer
+    :title="title"
+    :back="back"
+    @back="emit('back')"
+  >
     <template #header-right>
       <slot name="header-right" />
     </template>
 
     <slot />
 
-    <div v-if="showPagination" class="pagination-container">
+    <div
+      v-if="showPagination"
+      class="pagination-container"
+    >
       <el-pagination
         v-model:current-page="localCurrentPage"
         v-model:page-size="localPageSize"

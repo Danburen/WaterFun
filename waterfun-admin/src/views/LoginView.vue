@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted} from 'vue'
-import router from '~/router/index.js'
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/authStore'
 import {validateAuthname, validatePassword, validateVerifyCode} from "@/utils/validator";
 import { useI18n } from 'vue-i18n'
-import { throttle } from '@waterfun/web-core/src/triggerControl'
-import { convertArrayBufferToBase64 } from "@waterfun/web-core/src/dataMapper";
 import { generateFingerprint } from '@waterfun/web-core/src/fingerprint';
+import { APIError } from '@waterfun/web-core/src/errors/APIError';
 
 const { t } = useI18n()
+const router = useRouter()
 const authStore = useAuthStore()
 const loginFormRef = ref(null)
 const loginForm = ref({
@@ -36,11 +36,12 @@ const handleCaptchaConfirm = (code: string, callback: (success: boolean) => void
         authStore.tryLogin({
           ...loginForm.value,
           deviceFp: deviceFp,
-        }).then(res => {
+        }).then(_ => {
           ElMessage.success(t('message.success.loginSuccess'));
           router.push({ name: 'dashboard' })
-        }).catch((err) => {
-          ElMessage.error(t('message.error.apiError'));
+        }).catch((err: APIError) => {
+        
+          ElMessage.error(t(err.code));
           console.log(err);
         })
       })
@@ -61,27 +62,49 @@ const submitLoginForm = () => {
     <div class="main">
       <div class="left items-center">
         <div class="logo items-center">
-          <img src="../assets/logo.svg" style="height: 65px;width: 65px;padding: 10px" alt="">
+          <img
+            src="../assets/logo.svg"
+            style="height: 65px;width: 65px;padding: 10px"
+            alt=""
+          >
           <span>WaterFun</span>
         </div>
       </div>
       <div class="form-container items-center">
         <el-form 
-          class="form" 
+          ref="loginFormRef" 
+          class="form"
           label-width="auto"
-          ref="loginFormRef"
           :model="loginForm"
           :rules="validRules"
         >
-  <el-form-item prop="username" :label="$t('auth.username')">
-    <el-input v-model="loginForm.username" :placeholder="$t('auth.username')"></el-input>
-  </el-form-item>
-  <el-form-item prop="password" :label="$t('auth.password')">
-    <el-input v-model="loginForm.password" type="password" :placeholder="$t('auth.password')"></el-input>
-  </el-form-item>
-        <el-form-item>
-            <el-button class="login-btn" type="primary" 
-            @click="submitLoginForm">{{ $t('auth.btn.login') }}</el-button>
+          <el-form-item
+            prop="username"
+            :label="$t('auth.username')"
+          >
+            <el-input
+              v-model="loginForm.username"
+              :placeholder="$t('auth.username')"
+            />
+          </el-form-item>
+          <el-form-item
+            prop="password"
+            :label="$t('auth.password')"
+          >
+            <el-input
+              v-model="loginForm.password"
+              type="password"
+              :placeholder="$t('auth.password')"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              class="login-btn"
+              type="primary" 
+              @click="submitLoginForm"
+            >
+              {{ $t('auth.btn.login') }}
+            </el-button>
           </el-form-item>
         </el-form>
       </div>

@@ -2,6 +2,7 @@ package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.waterwood.waterfunservicecore.entity.post.Category;
 import org.waterwood.common.jpa.SlugUniquenessChecker;
 
@@ -18,4 +19,11 @@ public interface CategoryRepository extends JpaRepository<Category, Integer>, Jp
     void removeCategoryById(Integer id);
 
     int deleteByIdIn(Collection<Integer> ids);
+
+    @Query("""
+        SELECT p.id, new org.waterwood.api.VO.OptionVO(c.id, c.slug, c.name, false)
+        FROM Post p JOIN p.category c
+        WHERE p.id IN :postIds
+    """)
+    List<Object[]> findCategoryByPostIds(List<Long> postIds);
 }

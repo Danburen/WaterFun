@@ -12,6 +12,7 @@ import {
 import type { PageOptions } from "~/types";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 import SelectPermissionDialog from "../components/SelectPermissionDialog.vue";
 
 const { t } = useI18n();
@@ -143,31 +144,51 @@ onMounted(async () => {
 <template>
   <div class="assign-layout">
     <SearchContainer>
-      <el-form inline :model="searchForm" class="search-form">
+      <el-form
+        inline
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item label="ID">
-          <el-input v-model="searchForm.permId" placeholder="ID" />
+          <el-input
+            v-model="searchForm.permId"
+            placeholder="ID"
+          />
         </el-form-item>
         <el-form-item :label="t('permission.name')">
-          <el-input v-model="searchForm.name" :placeholder="t('permission.input.name')" />
+          <el-input
+            v-model="searchForm.name"
+            :placeholder="t('permission.input.name')"
+          />
         </el-form-item>
         <el-form-item :label="t('permission.code')">
-          <el-input v-model="searchForm.code" :placeholder="t('permission.input.code')" />
+          <el-input
+            v-model="searchForm.code"
+            :placeholder="t('permission.input.code')"
+          />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            {{ t('common.query.title') }}
+          </el-button>
+          <el-button @click="handleReset">
+            {{ t('common.reset.title') }}
+          </el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
 
     <TableContainer
-      :title="assignTitle"
-      :title-i18n="false"
-      showAddBtn
-      :total="pageOpts.total"
-      :disable-delete="selectedIds.length === 0"
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
+      :title="assignTitle"
+      :title-i18n="false"
+      show-add-btn
+      :total="pageOpts.total"
+      :disable-delete="selectedIds.length === 0"
       @change="fetchData"
       @add="handleAdd"
       @remove="handleRemove"
@@ -180,15 +201,38 @@ onMounted(async () => {
         style="width: 100%"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="name" :label="t('permission.name')" />
-        <el-table-column prop="code" :label="t('permission.code')" />
-        <el-table-column prop="assignedAt" :label="t('common.time.create')">
-          <template #default="{ row }">{{ formatISOData(row.assignedAt) }}</template>
+        <el-table-column
+          type="selection"
+          width="55"
+        />
+        <el-table-column
+          prop="id"
+          label="ID"
+          width="80"
+        />
+        <el-table-column
+          prop="name"
+          :label="t('permission.name')"
+        />
+        <el-table-column
+          prop="code"
+          :label="t('permission.code')"
+        />
+        <el-table-column
+          prop="assignedAt"
+          :label="t('common.time.create')"
+        >
+          <template #default="{ row }">
+            {{ formatISOData(row.assignedAt) }}
+          </template>
         </el-table-column>
-        <el-table-column prop="expiresAt" :label="t('expiresAt.title')">
-          <template #default="{ row }">{{ row.expiresAt ? formatISOData(row.expiresAt) : t('common.none.title') }}</template>
+        <el-table-column
+          prop="expiresAt"
+          :label="t('expiresAt.title')"
+        >
+          <template #default="{ row }">
+            {{ row.expiresAt ? formatISOData(row.expiresAt) : t('common.none.title') }}
+          </template>
         </el-table-column>
       </el-table>
     </TableContainer>

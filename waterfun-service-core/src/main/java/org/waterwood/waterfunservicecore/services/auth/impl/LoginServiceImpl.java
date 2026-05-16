@@ -43,11 +43,11 @@ public class LoginServiceImpl implements LoginService {
     public User login(PwdLoginReq body, String verifyUUIDKey){
         Optional<User> user = userRepo.findByUsername(body.getUsername());
         return user.map(u->{
-            if(! encoder.matches(body.getPassword(), u.getPasswordHash())){
-                throw new AuthException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
-            }
             if(! captchaService.verifyCode(verifyUUIDKey,body.getCaptcha())){
                 throw new AuthException(BaseResponseCode.CAPTCHA_INVALID);
+            }
+            if(! encoder.matches(body.getPassword(), u.getPasswordHash())){
+                throw new AuthException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
             }
             // User didn't set password so they are not allow to log in by password.
             if( u.getPasswordHash() == null){

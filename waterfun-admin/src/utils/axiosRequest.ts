@@ -1,9 +1,10 @@
 import axios from 'axios'
 import JSONBig from 'json-bigint';
-import { translate } from "@/utils/translator";
-import { getErrorMessage } from "~/utils/errorMessage";
 import { useAuthStore } from "~/stores/authStore";
-import {ApiRes} from "@waterfun/web-core/src/types";
+import { APIError } from "@waterfun/web-core/src/errors/APIError";
+import type { ApiRes } from "@waterfun/web-core/src/types/api/response";
+
+let isRedirectingToLogin = false;
 
 declare module 'axios' {
     interface AxiosRequestConfig {
@@ -17,6 +18,7 @@ declare module 'axios' {
 const CSRF_SKIP_LIST: string[] = import.meta.env.VITE_CSRF_SKIP_LIST?.split(',') || [];
 const AUTH_SKIP_LIST: string[] = import.meta.env.VITE_AUTH_SKIP_LIST?.split(',') || [];
 const jsonBig = JSONBig({ storeAsString: true });
+
 
 const parseResponseWithBigInt = (data: unknown) => {
     if (typeof data !== 'string' || data.length === 0) return data;
@@ -63,7 +65,7 @@ service.interceptors.request.use(
         //     config.headers['X-XSRF-TOKEN'] = CSRFToken;
         // }
 
-        if(needAuth){
+        if (needAuth && token && token.trim().length > 0) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
 
@@ -92,25 +94,31 @@ service.interceptors.response.use(
         }
     },
     error => {
-        let showError = error.config.meta?.showError !== false;
-        let errMessage
-        if(error.response) {
-            const status = error.response.status
-            errMessage = getErrorMessage(error.response.data.code || error.response.status)
-            if(errMessage === 'unknownError') { showError = false ; console.log(error.response.data.code); }
-            switch (status) {
-                case 401:
-                    // window.location.href = '/login'
-                    return Promise.reject(new Error('Unauthorized'))
+        if (error?.response) {
+            const status: number | undefined = error.response.status;
+            const data: unknown = error.response.data;
+
+            const apiError = APIError.fromHttp({
+                code: (data as any)?.code,
+                httpStatus: status,
+                raw: data,
+            });
+            console.log(data);
+            if (status === 401 && (data as any)?.code === 'system.invalid_token_or_expired') {
+                useAuthStore().removeToken();
+                const isOnLoginPage = window.location.pathname === '/login';
+                if (!isOnLoginPage && !isRedirectingToLogin) {
+                    isRedirectingToLogin = true;
+                    window.location.replace('/login');
+                }
             }
-            throw new Error(error);
-        }else if(error.request) {
-            // no response
-            errMessage = translate("message.error.networkError")
-        }else{
-            errMessage = translate("message.error.sendRequestError");
+
+            return Promise.reject(apiError);
         }
-        return Promise.reject(new Error(errMessage));
+        if (error?.request) {
+            return Promise.reject(APIError.fromHttp({ code: 'general.unknown_error' }));
+        }
+        return Promise.reject(APIError.fromHttp({ code: 'general.unknown_error' }));
     }
 )
 

@@ -16,6 +16,7 @@ import {
 } from "~/api/post";
 import { getTagOptions } from "~/api/tag";
 import { getUserOptions } from "~/api/user";
+import { ElMessage } from "element-plus";
 
 const props = withDefaults(
   defineProps<{
@@ -195,66 +196,48 @@ const handleSave = async () => {
 
 <template>
   <el-dialog v-model="visible" :title="dialogTitle" width="760" destroy-on-close @closed="resetForm">
-    <el-form ref="formRef" :model="formModel" :rules="rules" label-width="110px" status-icon v-loading="loadingOptions">
+    <el-form ref="formRef" v-loading="loadingOptions" :model="formModel" :rules="rules" label-width="110px" status-icon>
       <el-form-item prop="title" :label="t('content.post.field.title')">
-        <el-input v-model="formModel.title" :placeholder="t('content.post.input.title')" />
+        <el-input v-model="formModel.title" :placeholder="t('content.post.input.title')"/>
       </el-form-item>
       <el-form-item prop="subtitle" :label="t('content.post.field.subtitle')">
-        <el-input v-model="formModel.subtitle" :placeholder="t('content.post.input.subtitle')" />
+        <el-input v-model="formModel.subtitle" :placeholder="t('content.post.input.subtitle')"/>
       </el-form-item>
       <el-form-item prop="content" :label="t('content.post.field.content')">
-        <el-input v-model="formModel.content" type="textarea" :rows="6" :placeholder="t('content.post.input.content')" />
+        <el-input v-model="formModel.content" type="textarea" :rows="6" :placeholder="t('content.post.input.content')"/>
       </el-form-item>
       <el-form-item prop="summary" :label="t('content.post.field.summary')">
-        <el-input v-model="formModel.summary" type="textarea" :rows="3" :placeholder="t('content.post.input.summary')" />
+        <el-input v-model="formModel.summary" type="textarea" :rows="3" :placeholder="t('content.post.input.summary')"/>
       </el-form-item>
       <el-form-item prop="coverImg" :label="t('content.post.field.coverImg')">
-        <el-input v-model="formModel.coverImg" :placeholder="t('content.post.input.coverImg')" />
+        <el-input v-model="formModel.coverImg" :placeholder="t('content.post.input.coverImg')"/>
       </el-form-item>
       <el-form-item prop="slug" :label="t('content.post.field.slug')">
-        <el-input v-model="formModel.slug" :placeholder="t('content.post.input.slug')" />
+        <el-input v-model="formModel.slug" :placeholder="t('content.post.input.slug')"/>
       </el-form-item>
       <el-form-item prop="status" :label="t('content.post.field.status')">
         <el-select v-model="formModel.status" style="width: 220px">
-          <el-option v-for="item in statusOptions" :key="item.value" :label="t(item.label)" :value="item.value" />
+          <el-option v-for="item in statusOptions" :key="item.value" :label="t(item.label)" :value="item.value"/>
         </el-select>
       </el-form-item>
       <el-form-item prop="visibility" :label="t('content.post.field.visibility')">
         <el-select v-model="formModel.visibility" style="width: 220px">
-          <el-option v-for="item in visibilityOptions" :key="item.value" :label="t(item.label)" :value="item.value" />
+          <el-option v-for="item in visibilityOptions" :key="item.value" :label="t(item.label)" :value="item.value"/>
         </el-select>
       </el-form-item>
       <el-form-item prop="authorId" :label="t('content.post.field.authorId')">
         <el-select v-model="formModel.authorId" style="width: 300px" filterable>
-          <el-option
-            v-for="item in userOptions"
-            :key="item.id"
-            :label="`${item.id} (${item.name}${item.code ? ` / ${item.code}` : ''})`"
-            :value="item.id"
-            :disabled="item.disabled || false"
-          />
+          <el-option v-for="item in userOptions" :key="item.id" :label="`${item.id} (${item.name}${item.code ? ` / ${item.code}` : ''})`" :value="item.id" :disabled="item.disabled || false"/>
         </el-select>
       </el-form-item>
       <el-form-item prop="categoryId" :label="t('content.post.field.categoryId')">
         <el-select v-model="formModel.categoryId" style="width: 300px" filterable>
-          <el-option
-            v-for="item in categoryOptions"
-            :key="item.id"
-            :label="`${item.id} (${item.name})`"
-            :value="item.id"
-            :disabled="item.disabled || false"
-          />
+          <el-option v-for="item in categoryOptions" :key="item.id" :label="`${item.id} (${item.name})`" :value="item.id" :disabled="item.disabled || false"/>
         </el-select>
       </el-form-item>
       <el-form-item prop="tagIds" :label="t('content.post.field.tagIds')">
         <el-select v-model="formModel.tagIds" multiple style="width: 100%" filterable>
-          <el-option
-            v-for="item in tagOptions"
-            :key="item.id"
-            :label="`${item.id} (${item.name})`"
-            :value="item.id"
-            :disabled="item.disabled || false"
-          />
+          <el-option v-for="item in tagOptions" :key="item.id" :label="`${item.id} (${item.name})`" :value="item.id" :disabled="item.disabled || false"/>
         </el-select>
       </el-form-item>
     </el-form>

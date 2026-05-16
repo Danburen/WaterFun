@@ -1,21 +1,25 @@
-package org.waterwood.waterfunservicecore.entity.audit.resource;
+package org.waterwood.common.io;
 
 import lombok.Getter;
 
 @Getter
-public enum AuditResourceType {
+public enum ResourceType {
     UNKNOWN(0),
     IMAGE(1),
     VIDEO(2),
     AUDIO(3),
-    OTHER(4),;
+    TEXT(4),
+    DOCUMENT(5),
+    ARCHIVE(6),
+    EXECUTABLE(7),
+    OTHER(99),;
 
     private final short value;
-    AuditResourceType(final int value) {
+    ResourceType(final int value) {
         this.value = (short) value;
     }
 
-    public static AuditResourceType fromCode(Short value) {
+    public static ResourceType fromCode(Short value) {
         if(value == null) {
             return UNKNOWN;
         }

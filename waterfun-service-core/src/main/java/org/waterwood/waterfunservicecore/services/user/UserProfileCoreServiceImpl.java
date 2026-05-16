@@ -6,11 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.CloudStorageRootKey;
-import org.waterwood.common.KeyConstants;
 import org.waterwood.common.exceptions.BizException;
-import org.waterwood.utils.PathUtil;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
-import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
 import org.waterwood.waterfunservicecore.entity.user.User;
@@ -22,9 +19,9 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPro
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
-import org.waterwood.waterfunservicecore.services.sys.storage.CloudResOperationType;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -65,56 +62,30 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
         );
     }
 
-    @Transactional
-    @Override
-    public PresignedResp getUploadPolicyAndSaveAvatar(long userUid, String fileSuffix) {
-        if(fileSuffix == null){
-            throw new BizException(BaseResponseCode.NEED_FILE_TYPE);
-        }
-        String avatarPath = PathUtil.getUniquePathFile(fileSuffix);
-        User u = userCoreService.getUser(userUid);
-        cloudFileService.removeFile( CloudStorageRootKey.UPLOADS,
-                PathUtil.buildPath(KeyConstants.AVATAR, u.getAvatar()));
-        // clean the cache
-        redisHelper.del(
-                cloudFileService.getCachedRedisKey(
-                        userUid,
-                        MediaResourceType.USER_AVATAR,
-                        CloudResOperationType.WRITE
-                )
-        );
-
-        u.setAvatar(avatarPath);
-        userRepository.save(u);
-        return cloudFileService.buildPutPolicyWithBiz(CloudStorageRootKey.UPLOADS, PathUtil.buildPath(
-                KeyConstants.AVATAR,
-                avatarPath
-        ), String.valueOf(userUid));
-    }
-
     @Override
     public @Nullable CloudResPresignedUrlResp getUserAvatar(long userUid) {
         User u = userCoreService.getUser(userUid);
         if(u.getAvatar() == null){
             return null;
         }
-        return cloudFileService.getReadUrlCached(CloudStorageRootKey.UPLOADS,
-                PathUtil.buildPath(KeyConstants.AVATAR, u.getAvatar()),
-                String.valueOf(userUid), MediaResourceType.USER_AVATAR);
+        return cloudFileService.getReadUrlCached(
+                CloudStorageRootKey.UPLOADS,
+                u.getAvatar(),
+                String.valueOf(userUid),
+                MediaResourceType.USER_AVATAR
+        );
     }
 
     @Override
-    public List<CloudResPresignedUrlResp> listUserAvatars(List<Long> userUids) {
+    public Map<Long, CloudResPresignedUrlResp> listUserAvatars(List<Long> userUids) {
         List<User> users = userRepository.findAllVisibleUsersByIds(userUids);
         List<String> paths = users.stream().map(
                 User::getAvatar
         ).toList();
-        List<String> bizIds = users.stream().map(
-                u -> String.valueOf(u.getUid())
-        ).toList();
         return cloudFileService.batchGetReadPublicUrlCached(
+                CloudStorageRootKey.UPLOADS,
                 paths,
-                bizIds,
+                userUids,
                 MediaResourceType.USER_AVATAR
         );
     }

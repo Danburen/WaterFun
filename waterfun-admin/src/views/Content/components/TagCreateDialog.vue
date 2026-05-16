@@ -2,6 +2,7 @@
 import type { FormInstance, FormRules } from "element-plus";
 import { useI18n } from "vue-i18n";
 import { createTag, getTag, putTag, type CreateTagRequest } from "~/api/tag";
+import { ElMessage } from "element-plus";
 
 const props = withDefaults(
   defineProps<{

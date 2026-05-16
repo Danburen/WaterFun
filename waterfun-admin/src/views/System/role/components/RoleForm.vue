@@ -55,14 +55,37 @@ defineExpose<RoleFormExpose>({
 </script>
 
 <template>
-  <el-form ref="formRef" :model="localModel" :rules="rules" label-width="110px" status-icon>
-    <el-form-item prop="name" :label="t('role.name')">
-      <el-input v-model="localModel.name" :readonly="readonly " :placeholder="t('role.input.name')" />
+  <el-form
+    ref="formRef"
+    :model="localModel"
+    :rules="rules"
+    label-width="110px"
+    status-icon
+  >
+    <el-form-item
+      prop="name"
+      :label="t('role.name')"
+    >
+      <el-input
+        v-model="localModel.name"
+        :readonly="readonly "
+        :placeholder="t('role.input.name')"
+      />
     </el-form-item>
-    <el-form-item prop="code" :label="t('role.code')">
-      <el-input v-model="localModel.code" :readonly="readonly || localModel.isSystem" :placeholder="t('role.input.code')" />
+    <el-form-item
+      prop="code"
+      :label="t('role.code')"
+    >
+      <el-input
+        v-model="localModel.code"
+        :readonly="readonly || localModel.isSystem"
+        :placeholder="t('role.input.code')"
+      />
     </el-form-item>
-    <el-form-item prop="parentId" :label="t('role.parentId')">
+    <el-form-item
+      prop="parentId"
+      :label="t('role.parentId')"
+    >
       <el-select
         v-model="localModel.parentId"
         clearable
@@ -79,7 +102,10 @@ defineExpose<RoleFormExpose>({
         />
       </el-select>
     </el-form-item>
-    <el-form-item prop="orderWeight" :label="t('role.weight')">
+    <el-form-item
+      prop="orderWeight"
+      :label="t('role.weight')"
+    >
       <el-input-number
         v-model="localModel.orderWeight"
         :disabled="readonly"
@@ -88,7 +114,10 @@ defineExpose<RoleFormExpose>({
         style="width: 180px"
       />
     </el-form-item>
-    <el-form-item prop="description" :label="t('role.description')">
+    <el-form-item
+      prop="description"
+      :label="t('role.description')"
+    >
       <el-input
         v-model="localModel.description"
         type="textarea"
@@ -97,8 +126,14 @@ defineExpose<RoleFormExpose>({
         :placeholder="t('role.input.description')"
       />
     </el-form-item>
-    <el-form-item prop="isSystem" :label="t('role.isSystem')">
-      <el-switch v-model="localModel.isSystem" :disabled="readonly" />
+    <el-form-item
+      prop="isSystem"
+      :label="t('role.isSystem')"
+    >
+      <el-switch
+        v-model="localModel.isSystem"
+        :disabled="readonly"
+      />
     </el-form-item>
   </el-form>
 </template>

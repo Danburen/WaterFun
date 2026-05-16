@@ -2,8 +2,8 @@ package org.waterwood.waterfunservicecore.infrastructure.persistence.utils;
 
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
-import org.waterwood.api.enums.PostStatus;
-import org.waterwood.api.enums.PostVisibility;
+import org.waterwood.waterfunservicecore.entity.post.PostStatus;
+import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.Tag;

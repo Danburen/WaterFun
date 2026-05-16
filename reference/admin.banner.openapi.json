@@ -1,0 +1,1074 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "API Documentation",
+    "version" : "1.0"
+  },
+  "paths" : {
+    "/api/admin/content/banner/list" : {
+      "get" : {
+        "summary" : "list",
+        "description" : "list",
+        "parameters" : [ {
+          "name" : "title",
+          "in" : "query",
+          "description" : "",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        }, {
+          "name" : "subtitle",
+          "in" : "query",
+          "description" : "",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        }, {
+          "name" : "position",
+          "in" : "query",
+          "description" : " HOME :HOME\nSIDE :SIDE",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : " SHOW :SHOW\nHIDE :HIDE",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        }, {
+          "name" : "seconds",
+          "in" : "query",
+          "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "nullable" : false
+          }
+        }, {
+          "name" : "nanos",
+          "in" : "query",
+          "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999.",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        }, {
+          "name" : "seconds",
+          "in" : "query",
+          "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64",
+            "nullable" : false
+          }
+        }, {
+          "name" : "nanos",
+          "in" : "query",
+          "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999.",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "content" : {
+                          "type" : "array",
+                          "description" : "",
+                          "items" : {
+                            "type" : "object",
+                            "properties" : {
+                              "id" : {
+                                "type" : "integer",
+                                "description" : "",
+                                "format" : "int64"
+                              },
+                              "resourceKey" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "title" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "subtitle" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "linkUrl" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "position" : {
+                                "type" : "string",
+                                "description" : "{HOME=HOME, SIDE=SIDE}",
+                                "enum" : [ "HOME", "SIDE" ]
+                              },
+                              "sortNo" : {
+                                "type" : "integer",
+                                "description" : ""
+                              },
+                              "status" : {
+                                "type" : "string",
+                                "description" : "{SHOW=SHOW, HIDE=HIDE}",
+                                "enum" : [ "SHOW", "HIDE" ]
+                              },
+                              "startAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              },
+                              "endAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              },
+                              "createdAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              },
+                              "updatedAt" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "seconds" : {
+                                    "type" : "integer",
+                                    "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                                    "format" : "int64"
+                                  },
+                                  "nanos" : {
+                                    "type" : "integer",
+                                    "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                                  },
+                                  "epochSecond" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.\n<p>\nThe epoch second count is a simple incrementing count of seconds where\nsecond 0 is 1970-01-01T00:00:00Z.\nThe nanosecond part is returned by{@link #getNano}.",
+                                    "format" : "int64"
+                                  },
+                                  "nano" : {
+                                    "type" : "integer",
+                                    "description" : "Gets the number of nanoseconds, later along the time-line, from the start\nof the second.\n<p>\nThe nanosecond-of-second value measures the total number of nanoseconds from\nthe second returned by{@link #getEpochSecond}."
+                                  }
+                                },
+                                "description" : ""
+                              }
+                            },
+                            "description" : "DTO for{@link Banner}"
+                          }
+                        },
+                        "pageable" : {
+                          "type" : "object",
+                          "properties" : {
+                            "paged" : {
+                              "type" : "boolean",
+                              "description" : "Returns whether the current{@link Pageable} contains pagination information."
+                            },
+                            "unpaged" : {
+                              "type" : "boolean",
+                              "description" : "Returns whether the current{@link Pageable} does not contain pagination information."
+                            },
+                            "pageNumber" : {
+                              "type" : "integer",
+                              "description" : "Returns the page to be returned."
+                            },
+                            "pageSize" : {
+                              "type" : "integer",
+                              "description" : "Returns the number of items to be returned."
+                            },
+                            "offset" : {
+                              "type" : "integer",
+                              "description" : "Returns the offset to be taken according to the underlying page and page size.",
+                              "format" : "int64"
+                            },
+                            "sort" : {
+                              "type" : "array",
+                              "description" : "Returns the sorting parameters.",
+                              "items" : {
+                                "type" : "object",
+                                "properties" : {
+                                  "direction" : {
+                                    "type" : "string",
+                                    "description" : "{ASC=ASC, DESC=DESC}",
+                                    "enum" : [ "ASC", "DESC" ]
+                                  },
+                                  "property" : {
+                                    "type" : "string",
+                                    "description" : ""
+                                  },
+                                  "ignoreCase" : {
+                                    "type" : "boolean",
+                                    "description" : ""
+                                  },
+                                  "nullHandling" : {
+                                    "type" : "string",
+                                    "description" : "{NATIVE=Lets the data store decide what to do with nulls., NULLS_FIRST=A hint to the used data store to order entries with null values before non-null entries., NULLS_LAST=A hint to the used data store to order entries with null values after non-null entries.}",
+                                    "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+                                  },
+                                  "ascending" : {
+                                    "type" : "boolean",
+                                    "description" : "Returns whether sorting for this property shall be ascending."
+                                  },
+                                  "descending" : {
+                                    "type" : "boolean",
+                                    "description" : "Returns whether sorting for this property shall be descending."
+                                  }
+                                },
+                                "description" : "org.springframework.data.domain.Sort"
+                              }
+                            }
+                          },
+                          "description" : ""
+                        },
+                        "total" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "empty" : {
+                          "type" : "boolean",
+                          "description" : "Returns whether the current{@link Streamable} is empty."
+                        },
+                        "number" : {
+                          "type" : "integer"
+                        },
+                        "size" : {
+                          "type" : "integer"
+                        },
+                        "numberOfElements" : {
+                          "type" : "integer"
+                        },
+                        "sort" : {
+                          "type" : "array",
+                          "items" : {
+                            "type" : "object",
+                            "properties" : {
+                              "direction" : {
+                                "type" : "string",
+                                "description" : "{ASC=ASC, DESC=DESC}",
+                                "enum" : [ "ASC", "DESC" ]
+                              },
+                              "property" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "ignoreCase" : {
+                                "type" : "boolean",
+                                "description" : ""
+                              },
+                              "nullHandling" : {
+                                "type" : "string",
+                                "description" : "{NATIVE=Lets the data store decide what to do with nulls., NULLS_FIRST=A hint to the used data store to order entries with null values before non-null entries., NULLS_LAST=A hint to the used data store to order entries with null values after non-null entries.}",
+                                "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+                              },
+                              "ascending" : {
+                                "type" : "boolean",
+                                "description" : "Returns whether sorting for this property shall be ascending."
+                              },
+                              "descending" : {
+                                "type" : "boolean",
+                                "description" : "Returns whether sorting for this property shall be descending."
+                              }
+                            },
+                            "description" : "org.springframework.data.domain.Sort"
+                          }
+                        },
+                        "first" : {
+                          "type" : "boolean"
+                        },
+                        "last" : {
+                          "type" : "boolean"
+                        },
+                        "totalPages" : {
+                          "type" : "integer"
+                        },
+                        "totalElements" : {
+                          "type" : "integer",
+                          "format" : "int64"
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/content/banner/{id}" : {
+      "get" : {
+        "summary" : "get",
+        "description" : "get",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "id" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "resourceKey" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "title" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "subtitle" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "linkUrl" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "position" : {
+                          "type" : "string",
+                          "description" : "{HOME=HOME, SIDE=SIDE}",
+                          "enum" : [ "HOME", "SIDE" ]
+                        },
+                        "sortNo" : {
+                          "type" : "integer",
+                          "description" : ""
+                        },
+                        "status" : {
+                          "type" : "string",
+                          "description" : "{SHOW=SHOW, HIDE=HIDE}",
+                          "enum" : [ "SHOW", "HIDE" ]
+                        },
+                        "startAt" : {
+                          "type" : "object",
+                          "properties" : {
+                            "seconds" : {
+                              "type" : "integer",
+                              "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                              "format" : "int64"
+                            },
+                            "nanos" : {
+                              "type" : "integer",
+                              "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                            }
+                          },
+                          "description" : ""
+                        },
+                        "endAt" : {
+                          "type" : "object",
+                          "properties" : {
+                            "seconds" : {
+                              "type" : "integer",
+                              "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                              "format" : "int64"
+                            },
+                            "nanos" : {
+                              "type" : "integer",
+                              "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                            }
+                          },
+                          "description" : ""
+                        },
+                        "createdAt" : {
+                          "type" : "object",
+                          "properties" : {
+                            "seconds" : {
+                              "type" : "integer",
+                              "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                              "format" : "int64"
+                            },
+                            "nanos" : {
+                              "type" : "integer",
+                              "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                            }
+                          },
+                          "description" : ""
+                        },
+                        "updatedAt" : {
+                          "type" : "object",
+                          "properties" : {
+                            "seconds" : {
+                              "type" : "integer",
+                              "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                              "format" : "int64"
+                            },
+                            "nanos" : {
+                              "type" : "integer",
+                              "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                            }
+                          },
+                          "description" : ""
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "summary" : "update",
+        "description" : "update",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "resourceKey" : {
+                    "maxLength" : 64,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "title" : {
+                    "maxLength" : 64,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "subtitle" : {
+                    "maxLength" : 128,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "linkUrl" : {
+                    "maxLength" : 255,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "position" : {
+                    "type" : "string",
+                    "description" : "{HOME=HOME, SIDE=SIDE}",
+                    "enum" : [ "HOME", "SIDE" ]
+                  },
+                  "sortNo" : {
+                    "type" : "integer",
+                    "description" : ""
+                  },
+                  "status" : {
+                    "type" : "string",
+                    "description" : "{SHOW=SHOW, HIDE=HIDE}",
+                    "enum" : [ "SHOW", "HIDE" ]
+                  },
+                  "startAt" : {
+                    "type" : "object",
+                    "properties" : {
+                      "seconds" : {
+                        "type" : "integer",
+                        "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                        "format" : "int64"
+                      },
+                      "nanos" : {
+                        "type" : "integer",
+                        "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                      }
+                    },
+                    "description" : ""
+                  },
+                  "endAt" : {
+                    "type" : "object",
+                    "properties" : {
+                      "seconds" : {
+                        "type" : "integer",
+                        "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                        "format" : "int64"
+                      },
+                      "nanos" : {
+                        "type" : "integer",
+                        "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                      }
+                    },
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/content/banner" : {
+      "post" : {
+        "summary" : "create",
+        "description" : "create",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "required" : [ "putCallback", "title" ],
+                "type" : "object",
+                "properties" : {
+                  "title" : {
+                    "maxLength" : 64,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "subtitle" : {
+                    "maxLength" : 128,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "linkUrl" : {
+                    "maxLength" : 255,
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "position" : {
+                    "type" : "string",
+                    "description" : "{HOME=HOME, SIDE=SIDE}",
+                    "enum" : [ "HOME", "SIDE" ]
+                  },
+                  "sortNo" : {
+                    "type" : "integer",
+                    "description" : ""
+                  },
+                  "status" : {
+                    "type" : "string",
+                    "description" : "{SHOW=SHOW, HIDE=HIDE}",
+                    "enum" : [ "SHOW", "HIDE" ]
+                  },
+                  "startAt" : {
+                    "type" : "object",
+                    "properties" : {
+                      "seconds" : {
+                        "type" : "integer",
+                        "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                        "format" : "int64"
+                      },
+                      "nanos" : {
+                        "type" : "integer",
+                        "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                      }
+                    },
+                    "description" : ""
+                  },
+                  "endAt" : {
+                    "type" : "object",
+                    "properties" : {
+                      "seconds" : {
+                        "type" : "integer",
+                        "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                        "format" : "int64"
+                      },
+                      "nanos" : {
+                        "type" : "integer",
+                        "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+                      }
+                    },
+                    "description" : ""
+                  },
+                  "putCallback" : {
+                    "required" : [ "key", "token" ],
+                    "type" : "object",
+                    "properties" : {
+                      "key" : {
+                        "type" : "string",
+                        "description" : ""
+                      },
+                      "token" : {
+                        "type" : "string",
+                        "description" : ""
+                      }
+                    },
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/content/banner/coverage/upload" : {
+      "get" : {
+        "summary" : "getCoverageUpload",
+        "description" : "getCoverageUpload",
+        "parameters" : [ {
+          "name" : "suffix",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "key" : {
+                          "type" : "string",
+                          "description" : "path key without prefix"
+                        },
+                        "url" : {
+                          "type" : "string",
+                          "description" : ""
+                        },
+                        "method" : {
+                          "type" : "string",
+                          "description" : "{GET=GET, POST=POST, PUT=PUT, DELETE=DELETE, PATCH=PATCH}",
+                          "enum" : [ "GET", "POST", "PUT", "DELETE", "PATCH" ]
+                        },
+                        "token" : {
+                          "type" : "string",
+                          "description" : ""
+                        }
+                      },
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "java.time.Instant" : {
+        "type" : "object",
+        "properties" : {
+          "seconds" : {
+            "type" : "integer",
+            "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+            "format" : "int64"
+          },
+          "nanos" : {
+            "type" : "integer",
+            "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+          }
+        },
+        "description" : ""
+      },
+      "DTO for{@link Banner}" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "",
+            "format" : "int64"
+          },
+          "resourceKey" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "title" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "subtitle" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "linkUrl" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "position" : {
+            "type" : "string",
+            "description" : "{HOME=HOME, SIDE=SIDE}",
+            "enum" : [ "HOME", "SIDE" ]
+          },
+          "sortNo" : {
+            "type" : "integer",
+            "description" : ""
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "{SHOW=SHOW, HIDE=HIDE}",
+            "enum" : [ "SHOW", "HIDE" ]
+          },
+          "startAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              }
+            },
+            "description" : ""
+          },
+          "endAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              }
+            },
+            "description" : ""
+          },
+          "createdAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              }
+            },
+            "description" : ""
+          },
+          "updatedAt" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "description" : "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+                "format" : "int64"
+              },
+              "nanos" : {
+                "type" : "integer",
+                "description" : "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999."
+              }
+            },
+            "description" : ""
+          }
+        },
+        "description" : ""
+      },
+      "org.springframework.data.domain.Sort" : {
+        "type" : "object",
+        "properties" : {
+          "direction" : {
+            "type" : "string",
+            "description" : "{ASC=ASC, DESC=DESC}",
+            "enum" : [ "ASC", "DESC" ]
+          },
+          "property" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "ignoreCase" : {
+            "type" : "boolean",
+            "description" : ""
+          },
+          "nullHandling" : {
+            "type" : "string",
+            "description" : "{NATIVE=Lets the data store decide what to do with nulls., NULLS_FIRST=A hint to the used data store to order entries with null values before non-null entries., NULLS_LAST=A hint to the used data store to order entries with null values after non-null entries.}",
+            "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+          },
+          "ascending" : {
+            "type" : "boolean",
+            "description" : "Returns whether sorting for this property shall be ascending."
+          },
+          "descending" : {
+            "type" : "boolean",
+            "description" : "Returns whether sorting for this property shall be descending."
+          }
+        },
+        "description" : "org.springframework.data.domain.Sort"
+      },
+      "org.springframework.data.domain.Pageable" : {
+        "type" : "object",
+        "properties" : {
+          "paged" : {
+            "type" : "boolean",
+            "description" : "Returns whether the current{@link Pageable} contains pagination information."
+          },
+          "unpaged" : {
+            "type" : "boolean",
+            "description" : "Returns whether the current{@link Pageable} does not contain pagination information."
+          },
+          "pageNumber" : {
+            "type" : "integer",
+            "description" : "Returns the page to be returned."
+          },
+          "pageSize" : {
+            "type" : "integer",
+            "description" : "Returns the number of items to be returned."
+          },
+          "offset" : {
+            "type" : "integer",
+            "description" : "Returns the offset to be taken according to the underlying page and page size.",
+            "format" : "int64"
+          },
+          "sort" : {
+            "type" : "array",
+            "description" : "Returns the sorting parameters.",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "direction" : {
+                  "type" : "string",
+                  "description" : "{ASC=ASC, DESC=DESC}",
+                  "enum" : [ "ASC", "DESC" ]
+                },
+                "property" : {
+                  "type" : "string",
+                  "description" : ""
+                },
+                "ignoreCase" : {
+                  "type" : "boolean",
+                  "description" : ""
+                },
+                "nullHandling" : {
+                  "type" : "string",
+                  "description" : "{NATIVE=Lets the data store decide what to do with nulls., NULLS_FIRST=A hint to the used data store to order entries with null values before non-null entries., NULLS_LAST=A hint to the used data store to order entries with null values after non-null entries.}",
+                  "enum" : [ "NATIVE", "NULLS_FIRST", "NULLS_LAST" ]
+                },
+                "ascending" : {
+                  "type" : "boolean",
+                  "description" : "Returns whether sorting for this property shall be ascending."
+                },
+                "descending" : {
+                  "type" : "boolean",
+                  "description" : "Returns whether sorting for this property shall be descending."
+                }
+              },
+              "description" : "org.springframework.data.domain.Sort"
+            }
+          }
+        },
+        "description" : ""
+      },
+      "org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq" : {
+        "required" : [ "key", "token" ],
+        "type" : "object",
+        "properties" : {
+          "key" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "token" : {
+            "type" : "string",
+            "description" : ""
+          }
+        },
+        "description" : ""
+      },
+      "File upload response dto for file upload sign to cloud temporary storage." : {
+        "type" : "object",
+        "properties" : {
+          "key" : {
+            "type" : "string",
+            "description" : "path key without prefix"
+          },
+          "url" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "method" : {
+            "type" : "string",
+            "description" : "{GET=GET, POST=POST, PUT=PUT, DELETE=DELETE, PATCH=PATCH}",
+            "enum" : [ "GET", "POST", "PUT", "DELETE", "PATCH" ]
+          },
+          "token" : {
+            "type" : "string",
+            "description" : ""
+          }
+        },
+        "description" : ""
+      }
+    }
+  }
+}

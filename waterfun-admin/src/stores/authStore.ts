@@ -7,6 +7,8 @@ interface access {
     expire: number;
 }
 
+const STORAGE_KEY = 'accessStore'
+
 export const useAuthStore = defineStore('accessStore', ()=>{
     const accessData = ref<access>({
         token: '',
@@ -20,6 +22,24 @@ export const useAuthStore = defineStore('accessStore', ()=>{
         }
     }
 
+    const restore = () => {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored)
+                if (parsed?.accessData?.token) {
+                    accessData.value = {
+                        token: parsed.accessData.token,
+                        expire: parsed.accessData.expire || 0
+                    }
+                }
+            } catch (e) {
+                console.error('Auth restore failed:', e)
+                localStorage.removeItem(STORAGE_KEY)
+            }
+        }
+    }
+
     const removeToken = () => {
         accessData.value = {
             token: '',
@@ -27,9 +47,9 @@ export const useAuthStore = defineStore('accessStore', ()=>{
         }
     }
 
-    const isValid = computed(() => {
-        return accessData.value.token && Date.now() < accessData.value.expire;
-    });
+    const isTokenValid = computed(() => {
+        return !!accessData.value.token && Date.now() < accessData.value.expire
+    })
 
     const tryLogin = async (data: LoginRequest) => {
         return login(data).then(res => {
@@ -47,7 +67,8 @@ export const useAuthStore = defineStore('accessStore', ()=>{
         removeToken,
         tryLogin,
         accessData,
-        isValid,
+        isValid: isTokenValid,
+        restore,
     }
 },{    persist: {
         storage: localStorage

@@ -4,7 +4,137 @@
     "statusMonitor": "System Monitor"
   },
   "error": {
-    "fetch": "Failed to fetch data"
+    "fetch": "Failed to fetch data",
+
+    "success": "Success",
+    "http": {
+      "success": "Request succeeded",
+      "bad_request": "Bad request",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Forbidden",
+      "not_found": "Not found",
+      "conflict": "Conflict",
+      "internal_server_error": "Internal server error"
+    },
+    "general": {
+      "not_found": "Not found",
+      "forbidden": "Forbidden",
+      "conflict": "Conflict",
+      "unknown_error": "Unknown error",
+      "validation_error": "Validation error",
+      "resource_not_found": "Resource not found",
+      "parent_not_found": "Parent resource not found",
+      "parent_must_diff": "Parent must be different",
+      "verification": {
+        "already_exists": "Already exists"
+      }
+    },
+    "valid": {
+      "captcha": {
+        "empty": "Captcha is required"
+      },
+      "phone": {
+        "invalid": "Phone number is empty or invalid"
+      },
+      "email_address": {
+        "invalid": "Email address is empty or invalid"
+      },
+      "file_type_required": "File type is required"
+    },
+    "verify": {
+      "code": {
+        "invalid": "Verification code is invalid"
+      },
+      "captcha": {
+        "incorrect": "Captcha is incorrect"
+      },
+      "target": {
+        "unsupported": "Verification target is unsupported"
+      },
+      "two_value_must_diff": "Two values must be different",
+      "invalid": {
+        "scene": "Invalid verification scene"
+      }
+    },
+    "user": {
+      "validation": {
+        "username_invalid": "Username is empty or invalid",
+        "password_invalid": "Password is empty or invalid"
+      },
+      "verify": {
+        "credentials_incorrect": "Incorrect username or password",
+        "already_exists": "User already exists",
+        "old_password_incorrect": "Old password is incorrect"
+      },
+      "not_found": "User not found",
+      "not_found.args": "User not found: {args}",
+      "role": {
+        "not_found": "User role not found"
+      },
+      "permission": {
+        "not_found": "User permission not found"
+      },
+      "valid": {
+        "two_pwd_must_diff": "New password must be different from old password",
+        "two_pwd_not_equal": "Passwords do not match",
+        "pwd_already_set": "Password already set"
+      }
+    },
+    "email": {
+      "verify": {
+        "invalid": "Email verification is invalid"
+      },
+      "not": {
+        "found": "Email not found"
+      }
+    },
+    "role": {
+      "not_found": "Role not found",
+      "not_found.args": "Role not found: {args}",
+      "already_exists": "Role already exists",
+      "already_exists.args": "Role already exists: {args}"
+    },
+    "permission": {
+      "not_found": "Permission not found",
+      "not_found.args": "Permission not found: {args}",
+      "already_exists": "Permission already exists",
+      "already_exists.args": "Permission already exists: {args}"
+    },
+    "auth": {
+      "reauthenticate": {
+        "required": "Re-authentication required"
+      }
+    },
+    "system": {
+      "redundant_operation": "Redundant operation",
+      "invalid_path": "Invalid path",
+      "request_not_in_whitelist": "Request not in whitelist",
+      "invalid_content_type": "Invalid Content-Type",
+      "duplicate_entity": "Duplicate entity",
+      "cannot_delete_super_admin_user": "Cannot delete super admin user",
+      "cannot_delete_sys_role": "Cannot delete system role",
+      "cannot_update_sys_role_code": "Cannot update system role code",
+      "cannot_unset_sys_role": "Cannot unset system role",
+      "rate_limit_exceeded": "Rate limit exceeded",
+      "invalid_token_or_expired": "Token invalid or expired",
+      "invalid_key": "Invalid key",
+      "file_type_not_allow": "File type not allowed",
+      "cos_upload_client_not_configured": "COS upload client not configured",
+      "cloud_file_not_found": "Cloud file not found"
+    },
+    "post": {
+      "category": {
+        "exists": "Post category already exists"
+      },
+      "tag": {
+        "exists": "Post tag already exists"
+      }
+    },
+    "channel": {
+      "not": {
+        "supported": "Channel not supported"
+      }
+    }
   },
   "common": {
     "none": {
@@ -35,6 +165,8 @@
       "delete": "Delete",
       "edit": "Edit",
       "update": "Update",
+      "select": "Select",
+      "change": "Change",
       "export": "Export",
       "more": "More",
       "save": "Save",
@@ -77,6 +209,9 @@
       "category": {
         "title": "Categories",
         "detail": "Category Detail"
+      },
+      "banner": {
+        "title": "Carousel Management"
       }
     },
     "moderation": {
@@ -322,6 +457,56 @@
         "delete": "Failed to delete category",
         "fetchDetail": "Failed to fetch category detail",
         "invalidId": "Invalid category ID"
+      }
+    },
+    "banner": {
+      "create": "Create Carousel",
+      "edit": "Edit Carousel",
+      "title": "Carousel List",
+      "field": {
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "linkUrl": "Link URL",
+        "position": "Position",
+        "sortNo": "Sort",
+        "status": "Status",
+        "startAt": "Start Time",
+        "endAt": "End Time",
+        "resourceKey": "Resource Key"
+      },
+      "input": {
+        "title": "Please input title",
+        "subtitle": "Please input subtitle",
+        "linkUrl": "Please input link URL",
+        "resourceKey": "Please input resource key",
+        "suffix": "Please input file suffix",
+        "token": "Please input upload token"
+      },
+      "position": {
+        "home": "Home",
+        "side": "Side"
+      },
+      "status": {
+        "show": "Show",
+        "hide": "Hide"
+      },
+      "upload": {
+        "title": "Upload Token",
+        "suffix": "File Suffix",
+        "fetch": "Fetch Upload Token",
+        "method": "Upload Method",
+        "url": "Upload URL",
+        "token": "Upload Token"
+      },
+      "success": {
+        "create": "Carousel created",
+        "update": "Carousel updated"
+      },
+      "error": {
+        "create": "Failed to create carousel",
+        "save": "Failed to save carousel",
+        "missingUpload": "Please fetch upload token first",
+        "uploadToken": "Failed to fetch upload token"
       }
     }
   },

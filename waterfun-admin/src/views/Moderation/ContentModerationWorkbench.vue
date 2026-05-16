@@ -14,6 +14,7 @@ import {
   type ModerationResourceResp,
 } from "~/api/moderation";
 import type { PageOptions } from "~/types/api";
+import { ElMessage } from "element-plus";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -84,7 +85,7 @@ const previewUrl = (item: ModerationResourceResp): string => {
   return item.presignedUrl?.url || "";
 };
 
-const pageTotal = (payload: Record<string, any>): number => {
+const pageTotal = (payload: Record<string, unknown>): number => {
   if (typeof payload.totalElements === "number") return payload.totalElements;
   if (typeof payload.total === "number") return payload.total;
   if (payload.page && typeof payload.page.totalElements === "number") return payload.page.totalElements;
@@ -114,7 +115,7 @@ const fetchData = async () => {
     });
 
     cardData.value = res.data.content || [];
-    pageOpts.value.total = pageTotal(res.data as unknown as Record<string, any>);
+    pageOpts.value.total = pageTotal(res.data as unknown as Record<string, unknown>);
   } catch (e) {
     console.error(e);
     ElMessage.error(t("moderation.error.fetch"));
@@ -193,12 +194,23 @@ onMounted(fetchData);
 <template>
   <div class="list-layout">
     <SearchContainer>
-      <el-form inline class="search-form" :model="searchForm">
+      <el-form
+        inline
+        class="search-form"
+        :model="searchForm"
+      >
         <el-form-item :label="t('moderation.field.taskId')">
-          <el-input v-model="searchForm.taskId" :placeholder="t('moderation.input.taskId')" />
+          <el-input
+            v-model="searchForm.taskId"
+            :placeholder="t('moderation.input.taskId')"
+          />
         </el-form-item>
         <el-form-item :label="t('moderation.field.status')">
-          <el-select v-model="searchForm.status" clearable style="width: 160px">
+          <el-select
+            v-model="searchForm.status"
+            clearable
+            style="width: 160px"
+          >
             <el-option
               v-for="item in statusOptions"
               :key="item.value"
@@ -208,7 +220,10 @@ onMounted(fetchData);
           </el-select>
         </el-form-item>
         <el-form-item :label="t('moderation.field.auditorId')">
-          <el-input v-model="searchForm.auditorId" :placeholder="t('moderation.input.auditorId')" />
+          <el-input
+            v-model="searchForm.auditorId"
+            :placeholder="t('moderation.input.auditorId')"
+          />
         </el-form-item>
         <el-form-item :label="t('moderation.field.auditAt')">
           <el-date-picker
@@ -220,27 +235,43 @@ onMounted(fetchData);
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            {{ t('common.query.title') }}
+          </el-button>
+          <el-button @click="handleReset">
+            {{ t('common.reset.title') }}
+          </el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
 
     <TableContainer
+      v-model:page-size="pageOpts.pageSize"
+      v-model:current-page="pageOpts.currentPage"
       title="moderation.workbench"
       :show-add-btn="false"
       :show-remove-btn="false"
       :total="pageOpts.total"
-      v-model:page-size="pageOpts.pageSize"
-      v-model:current-page="pageOpts.currentPage"
       @change="fetchData"
     >
-      <div v-loading="loading" class="resource-grid-wrap">
-        <div v-if="cardData.length === 0" class="empty-box">
+      <div
+        v-loading="loading"
+        class="resource-grid-wrap"
+      >
+        <div
+          v-if="cardData.length === 0"
+          class="empty-box"
+        >
           <el-empty :description="t('common.none.description')" />
         </div>
 
-        <div v-else class="resource-grid">
+        <div
+          v-else
+          class="resource-grid"
+        >
           <el-card
             v-for="item in cardData"
             :key="item.id"
@@ -254,9 +285,16 @@ onMounted(fetchData);
                 :src="previewUrl(item)"
                 :alt="item.resourceKey || String(item.id || '')"
                 class="preview-image"
-              />
-              <div v-else class="image-empty">{{ t('common.none.title') }}</div>
-              <div class="hover-mask">{{ t('detail') }}</div>
+              >
+              <div
+                v-else
+                class="image-empty"
+              >
+                {{ t('common.none.title') }}
+              </div>
+              <div class="hover-mask">
+                {{ t('detail') }}
+              </div>
             </div>
 
             <div class="card-main">
@@ -286,7 +324,12 @@ onMounted(fetchData);
                 >
                   {{ t('moderation.action.approve') }}
                 </el-button>
-                <el-button size="small" type="warning" :disabled="!item.id" @click.stop="openRejectDialog(item.id)">
+                <el-button
+                  size="small"
+                  type="warning"
+                  :disabled="!item.id"
+                  @click.stop="openRejectDialog(item.id)"
+                >
                   {{ t('moderation.action.reject') }}
                 </el-button>
               </div>
@@ -296,10 +339,17 @@ onMounted(fetchData);
       </div>
     </TableContainer>
 
-    <el-dialog v-model="rejectDialogVisible" :title="t('moderation.dialog.rejectTitle')" width="520">
+    <el-dialog
+      v-model="rejectDialogVisible"
+      :title="t('moderation.dialog.rejectTitle')"
+      width="520"
+    >
       <el-form label-width="100px">
         <el-form-item :label="t('moderation.field.rejectType')">
-          <el-select v-model="rejectForm.rejectType" style="width: 100%">
+          <el-select
+            v-model="rejectForm.rejectType"
+            style="width: 100%"
+          >
             <el-option
               v-for="item in rejectTypeOptions"
               :key="item.value"
@@ -319,8 +369,16 @@ onMounted(fetchData);
       </el-form>
 
       <template #footer>
-        <el-button @click="rejectDialogVisible = false">{{ t('common.action.cancel') }}</el-button>
-        <el-button type="primary" :loading="rejectSubmitting" @click="submitReject">{{ t('common.action.save') }}</el-button>
+        <el-button @click="rejectDialogVisible = false">
+          {{ t('common.action.cancel') }}
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="rejectSubmitting"
+          @click="submitReject"
+        >
+          {{ t('common.action.save') }}
+        </el-button>
       </template>
     </el-dialog>
   </div>

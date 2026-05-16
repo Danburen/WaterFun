@@ -8,15 +8,20 @@ import router from "@/router/index";
 import {createPinia} from "pinia";
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import ECharts from 'vue-echarts'
+import { useAuthStore } from '@/stores/authStore';
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
 const app = createApp(App)
-app.component('v-chart', ECharts)
+app.component('VChart', ECharts)
+app.use(pinia)
+app.use(router)
 app.use(ElementPlus)
     .use(i18n)
-    .use(router)
-    .use(pinia)
+
+const authStore = useAuthStore();
+authStore.restore();
 
 app.mount('#app')
+

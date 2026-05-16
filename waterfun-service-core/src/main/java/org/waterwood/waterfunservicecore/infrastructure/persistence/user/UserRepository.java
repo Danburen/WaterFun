@@ -36,7 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
     @Transactional
     @Modifying
     @Query("UPDATE User u set u.avatar = :avatar where u.uid = :uid")
-    int updateAvatar(@Param("uid") Long userUid,@Param("avatar") String avatar);
+    int updateAvatar(@Param("uid") Long userUid,@Param("ofUser") String avatar);
 
     @Query("SELECT u.avatar FROM User u WHERE u.uid = :uid")
     String getUserAvatarByUid(@Param("uid") Long uid);

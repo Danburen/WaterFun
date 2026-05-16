@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.audit.resource.AuditResourceType;
+import org.waterwood.common.io.ResourceType;
 
 import java.time.Instant;
 
@@ -18,7 +18,7 @@ public class ModerationResourceRes {
     private Long taskId;
     private String placeholder;
     private String resourceKey;
-    private AuditResourceType resourceType;
+    private ResourceType resourceType;
     private String mimeType;
     private Long sizeBytes;
     private Long sortNo;

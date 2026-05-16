@@ -10,6 +10,7 @@ import TableContainer from "~/components/TableContainer.vue";
 import { deleteTag, deleteTags, listTags, type TagResp } from "~/api/tag";
 import type { PageOptions } from "~/types/api";
 import TagCreateDialog from "~/views/Content/components/TagCreateDialog.vue";
+import { ElMessage } from "element-plus";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -167,12 +168,22 @@ onMounted(() => {
 <template>
   <div class="list-layout">
     <SearchContainer>
-      <el-form inline class="search-form" :model="searchForm">
+      <el-form
+        inline
+        class="search-form"
+        :model="searchForm"
+      >
         <el-form-item :label="t('content.tag.field.name')">
-          <el-input v-model="searchForm.name" :placeholder="t('content.tag.input.name')" />
+          <el-input
+            v-model="searchForm.name"
+            :placeholder="t('content.tag.input.name')"
+          />
         </el-form-item>
         <el-form-item :label="t('content.tag.field.slug')">
-          <el-input v-model="searchForm.slug" :placeholder="t('content.tag.input.slug')" />
+          <el-input
+            v-model="searchForm.slug"
+            :placeholder="t('content.tag.input.slug')"
+          />
         </el-form-item>
         <el-form-item :label="t('content.tag.field.creatorId')">
           <el-select
@@ -193,20 +204,27 @@ onMounted(() => {
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            {{ t('common.query.title') }}
+          </el-button>
+          <el-button @click="handleReset">
+            {{ t('common.reset.title') }}
+          </el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
 
     <TableContainer
+      v-model:page-size="pageOpts.pageSize"
+      v-model:current-page="pageOpts.currentPage"
       title="content.tag.title"
-      showAddBtn
+      show-add-btn
       :show-remove-btn="true"
       :disable-delete="selectedTagIds.length === 0"
       :total="pageOpts.total"
-      v-model:page-size="pageOpts.pageSize"
-      v-model:current-page="pageOpts.currentPage"
       @add="handleAdd"
       @remove="handleBatchDelete"
       @change="fetchData"
@@ -220,27 +238,74 @@ onMounted(() => {
         style="width: 100%"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="id" label="ID" width="90" />
-        <el-table-column prop="name" :label="t('content.tag.field.name')" min-width="150" show-overflow-tooltip>
+        <el-table-column
+          type="selection"
+          width="55"
+        />
+        <el-table-column
+          prop="id"
+          label="ID"
+          width="90"
+        />
+        <el-table-column
+          prop="name"
+          :label="t('content.tag.field.name')"
+          min-width="150"
+          show-overflow-tooltip
+        >
           <template #default="{ row }">
-            <el-link type="primary" :underline="false" @click="gotoDetail(row.id)">{{ row.name }}</el-link>
+            <el-link
+              type="primary"
+              :underline="false"
+              @click="gotoDetail(row.id)"
+            >
+              {{ row.name }}
+            </el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="slug" :label="t('content.tag.field.slug')" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="usageCount" :label="t('content.tag.field.usageCount')" width="120" />
-        <el-table-column prop="creatorId" :label="t('content.tag.field.creatorId')" width="110" />
-        <el-table-column prop="createdAt" :label="t('common.time.create')" min-width="170">
+        <el-table-column
+          prop="slug"
+          :label="t('content.tag.field.slug')"
+          min-width="160"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="usageCount"
+          :label="t('content.tag.field.usageCount')"
+          width="120"
+        />
+        <el-table-column
+          prop="creatorId"
+          :label="t('content.tag.field.creatorId')"
+          width="110"
+        />
+        <el-table-column
+          prop="createdAt"
+          :label="t('common.time.create')"
+          min-width="170"
+        >
           <template #default="{ row }">
             {{ formatDate(row.createdAt) || t('common.none.title') }}
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.operation.title')" width="180" fixed="right">
+        <el-table-column
+          :label="t('common.operation.title')"
+          width="180"
+          fixed="right"
+        >
           <template #default="{ row }">
-            <el-button size="small" type="primary" @click="handleEdit(row.id)">
+            <el-button
+              size="small"
+              type="primary"
+              @click="handleEdit(row.id)"
+            >
               {{ t('common.action.edit') }}
             </el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row.id)">
+            <el-button
+              size="small"
+              type="danger"
+              @click="handleDelete(row.id)"
+            >
               {{ t('common.action.delete') }}
             </el-button>
           </template>

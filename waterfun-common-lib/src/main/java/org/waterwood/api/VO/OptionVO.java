@@ -16,6 +16,7 @@ public class OptionVO<ID extends Serializable> {
     private ID id;
     private String code;
     private String name;
+    @Builder.Default
     private Boolean disabled = false;
 
     public static <ID extends Serializable> OptionVO<ID> of(ID id, String name, String code, boolean b) {
@@ -25,6 +26,10 @@ public class OptionVO<ID extends Serializable> {
         vo.name = name;
         vo.disabled = b;
         return vo;
+    }
+
+    public static OptionVO<Integer> ofInteger(Integer id, String name, String code, boolean b) {
+        return of(id, name, code, b);
     }
 
     public ExpirableOptionVO<ID> toExpirableOption(Instant expireAt) {

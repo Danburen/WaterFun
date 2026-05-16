@@ -1,6 +1,136 @@
 {
   "error": {
-    "fetch": "获取数据失败"
+    "fetch": "获取数据失败",
+
+    "success": "成功",
+    "http": {
+      "success": "请求成功",
+      "bad_request": "请求参数错误",
+      "unauthorized": "未授权",
+      "forbidden": "无权限访问",
+      "not_found": "资源不存在",
+      "conflict": "资源冲突",
+      "internal_server_error": "服务器内部错误"
+    },
+    "general": {
+      "not_found": "资源不存在",
+      "forbidden": "无权限",
+      "conflict": "资源冲突",
+      "unknown_error": "未知错误",
+      "validation_error": "参数校验失败",
+      "resource_not_found": "资源未找到",
+      "parent_not_found": "父级资源不存在",
+      "parent_must_diff": "父级必须不同",
+      "verification": {
+        "already_exists": "已存在"
+      }
+    },
+    "valid": {
+      "captcha": {
+        "empty": "图形验证码不能为空"
+      },
+      "phone": {
+        "invalid": "手机号为空或格式不正确"
+      },
+      "email_address": {
+        "invalid": "邮箱地址为空或格式不正确"
+      },
+      "file_type_required": "请选择文件类型"
+    },
+    "verify": {
+      "code": {
+        "invalid": "验证码错误或已过期"
+      },
+      "captcha": {
+        "incorrect": "图形验证码不正确"
+      },
+      "target": {
+        "unsupported": "不支持的验证目标"
+      },
+      "two_value_must_diff": "两个值必须不同",
+      "invalid": {
+        "scene": "无效的验证场景"
+      }
+    },
+    "user": {
+      "validation": {
+        "username_invalid": "用户名为空或格式不正确",
+        "password_invalid": "密码为空或格式不正确"
+      },
+      "verify": {
+        "credentials_incorrect": "用户名或密码错误",
+        "already_exists": "用户已存在",
+        "old_password_incorrect": "原密码错误"
+      },
+      "not_found": "用户不存在",
+      "not_found.args": "用户不存在：{args}",
+      "role": {
+        "not_found": "用户角色不存在"
+      },
+      "permission": {
+        "not_found": "用户权限不存在"
+      },
+      "valid": {
+        "two_pwd_must_diff": "新旧密码必须不同",
+        "two_pwd_not_equal": "两次输入的密码不一致",
+        "pwd_already_set": "密码已设置"
+      }
+    },
+    "email": {
+      "verify": {
+        "invalid": "邮箱验证码无效"
+      },
+      "not": {
+        "found": "邮箱不存在"
+      }
+    },
+    "role": {
+      "not_found": "角色不存在",
+      "not_found.args": "角色不存在：{args}",
+      "already_exists": "角色已存在",
+      "already_exists.args": "角色已存在：{args}"
+    },
+    "permission": {
+      "not_found": "权限不存在",
+      "not_found.args": "权限不存在：{args}",
+      "already_exists": "权限已存在",
+      "already_exists.args": "权限已存在：{args}"
+    },
+    "auth": {
+      "reauthenticate": {
+        "required": "需要重新登录"
+      }
+    },
+    "system": {
+      "redundant_operation": "重复操作",
+      "invalid_path": "路径无效",
+      "request_not_in_whitelist": "请求不在白名单中",
+      "invalid_content_type": "Content-Type 无效",
+      "duplicate_entity": "数据重复",
+      "cannot_delete_super_admin_user": "不能删除超级管理员用户",
+      "cannot_delete_sys_role": "不能删除系统角色",
+      "cannot_update_sys_role_code": "不能修改系统角色编码",
+      "cannot_unset_sys_role": "不能取消系统角色",
+      "rate_limit_exceeded": "请求过于频繁，请稍后再试",
+      "invalid_token_or_expired": "登录已过期，请重新登录",
+      "invalid_key": "无效的 Key",
+      "file_type_not_allow": "文件类型不允许",
+      "cos_upload_client_not_configured": "COS 上传客户端未配置",
+      "cloud_file_not_found": "云端文件不存在"
+    },
+    "post": {
+      "category": {
+        "exists": "文章分类已存在"
+      },
+      "tag": {
+        "exists": "文章标签已存在"
+      }
+    },
+    "channel": {
+      "not": {
+        "supported": "渠道不支持"
+      }
+    }
   },
   "common": {
     "none": {
@@ -31,6 +161,8 @@
       "delete": "删除",
       "edit": "编辑",
       "update": "修改",
+      "select": "选择",
+      "change": "更换",
       "export": "导出",
       "more": "更多",
       "save": "保存",
@@ -82,6 +214,9 @@
       "category": {
         "title": "分类管理",
         "detail": "分类详情"
+      },
+      "banner": {
+        "title": "轮播图管理"
       }
     },
     "moderation": {
@@ -421,6 +556,51 @@
         "delete": "分类删除失败",
         "fetchDetail": "获取分类详情失败",
         "invalidId": "无效的分类ID"
+      }
+    },
+    "banner": {
+      "create": "新增轮播图",
+      "edit": "编辑轮播图",
+      "title": "轮播图列表",
+      "field": {
+        "title": "标题",
+        "subtitle": "副标题",
+        "linkUrl": "跳转链接",
+        "position": "位置",
+        "sortNo": "排序",
+        "status": "状态",
+        "startAt": "开始时间",
+        "endAt": "结束时间",
+        "resourceKey": "资源Key",
+        "img": "轮播图图片"
+      },
+      "input": {
+        "title": "请输入标题",
+        "subtitle": "请输入副标题",
+        "linkUrl": "请输入跳转链接",
+        "suffix": "请输入文件后缀",
+        "token": "请输入上传Token"
+      },
+      "description": {
+        "resourceKey": "资源Key等待上传成功后自动生成，无需输入"
+      },
+      "position": {
+        "home": "首页",
+        "side": "侧边"
+      },
+      "status": {
+        "show": "展示",
+        "hide": "隐藏"
+      },
+      "success": {
+        "create": "轮播图创建成功",
+        "update": "轮播图更新成功"
+      },
+      "error": {
+        "create": "轮播图创建失败",
+        "save": "轮播图保存失败",
+        "missingUpload": "请先获取上传凭证",
+        "uploadToken": "获取上传凭证失败"
       }
     }
   },

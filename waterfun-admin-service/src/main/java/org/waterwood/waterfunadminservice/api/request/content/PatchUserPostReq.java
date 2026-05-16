@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.api.enums.PostVisibility;
+import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 
 import java.io.Serializable;

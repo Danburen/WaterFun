@@ -4,6 +4,7 @@ import { formatISOData } from "@waterfun/web-core/src/timer";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { getPermOptions, getPermUsers, getPermission, type PermissionResp } from "~/api/permission";
+import { ElMessage } from "element-plus";
 import PermEditDialog from "./components/PermEditDialog.vue";
 
 const { t } = useI18n();
@@ -93,21 +94,47 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="perm-detail" v-loading="loading">
+  <div
+    v-loading="loading"
+    class="perm-detail"
+  >
     <CardContainer title="permission.detail">
       <template #header-right>
-        <el-button text @click="router.back()">{{ t("common.action.back") }}</el-button>
-        <el-button type="primary" plain @click="openEditDialog">{{ t("common.action.edit") }}</el-button>
+        <el-button
+          text
+          @click="router.back()"
+        >
+          {{ t("common.action.back") }}
+        </el-button>
+        <el-button
+          type="primary"
+          plain
+          @click="openEditDialog"
+        >
+          {{ t("common.action.edit") }}
+        </el-button>
       </template>
 
-      <el-descriptions v-if="permissionDetail" :column="2" border>
-        <el-descriptions-item label="ID">{{ permissionDetail.id }}</el-descriptions-item>
-        <el-descriptions-item :label="t('permission.name')">{{ permissionDetail.name }}</el-descriptions-item>
-        <el-descriptions-item :label="t('permission.code')">{{ permissionDetail.code || t('common.none.title') }}</el-descriptions-item>
+      <el-descriptions
+        v-if="permissionDetail"
+        :column="2"
+        border
+      >
+        <el-descriptions-item label="ID">
+          {{ permissionDetail.id }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('permission.name')">
+          {{ permissionDetail.name }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('permission.code')">
+          {{ permissionDetail.code || t('common.none.title') }}
+        </el-descriptions-item>
         <el-descriptions-item :label="t('permission.type.title')">
           {{ t(`permission.type.${permissionDetail.type.toLowerCase()}`) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.resource')">{{ permissionDetail.resource || t('common.none.title') }}</el-descriptions-item>
+        <el-descriptions-item :label="t('permission.resource')">
+          {{ permissionDetail.resource || t('common.none.title') }}
+        </el-descriptions-item>
         <el-descriptions-item :label="t('permission.parentId')">
           <el-link
             v-if="permissionDetail.parentId != null"
@@ -123,26 +150,58 @@ onMounted(async () => {
           {{ permissionDetail.orderWeight ?? t('common.none.title') }}
         </el-descriptions-item>
         <el-descriptions-item :label="t('permission.isSystem')">
-          <el-tag size="small" :type="permissionDetail.isSystem ? 'warning' : 'info'">
+          <el-tag
+            size="small"
+            :type="permissionDetail.isSystem ? 'warning' : 'info'"
+          >
             {{ permissionDetail.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="t('permission.description')">
           {{ permissionDetail.description || t('common.none.title') }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">{{ formatISOData(permissionDetail.createdAt) }}</el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">{{ formatISOData(permissionDetail.updatedAt) }}</el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.create')">
+          {{ formatISOData(permissionDetail.createdAt) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.update')">
+          {{ formatISOData(permissionDetail.updatedAt) }}
+        </el-descriptions-item>
       </el-descriptions>
     </CardContainer>
 
-    <CardContainer style="margin-top: 12px" title="permission.assignedUsers">
+    <CardContainer
+      style="margin-top: 12px"
+      title="permission.assignedUsers"
+    >
       <el-collapse v-model="collapseActive">
-        <el-collapse-item :title="t('permission.assignedUsers')" name="users">
+        <el-collapse-item
+          :title="t('permission.assignedUsers')"
+          name="users"
+        >
           <el-row :gutter="10">
-            <el-col v-for="item in assignedUserOptions" :key="`user-${item.id}`" :xs="24" :sm="12" :md="8" :lg="6" class="option-col">
-              <el-link type="primary" :underline="false" @click="gotoUserDetail(item.id)">{{ item.name }}</el-link>
+            <el-col
+              v-for="item in assignedUserOptions"
+              :key="`user-${item.id}`"
+              :xs="24"
+              :sm="12"
+              :md="8"
+              :lg="6"
+              class="option-col"
+            >
+              <el-link
+                type="primary"
+                :underline="false"
+                @click="gotoUserDetail(item.id)"
+              >
+                {{ item.name }}
+              </el-link>
             </el-col>
-            <el-col v-if="assignedUserOptions.length === 0" :span="24">{{ t('common.none.description') }}</el-col>
+            <el-col
+              v-if="assignedUserOptions.length === 0"
+              :span="24"
+            >
+              {{ t('common.none.description') }}
+            </el-col>
           </el-row>
         </el-collapse-item>
       </el-collapse>

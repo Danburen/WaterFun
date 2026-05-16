@@ -3,6 +3,7 @@ import type { OptionResItem } from "@waterfun/web-core/src/types";
 import { useI18n } from "vue-i18n";
 import { addPermission, getPermission, updatePermission, type PermissionType } from "~/api/permission";
 import PermForm from "./PermForm.vue";
+import { ElMessage } from "element-plus";
 import type { PermFormExpose, PermFormModel } from "../types";
 
 const props = withDefaults(
@@ -129,22 +130,30 @@ const handleClosed = () => {
 
 <template>
   <el-dialog
-	v-model="visible"
-	:title="mode === 'create' ? t('permission.create') : t('permission.edit')"
-	width="680"
-	destroy-on-close
-	@closed="handleClosed"
+    v-model="visible"
+    :title="mode === 'create' ? t('permission.create') : t('permission.edit')"
+    width="680"
+    destroy-on-close
+    @closed="handleClosed"
   >
-	<PermForm
-	  ref="permFormRef"
-	  v-model="permFormModel"
-	  :perm-options="permOptions"
-	  :disabled-parent-ids="disabledParentIds"
-	/>
-	<template #footer>
-	  <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
-	  <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('common.action.save') }}</el-button>
-	</template>
+    <PermForm
+      ref="permFormRef"
+      v-model="permFormModel"
+      :perm-options="permOptions"
+      :disabled-parent-ids="disabledParentIds"
+    />
+    <template #footer>
+      <el-button @click="visible = false">
+        {{ t('common.action.cancel') }}
+      </el-button>
+      <el-button
+        type="primary"
+        :loading="submitting"
+        @click="handleSave"
+      >
+        {{ t('common.action.save') }}
+      </el-button>
+    </template>
   </el-dialog>
 </template>
 

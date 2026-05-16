@@ -14,6 +14,7 @@ import {
   type PermissionResp,
   type PermissionType,
 } from "~/api/permission";
+import { ElMessage } from "element-plus";
 import type { PageOptions } from "~/types";
 import PermEditDialog from "./components/PermEditDialog.vue";
 
@@ -191,23 +192,45 @@ onMounted(async () => {
 <template>
   <div class="list-layout">
     <SearchContainer>
-      <el-form inline class="search-form" :model="searchForm">
+      <el-form
+        inline
+        class="search-form"
+        :model="searchForm"
+      >
         <el-form-item :label="t('permission.name')">
-          <el-input v-model="searchForm.name" :placeholder="t('permission.input.name')" />
+          <el-input
+            v-model="searchForm.name"
+            :placeholder="t('permission.input.name')"
+          />
         </el-form-item>
 
         <el-form-item :label="t('permission.code')">
-          <el-input v-model="searchForm.code" :placeholder="t('permission.input.code')" />
+          <el-input
+            v-model="searchForm.code"
+            :placeholder="t('permission.input.code')"
+          />
         </el-form-item>
 
         <el-form-item :label="t('permission.type.title')">
-          <el-select v-model="searchForm.type" clearable style="width: 140px">
-            <el-option v-for="item in permTypeOptions" :key="item.value" :label="t(item.label)" :value="item.value" />
+          <el-select
+            v-model="searchForm.type"
+            clearable
+            style="width: 140px"
+          >
+            <el-option
+              v-for="item in permTypeOptions"
+              :key="item.value"
+              :label="t(item.label)"
+              :value="item.value"
+            />
           </el-select>
         </el-form-item>
 
         <el-form-item :label="t('permission.resource')">
-          <el-input v-model="searchForm.resource" :placeholder="t('permission.input.resource')" />
+          <el-input
+            v-model="searchForm.resource"
+            :placeholder="t('permission.input.resource')"
+          />
         </el-form-item>
 
         <el-form-item :label="t('permission.parentId')">
@@ -228,87 +251,169 @@ onMounted(async () => {
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            {{ t('common.query.title') }}
+          </el-button>
+          <el-button @click="handleReset">
+            {{ t('common.reset.title') }}
+          </el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
 
     <TableContainer
+      v-model:page-size="pageOpts.pageSize"
+      v-model:current-page="pageOpts.currentPage"
       title="permission.title"
-      showAddBtn
+      show-add-btn
       :show-remove-btn="true"
       :disable-delete="selectedPermIds.length === 0"
+      :total="pageOpts.total"
       @add="handleAdd"
       @remove="handleBatchDelete"
       @change="fetchData"
-      :total="pageOpts.total"
-      v-model:page-size="pageOpts.pageSize"
-      v-model:current-page="pageOpts.currentPage"
     >
+      <el-table
+        v-loading="loading"
+        :data="permissionList"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column
+          type="selection"
+          :selectable="selectable"
+          width="55"
+        />
+        <el-table-column
+          prop="id"
+          label="ID"
+          width="80"
+        />
 
-    <el-table
-      v-loading="loading"
-      :data="permissionList"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" :selectable="selectable" width="55" />
-      <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column
+          prop="name"
+          :label="t('permission.name')"
+          min-width="140"
+        >
+          <template #default="{ row }">
+            <el-link
+              type="primary"
+              :underline="false"
+              @click="gotoDetail(row)"
+            >
+              {{ row.name }}
+            </el-link>
+          </template>
+        </el-table-column>
 
-      <el-table-column prop="name" :label="t('permission.name')" min-width="140">
-        <template #default="{ row }">
-          <el-link type="primary" :underline="false" @click="gotoDetail(row)">{{ row.name }}</el-link>
-        </template>
-      </el-table-column>
+        <el-table-column
+          prop="code"
+          :label="t('permission.code')"
+          min-width="140"
+        />
 
-      <el-table-column prop="code" :label="t('permission.code')" min-width="140" />
+        <el-table-column
+          prop="type"
+          :label="t('permission.type.title')"
+          width="110"
+        >
+          <template #default="{ row }">
+            {{ t(`permission.type.${row.type?.toLowerCase?.() || 'other'}`) }}
+          </template>
+        </el-table-column>
 
-      <el-table-column prop="type" :label="t('permission.type.title')" width="110">
-        <template #default="{ row }">
-          {{ t(`permission.type.${row.type?.toLowerCase?.() || 'other'}`) }}
-        </template>
-      </el-table-column>
+        <el-table-column
+          prop="resource"
+          :label="t('permission.resource')"
+          min-width="180"
+          show-overflow-tooltip
+        />
 
-      <el-table-column prop="resource" :label="t('permission.resource')" min-width="180" show-overflow-tooltip />
+        <el-table-column
+          prop="parentId"
+          :label="t('permission.parentId')"
+          width="120"
+        >
+          <template #default="{ row }">
+            <el-link
+              v-if="row.parentId != null"
+              type="primary"
+              :underline="false"
+              @click="gotoDetail(row.parentId)"
+            >
+              {{ row.parentId }}
+            </el-link>
+            <span v-else>{{ t('common.none.title') }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column prop="parentId" :label="t('permission.parentId')" width="120">
-        <template #default="{ row }">
-          <el-link v-if="row.parentId != null" type="primary" :underline="false" @click="gotoDetail(row.parentId)">
-            {{ row.parentId }}
-          </el-link>
-          <span v-else>{{ t('common.none.title') }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column
+          prop="orderWeight"
+          :label="t('permission.weight')"
+          width="90"
+        />
 
-      <el-table-column prop="orderWeight" :label="t('permission.weight')" width="90" />
+        <el-table-column
+          prop="isSystem"
+          :label="t('permission.isSystem')"
+          width="100"
+        >
+          <template #default="{ row }">
+            <el-tag
+              size="small"
+              :type="row.isSystem ? 'warning' : 'info'"
+            >
+              {{ row.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
+            </el-tag>
+          </template>
+        </el-table-column>
 
-      <el-table-column prop="isSystem" :label="t('permission.isSystem')" width="100">
-        <template #default="{ row }">
-          <el-tag size="small" :type="row.isSystem ? 'warning' : 'info'">
-            {{ row.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
-          </el-tag>
-        </template>
-      </el-table-column>
+        <el-table-column
+          prop="description"
+          :label="t('permission.description')"
+          min-width="180"
+          show-overflow-tooltip
+        />
 
-      <el-table-column prop="description" :label="t('permission.description')" min-width="180" show-overflow-tooltip />
+        <el-table-column
+          prop="createdAt"
+          :label="t('common.time.create')"
+          min-width="170"
+        >
+          <template #default="{ row }">
+            <span>{{ formatISOData(row.createdAt) }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column prop="createdAt" :label="t('common.time.create')" min-width="170">
-        <template #default="{ row }">
-          <span>{{ formatISOData(row.createdAt) }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column :label="t('common.operation.title')" width="150" fixed="right">
-        <template #default="scope">
-          <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ t('common.action.edit') }}</el-button>
-          <el-button type="danger" size="small" @click="handleDelete(scope.row)">{{ t('common.action.delete') }}</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        <el-table-column
+          :label="t('common.operation.title')"
+          width="150"
+          fixed="right"
+        >
+          <template #default="scope">
+            <el-button
+              type="primary"
+              size="small"
+              @click="handleEdit(scope.row)"
+            >
+              {{ t('common.action.edit') }}
+            </el-button>
+            <el-button
+              type="danger"
+              size="small"
+              @click="handleDelete(scope.row)"
+            >
+              {{ t('common.action.delete') }}
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
       <PermEditDialog
         v-model="dialogVisible"

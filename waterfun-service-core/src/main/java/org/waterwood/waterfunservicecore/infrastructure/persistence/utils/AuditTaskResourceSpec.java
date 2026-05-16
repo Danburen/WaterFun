@@ -3,8 +3,8 @@ package org.waterwood.waterfunservicecore.infrastructure.persistence.utils;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.audit.resource.AuditResourceType;
-import org.waterwood.waterfunservicecore.entity.audit.resource.AuditTaskResource;
+import org.waterwood.common.io.ResourceType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public final class AuditTaskResourceSpec {
     public static Specification<AuditTaskResource> of(
             Long taskId,
             AuditStatus status,
-            AuditResourceType resourceType,
+            ResourceType resourceType,
             Long auditorId,
             Instant auditAtStart,
             Instant auditAtEnd

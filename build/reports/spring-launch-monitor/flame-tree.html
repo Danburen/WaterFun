@@ -29,7 +29,7 @@
   <div class="card">
     <h1>🚀 Spring Launch Monitor Startup Report</h1>
     <div class="section-title">📊 Startup Report</div>
-    <div class="report"><p class="report-total">Total startup time: 10,072 ms</p><h3>📊 Startup phase details:</h3><ul><li><span class="phase-label">Application starting phase</span> <span class="phase-metric">0ms</span> <span class="phase-bar"></span></li><li><span class="phase-label">Application environment prepared phase</span> <span class="phase-metric">598ms</span> <span class="phase-bar">#####</span></li><li><span class="phase-label">Application context refreshed phase</span> <span class="phase-metric">10064ms</span> <span class="phase-bar">##################################################</span></li><li><span class="phase-label">Application ready phase</span> <span class="phase-metric">10072ms</span> <span class="phase-bar">##################################################</span></li></ul><h3>🔥 Slowest Top 10 Beans:</h3><ol><li>entityManagerFactory <span class="bean-metric">2211ms</span></li><li>userRepository <span class="bean-metric">659ms</span></li><li>encryptedKeyService <span class="bean-metric">129ms</span></li><li>inboxSystemRepository <span class="bean-metric">123ms</span></li><li>userRoleRepo <span class="bean-metric">111ms</span></li><li>tomcatServletWebServerFactory <span class="bean-metric">98ms</span></li><li>requestMappingHandlerAdapter <span class="bean-metric">46ms</span></li><li>requestMappingHandlerMapping <span class="bean-metric">39ms</span></li><li>redisConnectionFactory <span class="bean-metric">30ms</span></li><li>userPermRepo <span class="bean-metric">26ms</span></li></ol><h3>💡 Optimization suggestions:</h3><ul><li>Total bean initialization time is high (3,645ms); check circular dependencies</li></ul></div></div>
+    <div class="report"><p class="report-total">Total startup time: 28,511 ms</p><h3>📊 Startup phase details:</h3><ul><li><span class="phase-label">Application starting phase</span> <span class="phase-metric">0ms</span> <span class="phase-bar"></span></li><li><span class="phase-label">Application environment prepared phase</span> <span class="phase-metric">451ms</span> <span class="phase-bar">####</span></li><li><span class="phase-label">Application context refreshed phase</span> <span class="phase-metric">28491ms</span> <span class="phase-bar">##################################################</span></li><li><span class="phase-label">Application ready phase</span> <span class="phase-metric">28511ms</span> <span class="phase-bar">##################################################</span></li></ul><h3>🔥 Slowest Top 10 Beans:</h3><ol><li>entityManagerFactory <span class="bean-metric">7968ms</span></li><li>userRepository <span class="bean-metric">1614ms</span></li><li>encryptedKeyService <span class="bean-metric">474ms</span></li><li>inboxSystemRepository <span class="bean-metric">335ms</span></li><li>userRoleRepo <span class="bean-metric">265ms</span></li><li>requestMappingHandlerAdapter <span class="bean-metric">119ms</span></li><li>auditTaskRepository <span class="bean-metric">118ms</span></li><li>tomcatServletWebServerFactory <span class="bean-metric">101ms</span></li><li>requestMappingHandlerMapping <span class="bean-metric">90ms</span></li><li>userPermRepo <span class="bean-metric">58ms</span></li></ol><h3>💡 Optimization suggestions:</h3><ul><li>Total bean initialization time is high (11,839ms); check circular dependencies</li></ul></div></div>
     <div class="section-title">🔥 Package Flame Tree</div>
     <div class="toolbar">
       <button class="btn" type="button" onclick="toggleAll(true)">Expand All</button>
@@ -40,7 +40,7 @@
   <summary>
     <div class="row">
       <div class="label">bean-init</div>
-      <div class="metrics">total=3,645ms, self=0ms, beans=709</div>
+      <div class="metrics">total=11,839ms, self=0ms, beans=715</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:100%"></div></div>
   </summary>
@@ -48,7 +48,7 @@
   <summary>
     <div class="row">
       <div class="label">com</div>
-      <div class="metrics">total=4ms, self=0ms, beans=5</div>
+      <div class="metrics">total=15ms, self=0ms, beans=5</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -76,7 +76,7 @@
   <summary>
     <div class="row">
       <div class="label">nimbusds</div>
-      <div class="metrics">total=1ms, self=0ms, beans=1</div>
+      <div class="metrics">total=2ms, self=0ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -84,7 +84,7 @@
   <summary>
     <div class="row">
       <div class="label">jose</div>
-      <div class="metrics">total=1ms, self=0ms, beans=1</div>
+      <div class="metrics">total=2ms, self=0ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -92,7 +92,7 @@
   <summary>
     <div class="row">
       <div class="label">jwk</div>
-      <div class="metrics">total=1ms, self=0ms, beans=1</div>
+      <div class="metrics">total=2ms, self=0ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -100,7 +100,7 @@
   <summary>
     <div class="row">
       <div class="label">source</div>
-      <div class="metrics">total=1ms, self=1ms, beans=1</div>
+      <div class="metrics">total=2ms, self=2ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -116,7 +116,7 @@
   <summary>
     <div class="row">
       <div class="label">qcloud</div>
-      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+      <div class="metrics">total=7ms, self=0ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -124,7 +124,7 @@
   <summary>
     <div class="row">
       <div class="label">cos</div>
-      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+      <div class="metrics">total=7ms, self=7ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -166,7 +166,7 @@
   <summary>
     <div class="row">
       <div class="label">zaxxer</div>
-      <div class="metrics">total=3ms, self=0ms, beans=1</div>
+      <div class="metrics">total=6ms, self=0ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -174,7 +174,7 @@
   <summary>
     <div class="row">
       <div class="label">hikari</div>
-      <div class="metrics">total=3ms, self=3ms, beans=1</div>
+      <div class="metrics">total=6ms, self=6ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -188,7 +188,7 @@
   <summary>
     <div class="row">
       <div class="label">io</div>
-      <div class="metrics">total=1ms, self=0ms, beans=20</div>
+      <div class="metrics">total=3ms, self=0ms, beans=20</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -196,7 +196,7 @@
   <summary>
     <div class="row">
       <div class="label">github</div>
-      <div class="metrics">total=1ms, self=0ms, beans=4</div>
+      <div class="metrics">total=3ms, self=0ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -204,7 +204,7 @@
   <summary>
     <div class="row">
       <div class="label">danburen</div>
-      <div class="metrics">total=1ms, self=0ms, beans=4</div>
+      <div class="metrics">total=3ms, self=0ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -212,7 +212,7 @@
   <summary>
     <div class="row">
       <div class="label">springlaunchmonitor</div>
-      <div class="metrics">total=1ms, self=0ms, beans=4</div>
+      <div class="metrics">total=3ms, self=0ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -220,7 +220,7 @@
   <summary>
     <div class="row">
       <div class="label">config</div>
-      <div class="metrics">total=1ms, self=1ms, beans=1</div>
+      <div class="metrics">total=3ms, self=3ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -428,7 +428,7 @@
   <summary>
     <div class="row">
       <div class="label">org</div>
-      <div class="metrics">total=3,640ms, self=0ms, beans=678</div>
+      <div class="metrics">total=11,821ms, self=0ms, beans=684</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:100%"></div></div>
   </summary>
@@ -476,7 +476,7 @@
   <summary>
     <div class="row">
       <div class="label">springframework</div>
-      <div class="metrics">total=3,511ms, self=0ms, beans=593</div>
+      <div class="metrics">total=11,342ms, self=0ms, beans=597</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:96%"></div></div>
   </summary>
@@ -484,7 +484,7 @@
   <summary>
     <div class="row">
       <div class="label">amqp</div>
-      <div class="metrics">total=2ms, self=0ms, beans=12</div>
+      <div class="metrics">total=7ms, self=0ms, beans=12</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -502,7 +502,7 @@
   <summary>
     <div class="row">
       <div class="label">rabbit</div>
-      <div class="metrics">total=2ms, self=0ms, beans=7</div>
+      <div class="metrics">total=7ms, self=0ms, beans=7</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -540,7 +540,7 @@
   <summary>
     <div class="row">
       <div class="label">core</div>
-      <div class="metrics">total=2ms, self=2ms, beans=3</div>
+      <div class="metrics">total=7ms, self=7ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -624,15 +624,15 @@
   <summary>
     <div class="row">
       <div class="label">boot</div>
-      <div class="metrics">total=146ms, self=0ms, beans=366</div>
+      <div class="metrics">total=219ms, self=0ms, beans=366</div>
     </div>
-    <div class="bar-wrap"><div class="bar" style="width:4%"></div></div>
+    <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
   </summary>
   <details class="tree-node" open>
   <summary>
     <div class="row">
       <div class="label">actuate</div>
-      <div class="metrics">total=6ms, self=0ms, beans=63</div>
+      <div class="metrics">total=13ms, self=0ms, beans=63</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -640,7 +640,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=0ms, self=0ms, beans=41</div>
+      <div class="metrics">total=1ms, self=0ms, beans=41</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -698,7 +698,7 @@
   <summary>
     <div class="row">
       <div class="label">endpoint</div>
-      <div class="metrics">total=0ms, self=0ms, beans=19</div>
+      <div class="metrics">total=1ms, self=0ms, beans=19</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -726,7 +726,7 @@
   <summary>
     <div class="row">
       <div class="label">jmx</div>
-      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+      <div class="metrics">total=1ms, self=1ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -880,7 +880,7 @@
   <summary>
     <div class="row">
       <div class="label">endpoint</div>
-      <div class="metrics">total=6ms, self=0ms, beans=12</div>
+      <div class="metrics">total=12ms, self=0ms, beans=12</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -928,7 +928,7 @@
   <summary>
     <div class="row">
       <div class="label">jmx</div>
-      <div class="metrics">total=6ms, self=6ms, beans=2</div>
+      <div class="metrics">total=12ms, self=12ms, beans=2</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1062,7 +1062,7 @@
   <summary>
     <div class="row">
       <div class="label">amqp</div>
-      <div class="metrics">total=1ms, self=0ms, beans=17</div>
+      <div class="metrics">total=3ms, self=0ms, beans=17</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1070,7 +1070,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=1ms, self=1ms, beans=16</div>
+      <div class="metrics">total=3ms, self=3ms, beans=16</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1112,7 +1112,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=17ms, self=0ms, beans=34</div>
+      <div class="metrics">total=20ms, self=0ms, beans=34</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1150,7 +1150,7 @@
   <summary>
     <div class="row">
       <div class="label">context</div>
-      <div class="metrics">total=16ms, self=16ms, beans=6</div>
+      <div class="metrics">total=17ms, self=17ms, beans=6</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1170,7 +1170,7 @@
   <summary>
     <div class="row">
       <div class="label">jmx</div>
-      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+      <div class="metrics">total=1ms, self=1ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1190,7 +1190,7 @@
   <summary>
     <div class="row">
       <div class="label">task</div>
-      <div class="metrics">total=0ms, self=0ms, beans=12</div>
+      <div class="metrics">total=1ms, self=1ms, beans=12</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1252,7 +1252,7 @@
   <summary>
     <div class="row">
       <div class="label">data</div>
-      <div class="metrics">total=2ms, self=0ms, beans=26</div>
+      <div class="metrics">total=4ms, self=0ms, beans=26</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1290,7 +1290,7 @@
   <summary>
     <div class="row">
       <div class="label">jdbc</div>
-      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+      <div class="metrics">total=3ms, self=0ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1298,7 +1298,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=0ms, self=0ms, beans=4</div>
+      <div class="metrics">total=3ms, self=3ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1340,7 +1340,7 @@
   <summary>
     <div class="row">
       <div class="label">redis</div>
-      <div class="metrics">total=2ms, self=0ms, beans=11</div>
+      <div class="metrics">total=1ms, self=0ms, beans=11</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1348,7 +1348,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=2ms, self=2ms, beans=10</div>
+      <div class="metrics">total=1ms, self=1ms, beans=10</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1392,7 +1392,7 @@
   <summary>
     <div class="row">
       <div class="label">health</div>
-      <div class="metrics">total=0ms, self=0ms, beans=29</div>
+      <div class="metrics">total=1ms, self=0ms, beans=29</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1430,7 +1430,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=0ms, self=0ms, beans=18</div>
+      <div class="metrics">total=1ms, self=0ms, beans=18</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1438,7 +1438,7 @@
   <summary>
     <div class="row">
       <div class="label">actuate</div>
-      <div class="metrics">total=0ms, self=0ms, beans=10</div>
+      <div class="metrics">total=1ms, self=0ms, beans=10</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1446,7 +1446,7 @@
   <summary>
     <div class="row">
       <div class="label">endpoint</div>
-      <div class="metrics">total=0ms, self=0ms, beans=10</div>
+      <div class="metrics">total=1ms, self=1ms, beans=10</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1512,7 +1512,7 @@
   <summary>
     <div class="row">
       <div class="label">hibernate</div>
-      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+      <div class="metrics">total=1ms, self=0ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1520,7 +1520,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+      <div class="metrics">total=1ms, self=1ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1532,7 +1532,7 @@
   <summary>
     <div class="row">
       <div class="label">http</div>
-      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+      <div class="metrics">total=1ms, self=0ms, beans=11</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1540,7 +1540,7 @@
   <summary>
     <div class="row">
       <div class="label">converter</div>
-      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+      <div class="metrics">total=1ms, self=0ms, beans=11</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1548,7 +1548,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+      <div class="metrics">total=1ms, self=1ms, beans=11</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1572,7 +1572,7 @@
   <summary>
     <div class="row">
       <div class="label">jackson</div>
-      <div class="metrics">total=4ms, self=3ms, beans=10</div>
+      <div class="metrics">total=11ms, self=9ms, beans=10</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1580,7 +1580,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=1ms, self=1ms, beans=7</div>
+      <div class="metrics">total=2ms, self=2ms, beans=7</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1592,7 +1592,7 @@
   <summary>
     <div class="row">
       <div class="label">jdbc</div>
-      <div class="metrics">total=5ms, self=0ms, beans=27</div>
+      <div class="metrics">total=30ms, self=0ms, beans=27</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1600,7 +1600,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=5ms, self=5ms, beans=26</div>
+      <div class="metrics">total=30ms, self=30ms, beans=26</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1642,7 +1642,7 @@
   <summary>
     <div class="row">
       <div class="label">jpa</div>
-      <div class="metrics">total=1ms, self=0ms, beans=5</div>
+      <div class="metrics">total=2ms, self=0ms, beans=5</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1650,7 +1650,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=1ms, self=1ms, beans=4</div>
+      <div class="metrics">total=2ms, self=2ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1872,7 +1872,7 @@
   <summary>
     <div class="row">
       <div class="label">security</div>
-      <div class="metrics">total=0ms, self=0ms, beans=20</div>
+      <div class="metrics">total=2ms, self=0ms, beans=20</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1880,7 +1880,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=0ms, self=0ms, beans=9</div>
+      <div class="metrics">total=1ms, self=1ms, beans=9</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1940,7 +1940,7 @@
   <summary>
     <div class="row">
       <div class="label">oauth2</div>
-      <div class="metrics">total=0ms, self=0ms, beans=11</div>
+      <div class="metrics">total=1ms, self=0ms, beans=11</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1968,7 +1968,7 @@
   <summary>
     <div class="row">
       <div class="label">server</div>
-      <div class="metrics">total=0ms, self=0ms, beans=10</div>
+      <div class="metrics">total=1ms, self=0ms, beans=10</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1976,7 +1976,7 @@
   <summary>
     <div class="row">
       <div class="label">authorization</div>
-      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+      <div class="metrics">total=1ms, self=0ms, beans=5</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1984,7 +1984,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+      <div class="metrics">total=1ms, self=0ms, beans=5</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -1992,7 +1992,7 @@
   <summary>
     <div class="row">
       <div class="label">servlet</div>
-      <div class="metrics">total=0ms, self=0ms, beans=5</div>
+      <div class="metrics">total=1ms, self=1ms, beans=5</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2132,7 +2132,7 @@
   <summary>
     <div class="row">
       <div class="label">sql</div>
-      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+      <div class="metrics">total=1ms, self=0ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2140,7 +2140,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+      <div class="metrics">total=1ms, self=0ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2148,7 +2148,7 @@
   <summary>
     <div class="row">
       <div class="label">init</div>
-      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+      <div class="metrics">total=1ms, self=1ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2182,7 +2182,7 @@
   <summary>
     <div class="row">
       <div class="label">thymeleaf</div>
-      <div class="metrics">total=0ms, self=0ms, beans=6</div>
+      <div class="metrics">total=11ms, self=0ms, beans=6</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2190,7 +2190,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=0ms, self=0ms, beans=6</div>
+      <div class="metrics">total=11ms, self=11ms, beans=6</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2202,15 +2202,15 @@
   <summary>
     <div class="row">
       <div class="label">tomcat</div>
-      <div class="metrics">total=99ms, self=0ms, beans=10</div>
+      <div class="metrics">total=103ms, self=0ms, beans=10</div>
     </div>
-    <div class="bar-wrap"><div class="bar" style="width:3%"></div></div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
   <details class="tree-node" open>
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=1ms, self=1ms, beans=8</div>
+      <div class="metrics">total=2ms, self=2ms, beans=8</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2250,9 +2250,9 @@
   <summary>
     <div class="row">
       <div class="label">servlet</div>
-      <div class="metrics">total=98ms, self=98ms, beans=1</div>
+      <div class="metrics">total=101ms, self=101ms, beans=1</div>
     </div>
-    <div class="bar-wrap"><div class="bar" style="width:3%"></div></div>
+    <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
   
 </details>
@@ -2302,7 +2302,7 @@
   <summary>
     <div class="row">
       <div class="label">validation</div>
-      <div class="metrics">total=4ms, self=0ms, beans=4</div>
+      <div class="metrics">total=6ms, self=0ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2320,7 +2320,7 @@
   <summary>
     <div class="row">
       <div class="label">beanvalidation</div>
-      <div class="metrics">total=4ms, self=4ms, beans=2</div>
+      <div class="metrics">total=6ms, self=6ms, beans=2</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2332,7 +2332,7 @@
   <summary>
     <div class="row">
       <div class="label">web</div>
-      <div class="metrics">total=2ms, self=0ms, beans=5</div>
+      <div class="metrics">total=3ms, self=0ms, beans=5</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2340,7 +2340,7 @@
   <summary>
     <div class="row">
       <div class="label">server</div>
-      <div class="metrics">total=2ms, self=0ms, beans=3</div>
+      <div class="metrics">total=3ms, self=0ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2348,7 +2348,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=2ms, self=2ms, beans=3</div>
+      <div class="metrics">total=3ms, self=3ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2382,7 +2382,7 @@
   <summary>
     <div class="row">
       <div class="label">webmvc</div>
-      <div class="metrics">total=4ms, self=0ms, beans=29</div>
+      <div class="metrics">total=6ms, self=0ms, beans=29</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2390,7 +2390,7 @@
   <summary>
     <div class="row">
       <div class="label">actuate</div>
-      <div class="metrics">total=3ms, self=0ms, beans=4</div>
+      <div class="metrics">total=6ms, self=0ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2398,7 +2398,7 @@
   <summary>
     <div class="row">
       <div class="label">endpoint</div>
-      <div class="metrics">total=3ms, self=0ms, beans=3</div>
+      <div class="metrics">total=6ms, self=0ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2406,7 +2406,7 @@
   <summary>
     <div class="row">
       <div class="label">web</div>
-      <div class="metrics">total=3ms, self=3ms, beans=3</div>
+      <div class="metrics">total=6ms, self=6ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2440,7 +2440,7 @@
   <summary>
     <div class="row">
       <div class="label">autoconfigure</div>
-      <div class="metrics">total=1ms, self=1ms, beans=24</div>
+      <div class="metrics">total=0ms, self=0ms, beans=24</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2594,9 +2594,9 @@
   <summary>
     <div class="row">
       <div class="label">data</div>
-      <div class="metrics">total=1,065ms, self=0ms, beans=121</div>
+      <div class="metrics">total=2,924ms, self=0ms, beans=125</div>
     </div>
-    <div class="bar-wrap"><div class="bar" style="width:29%"></div></div>
+    <div class="bar-wrap"><div class="bar" style="width:25%"></div></div>
   </summary>
   <details class="tree-node" open>
   <summary>
@@ -2682,23 +2682,23 @@
   <summary>
     <div class="row">
       <div class="label">jpa</div>
-      <div class="metrics">total=1,033ms, self=0ms, beans=44</div>
+      <div class="metrics">total=2,858ms, self=0ms, beans=46</div>
     </div>
-    <div class="bar-wrap"><div class="bar" style="width:28%"></div></div>
+    <div class="bar-wrap"><div class="bar" style="width:24%"></div></div>
   </summary>
   <details class="tree-node" open>
   <summary>
     <div class="row">
       <div class="label">repository</div>
-      <div class="metrics">total=1,033ms, self=0ms, beans=43</div>
+      <div class="metrics">total=2,858ms, self=0ms, beans=45</div>
     </div>
-    <div class="bar-wrap"><div class="bar" style="width:28%"></div></div>
+    <div class="bar-wrap"><div class="bar" style="width:24%"></div></div>
   </summary>
   <details class="tree-node" open>
   <summary>
     <div class="row">
       <div class="label">config</div>
-      <div class="metrics">total=4ms, self=4ms, beans=2</div>
+      <div class="metrics">total=9ms, self=9ms, beans=2</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2708,7 +2708,7 @@
   <summary>
     <div class="row">
       <div class="label">query</div>
-      <div class="metrics">total=0ms, self=0ms, beans=20</div>
+      <div class="metrics">total=0ms, self=0ms, beans=21</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2718,9 +2718,9 @@
   <summary>
     <div class="row">
       <div class="label">support</div>
-      <div class="metrics">total=1,029ms, self=1,029ms, beans=21</div>
+      <div class="metrics">total=2,849ms, self=2,849ms, beans=22</div>
     </div>
-    <div class="bar-wrap"><div class="bar" style="width:28%"></div></div>
+    <div class="bar-wrap"><div class="bar" style="width:24%"></div></div>
   </summary>
   
 </details>
@@ -2742,7 +2742,7 @@
   <summary>
     <div class="row">
       <div class="label">redis</div>
-      <div class="metrics">total=32ms, self=0ms, beans=14</div>
+      <div class="metrics">total=66ms, self=0ms, beans=14</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2750,7 +2750,7 @@
   <summary>
     <div class="row">
       <div class="label">connection</div>
-      <div class="metrics">total=30ms, self=0ms, beans=1</div>
+      <div class="metrics">total=50ms, self=0ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2758,7 +2758,7 @@
   <summary>
     <div class="row">
       <div class="label">lettuce</div>
-      <div class="metrics">total=30ms, self=30ms, beans=1</div>
+      <div class="metrics">total=50ms, self=50ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2770,7 +2770,7 @@
   <summary>
     <div class="row">
       <div class="label">core</div>
-      <div class="metrics">total=2ms, self=2ms, beans=13</div>
+      <div class="metrics">total=16ms, self=16ms, beans=13</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2822,7 +2822,7 @@
   <summary>
     <div class="row">
       <div class="label">repository</div>
-      <div class="metrics">total=0ms, self=0ms, beans=41</div>
+      <div class="metrics">total=0ms, self=0ms, beans=43</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2830,7 +2830,7 @@
   <summary>
     <div class="row">
       <div class="label">config</div>
-      <div class="metrics">total=0ms, self=0ms, beans=21</div>
+      <div class="metrics">total=0ms, self=0ms, beans=22</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2840,7 +2840,7 @@
   <summary>
     <div class="row">
       <div class="label">core</div>
-      <div class="metrics">total=0ms, self=0ms, beans=20</div>
+      <div class="metrics">total=0ms, self=0ms, beans=21</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2848,7 +2848,7 @@
   <summary>
     <div class="row">
       <div class="label">support</div>
-      <div class="metrics">total=0ms, self=0ms, beans=20</div>
+      <div class="metrics">total=0ms, self=0ms, beans=21</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -2974,17 +2974,17 @@
   <summary>
     <div class="row">
       <div class="label">orm</div>
-      <div class="metrics">total=2,211ms, self=0ms, beans=5</div>
+      <div class="metrics">total=7,969ms, self=0ms, beans=5</div>
     </div>
-    <div class="bar-wrap"><div class="bar" style="width:61%"></div></div>
+    <div class="bar-wrap"><div class="bar" style="width:67%"></div></div>
   </summary>
   <details class="tree-node" open>
   <summary>
     <div class="row">
       <div class="label">jpa</div>
-      <div class="metrics">total=2,211ms, self=2,211ms, beans=5</div>
+      <div class="metrics">total=7,969ms, self=7,969ms, beans=5</div>
     </div>
-    <div class="bar-wrap"><div class="bar" style="width:61%"></div></div>
+    <div class="bar-wrap"><div class="bar" style="width:67%"></div></div>
   </summary>
   <details class="tree-node" open>
   <summary>
@@ -3044,7 +3044,7 @@
   <summary>
     <div class="row">
       <div class="label">security</div>
-      <div class="metrics">total=0ms, self=0ms, beans=41</div>
+      <div class="metrics">total=3ms, self=0ms, beans=41</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3062,7 +3062,7 @@
   <summary>
     <div class="row">
       <div class="label">config</div>
-      <div class="metrics">total=0ms, self=0ms, beans=20</div>
+      <div class="metrics">total=2ms, self=0ms, beans=20</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3070,7 +3070,7 @@
   <summary>
     <div class="row">
       <div class="label">annotation</div>
-      <div class="metrics">total=0ms, self=0ms, beans=20</div>
+      <div class="metrics">total=2ms, self=0ms, beans=20</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3108,7 +3108,7 @@
   <summary>
     <div class="row">
       <div class="label">web</div>
-      <div class="metrics">total=0ms, self=0ms, beans=13</div>
+      <div class="metrics">total=2ms, self=0ms, beans=13</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3116,7 +3116,7 @@
   <summary>
     <div class="row">
       <div class="label">builders</div>
-      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+      <div class="metrics">total=2ms, self=2ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3192,7 +3192,7 @@
   <summary>
     <div class="row">
       <div class="label">web</div>
-      <div class="metrics">total=0ms, self=0ms, beans=16</div>
+      <div class="metrics">total=1ms, self=0ms, beans=16</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3330,7 +3330,7 @@
   <summary>
     <div class="row">
       <div class="label">servletapi</div>
-      <div class="metrics">total=0ms, self=0ms, beans=1</div>
+      <div class="metrics">total=1ms, self=1ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3524,7 +3524,7 @@
   <summary>
     <div class="row">
       <div class="label">validation</div>
-      <div class="metrics">total=2ms, self=0ms, beans=1</div>
+      <div class="metrics">total=10ms, self=0ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3532,7 +3532,7 @@
   <summary>
     <div class="row">
       <div class="label">beanvalidation</div>
-      <div class="metrics">total=2ms, self=2ms, beans=1</div>
+      <div class="metrics">total=10ms, self=10ms, beans=1</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3544,7 +3544,7 @@
   <summary>
     <div class="row">
       <div class="label">web</div>
-      <div class="metrics">total=85ms, self=0ms, beans=24</div>
+      <div class="metrics">total=210ms, self=0ms, beans=24</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
   </summary>
@@ -3612,7 +3612,7 @@
   <summary>
     <div class="row">
       <div class="label">servlet</div>
-      <div class="metrics">total=85ms, self=0ms, beans=18</div>
+      <div class="metrics">total=210ms, self=0ms, beans=18</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
   </summary>
@@ -3620,7 +3620,7 @@
   <summary>
     <div class="row">
       <div class="label">function</div>
-      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+      <div class="metrics">total=1ms, self=0ms, beans=2</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3628,7 +3628,7 @@
   <summary>
     <div class="row">
       <div class="label">support</div>
-      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+      <div class="metrics">total=1ms, self=1ms, beans=2</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3660,7 +3660,7 @@
   <summary>
     <div class="row">
       <div class="label">mvc</div>
-      <div class="metrics">total=85ms, self=0ms, beans=4</div>
+      <div class="metrics">total=209ms, self=0ms, beans=4</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
   </summary>
@@ -3668,7 +3668,7 @@
   <summary>
     <div class="row">
       <div class="label">method</div>
-      <div class="metrics">total=85ms, self=0ms, beans=2</div>
+      <div class="metrics">total=209ms, self=0ms, beans=2</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
   </summary>
@@ -3676,7 +3676,7 @@
   <summary>
     <div class="row">
       <div class="label">annotation</div>
-      <div class="metrics">total=85ms, self=85ms, beans=2</div>
+      <div class="metrics">total=209ms, self=209ms, beans=2</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:2%"></div></div>
   </summary>
@@ -3786,7 +3786,7 @@
   <summary>
     <div class="row">
       <div class="label">waterwood</div>
-      <div class="metrics">total=129ms, self=0ms, beans=81</div>
+      <div class="metrics">total=479ms, self=0ms, beans=83</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:4%"></div></div>
   </summary>
@@ -3794,7 +3794,7 @@
   <summary>
     <div class="row">
       <div class="label">waterfunservice</div>
-      <div class="metrics">total=0ms, self=0ms, beans=36</div>
+      <div class="metrics">total=1ms, self=0ms, beans=36</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3822,7 +3822,7 @@
   <summary>
     <div class="row">
       <div class="label">controller</div>
-      <div class="metrics">total=0ms, self=0ms, beans=12</div>
+      <div class="metrics">total=1ms, self=1ms, beans=12</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -3964,7 +3964,7 @@
   <summary>
     <div class="row">
       <div class="label">waterfunservicecore</div>
-      <div class="metrics">total=129ms, self=0ms, beans=45</div>
+      <div class="metrics">total=478ms, self=0ms, beans=47</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:4%"></div></div>
   </summary>
@@ -3982,7 +3982,7 @@
   <summary>
     <div class="row">
       <div class="label">entity</div>
-      <div class="metrics">total=0ms, self=0ms, beans=6</div>
+      <div class="metrics">total=0ms, self=0ms, beans=8</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -4022,7 +4022,7 @@
   <summary>
     <div class="row">
       <div class="label">infrastructure</div>
-      <div class="metrics">total=129ms, self=0ms, beans=11</div>
+      <div class="metrics">total=474ms, self=0ms, beans=11</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:4%"></div></div>
   </summary>
@@ -4050,7 +4050,7 @@
   <summary>
     <div class="row">
       <div class="label">security</div>
-      <div class="metrics">total=129ms, self=129ms, beans=3</div>
+      <div class="metrics">total=474ms, self=474ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:4%"></div></div>
   </summary>
@@ -4082,7 +4082,7 @@
   <summary>
     <div class="row">
       <div class="label">services</div>
-      <div class="metrics">total=0ms, self=0ms, beans=23</div>
+      <div class="metrics">total=4ms, self=0ms, beans=23</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -4140,7 +4140,7 @@
   <summary>
     <div class="row">
       <div class="label">sys</div>
-      <div class="metrics">total=0ms, self=0ms, beans=3</div>
+      <div class="metrics">total=4ms, self=0ms, beans=3</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -4148,7 +4148,7 @@
   <summary>
     <div class="row">
       <div class="label">storage</div>
-      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+      <div class="metrics">total=4ms, self=0ms, beans=2</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>
@@ -4156,7 +4156,7 @@
   <summary>
     <div class="row">
       <div class="label">tencent</div>
-      <div class="metrics">total=0ms, self=0ms, beans=2</div>
+      <div class="metrics">total=4ms, self=4ms, beans=2</div>
     </div>
     <div class="bar-wrap"><div class="bar" style="width:1%"></div></div>
   </summary>

@@ -10,6 +10,7 @@ import {
   listRolePerms,
   type RoleResp,
 } from "~/api/role";
+import { ElMessage } from "element-plus";
 import RoleEditDialog from "./components/RoleEditDialog.vue";
 
 const { t } = useI18n();
@@ -135,53 +136,153 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="role-detail" v-loading="loading">
+  <div
+    v-loading="loading"
+    class="role-detail"
+  >
     <CardContainer title="role.detail">
       <template #header-right>
-        <el-button text @click="router.back()">{{ t("common.action.back") }}</el-button>
-        <el-button type="primary" plain @click="gotoAssignPermPage">{{ t("permission.assign") }}</el-button>
-        <el-button type="primary" plain @click="gotoAssignUserPage">{{ t("user.assign") }}</el-button>
-        <el-button type="primary" plain @click="openEditDialog">{{ t("common.action.edit") }}</el-button>
+        <el-button
+          text
+          @click="router.back()"
+        >
+          {{ t("common.action.back") }}
+        </el-button>
+        <el-button
+          type="primary"
+          plain
+          @click="gotoAssignPermPage"
+        >
+          {{ t("permission.assign") }}
+        </el-button>
+        <el-button
+          type="primary"
+          plain
+          @click="gotoAssignUserPage"
+        >
+          {{ t("user.assign") }}
+        </el-button>
+        <el-button
+          type="primary"
+          plain
+          @click="openEditDialog"
+        >
+          {{ t("common.action.edit") }}
+        </el-button>
       </template>
 
-      <el-descriptions v-if="roleDetail" :title="t('role.basicInfo')" :column="2" border>
-        <el-descriptions-item label="ID">{{ roleDetail.id }}</el-descriptions-item>
-        <el-descriptions-item :label="t('role.name')">{{ roleDetail.name }}</el-descriptions-item>
-        <el-descriptions-item :label="t('role.code')">{{ roleDetail.code || t('common.none.title') }}</el-descriptions-item>
+      <el-descriptions
+        v-if="roleDetail"
+        :title="t('role.basicInfo')"
+        :column="2"
+        border
+      >
+        <el-descriptions-item label="ID">
+          {{ roleDetail.id }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('role.name')">
+          {{ roleDetail.name }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('role.code')">
+          {{ roleDetail.code || t('common.none.title') }}
+        </el-descriptions-item>
         <el-descriptions-item :label="t('role.parentId')">
-          <el-link v-if="roleDetail.parentId != null" type="primary" :underline="false" @click="gotoRoleDetail(roleDetail.parentId)">
+          <el-link
+            v-if="roleDetail.parentId != null"
+            type="primary"
+            :underline="false"
+            @click="gotoRoleDetail(roleDetail.parentId)"
+          >
             {{ roleDetail.parentId }}
           </el-link>
           <span v-else>{{ t('common.none.title') }}</span>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('role.weight')">{{ roleDetail.orderWeight ?? t('common.none.title') }}</el-descriptions-item>
+        <el-descriptions-item :label="t('role.weight')">
+          {{ roleDetail.orderWeight ?? t('common.none.title') }}
+        </el-descriptions-item>
         <el-descriptions-item :label="t('role.isSystem')">
-          <el-tag size="small" :type="roleDetail.isSystem ? 'warning' : 'info'">
-              {{ roleDetail.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
+          <el-tag
+            size="small"
+            :type="roleDetail.isSystem ? 'warning' : 'info'"
+          >
+            {{ roleDetail.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('role.description')">{{ roleDetail.description || t('common.none.title') }}</el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">{{ formatISOData(roleDetail.createdAt) }}</el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">{{ formatISOData(roleDetail.updatedAt) }}</el-descriptions-item>
+        <el-descriptions-item :label="t('role.description')">
+          {{ roleDetail.description || t('common.none.title') }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.create')">
+          {{ formatISOData(roleDetail.createdAt) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.update')">
+          {{ formatISOData(roleDetail.updatedAt) }}
+        </el-descriptions-item>
       </el-descriptions>
     </CardContainer>
 
-    <CardContainer style="margin-top: 12px" title="role.permissionConfig">
+    <CardContainer
+      style="margin-top: 12px"
+      title="role.permissionConfig"
+    >
       <el-collapse v-model="collapseActive">
-        <el-collapse-item :title="t('role.assignedPermissions')" name="permissions">
+        <el-collapse-item
+          :title="t('role.assignedPermissions')"
+          name="permissions"
+        >
           <el-row :gutter="10">
-            <el-col v-for="item in assignedPermissionOptions" :key="`perm-${item.id}`" :xs="24" :sm="12" :md="8" :lg="6" class="option-col">
-              <el-link type="primary" :underline="false" @click="gotoPermissionDetail(item.id)">{{ item.name }}</el-link>
+            <el-col
+              v-for="item in assignedPermissionOptions"
+              :key="`perm-${item.id}`"
+              :xs="24"
+              :sm="12"
+              :md="8"
+              :lg="6"
+              class="option-col"
+            >
+              <el-link
+                type="primary"
+                :underline="false"
+                @click="gotoPermissionDetail(item.id)"
+              >
+                {{ item.name }}
+              </el-link>
             </el-col>
-            <el-col v-if="assignedPermissionOptions.length === 0" :span="24">{{ t('common.none.description') }}</el-col>
+            <el-col
+              v-if="assignedPermissionOptions.length === 0"
+              :span="24"
+            >
+              {{ t('common.none.description') }}
+            </el-col>
           </el-row>
         </el-collapse-item>
-        <el-collapse-item :title="t('role.assignedUsers')" name="users">
+        <el-collapse-item
+          :title="t('role.assignedUsers')"
+          name="users"
+        >
           <el-row :gutter="10">
-            <el-col v-for="item in assignedUserOptions" :key="`user-${item.id}`" :xs="24" :sm="12" :md="8" :lg="6" class="option-col">
-              <el-link type="primary" :underline="false" @click="gotoUserDetail(item.id)">{{ item.name }}</el-link>
+            <el-col
+              v-for="item in assignedUserOptions"
+              :key="`user-${item.id}`"
+              :xs="24"
+              :sm="12"
+              :md="8"
+              :lg="6"
+              class="option-col"
+            >
+              <el-link
+                type="primary"
+                :underline="false"
+                @click="gotoUserDetail(item.id)"
+              >
+                {{ item.name }}
+              </el-link>
             </el-col>
-            <el-col v-if="assignedUserOptions.length === 0" :span="24">{{ t('common.none.description') }}</el-col>
+            <el-col
+              v-if="assignedUserOptions.length === 0"
+              :span="24"
+            >
+              {{ t('common.none.description') }}
+            </el-col>
           </el-row>
         </el-collapse-item>
       </el-collapse>

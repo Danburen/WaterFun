@@ -2,14 +2,17 @@ package org.waterwood.waterfunservicecore.infrastructure;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.waterwood.utils.JsonUtil;
 import org.waterwood.utils.StringUtil;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -106,11 +109,25 @@ public class RedisHelper implements RedisHelperHolder {
             return Collections.emptyList();
         }
         List<String> values = redisTemplate.opsForValue().multiGet(keys);
-        if (values == null) {
-            return Collections.nCopies(keys.size(), null);
-        }
-        return values;
+        return values != null ? values : Collections.nCopies(keys.size(), null);
     }
+
+    @Override
+    public List<Long> mgetExpire(List<String> keys) {
+        if (keys == null || keys.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+                    for (String key : keys) {
+                        connection.keyCommands().ttl(key.getBytes(StandardCharsets.UTF_8));
+                    }
+                    return null;
+                }).stream()
+                .map(result -> result == null ? -2L : ((Number) result).longValue())
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public Cursor<String> scan(ScanOptions options) {
@@ -132,5 +149,27 @@ public class RedisHelper implements RedisHelperHolder {
         String val =  getValue(redisKey);
         del(redisKey);
         return val;
+    }
+
+    @Override
+    public void mset(Map<String, String> toCache, Duration dur) {
+        if (toCache == null || toCache.isEmpty()) {
+            return;
+        }
+        long seconds = Math.max(1, dur.getSeconds());
+
+        redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            toCache.forEach((key, value) -> {
+                if (key == null || value == null) {
+                    return; // skip
+                }
+                connection.stringCommands().setEx(
+                        key.getBytes(StandardCharsets.UTF_8),
+                        seconds,
+                        value.getBytes(StandardCharsets.UTF_8)
+                );
+            });
+            return null;
+        });
     }
 }

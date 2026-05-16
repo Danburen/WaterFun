@@ -19,6 +19,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.waterwood.waterfun.waterfungateway.component.RsaJwtDecoder;
+import org.waterwood.waterfun.waterfungateway.exception.JsonAccessDeniedHandler;
+import org.waterwood.waterfun.waterfungateway.exception.JsonAuthenticationEntryPoint;
 
 @Configuration
 @RequiredArgsConstructor
@@ -26,14 +28,22 @@ import org.waterwood.waterfun.waterfungateway.component.RsaJwtDecoder;
 public class GatewaySecurityConfig {
     private PublicKey publicKey;
     private final RsaJwtDecoder jwtParser;
+    private final JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint;
+    private final JsonAccessDeniedHandler jsonAccessDeniedHandler;
     @Bean
     SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
 
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(Customizer.withDefaults())
-                .oauth2ResourceServer(oauth2 ->
-                        oauth2.jwt(jwt -> jwt
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(jsonAuthenticationEntryPoint)
+                        .accessDeniedHandler(jsonAccessDeniedHandler)
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .authenticationEntryPoint(jsonAuthenticationEntryPoint)
+                        .accessDeniedHandler(jsonAccessDeniedHandler)
+                        .jwt(jwt -> jwt
                                 .jwtDecoder(jwtParser)
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
@@ -82,4 +92,3 @@ public class GatewaySecurityConfig {
         return new ReactiveJwtAuthenticationConverterAdapter(converter);
     }
 }
-

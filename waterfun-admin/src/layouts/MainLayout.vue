@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import MainNavBar from "@/layouts/main/MainNavBar.vue";
-import {ref, computed, onMounted, onBeforeMount, watch} from 'vue'
-import type {BreadNavItemType, TagNavItemType} from "@/types/ui/tagNav.js";
+import { ref, computed, onBeforeMount, watch } from 'vue'
+import type { BreadNavItemType, TagNavItemType } from "@/types/ui/tagNav.js";
 import TagNavigation from "@/layouts/main/TagNavigation.vue";
 import AsideNavBar from "@/layouts/main/AsideNavBar.vue";
-import router, {type routeType} from "@/router";
-import {useTagStore} from "~/stores/tagStore.js";
+import { useRouter } from "vue-router";
+import { useTagStore } from "~/stores/tagStore";
+import { useAuthStore } from '@/stores/authStore'
 
 const menuCollapse = ref(false)
 const tagNavContainer = ref(null)
 const tagStore = useTagStore();
 const activeTags = ref<string>('dashboard');
+const authStore = useAuthStore();
+const router = useRouter();
 
 const tagList = ref<TagNavItemType[]>([]);
 const breadList = computed(() => {
@@ -81,30 +84,43 @@ watch(()=>tagStore.getTags,
     (newTags)=> {
       tagList.value = newTags;
     }, { immediate: true, deep: true })
+
+
 </script>
 
 <template>
   <div class="container full-page-container">
     <!-- Global Header -->
-    <MainNavBar class="header-navbar" :navItems="breadList" @collapse="menuCollapse = !menuCollapse" />
+    <MainNavBar
+      class="header-navbar"
+      :nav-items="breadList"
+      @collapse="menuCollapse = !menuCollapse"
+    />
     <!-- Main Container-->
     <div class="main-container">
       <aside :class="['aside-navbar', { collapsed: menuCollapse }]">
-        <AsideNavBar :collapse="menuCollapse" @menuClick="" />
+        <AsideNavBar
+          :collapse="menuCollapse"
+          @menu-click=""
+        />
       </aside>
       <div class="content-container">
         <div class="content-header default-border-bottom">
           <TagNavigation
-              class="tag-nav"
-              v-model="activeTags"
-              :tag-list="tagList"
-              @order-updated="handleOrderUpdated"
-              @tag-removed="handleRemoveTag"
+            v-model="activeTags"
+            class="tag-nav"
+            :tag-list="tagList"
+            @order-updated="handleOrderUpdated"
+            @tag-removed="handleRemoveTag"
           />
         </div>
-        <div class="content-main"><RouterView /></div>
+        <div class="content-main">
+          <RouterView />
+        </div>
         <div class="content-footer default-border-top">
-          <div class="copyright">CopyRight © WaterFun 2025</div>
+          <div class="copyright">
+            CopyRight © WaterFun 2025
+          </div>
         </div>
       </div>
     </div>

@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.waterwood.waterfunservicecore.api.CursorPage;
 import org.waterwood.waterfunservicecore.entity.notification.InboxSystem;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface InboxSystemRepository extends JpaRepository<InboxSystem, Long> {
@@ -33,16 +33,17 @@ public interface InboxSystemRepository extends JpaRepository<InboxSystem, Long> 
 
     @Transactional
     @Modifying
-    @Query("UPDATE InboxSystem i SET i.isRead = true WHERE i.user.uid = :userUid AND i.isRead = false")
-    void markAllReadByUserUid(@Param("userUid") Long userUid);
+    @Query("UPDATE InboxSystem i SET i.isRead = true, i.readAt = :readAt WHERE i.user.uid = :userUid AND i.isRead = false")
+    void markAllReadByUserUid(@Param("userUid") Long userUid,@Param("readAt") Instant readAt);
 
+    @Transactional
     @Modifying
     @Query("""
     UPDATE InboxSystem i
-    SET i.isRead = true, i.readAt = CURRENT_TIMESTAMP
+    SET i.isRead = true, i.readAt = :readAt
     WHERE i.id IN :ids
-      AND i.user = :userId
+      AND i.user.uid = :userId
       AND i.isRead = false
     """)
-    int markReadBatch(@Param("ids") List<Long> ids, @Param("userId") Long userId);
+    int markReadBatch(@Param("ids") List<Long> ids, @Param("userId") Long userId,@Param("readAt") Instant readAt);
 }

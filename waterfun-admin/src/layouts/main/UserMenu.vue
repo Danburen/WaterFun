@@ -3,13 +3,9 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 import { generateFingerprint } from '@waterfun/web-core/src/fingerprint'
-import {
-  getCurrentUserInfo,
-  logout,
-  updateCurrentUserProfile,
-  type AdminUserInfoResponse,
-  type UpdateUserProfileRequest
-} from '@/api/auth'
+import { logout } from '@/api/auth'
+import { getCurrentUserInfo, updateCurrentUserProfile } from '@/api/me'
+import type { AdminUserInfoResponse, UpdateUserProfileRequest } from '@/api/me'
 import { useAuthStore } from '@/stores/authStore'
 
 const authStore = useAuthStore()
@@ -92,17 +88,37 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="user-menu" v-loading="loading">
+  <div
+    v-loading="loading"
+    class="user-menu"
+  >
     <el-dropdown trigger="click">
-      <el-button link class="dropdown-header">
-        <el-avatar :src="avatarUrl" class="avatar">{{ displayName.slice(0, 1).toUpperCase() }}</el-avatar>
+      <el-button
+        link
+        class="dropdown-header"
+      >
+        <el-avatar
+          :src="avatarUrl"
+          class="avatar"
+        >
+          {{ displayName.slice(0, 1).toUpperCase() }}
+        </el-avatar>
         <span class="display">{{ displayName }}</span>
       </el-button>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item @click="openProfileDialog">个人中心</el-dropdown-item>
-          <el-dropdown-item @click="handleChangePassword">修改密码</el-dropdown-item>
-          <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
+          <el-dropdown-item @click="openProfileDialog">
+            个人中心
+          </el-dropdown-item>
+          <el-dropdown-item @click="handleChangePassword">
+            修改密码
+          </el-dropdown-item>
+          <el-dropdown-item
+            divided
+            @click="handleLogout"
+          >
+            退出登录
+          </el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -115,11 +131,25 @@ onMounted(() => {
     >
       <div class="profile-grid">
         <div class="left-panel">
-          <el-avatar :src="avatarUrl" :size="64" class="mb-8">{{ displayName.slice(0, 1).toUpperCase() }}</el-avatar>
-          <div class="title">{{ displayName }}</div>
-          <div class="desc">账号：{{ userInfo?.username || '-' }}</div>
-          <div class="desc">状态：{{ userInfo?.accountStatus || '-' }}</div>
-          <div class="desc">角色：{{ userInfo?.roles?.join(', ') || '-' }}</div>
+          <el-avatar
+            :src="avatarUrl"
+            :size="64"
+            class="mb-8"
+          >
+            {{ displayName.slice(0, 1).toUpperCase() }}
+          </el-avatar>
+          <div class="title">
+            {{ displayName }}
+          </div>
+          <div class="desc">
+            账号：{{ userInfo?.username || '-' }}
+          </div>
+          <div class="desc">
+            状态：{{ userInfo?.accountStatus || '-' }}
+          </div>
+          <div class="desc">
+            角色：{{ userInfo?.roles?.join(', ') || '-' }}
+          </div>
         </div>
 
         <div class="right-panel">
@@ -135,11 +165,26 @@ onMounted(() => {
               />
             </el-form-item>
             <el-form-item label="性别">
-              <el-select v-model="profileForm.gender" placeholder="请选择">
-                <el-option label="未知" value="UNKNOWN" />
-                <el-option label="男" value="MALE" />
-                <el-option label="女" value="FEMALE" />
-                <el-option label="其他" value="OTHER" />
+              <el-select
+                v-model="profileForm.gender"
+                placeholder="请选择"
+              >
+                <el-option
+                  label="未知"
+                  value="UNKNOWN"
+                />
+                <el-option
+                  label="男"
+                  value="MALE"
+                />
+                <el-option
+                  label="女"
+                  value="FEMALE"
+                />
+                <el-option
+                  label="其他"
+                  value="OTHER"
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="生日">
@@ -163,8 +208,16 @@ onMounted(() => {
       </div>
 
       <template #footer>
-        <el-button @click="profileDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saving" @click="saveProfile">保存</el-button>
+        <el-button @click="profileDialogVisible = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="saving"
+          @click="saveProfile"
+        >
+          保存
+        </el-button>
       </template>
     </el-dialog>
   </div>

@@ -14,8 +14,11 @@ export default defineConfig({
     vueDevTools(),
     AutoImport({
       resolvers: [ElementPlusResolver()],
-      imports: ['vue'],
-      dts: 'src/auto-imports.d.ts', // 生成自动导入的类型文件
+      imports: ['vue', 'vue-router'],
+      dts: 'src/auto-imports.d.ts', 
+      eslintrc: {
+        enabled: true, // 生成 .eslintrc-auto-import.json
+      },
     }),
     Components({
       resolvers: [ElementPlusResolver()],

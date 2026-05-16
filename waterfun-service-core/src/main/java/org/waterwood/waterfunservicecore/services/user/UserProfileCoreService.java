@@ -2,11 +2,11 @@ package org.waterwood.waterfunservicecore.services.user;
 
 import org.jetbrains.annotations.Nullable;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
-import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserProfileCoreService {
     void addUserProfile(UserProfile up);
@@ -26,19 +26,18 @@ public interface UserProfileCoreService {
      */
     UserProfile getUserProfile(Long userUid);
 
-    PresignedResp getUploadPolicyAndSaveAvatar(long userUid, String fileSuffix);
-
     /**
      * Get the User Avatar
-     * @return the presigned url, null if the avatar is not set
+     * @return the presigned url, null if the ofUser is not set
      */
     @Nullable CloudResPresignedUrlResp getUserAvatar(long userUid);
 
     /**
      * List the User Avatars
+     *
      * @return the presigned url list
      */
-    List<CloudResPresignedUrlResp> listUserAvatars(List<Long> userUids);
+    Map<Long, CloudResPresignedUrlResp> listUserAvatars(List<Long> userUids);
 
     /**
      * Update the User Profile

@@ -11,7 +11,8 @@ import {
 } from "~/api/role";
 import {useI18n} from "vue-i18n";
 import {formatISOData} from "@waterfun/web-core/src/timer";
-import {OptionResItem} from "@waterfun/web-core/src/types";
+import { ElMessage } from "element-plus";
+import {OptionResItem} from "@waterfun/web-core/src/types/api/response";
 import {useRouter} from "vue-router";
 import RoleEditDialog from "./components/RoleEditDialog.vue";
 import {ElMessageBox} from "element-plus";
@@ -172,98 +173,205 @@ onMounted(() => {
 <template>
   <div class="list-layout">
     <SearchContainer>
-      <el-form inline class="search-form" :model="searchForm">
+      <el-form
+        inline
+        class="search-form"
+        :model="searchForm"
+      >
         <el-form-item :label="t('role.name')">
-          <el-input :placeholder="t('role.input.name')" v-model="searchForm.name"/>
+          <el-input
+            v-model="searchForm.name"
+            :placeholder="t('role.input.name')"
+          />
         </el-form-item>
         <el-form-item :label="t('role.code')">
-          <el-input :placeholder="t('role.input.code')" v-model="searchForm.code"/>
+          <el-input
+            v-model="searchForm.code"
+            :placeholder="t('role.input.code')"
+          />
         </el-form-item>
         <el-form-item :label="t('role.parentId')">
-          <el-select v-model="searchForm.parentId" :placeholder="t('role.input.parentId')" style="width: 150px">
-            <el-option v-for="item in roleOptions"
-                       :key="item.id"
-                       :label="`${item.id} (${item.name} 【${item.code}】)`"
-                       :value="item.id"
-                       :disabled="item.disabled"
+          <el-select
+            v-model="searchForm.parentId"
+            :placeholder="t('role.input.parentId')"
+            style="width: 150px"
+          >
+            <el-option
+              v-for="item in roleOptions"
+              :key="item.id"
+              :label="`${item.id} (${item.name} 【${item.code}】)`"
+              :value="item.id"
+              :disabled="item.disabled"
             />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            {{ t('common.query.title') }}
+          </el-button>
+          <el-button @click="handleReset">
+            {{ t('common.reset.title') }}
+          </el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
 
     <TableContainer
+      v-model:page-size="pageOpts.pageSize"
+      v-model:current-page="pageOpts.currentPage"
       title="role.title"
-      showAddBtn
+      show-add-btn
       :show-remove-btn="true"
       :disable-delete="selectedRoleIds.length === 0"
+      :total="pageOpts.total"
       @add="handleAdd"
       @remove="handleBatchDelete"
       @change="fetchData"
-      :total="pageOpts.total"
-      v-model:page-size="pageOpts.pageSize"
-      v-model:current-page="pageOpts.currentPage"
     >
-    <el-table v-loading="loading" :data="roleList" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" :selectable="selectable" width="55" />
-      <el-table-column prop="id" label="ID" width="80">
-      </el-table-column>
-      <el-table-column prop="name" :label="t('role.name')">
-        <template #default="{ row }">
-          <el-link type="primary" :underline="false" @click="gotoDetail(row.id)">
-            {{ row.name }}
-          </el-link>
-        </template>
-      </el-table-column>
-      <el-table-column prop="code" :label="t('role.code')"/>
-      <el-table-column prop="parentId" :label="t('role.parentId')">
-        <template #default="{ row }">
-          <el-link v-if="row.parentId != null" type="primary" :underline="false" @click="gotoDetail(row.parentId)">
-            {{ row.parentId }} ({{ getParentRoleName(row.parentId) }})
-          </el-link>
-          <span v-else>{{ t('common.none.title') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="orderWeight" sortable :label="t('order.title')" width="80px"></el-table-column>
-      <el-table-column prop="description" :label="t('role.description')"/>
-      <el-table-column prop="createdAt" sortable column-key="date" :label="t('common.time.create')">
-        <template #default="scope">
-          <span>{{ formatISOData(scope.row.createdAt) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('common.operation.title')" width="260px" fixed="right">
-        <template #default="scope">
-          <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ t('common.action.edit') }}</el-button>
-          <el-button v-if="! scope.row.isSystem" type="danger" size="small" @click="handleDelete(scope.row)">{{ t('common.action.delete') }}</el-button>
-          <el-popover placement="bottom" trigger="click" :width="130" popper-style="min-width: auto; padding: 8px;">
-            <template #reference>
-              <el-button size="small" type="success">{{ t("common.action.more") }}</el-button>
-            </template>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <el-button size="small" type="primary" plain @click="router.push({ name: 'rolePermissionAssign', params: { id: scope.row.id } })" style="margin: 0; width: 100%;">
-                {{ t("permission.assign") }}
-              </el-button>
-              <el-button size="small" type="primary" plain @click="router.push({ name: 'roleUserAssign', params: { id: scope.row.id } })" style="margin: 0; width: 100%;">
-                {{ t("user.assign") }}
-              </el-button>
-            </div>
-          </el-popover>
-        </template>
-      </el-table-column>
-    </el-table>
+      <el-table
+        v-loading="loading"
+        :data="roleList"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column
+          type="selection"
+          :selectable="selectable"
+          width="55"
+        />
+        <el-table-column
+          prop="id"
+          label="ID"
+          width="80"
+        />
+        <el-table-column
+          prop="name"
+          :label="t('role.name')"
+        >
+          <template #default="{ row }">
+            <el-link
+              type="primary"
+              :underline="false"
+              @click="gotoDetail(row.id)"
+            >
+              {{ row.name }}
+            </el-link>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="code"
+          :label="t('role.code')"
+        />
+        <el-table-column
+          prop="parentId"
+          :label="t('role.parentId')"
+        >
+          <template #default="{ row }">
+            <el-link
+              v-if="row.parentId != null"
+              type="primary"
+              :underline="false"
+              @click="gotoDetail(row.parentId)"
+            >
+              {{ row.parentId }} ({{ getParentRoleName(row.parentId) }})
+            </el-link>
+            <span v-else>{{ t('common.none.title') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="orderWeight"
+          sortable
+          :label="t('order.title')"
+          width="80px"
+        />
+        <el-table-column
+          prop="description"
+          :label="t('role.description')"
+        />
+        <el-table-column
+          prop="createdAt"
+          sortable
+          column-key="date"
+          :label="t('common.time.create')"
+        >
+          <template #default="scope">
+            <span>{{ formatISOData(scope.row.createdAt) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          :label="t('common.operation.title')"
+          width="260px"
+          fixed="right"
+        >
+          <template #default="scope">
+            <el-button
+              type="primary"
+              size="small"
+              @click="handleEdit(scope.row)"
+            >
+              {{ t('common.action.edit') }}
+            </el-button>
+            <el-button
+              v-if="! scope.row.isSystem"
+              type="danger"
+              size="small"
+              @click="handleDelete(scope.row)"
+            >
+              {{ t('common.action.delete') }}
+            </el-button>
+            <el-popover
+              placement="bottom"
+              trigger="click"
+              :width="130"
+              popper-style="min-width: auto; padding: 8px;"
+            >
+              <template #reference>
+                <el-button
+                  size="small"
+                  type="success"
+                >
+                  {{ t("common.action.more") }}
+                </el-button>
+              </template>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <el-button
+                  size="small"
+                  type="primary"
+                  plain
+                  style="margin: 0; width: 100%;"
+                  @click="router.push({ name: 'rolePermissionAssign', params: { id: scope.row.id } })"
+                >
+                  {{ t("permission.assign") }}
+                </el-button>
+                <el-button
+                  size="small"
+                  type="primary"
+                  plain
+                  style="margin: 0; width: 100%;"
+                  @click="router.push({ name: 'roleUserAssign', params: { id: scope.row.id } })"
+                >
+                  {{ t("user.assign") }}
+                </el-button>
+              </div>
+            </el-popover>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <RoleEditDialog
-      v-model="dialogVisible"
-      :mode="dialogMode"
-      :role-id="currentRoleId"
-      :role-options="roleOptions"
-      :disabled-parent-ids="currentRoleId ? [currentRoleId] : []"
-      @success="handleDialogSuccess"
-    />
+      <RoleEditDialog
+        v-model="dialogVisible"
+        :mode="dialogMode"
+        :role-id="currentRoleId"
+        :role-options="roleOptions"
+        :disabled-parent-ids="currentRoleId ? [currentRoleId] : []"
+        @success="handleDialogSuccess"
+      />
     </TableContainer>
   </div>
 </template>

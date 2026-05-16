@@ -14,8 +14,15 @@ const getIconComponent = (name) =>{
 </script>
 
 <template>
-  <component v-if="icon.startsWith('el-')" :is="getIconComponent(icon.replace('el-','')) " />
-  <img v-else :src="getIconComponent(icon)" alt="icon">
+  <component
+    :is="getIconComponent(icon.replace('el-','')) "
+    v-if="icon.startsWith('el-')"
+  />
+  <img
+    v-else
+    :src="getIconComponent(icon)"
+    alt="icon"
+  >
 </template>
 
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
   <div class="default-table-container search-container">
     <div class="search-content">
-      <slot></slot>
+      <slot />
     </div>
   </div>
 </template>

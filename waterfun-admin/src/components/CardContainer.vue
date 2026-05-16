@@ -16,17 +16,23 @@ const props = withDefaults(defineProps<{
 
 <template>
   <div class="table-container">
-    <div class="header" v-if="props.showTitle">
+    <div
+      v-if="props.showTitle"
+      class="header"
+    >
       <div class="table-header">
-      <div class="header-left">
-        <span>{{ props.titleI18n ? t(title) : title }}</span>
+        <div class="header-left">
+          <span>{{ props.titleI18n ? t(title) : title }}</span>
+        </div>
+        <slot
+          class="header-right"
+          name="header-right"
+        />
       </div>
-        <slot class="header-right" name="header-right"></slot>
-      </div>
-      <div class="header-divider"></div>
+      <div class="header-divider" />
     </div>
     <div class="table-content">
-      <slot></slot>
+      <slot />
     </div>
   </div>
 </template>

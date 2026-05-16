@@ -6,6 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 import { getCategory, getCategoryOptions, type CategoryResp } from "~/api/category";
 import { getUserOptions } from "~/api/user";
 import CategoryCreateDialog from "~/views/Content/components/CategoryCreateDialog.vue";
+import { ElMessage } from "element-plus";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -71,17 +72,41 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="category-detail" v-loading="loading">
+  <div
+    v-loading="loading"
+    class="category-detail"
+  >
     <CardContainer title="content.category.detail">
       <template #header-right>
-        <el-button text @click="router.back()">{{ t("common.action.back") }}</el-button>
-        <el-button type="primary" plain @click="editDialogVisible = true">{{ t("common.action.edit") }}</el-button>
+        <el-button
+          text
+          @click="router.back()"
+        >
+          {{ t("common.action.back") }}
+        </el-button>
+        <el-button
+          type="primary"
+          plain
+          @click="editDialogVisible = true"
+        >
+          {{ t("common.action.edit") }}
+        </el-button>
       </template>
 
-      <el-descriptions v-if="categoryDetail" :column="2" border>
-        <el-descriptions-item label="ID">{{ categoryDetail.id }}</el-descriptions-item>
-        <el-descriptions-item :label="t('content.category.field.name')">{{ categoryDetail.name }}</el-descriptions-item>
-        <el-descriptions-item :label="t('content.category.field.slug')">{{ categoryDetail.slug || t('common.none.title') }}</el-descriptions-item>
+      <el-descriptions
+        v-if="categoryDetail"
+        :column="2"
+        border
+      >
+        <el-descriptions-item label="ID">
+          {{ categoryDetail.id }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('content.category.field.name')">
+          {{ categoryDetail.name }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('content.category.field.slug')">
+          {{ categoryDetail.slug || t('common.none.title') }}
+        </el-descriptions-item>
         <el-descriptions-item :label="t('content.category.field.parentId')">
           <span v-if="categoryDetail.parentId">
             {{ categoryDetail.parentId }} ({{ categoryNameMap.get(categoryDetail.parentId) || t('common.none.title') }})
@@ -98,15 +123,22 @@ onMounted(async () => {
           <span v-else>{{ t('common.none.title') }}</span>
         </el-descriptions-item>
         <el-descriptions-item :label="t('content.category.field.isActive')">
-          <el-tag size="small" :type="categoryDetail.isActive ? 'success' : 'info'">
+          <el-tag
+            size="small"
+            :type="categoryDetail.isActive ? 'success' : 'info'"
+          >
             {{ categoryDetail.isActive ? t('common.boolean.yes') : t('common.boolean.no') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="t('content.category.field.description')">
           {{ categoryDetail.description || t('common.none.title') }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">{{ formatDate(categoryDetail.createdAt) }}</el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">{{ formatDate(categoryDetail.updateAt) }}</el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.create')">
+          {{ formatDate(categoryDetail.createdAt) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.update')">
+          {{ formatDate(categoryDetail.updateAt) }}
+        </el-descriptions-item>
       </el-descriptions>
     </CardContainer>
 

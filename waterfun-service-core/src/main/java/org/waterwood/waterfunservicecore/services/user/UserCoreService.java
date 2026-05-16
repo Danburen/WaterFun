@@ -87,7 +87,7 @@ public interface UserCoreService {
     Page<User> listUsers(String username, String nickname, String accountStatus, Instant createdStart, Instant updatedStart, Pageable pageable);
 
     /**
-     * Update user' avatar
+     * Update user' ofUser
      *
      * @param userUid     target uid
      * @param resourceKey string key
@@ -96,9 +96,9 @@ public interface UserCoreService {
     int updateAvatar(Long userUid, String resourceKey);
 
     /**
-     * Return target user avatar
+     * Return target user ofUser
      * @param userUid target user uid
-     * @return string of avatar null if user's avatar or user is not exists.
+     * @return string of ofUser null if user's ofUser or user is not exists.
      */
     String getUserAvatar(Long userUid);
 }

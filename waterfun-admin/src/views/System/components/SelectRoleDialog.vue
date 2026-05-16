@@ -6,6 +6,7 @@ import TableContainer from "~/components/TableContainer.vue";
 import { getRoleAllIds, listRoles, type RoleResp } from "~/api/role";
 import type { PageOptions } from "~/types";
 import { useI18n } from "vue-i18n";
+import { ElMessage } from "element-plus";
 
 const props = withDefaults(
   defineProps<{
@@ -110,18 +111,38 @@ watch(
 </script>
 
 <template>
-  <el-dialog v-model="visible" :title="t('role.select')" width="1200" destroy-on-close>
+  <el-dialog
+    v-model="visible"
+    :title="t('role.select')"
+    width="1200"
+    destroy-on-close
+  >
     <div class="picker-layout">
       <SearchContainer>
-        <el-form inline :model="searchForm" class="search-form">
+        <el-form
+          inline
+          :model="searchForm"
+          class="search-form"
+        >
           <el-form-item :label="t('role.name')">
-            <el-input v-model="searchForm.name" :placeholder="t('role.input.name')" />
+            <el-input
+              v-model="searchForm.name"
+              :placeholder="t('role.input.name')"
+            />
           </el-form-item>
           <el-form-item :label="t('role.code')">
-            <el-input v-model="searchForm.code" :placeholder="t('role.input.code')" />
+            <el-input
+              v-model="searchForm.code"
+              :placeholder="t('role.input.code')"
+            />
           </el-form-item>
           <el-form-item :label="t('role.parentId')">
-            <el-select v-model="searchForm.parentId" clearable :placeholder="t('role.input.parentId')" style="width: 180px">
+            <el-select
+              v-model="searchForm.parentId"
+              clearable
+              :placeholder="t('role.input.parentId')"
+              style="width: 180px"
+            >
               <el-option
                 v-for="item in roleOptions"
                 :key="item.id"
@@ -132,19 +153,26 @@ watch(
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
-            <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
+            <el-button
+              type="primary"
+              @click="handleSearch"
+            >
+              {{ t('common.query.title') }}
+            </el-button>
+            <el-button @click="handleReset">
+              {{ t('common.reset.title') }}
+            </el-button>
           </el-form-item>
         </el-form>
       </SearchContainer>
 
       <TableContainer
+        v-model:page-size="pageOpts.pageSize"
+        v-model:current-page="pageOpts.currentPage"
         title="role.list"
         :show-add-btn="false"
         :show-remove-btn="false"
         :total="pageOpts.total"
-        v-model:page-size="pageOpts.pageSize"
-        v-model:current-page="pageOpts.currentPage"
         @change="fetchData"
       >
         <el-table
@@ -156,29 +184,66 @@ watch(
           style="width: 100%"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column type="selection" :selectable="selectable" width="55" />
-          <el-table-column prop="id" label="ID" width="90" />
-          <el-table-column prop="name" :label="t('role.name')" min-width="180" />
-          <el-table-column prop="code" :label="t('role.code')" min-width="180" />
-          <el-table-column prop="parentId" :label="t('role.parentId')" width="120">
+          <el-table-column
+            type="selection"
+            :selectable="selectable"
+            width="55"
+          />
+          <el-table-column
+            prop="id"
+            label="ID"
+            width="90"
+          />
+          <el-table-column
+            prop="name"
+            :label="t('role.name')"
+            min-width="180"
+          />
+          <el-table-column
+            prop="code"
+            :label="t('role.code')"
+            min-width="180"
+          />
+          <el-table-column
+            prop="parentId"
+            :label="t('role.parentId')"
+            width="120"
+          >
             <template #default="{ row }">
               <span>{{ row.parentId ?? t('common.none.title') }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="createdAt" :label="t('common.time.create')" min-width="170">
-            <template #default="{ row }">{{ formatISOData(row.createdAt) }}</template>
+          <el-table-column
+            prop="createdAt"
+            :label="t('common.time.create')"
+            min-width="170"
+          >
+            <template #default="{ row }">
+              {{ formatISOData(row.createdAt) }}
+            </template>
           </el-table-column>
         </el-table>
       </TableContainer>
 
       <div class="dialog-extra">
-        <slot name="footer-extra" :selected-ids="selectedIds" />
+        <slot
+          name="footer-extra"
+          :selected-ids="selectedIds"
+        />
       </div>
     </div>
 
     <template #footer>
-      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
-      <el-button type="primary" :disabled="selectedIds.length === 0" @click="handleConfirm">{{ t('common.action.save') }}</el-button>
+      <el-button @click="visible = false">
+        {{ t('common.action.cancel') }}
+      </el-button>
+      <el-button
+        type="primary"
+        :disabled="selectedIds.length === 0"
+        @click="handleConfirm"
+      >
+        {{ t('common.action.save') }}
+      </el-button>
     </template>
   </el-dialog>
 </template>

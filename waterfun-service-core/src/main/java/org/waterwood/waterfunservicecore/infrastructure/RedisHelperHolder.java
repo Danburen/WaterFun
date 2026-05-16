@@ -41,10 +41,20 @@ public interface RedisHelperHolder {
 
     /**
      * Redis pipeline mget
+     *
      * @param keys redis keys
      * @return redis value
      */
     List<String> mget(List<String> keys);
+
+    /**
+     * Batch get TTL (time-to-live) for multiple keys using pipeline.
+     *
+     * @param keys list of keys to query
+     * @return list of TTL in seconds, aligned with input order.
+     *         -1 if key has no expiration, -2 if key does not exist
+     */
+    List<Long> mgetExpire(List<String> keys);
 
     Cursor<String> scan(ScanOptions options);
 
@@ -56,4 +66,11 @@ public interface RedisHelperHolder {
      * @param redisKey target redis key
      */
     String getAndDel(String redisKey);
+
+    /**
+     * Redis multiply set
+     * @param toCache key-value to save
+     * @param dur duration of key-values.
+     */
+    void mset(Map<String, String> toCache, Duration dur);
 }

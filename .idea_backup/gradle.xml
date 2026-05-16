@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="E:/Program Files/gradle-9.2.1" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/waterfun-admin-service" />
+            <option value="$PROJECT_DIR$/waterfun-common-lib" />
+            <option value="$PROJECT_DIR$/waterfun-gateway" />
+            <option value="$PROJECT_DIR$/waterfun-service" />
+            <option value="$PROJECT_DIR$/waterfun-service-core" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/waterfun-gateway" />
+        <option name="gradleHome" value="E:/Program Files/gradle-9.2.1" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/waterfun-admin-service" />
+            <option value="$PROJECT_DIR$/waterfun-common-lib" />
+            <option value="$PROJECT_DIR$/waterfun-gateway" />
+            <option value="$PROJECT_DIR$/waterfun-service" />
+            <option value="$PROJECT_DIR$/waterfun-service-core" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/waterfun-service" />
+        <option name="gradleHome" value="E:/Program Files/gradle-9.2.1" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/waterfun-admin-service" />
+            <option value="$PROJECT_DIR$/waterfun-common-lib" />
+            <option value="$PROJECT_DIR$/waterfun-gateway" />
+            <option value="$PROJECT_DIR$/waterfun-service" />
+            <option value="$PROJECT_DIR$/waterfun-service-core" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/waterfun-service-core" />
+        <option name="gradleHome" value="E:/Program Files/gradle-9.2.1" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/waterfun-admin-service" />
+            <option value="$PROJECT_DIR$/waterfun-common-lib" />
+            <option value="$PROJECT_DIR$/waterfun-gateway" />
+            <option value="$PROJECT_DIR$/waterfun-service" />
+            <option value="$PROJECT_DIR$/waterfun-service-core" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

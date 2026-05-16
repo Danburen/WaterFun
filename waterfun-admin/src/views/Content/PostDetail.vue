@@ -8,6 +8,7 @@ import { getPostById, type PostResp } from "~/api/post";
 import { getTagOptions } from "~/api/tag";
 import { getUserOptions } from "~/api/user";
 import PostCreateDialog from "~/views/Content/components/PostCreateDialog.vue";
+import { ElMessage } from "element-plus";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -91,20 +92,44 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="post-detail" v-loading="loading">
+  <div
+    v-loading="loading"
+    class="post-detail"
+  >
     <CardContainer title="content.post.detail">
       <template #header-right>
-        <el-button text @click="router.back()">{{ t("common.action.back") }}</el-button>
-        <el-button type="primary" plain @click="editDialogVisible = true">{{ t("common.action.edit") }}</el-button>
+        <el-button
+          text
+          @click="router.back()"
+        >
+          {{ t("common.action.back") }}
+        </el-button>
+        <el-button
+          type="primary"
+          plain
+          @click="editDialogVisible = true"
+        >
+          {{ t("common.action.edit") }}
+        </el-button>
       </template>
 
-      <el-descriptions v-if="postDetail" :column="2" border>
-        <el-descriptions-item label="ID">{{ postDetail.id }}</el-descriptions-item>
-        <el-descriptions-item :label="t('content.post.field.title')">{{ postDetail.title }}</el-descriptions-item>
+      <el-descriptions
+        v-if="postDetail"
+        :column="2"
+        border
+      >
+        <el-descriptions-item label="ID">
+          {{ postDetail.id }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('content.post.field.title')">
+          {{ postDetail.title }}
+        </el-descriptions-item>
         <el-descriptions-item :label="t('content.post.field.subtitle')">
           {{ postDetail.subtitle || t('common.none.title') }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.post.field.slug')">{{ postDetail.slug || t('common.none.title') }}</el-descriptions-item>
+        <el-descriptions-item :label="t('content.post.field.slug')">
+          {{ postDetail.slug || t('common.none.title') }}
+        </el-descriptions-item>
         <el-descriptions-item :label="t('content.post.field.status')">
           {{ postDetail.status ? t(`content.post.status.${postDetail.status.toLowerCase()}`) : t('common.none.title') }}
         </el-descriptions-item>
@@ -125,7 +150,11 @@ onMounted(async () => {
         </el-descriptions-item>
         <el-descriptions-item :label="t('content.post.field.tagIds')">
           <el-space wrap>
-            <el-tag v-for="tagId in postDetail.tagIds || []" :key="tagId" size="small">
+            <el-tag
+              v-for="tagId in postDetail.tagIds || []"
+              :key="tagId"
+              size="small"
+            >
               {{ tagId }} ({{ tagNameMap.get(tagId) || t('common.none.title') }})
             </el-tag>
             <span v-if="!postDetail.tagIds || postDetail.tagIds.length === 0">{{ t('common.none.title') }}</span>
@@ -137,9 +166,16 @@ onMounted(async () => {
         <el-descriptions-item :label="t('content.post.field.coverImg')">
           {{ postDetail.coverImg || t('common.none.title') }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">{{ formatDate(postDetail.createdAt) }}</el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">{{ formatDate(postDetail.updatedAt) }}</el-descriptions-item>
-        <el-descriptions-item :label="t('content.post.field.content')" :span="2">
+        <el-descriptions-item :label="t('common.time.create')">
+          {{ formatDate(postDetail.createdAt) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.update')">
+          {{ formatDate(postDetail.updatedAt) }}
+        </el-descriptions-item>
+        <el-descriptions-item
+          :label="t('content.post.field.content')"
+          :span="2"
+        >
           <pre class="content-block">{{ postDetail.content || t('common.none.title') }}</pre>
         </el-descriptions-item>
       </el-descriptions>

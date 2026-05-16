@@ -2,11 +2,14 @@
   "name": "waterfun",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "adev": "pnpm --filter @waterfun/admin run dev",
-    "cdev": "pnpm --filter @waterfun/web-client run dev"
+    "cdev": "pnpm --filter @waterfun/web-client run dev",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +20,13 @@
     "element-plus": "^2.11.5",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-vue": "^10.9.0",
+    "globals": "^17.6.0",
+    "typescript-eslint": "^8.59.1",
+    "vue-eslint-parser": "^10.4.0"
   }
 }

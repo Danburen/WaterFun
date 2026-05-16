@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
-import { ElMessageBox } from "element-plus";
+import { ElMessageBox, ElMessage } from "element-plus";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import SearchContainer from "~/components/SearchContainer.vue";
@@ -176,101 +176,215 @@ onMounted(fetchData);
 <template>
   <div class="list-layout">
     <SearchContainer>
-      <el-form inline :model="searchForm" class="search-form">
+      <el-form
+        inline
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item :label="t('user.username')">
-          <el-input v-model="searchForm.username" :placeholder="t('user.input.username')" />
+          <el-input
+            v-model="searchForm.username"
+            :placeholder="t('user.input.username')"
+          />
         </el-form-item>
         <el-form-item :label="t('user.nickname')">
-          <el-input v-model="searchForm.nickname" :placeholder="t('user.input.nickname')" />
+          <el-input
+            v-model="searchForm.nickname"
+            :placeholder="t('user.input.nickname')"
+          />
         </el-form-item>
         <el-form-item :label="t('user.status')">
-          <el-select v-model="searchForm.accountStatus" clearable style="width: 150px">
-            <el-option :label="statusLabel('ACTIVE')" value="ACTIVE" />
-            <el-option :label="statusLabel('SUSPENDED')" value="SUSPENDED" />
-            <el-option :label="statusLabel('DEACTIVATED')" value="DEACTIVATED" />
-            <el-option :label="statusLabel('DELETED')" value="DELETED" />
+          <el-select
+            v-model="searchForm.accountStatus"
+            clearable
+            style="width: 150px"
+          >
+            <el-option
+              :label="statusLabel('ACTIVE')"
+              value="ACTIVE"
+            />
+            <el-option
+              :label="statusLabel('SUSPENDED')"
+              value="SUSPENDED"
+            />
+            <el-option
+              :label="statusLabel('DEACTIVATED')"
+              value="DEACTIVATED"
+            />
+            <el-option
+              :label="statusLabel('DELETED')"
+              value="DELETED"
+            />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t("common.query.title") }}</el-button>
-          <el-button @click="handleReset">{{ t("common.reset.title") }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            {{ t("common.query.title") }}
+          </el-button>
+          <el-button @click="handleReset">
+            {{ t("common.reset.title") }}
+          </el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
 
     <TableContainer
+      v-model:page-size="pageOpts.pageSize"
+      v-model:current-page="pageOpts.currentPage"
       title="user.title"
-      showAddBtn
+      show-add-btn
       :show-remove-btn="true"
       :disable-delete="selectedUserUids.length === 0"
       :total="pageOpts.total"
-      v-model:page-size="pageOpts.pageSize"
-      v-model:current-page="pageOpts.currentPage"
       @add="handleAdd"
       @remove="handleBatchDelete"
       @change="fetchData"
     >
+      <el-table
+        v-loading="loading"
+        :data="userList"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column
+          type="selection"
+          :selectable="selectable"
+          width="55"
+        />
+        <el-table-column
+          prop="uid"
+          label="UID"
+          min-width="140"
+        />
+        <el-table-column
+          prop="username"
+          :label="t('user.username')"
+        >
+          <template #default="{ row }">
+            <el-link
+              type="primary"
+              :underline="false"
+              @click="gotoDetail(row.uid)"
+            >
+              {{ row.username }}
+            </el-link>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="nickname"
+          :label="t('user.nickname')"
+        >
+          <template #default="{ row }">
+            {{ row.nickname || t('common.none.title') }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="userType"
+          :label="t('user.type')"
+          min-width="120"
+        >
+          <template #default="{ row }">
+            <el-tag
+              size="small"
+              :type="userTypeTagTypeMap[row.userType]"
+            >
+              {{ userTypeLabel(row.userType) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="accountStatus"
+          :label="t('user.status')"
+        >
+          <template #default="{ row }">
+            <el-tag
+              size="small"
+              :type="statusTypeMap[row.accountStatus]"
+            >
+              {{ statusLabel(row.accountStatus) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="createdAt"
+          :label="t('common.time.create')"
+        >
+          <template #default="{ row }">
+            {{ formatISOData(row.createdAt) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          :label="t('common.operation.title')"
+          min-width="120"
+          fixed="right"
+        >
+          <template #default="{ row }">
+            <el-button
+              size="small"
+              type="primary"
+              @click="gotoEdit(row.uid)"
+            >
+              {{ t("common.action.edit") }}
+            </el-button>
+            <el-button
+              size="small"
+              type="danger"
+              @click="handleDelete(row.uid)"
+            >
+              {{ t("common.action.delete") }}
+            </el-button>
+            <el-popover
+              placement="bottom"
+              trigger="click"
+              :width="100"
+              popper-style="min-width: auto; padding: 8px;"
+            >
+              <template #reference>
+                <el-button
+                  size="small"
+                  type="success"
+                  style="margin-left: 12px;"
+                >
+                  {{ t("common.action.more") }}
+                </el-button>
+              </template>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <el-button
+                  size="small"
+                  type="primary"
+                  plain
+                  style="margin: 0; width: 100%;"
+                  @click="router.push({ name: 'userRoleAssign', params: { uid: String(row.uid) } })"
+                >
+                  {{ t("role.assign") }}
+                </el-button>
+                <el-button
+                  size="small"
+                  type="primary"
+                  plain
+                  style="margin: 0; width: 100%;"
+                  @click="router.push({ name: 'userPermissionAssign', params: { uid: String(row.uid) } })"
+                >
+                  {{ t("permission.assign") }}
+                </el-button>
+              </div>
+            </el-popover>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <el-table
-      v-loading="loading"
-      :data="userList"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" :selectable="selectable" width="55" />
-      <el-table-column prop="uid" label="UID" min-width="140" />
-      <el-table-column prop="username" :label="t('user.username')">
-        <template #default="{ row }">
-          <el-link type="primary" :underline="false" @click="gotoDetail(row.uid)">
-            {{ row.username }}
-          </el-link>
-        </template>
-      </el-table-column>
-      <el-table-column prop="nickname" :label="t('user.nickname')" >
-        <template #default="{ row }">
-          {{ row.nickname || t('common.none.title') }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="userType" :label="t('user.type')" min-width="120">
-        <template #default="{ row }">
-          <el-tag size="small" :type="userTypeTagTypeMap[row.userType]">
-            {{ userTypeLabel(row.userType) }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="accountStatus" :label="t('user.status')">
-        <template #default="{ row }">
-          <el-tag size="small" :type="statusTypeMap[row.accountStatus]">
-            {{ statusLabel(row.accountStatus) }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="createdAt" :label="t('common.time.create')">
-        <template #default="{ row }">
-          {{ formatISOData(row.createdAt) }}
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('common.operation.title')" min-width="120" fixed="right">
-        <template #default="{ row }">
-          <el-button size="small" type="primary" @click="gotoEdit(row.uid)">{{ t("common.action.edit") }}</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(row.uid)">{{ t("common.action.delete") }}</el-button>
-          <el-popover placement="bottom" trigger="click" :width="100" popper-style="min-width: auto; padding: 8px;">
-            <template #reference>
-              <el-button size="small" type="success" style="margin-left: 12px;">{{ t("common.action.more") }}</el-button>
-            </template>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <el-button size="small" type="primary" plain @click="router.push({ name: 'userRoleAssign', params: { uid: String(row.uid) } })" style="margin: 0; width: 100%;">{{ t("role.assign") }}</el-button>
-              <el-button size="small" type="primary" plain @click="router.push({ name: 'userPermissionAssign', params: { uid: String(row.uid) } })" style="margin: 0; width: 100%;">{{ t("permission.assign") }}</el-button>
-            </div>
-          </el-popover>
-        </template>
-      </el-table-column>
-    </el-table>
-
-      <UserEditDialog v-model="editDialogVisible" :mode="dialogMode" :uid="currentEditUid" @success="handleEditSuccess" />
+      <UserEditDialog
+        v-model="editDialogVisible"
+        :mode="dialogMode"
+        :uid="currentEditUid"
+        @success="handleEditSuccess"
+      />
     </TableContainer>
   </div>
 </template>

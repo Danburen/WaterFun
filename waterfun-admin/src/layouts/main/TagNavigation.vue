@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type {TagNavItemType} from "@/types/ui/tagNav.js";
 import {ref, computed, onMounted, onUnmounted, watch} from 'vue'
-import router from "@/router/index.js";
+import router from "@/router";
 const tagNavContainer = ref();
 const activeTagName = ref('');
 const dragIndex = ref<number | null>(null);
@@ -112,12 +112,6 @@ const handleDrop = () => {
   dragPlaceholderIndex.value = null
 }
 
-const setCurrentName = (name?:string) => {
-  if(name === null) return
-  if(sortedTags.value.some(tag => tag.name === name)){
-    activeTagName.value = name
-  }
-}
 
 onMounted(() => {
   const container = tagNavContainer.value
@@ -152,35 +146,42 @@ watch(()=> props.modelValue,
 </script>
 
 <template>
-    <div class="tag-container no-scroll-bar" :style="{ gap: `${tagGap || 6}px` }" ref="tagNavContainer">
-      <template v-for="(tag, index) in sortedTags" :key="tag.name">
-        <div
-            v-if="dragPlaceholderIndex === index"
-            class="tag-placeholder"
-        />
-        <el-tag
-            class="tag"
-            :effect="activeTagName  === tag.name ? 'light' : 'plain'"
-            :class="{ 'tag-dragging': dragIndex === index,
-                      'active': activeTagName === tag.name
-                    }"
-            :closable="tag.closeable"
-            draggable="true"
-            @close="handleClose(tag.name)"
-            @click="handleClick(tag.name)"
-            @dragstart="dragIndex = index"
-            @dragover="handleDragOver"
-            @dragend="handleDrop"
-            @drop="handleDrop"
-        >
-          {{ $t(tag.locale) }}
-        </el-tag>
-        <div
-            v-if="dragPlaceholderIndex === sortedTags.length && index === sortedTags.length - 1"
-            class="tag-placeholder"
-        />
-      </template>
-    </div>
+  <div
+    ref="tagNavContainer"
+    class="tag-container no-scroll-bar"
+    :style="{ gap: `${tagGap || 6}px` }"
+  >
+    <template
+      v-for="(tag, index) in sortedTags"
+      :key="tag.name"
+    >
+      <div
+        v-if="dragPlaceholderIndex === index"
+        class="tag-placeholder"
+      />
+      <el-tag
+        class="tag"
+        :effect="activeTagName === tag.name ? 'light' : 'plain'"
+        :class="{ 'tag-dragging': dragIndex === index,
+                  'active': activeTagName === tag.name
+        }"
+        :closable="tag.closeable"
+        draggable="true"
+        @close="handleClose(tag.name)"
+        @click="handleClick(tag.name)"
+        @dragstart="dragIndex = index"
+        @dragover="handleDragOver"
+        @dragend="handleDrop"
+        @drop="handleDrop"
+      >
+        {{ $t(tag.locale) }}
+      </el-tag>
+      <div
+        v-if="dragPlaceholderIndex === sortedTags.length && index === sortedTags.length - 1"
+        class="tag-placeholder"
+      />
+    </template>
+  </div>
 </template>
 
 <style scoped>

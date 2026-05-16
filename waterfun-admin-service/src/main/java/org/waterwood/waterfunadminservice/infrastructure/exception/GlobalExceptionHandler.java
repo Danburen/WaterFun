@@ -1,6 +1,7 @@
 package org.waterwood.waterfunadminservice.infrastructure.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotBlank;
@@ -53,6 +54,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<?> handleJwtException(JwtException exception) {
+        ErrorResponse errRes = new ErrorResponse(
+                BaseResponseCode.INVALID_TOKEN_OR_EXPIRED.getCode(),
+                exception.getMessage(),
+                null,
+                new Date()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errRes);
+    }
     /**
      * Handle request body validation.
      * e.g. {@link RequestBody}

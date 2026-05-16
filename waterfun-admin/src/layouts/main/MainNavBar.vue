@@ -20,15 +20,43 @@ const bcStore = useBreadcrumbs();
     <el-header class="app-header items-center">
       <div class="header-left">
         <div class="align-center logo">
-          <el-button size="large" style="width: 40px;height: 40px;" link  @click="collapseButtonClick">
-            <div class="collapse-icon" v-if="!menuCollapse"><Fold /></div>
-            <div class="collapse-icon" v-else><Expand /></div>
+          <el-button
+            size="large"
+            style="width: 40px;height: 40px;"
+            link
+            @click="collapseButtonClick"
+          >
+            <div
+              v-if="!menuCollapse"
+              class="collapse-icon"
+            >
+              <Fold />
+            </div>
+            <div
+              v-else
+              class="collapse-icon"
+            >
+              <Expand />
+            </div>
           </el-button>
-          <img src="../../assets/logo.svg" width="35px" height="35px" alt="WaterFun">
+          <img
+            src="../../assets/logo.svg"
+            width="35px"
+            height="35px"
+            alt="WaterFun"
+          >
           <span style="margin-left: 0.5em; font-size: 1em">WaterFun</span>
         </div>
-        <el-breadcrumb class="bread-nav" separator="/">
-          <el-breadcrumb-item v-for="item in bcStore.breadcrumbs.value" :to="item.to">{{ $t(item.locale) }}</el-breadcrumb-item>
+        <el-breadcrumb
+          class="bread-nav"
+          separator="/"
+        >
+          <el-breadcrumb-item
+            v-for="item in bcStore.breadcrumbs.value"
+            :to="item.to"
+          >
+            {{ $t(item.locale) }}
+          </el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <div class="header-right float-right">

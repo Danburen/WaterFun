@@ -6,6 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 import { getTag, type TagResp } from "~/api/tag";
 import { getUserOptions } from "~/api/user";
 import TagCreateDialog from "~/views/Content/components/TagCreateDialog.vue";
+import { ElMessage } from "element-plus";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -62,17 +63,41 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="tag-detail" v-loading="loading">
+  <div
+    v-loading="loading"
+    class="tag-detail"
+  >
     <CardContainer title="content.tag.detail">
       <template #header-right>
-        <el-button text @click="router.back()">{{ t("common.action.back") }}</el-button>
-        <el-button type="primary" plain @click="editDialogVisible = true">{{ t("common.action.edit") }}</el-button>
+        <el-button
+          text
+          @click="router.back()"
+        >
+          {{ t("common.action.back") }}
+        </el-button>
+        <el-button
+          type="primary"
+          plain
+          @click="editDialogVisible = true"
+        >
+          {{ t("common.action.edit") }}
+        </el-button>
       </template>
 
-      <el-descriptions v-if="tagDetail" :column="2" border>
-        <el-descriptions-item label="ID">{{ tagDetail.id }}</el-descriptions-item>
-        <el-descriptions-item :label="t('content.tag.field.name')">{{ tagDetail.name }}</el-descriptions-item>
-        <el-descriptions-item :label="t('content.tag.field.slug')">{{ tagDetail.slug || t('common.none.title') }}</el-descriptions-item>
+      <el-descriptions
+        v-if="tagDetail"
+        :column="2"
+        border
+      >
+        <el-descriptions-item label="ID">
+          {{ tagDetail.id }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('content.tag.field.name')">
+          {{ tagDetail.name }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('content.tag.field.slug')">
+          {{ tagDetail.slug || t('common.none.title') }}
+        </el-descriptions-item>
         <el-descriptions-item :label="t('content.tag.field.usageCount')">
           {{ tagDetail.usageCount ?? t('common.none.title') }}
         </el-descriptions-item>
@@ -85,8 +110,12 @@ onMounted(async () => {
         <el-descriptions-item :label="t('content.tag.field.description')">
           {{ tagDetail.description || t('common.none.title') }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">{{ formatDate(tagDetail.createdAt) }}</el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">{{ formatDate(tagDetail.updateAt) }}</el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.create')">
+          {{ formatDate(tagDetail.createdAt) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('common.time.update')">
+          {{ formatDate(tagDetail.updateAt) }}
+        </el-descriptions-item>
       </el-descriptions>
     </CardContainer>
 

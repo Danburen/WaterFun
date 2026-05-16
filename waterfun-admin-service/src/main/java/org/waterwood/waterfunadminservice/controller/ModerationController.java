@@ -16,10 +16,10 @@ import org.waterwood.waterfunadminservice.api.response.ModerateTaskResponse;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
 import org.waterwood.waterfunadminservice.service.ModerationService;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.audit.resource.AuditResourceType;
-import org.waterwood.waterfunservicecore.entity.audit.resource.AuditTaskResource;
+import org.waterwood.common.io.ResourceType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
-import org.waterwood.waterfunservicecore.entity.audit.task.AduitTaskType;
+import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.AuditTaskResourceSpec;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.AuditTaskSpec;
 
@@ -34,7 +34,7 @@ public class ModerationController {
     private final ModerationService moderationService;
 
     @GetMapping("/list")
-    public ApiResponse<Page<ModerateTaskResponse>> list(@RequestParam(required = false) AduitTaskType taskType,
+    public ApiResponse<Page<ModerateTaskResponse>> list(@RequestParam(required = false) MediaResourceType taskType,
                                                         @RequestParam(required = false) Long submitterId,
                                                         @RequestParam(required = false) Instant submitAtStart,
                                                         @RequestParam(required = false) Instant submitAtEnd,
@@ -47,7 +47,7 @@ public class ModerationController {
     public ApiResponse<Page<ModerationResourceRes>> listResources(
             @RequestParam(required = false) Long taskId,
             @RequestParam(required = false) AuditStatus status,
-            @RequestParam(required = false) AuditResourceType resourceType,
+            @RequestParam(required = false) ResourceType resourceType,
             @RequestParam(required = false) Long auditorId,
             @RequestParam(required = false) Instant auditAtStart,
             @RequestParam(required = false) Instant auditAtEnd,

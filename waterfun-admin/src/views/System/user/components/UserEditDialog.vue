@@ -9,6 +9,7 @@ import {
   type AccountStatus,
   type Gender,
 } from "~/api/user";
+import { ElMessage } from "element-plus";
 
 const props = withDefaults(
   defineProps<{
@@ -287,14 +288,35 @@ const handleClosed = () => {
     @closed="handleClosed"
   >
     <div v-if="isCreateMode">
-      <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-width="120px" class="form-block">
-        <el-form-item :label="t('user.phone')" prop="phone">
-          <el-input v-model="createForm.phone" :placeholder="t('user.input.phone')" />
+      <el-form
+        ref="createFormRef"
+        :model="createForm"
+        :rules="createRules"
+        label-width="120px"
+        class="form-block"
+      >
+        <el-form-item
+          :label="t('user.phone')"
+          prop="phone"
+        >
+          <el-input
+            v-model="createForm.phone"
+            :placeholder="t('user.input.phone')"
+          />
         </el-form-item>
-        <el-form-item :label="t('user.username')" prop="username">
-          <el-input v-model="createForm.username" :placeholder="t('user.input.username')" />
+        <el-form-item
+          :label="t('user.username')"
+          prop="username"
+        >
+          <el-input
+            v-model="createForm.username"
+            :placeholder="t('user.input.username')"
+          />
         </el-form-item>
-        <el-form-item :label="t('auth.password')" prop="password">
+        <el-form-item
+          :label="t('auth.password')"
+          prop="password"
+        >
           <el-input
             v-model="createForm.password"
             type="password"
@@ -302,60 +324,155 @@ const handleClosed = () => {
             :placeholder="t('user.input.password')"
           />
         </el-form-item>
-        <el-form-item :label="t('user.type')" prop="userType">
-          <el-select v-model="createForm.userType" style="width: 100%">
-            <el-option :label="t('user.typeMap.normal')" :value="0" />
-            <el-option :label="t('user.typeMap.tester')" :value="1" />
-            <el-option :label="t('user.typeMap.admin')" :value="2" />
-            <el-option :label="t('user.typeMap.system')" :value="3" />
-            <el-option :label="t('user.typeMap.superAdmin')" :value="4" />
+        <el-form-item
+          :label="t('user.type')"
+          prop="userType"
+        >
+          <el-select
+            v-model="createForm.userType"
+            style="width: 100%"
+          >
+            <el-option
+              :label="t('user.typeMap.normal')"
+              :value="0"
+            />
+            <el-option
+              :label="t('user.typeMap.tester')"
+              :value="1"
+            />
+            <el-option
+              :label="t('user.typeMap.admin')"
+              :value="2"
+            />
+            <el-option
+              :label="t('user.typeMap.system')"
+              :value="3"
+            />
+            <el-option
+              :label="t('user.typeMap.superAdmin')"
+              :value="4"
+            />
           </el-select>
         </el-form-item>
       </el-form>
     </div>
 
-    <div v-else v-loading="loading">
-      <el-form :model="userInfoForm" label-width="120px" class="form-block">
+    <div
+      v-else
+      v-loading="loading"
+    >
+      <el-form
+        :model="userInfoForm"
+        label-width="120px"
+        class="form-block"
+      >
         <el-form-item :label="t('user.username')">
-          <el-input v-model="userInfoForm.username" disabled />
+          <el-input
+            v-model="userInfoForm.username"
+            disabled
+          />
         </el-form-item>
         <el-form-item :label="t('user.type')">
-          <el-select v-model="userInfoForm.userType" disabled style="width: 100%">
-            <el-option :label="t('user.typeMap.normal')" :value="0" />
-            <el-option :label="t('user.typeMap.tester')" :value="1" />
-            <el-option :label="t('user.typeMap.admin')" :value="2" />
-            <el-option :label="t('user.typeMap.system')" :value="3" />
-            <el-option :label="t('user.typeMap.superAdmin')" :value="4" />
+          <el-select
+            v-model="userInfoForm.userType"
+            disabled
+            style="width: 100%"
+          >
+            <el-option
+              :label="t('user.typeMap.normal')"
+              :value="0"
+            />
+            <el-option
+              :label="t('user.typeMap.tester')"
+              :value="1"
+            />
+            <el-option
+              :label="t('user.typeMap.admin')"
+              :value="2"
+            />
+            <el-option
+              :label="t('user.typeMap.system')"
+              :value="3"
+            />
+            <el-option
+              :label="t('user.typeMap.superAdmin')"
+              :value="4"
+            />
           </el-select>
         </el-form-item>
         <el-form-item :label="t('user.nickname')">
-          <el-input v-model="userInfoForm.nickname" :placeholder="t('user.input.nickname')" />
+          <el-input
+            v-model="userInfoForm.nickname"
+            :placeholder="t('user.input.nickname')"
+          />
         </el-form-item>
         <el-form-item :label="t('user.avatar')">
-          <el-input v-model="userInfoForm.avatarUrl" :placeholder="t('user.input.avatar')" />
+          <el-input
+            v-model="userInfoForm.avatarUrl"
+            :placeholder="t('user.input.avatar')"
+          />
         </el-form-item>
         <el-form-item :label="t('user.status')">
-          <el-select v-model="userInfoForm.accountStatus" style="width: 100%">
-            <el-option :label="statusLabel('ACTIVE')" value="ACTIVE" />
-            <el-option :label="statusLabel('SUSPENDED')" value="SUSPENDED" />
-            <el-option :label="statusLabel('DEACTIVATED')" value="DEACTIVATED" />
-            <el-option :label="statusLabel('DELETED')" value="DELETED" />
+          <el-select
+            v-model="userInfoForm.accountStatus"
+            style="width: 100%"
+          >
+            <el-option
+              :label="statusLabel('ACTIVE')"
+              value="ACTIVE"
+            />
+            <el-option
+              :label="statusLabel('SUSPENDED')"
+              value="SUSPENDED"
+            />
+            <el-option
+              :label="statusLabel('DEACTIVATED')"
+              value="DEACTIVATED"
+            />
+            <el-option
+              :label="statusLabel('DELETED')"
+              value="DELETED"
+            />
           </el-select>
         </el-form-item>
       </el-form>
 
       <el-divider />
 
-      <el-form :model="userProfileForm" label-width="120px" class="form-block">
+      <el-form
+        :model="userProfileForm"
+        label-width="120px"
+        class="form-block"
+      >
         <el-form-item :label="t('user.bio')">
-          <el-input v-model="userProfileForm.bio" type="textarea" :rows="3" :placeholder="t('user.input.bio')" />
+          <el-input
+            v-model="userProfileForm.bio"
+            type="textarea"
+            :rows="3"
+            :placeholder="t('user.input.bio')"
+          />
         </el-form-item>
         <el-form-item :label="t('user.gender')">
-          <el-select v-model="userProfileForm.gender" style="width: 100%">
-            <el-option :label="genderLabel('MALE')" value="MALE" />
-            <el-option :label="genderLabel('FEMALE')" value="FEMALE" />
-            <el-option :label="genderLabel('OTHER')" value="OTHER" />
-            <el-option :label="genderLabel('UNKNOWN')" value="UNKNOWN" />
+          <el-select
+            v-model="userProfileForm.gender"
+            style="width: 100%"
+          >
+            <el-option
+              :label="genderLabel('MALE')"
+              value="MALE"
+            />
+            <el-option
+              :label="genderLabel('FEMALE')"
+              value="FEMALE"
+            />
+            <el-option
+              :label="genderLabel('OTHER')"
+              value="OTHER"
+            />
+            <el-option
+              :label="genderLabel('UNKNOWN')"
+              value="UNKNOWN"
+            />
           </el-select>
         </el-form-item>
         <el-form-item :label="t('user.birthDate')">
@@ -368,25 +485,46 @@ const handleClosed = () => {
           />
         </el-form-item>
         <el-form-item :label="t('user.residence')">
-          <el-input v-model="userProfileForm.residence" :placeholder="t('user.input.residence')" />
+          <el-input
+            v-model="userProfileForm.residence"
+            :placeholder="t('user.input.residence')"
+          />
         </el-form-item>
       </el-form>
 
       <el-divider />
 
-      <el-form :model="userDatumForm" label-width="120px" class="form-block">
+      <el-form
+        :model="userDatumForm"
+        label-width="120px"
+        class="form-block"
+      >
         <el-form-item :label="t('user.email')">
-          <el-input v-model="userDatumForm.email" :placeholder="t('user.input.email')" />
+          <el-input
+            v-model="userDatumForm.email"
+            :placeholder="t('user.input.email')"
+          />
         </el-form-item>
         <el-form-item :label="t('user.phone')">
-          <el-input v-model="userDatumForm.phone" :placeholder="t('user.input.phone')" />
+          <el-input
+            v-model="userDatumForm.phone"
+            :placeholder="t('user.input.phone')"
+          />
         </el-form-item>
       </el-form>
     </div>
 
     <template #footer>
-      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('common.action.save') }}</el-button>
+      <el-button @click="visible = false">
+        {{ t('common.action.cancel') }}
+      </el-button>
+      <el-button
+        type="primary"
+        :loading="submitting"
+        @click="handleSave"
+      >
+        {{ t('common.action.save') }}
+      </el-button>
     </template>
   </el-dialog>
 </template>

@@ -68,22 +68,57 @@ defineExpose<PermFormExpose>({
 </script>
 
 <template>
-  <el-form ref="formRef" :model="localModel" :rules="rules" label-width="120px" status-icon>
-    <el-form-item prop="name" :label="t('permission.name')">
-      <el-input v-model="localModel.name" :readonly="readonly" :placeholder="t('permission.input.name')" />
+  <el-form
+    ref="formRef"
+    :model="localModel"
+    :rules="rules"
+    label-width="120px"
+    status-icon
+  >
+    <el-form-item
+      prop="name"
+      :label="t('permission.name')"
+    >
+      <el-input
+        v-model="localModel.name"
+        :readonly="readonly"
+        :placeholder="t('permission.input.name')"
+      />
     </el-form-item>
 
-    <el-form-item prop="code" :label="t('permission.code')">
-      <el-input v-model="localModel.code" :readonly="readonly" :placeholder="t('permission.input.code')" />
+    <el-form-item
+      prop="code"
+      :label="t('permission.code')"
+    >
+      <el-input
+        v-model="localModel.code"
+        :readonly="readonly"
+        :placeholder="t('permission.input.code')"
+      />
     </el-form-item>
 
-    <el-form-item prop="type" :label="t('permission.type.title')">
-      <el-select v-model="localModel.type" :disabled="readonly" style="width: 100%">
-        <el-option v-for="item in permTypeOptions" :key="item.value" :label="t(item.label)" :value="item.value" />
+    <el-form-item
+      prop="type"
+      :label="t('permission.type.title')"
+    >
+      <el-select
+        v-model="localModel.type"
+        :disabled="readonly"
+        style="width: 100%"
+      >
+        <el-option
+          v-for="item in permTypeOptions"
+          :key="item.value"
+          :label="t(item.label)"
+          :value="item.value"
+        />
       </el-select>
     </el-form-item>
 
-    <el-form-item prop="resource" :label="t('permission.resource')">
+    <el-form-item
+      prop="resource"
+      :label="t('permission.resource')"
+    >
       <el-input
         v-model="localModel.resource"
         :readonly="readonly"
@@ -91,7 +126,10 @@ defineExpose<PermFormExpose>({
       />
     </el-form-item>
 
-    <el-form-item prop="parentId" :label="t('permission.parentId')">
+    <el-form-item
+      prop="parentId"
+      :label="t('permission.parentId')"
+    >
       <el-select
         v-model="localModel.parentId"
         clearable
@@ -109,11 +147,22 @@ defineExpose<PermFormExpose>({
       </el-select>
     </el-form-item>
 
-    <el-form-item prop="orderWeight" :label="t('permission.weight')">
-      <el-input-number v-model="localModel.orderWeight" :disabled="readonly" :min="0" :max="99999" />
+    <el-form-item
+      prop="orderWeight"
+      :label="t('permission.weight')"
+    >
+      <el-input-number
+        v-model="localModel.orderWeight"
+        :disabled="readonly"
+        :min="0"
+        :max="99999"
+      />
     </el-form-item>
 
-    <el-form-item prop="description" :label="t('permission.description')">
+    <el-form-item
+      prop="description"
+      :label="t('permission.description')"
+    >
       <el-input
         v-model="localModel.description"
         type="textarea"
@@ -123,8 +172,14 @@ defineExpose<PermFormExpose>({
       />
     </el-form-item>
 
-    <el-form-item prop="isSystem" :label="t('permission.isSystem')">
-      <el-switch v-model="localModel.isSystem" :disabled="readonly" />
+    <el-form-item
+      prop="isSystem"
+      :label="t('permission.isSystem')"
+    >
+      <el-switch
+        v-model="localModel.isSystem"
+        :disabled="readonly"
+      />
     </el-form-item>
   </el-form>
 </template>

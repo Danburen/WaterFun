@@ -10,7 +10,6 @@
     "module": "esNext",
     "target": "esnext",
     "types": ["node", "vue" ],
-    "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
       "@/*": ["./src/*"]

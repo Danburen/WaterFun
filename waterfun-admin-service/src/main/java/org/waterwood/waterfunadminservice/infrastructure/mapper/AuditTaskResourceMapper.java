@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
-import org.waterwood.waterfunservicecore.entity.audit.resource.AuditTaskResource;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
 
 @Mapper(
         unmappedTargetPolicy = ReportingPolicy.IGNORE,

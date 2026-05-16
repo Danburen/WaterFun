@@ -57,25 +57,43 @@ const localCurrentPage = computed({
 
 </script>
 <template>
-  <CardContainer :title="title" :title-i18n="titleI18n" :show-title="showTitle">
+  <CardContainer
+    :title="title"
+    :title-i18n="titleI18n"
+    :show-title="showTitle"
+  >
     <div class="operation-bar">
-      <el-button v-if="showAddBtn" type="primary" size="small" @click="$emit('add')">
+      <el-button
+        v-if="showAddBtn"
+        type="primary"
+        size="small"
+        @click="$emit('add')"
+      >
         {{ t('common.action.create') }}
       </el-button>
-      <el-button v-if="showRemoveBtn" :disabled="disableDelete" type="danger" size="small" @click="$emit('remove')">
+      <el-button
+        v-if="showRemoveBtn"
+        :disabled="disableDelete"
+        type="danger"
+        size="small"
+        @click="$emit('remove')"
+      >
         {{ t('common.action.delete') }}
       </el-button>
       <slot name="action-buttons" />
     </div>
-    <slot name="search"></slot>
-    <slot></slot>
-    <div v-if="showPagination" class="pagination-container">
+    <slot name="search" />
+    <slot />
+    <div
+      v-if="showPagination"
+      class="pagination-container"
+    >
       <el-pagination
-          v-model:current-page="localCurrentPage"
-          v-model:page-size="localPageSize"
-          :page-sizes="pageSizes"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
+        v-model:current-page="localCurrentPage"
+        v-model:page-size="localPageSize"
+        :page-sizes="pageSizes"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
       />
     </div>
   </CardContainer>

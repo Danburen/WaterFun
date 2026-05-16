@@ -110,14 +110,14 @@ onMounted(() => {
           :src="captchaUrl"
           alt="验证码"
           class="captcha-image"
-          @click="refreshCaptcha"
           style="cursor: pointer;"
-        />
+          @click="refreshCaptcha"
+        >
         <el-icon
           :size="20"
           class="refresh-icon"
-          @click="refreshCaptcha"
           style="cursor: pointer;"
+          @click="refreshCaptcha"
         >
           <Refresh />
         </el-icon>
@@ -126,15 +126,22 @@ onMounted(() => {
         v-model="inputCode"
         placeholder="请输入验证码"
         maxlength="4"
-        @keyup.enter="confirmCaptcha"
         style="margin-top: 15px;"
-      >
-      </el-input>
+        @keyup.enter="confirmCaptcha"
+      />
     </div>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="cancelCaptcha">取消</el-button>
-        <el-button type="primary" @click="confirmCaptcha" :loading="loading">确定</el-button>
+        <el-button @click="cancelCaptcha">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="loading"
+          @click="confirmCaptcha"
+        >
+          确定
+        </el-button>
       </div>
     </template>
   </el-dialog>

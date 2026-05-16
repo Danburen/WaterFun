@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 const props = withDefaults(defineProps<{
     modelValue: boolean;
     title: string;
@@ -29,21 +29,28 @@ const emit = defineEmits<{
 }>();
 </script>
 <template>
-    <el-dialog
-        v-model="visible"
-        :title="title"
-        :width="width"
-        :destroy-on-close="destroyOnClose"
-        :confirm-button-text="confirmButtonText"
-        :cancel-button-text="cancelButtonText"
-        @close="emit('close')"
-    >
-    <slot></slot>
+  <el-dialog
+    v-model="visible"
+    :title="title"
+    :width="width"
+    :destroy-on-close="destroyOnClose"
+    :confirm-button-text="confirmButtonText"
+    :cancel-button-text="cancelButtonText"
+    @close="emit('close')"
+  >
+    <slot />
     <template #footer>
-        <el-button type="primary" @click="emit('confirm')">{{ confirmButtonText }}</el-button>
-        <el-button @click="emit('cancel')">{{ cancelButtonText }}</el-button>
+      <el-button
+        type="primary"
+        @click="emit('confirm')"
+      >
+        {{ confirmButtonText }}
+      </el-button>
+      <el-button @click="emit('cancel')">
+        {{ cancelButtonText }}
+      </el-button>
     </template>
-    </el-dialog>
+  </el-dialog>
 </template>
 <style scoped>
 .dialog-footer {

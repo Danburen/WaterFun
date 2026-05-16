@@ -40,7 +40,7 @@ public class Tag {
 
     @ColumnDefault("'0'")
     @Column(name = "usage_count", columnDefinition = "int UNSIGNED")
-    private Long usageCount;
+    private Long usageCount = 0L;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

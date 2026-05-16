@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import router, { menuRoutes } from '@/router/index.js'
+import router, { menuRoutes } from '@/router'
 import IconComponent from "@/components/IconComponent.vue";
 
 const props = defineProps<{
@@ -73,25 +73,33 @@ const handleMenuClick = (routeName:string) => {
     :collapse="collapse"
   >
     <template v-for="route in menuRoutes">
-      <el-sub-menu v-if="route.children && route.children.length" :index="getTopLevelIndex(route)">
+      <el-sub-menu
+        v-if="route.children && route.children.length"
+        :index="getTopLevelIndex(route)"
+      >
         <template #title>
-          <el-icon class="menu-icon"><IconComponent :icon="route.meta.icon" /></el-icon>
+          <el-icon class="menu-icon">
+            <IconComponent :icon="route.meta.icon" />
+          </el-icon>
           <span>{{ $t(`nav.${route.meta.locale}`) }}</span>
         </template>
-        <el-menu-item @click="handleMenuClick(child.name as string)"  
-          v-for="child in route.children.filter(child => !child.meta.isDetail)" 
-          :index="child.name as string"
+        <el-menu-item
+          v-for="child in route.children.filter(child => !child.meta.isDetail)"  
+          :index="child.name as string" 
+          @click="handleMenuClick(child.name as string)"
         >
-          <span>{{ $t(`nav.${child.meta.locale}`)}}</span>
+          <span>{{ $t(`nav.${child.meta.locale}`) }}</span>
         </el-menu-item>
       </el-sub-menu>
       <el-menu-item 
-        @click="handleMenuClick(route.name as string)" 
         v-else-if="! route.meta.isDetail" 
-        :index="route.name as string"
+        :index="route.name as string" 
+        @click="handleMenuClick(route.name as string)"
       >
-        <el-icon class="menu-icon"><IconComponent :icon="route.meta.icon" /></el-icon>
-        <span>{{ $t(`nav.${route.meta.locale}`)}}</span>
+        <el-icon class="menu-icon">
+          <IconComponent :icon="route.meta.icon" />
+        </el-icon>
+        <span>{{ $t(`nav.${route.meta.locale}`) }}</span>
       </el-menu-item>
     </template>
   </el-menu>

@@ -123,16 +123,34 @@ onMounted(() => {
   <div class="dashboard-container">
     <h1>销售数据仪表盘</h1>
 
-    <div v-if="loading" class="loading">加载中...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else-if="option.series[0].data.length > 0" class="chart-container">
+    <div
+      v-if="loading"
+      class="loading"
+    >
+      加载中...
+    </div>
+    <div
+      v-else-if="error"
+      class="error"
+    >
+      {{ error }}
+    </div>
+    <div
+      v-else-if="option.series[0].data.length > 0"
+      class="chart-container"
+    >
       <v-chart
-          class="chart"
-          :option="option"
-          :autoresize="true"
+        class="chart"
+        :option="option"
+        :autoresize="true"
       />
     </div>
-    <div v-else class="loading">无可用数据</div>
+    <div
+      v-else
+      class="loading"
+    >
+      无可用数据
+    </div>
   </div>
 </template>
 

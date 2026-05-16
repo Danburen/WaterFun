@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../ProgramData/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.36/5a30490a6e14977d97d9c73c924c1f1b5311ea95/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="waterfun.waterfun-common-lib.main" />
+        <module name="waterfun.waterfun-common-lib.test" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../ProgramData/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.42/8365263844ebb62398e0dc33057ba10ba472d3b8/lombok-1.18.42.jar" />
+          <entry name="$PROJECT_DIR$/../../../ProgramData/.gradle/caches/modules-2/files-2.1/org.mapstruct/mapstruct-processor/1.6.3/52e345c907fbf173b376586c7f8b131d53fa5867/mapstruct-processor-1.6.3.jar" />
+        </processorPath>
+        <module name="waterfun.waterfun-service-core.main" />
+        <module name="waterfun.waterfun-admin-service.main" />
+        <module name="waterfun.waterfun-service.main" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../ProgramData/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.42/8365263844ebb62398e0dc33057ba10ba472d3b8/lombok-1.18.42.jar" />
+        </processorPath>
+        <module name="waterfun.waterfun-gateway.main" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="waterfun-admin-service" target="22" />
+      <module name="waterfun-admin-service.main" target="22" />
+      <module name="waterfun-admin-service.test" target="22" />
+      <module name="waterfun-common-lib" target="22" />
+      <module name="waterfun-common-lib.main" target="22" />
+      <module name="waterfun-common-lib.test" target="22" />
+      <module name="waterfun-service" target="22" />
+      <module name="waterfun-service.main" target="22" />
+      <module name="waterfun-service.test" target="22" />
+      <module name="waterfun.waterfun-notify" target="22" />
+      <module name="waterfun.waterfun-notify-service" target="22" />
+      <module name="waterfun.waterfun-notify-service.main" target="22" />
+      <module name="waterfun.waterfun-notify-service.test" target="22" />
+      <module name="waterfun.waterfun-notify.main" target="22" />
+      <module name="waterfun.waterfun-notify.test" target="22" />
+      <module name="waterfun.waterfun-storage-service" target="22" />
+      <module name="waterfun.waterfun-storage-service.main" target="22" />
+      <module name="waterfun.waterfun-storage-service.test" target="22" />
+      <module name="waterfun.waterfun-thirdparty-starter" target="22" />
+      <module name="waterfun.waterfun-thirdparty-starter.main" target="22" />
+      <module name="waterfun.waterfun-thirdparty-starter.test" target="22" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -11,6 +11,7 @@ import {
   type ModerateRejectType,
   type ModerationResourceResp,
 } from "~/api/moderation";
+import { ElMessage } from "element-plus";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -124,15 +125,38 @@ watch(resourceId, fetchDetail);
 </script>
 
 <template>
-  <div class="resource-detail" v-loading="loading">
+  <div
+    v-loading="loading"
+    class="resource-detail"
+  >
     <CardContainer title="moderation.resourceDetail">
       <template #header-right>
-        <el-button text @click="router.back()">{{ t('common.action.back') }}</el-button>
-        <el-button type="success" :disabled="!resourceId" @click="handleApprove">{{ t('moderation.action.approve') }}</el-button>
-        <el-button type="warning" :disabled="!resourceId" @click="openRejectDialog">{{ t('moderation.action.reject') }}</el-button>
+        <el-button
+          text
+          @click="router.back()"
+        >
+          {{ t('common.action.back') }}
+        </el-button>
+        <el-button
+          type="success"
+          :disabled="!resourceId"
+          @click="handleApprove"
+        >
+          {{ t('moderation.action.approve') }}
+        </el-button>
+        <el-button
+          type="warning"
+          :disabled="!resourceId"
+          @click="openRejectDialog"
+        >
+          {{ t('moderation.action.reject') }}
+        </el-button>
       </template>
 
-      <div v-if="detail" class="detail-layout">
+      <div
+        v-if="detail"
+        class="detail-layout"
+      >
         <div class="image-pane">
           <div class="image-stage">
             <img
@@ -140,17 +164,34 @@ watch(resourceId, fetchDetail);
               :src="previewUrl"
               :alt="detail.resourceKey || String(detail.id || '')"
               class="full-image"
+            >
+            <el-empty
+              v-else
+              :description="t('common.none.description')"
             />
-            <el-empty v-else :description="t('common.none.description')" />
           </div>
-          <div class="image-actions" v-if="previewUrl">
-            <el-link :href="previewUrl" target="_blank" type="primary">{{ t('moderation.action.openOriginal') }}</el-link>
+          <div
+            v-if="previewUrl"
+            class="image-actions"
+          >
+            <el-link
+              :href="previewUrl"
+              target="_blank"
+              type="primary"
+            >
+              {{ t('moderation.action.openOriginal') }}
+            </el-link>
           </div>
         </div>
 
         <div class="info-pane">
-          <el-descriptions :column="1" border>
-            <el-descriptions-item label="ID">{{ detail.id || t('common.none.title') }}</el-descriptions-item>
+          <el-descriptions
+            :column="1"
+            border
+          >
+            <el-descriptions-item label="ID">
+              {{ detail.id || t('common.none.title') }}
+            </el-descriptions-item>
             <el-descriptions-item :label="t('moderation.field.taskId')">
               {{ detail.taskId || t('common.none.title') }}
             </el-descriptions-item>
@@ -184,13 +225,23 @@ watch(resourceId, fetchDetail);
         </div>
       </div>
 
-      <el-empty v-else :description="t('common.none.description')" />
+      <el-empty
+        v-else
+        :description="t('common.none.description')"
+      />
     </CardContainer>
 
-    <el-dialog v-model="rejectDialogVisible" :title="t('moderation.dialog.rejectTitle')" width="520">
+    <el-dialog
+      v-model="rejectDialogVisible"
+      :title="t('moderation.dialog.rejectTitle')"
+      width="520"
+    >
       <el-form label-width="100px">
         <el-form-item :label="t('moderation.field.rejectType')">
-          <el-select v-model="rejectForm.rejectType" style="width: 100%">
+          <el-select
+            v-model="rejectForm.rejectType"
+            style="width: 100%"
+          >
             <el-option
               v-for="item in rejectTypeOptions"
               :key="item.value"
@@ -210,8 +261,16 @@ watch(resourceId, fetchDetail);
       </el-form>
 
       <template #footer>
-        <el-button @click="rejectDialogVisible = false">{{ t('common.action.cancel') }}</el-button>
-        <el-button type="primary" :loading="rejectSubmitting" @click="submitReject">{{ t('common.action.save') }}</el-button>
+        <el-button @click="rejectDialogVisible = false">
+          {{ t('common.action.cancel') }}
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="rejectSubmitting"
+          @click="submitReject"
+        >
+          {{ t('common.action.save') }}
+        </el-button>
       </template>
     </el-dialog>
   </div>

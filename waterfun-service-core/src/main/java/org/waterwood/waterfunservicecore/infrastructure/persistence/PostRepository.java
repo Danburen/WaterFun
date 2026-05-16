@@ -1,11 +1,19 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
+import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.common.jpa.SlugUniquenessChecker;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>,
         JpaSpecificationExecutor<Post>,
@@ -13,4 +21,10 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     boolean existsBySlug(String slug);
 
     int deleteByIdIn(List<Long> attr0);
+
+    Optional<Post> findByIdAndVisibilityAndIsDeleted(Long id, PostVisibility visibility, Boolean isDeleted);
+
+    Page<Long> findAllIds(Specification<Post> spec, Pageable pageable);
+
+    Optional<Post> findByIdAndAuthorUid(Long postId, Long authorUid);
 }

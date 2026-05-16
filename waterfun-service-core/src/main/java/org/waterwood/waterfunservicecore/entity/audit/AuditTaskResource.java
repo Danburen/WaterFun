@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.entity.audit.resource;
+package org.waterwood.waterfunservicecore.entity.audit;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,8 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
-import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
+import org.waterwood.common.io.ResourceType;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
@@ -41,7 +40,7 @@ public class AuditTaskResource {
     private String resourceKey;
 
     @Column(name = "resource_type", columnDefinition = "tinyint UNSIGNED not null")
-    private AuditResourceType resourceType = AuditResourceType.UNKNOWN;
+    private ResourceType resourceType = ResourceType.UNKNOWN;
 
     @Size(max = 64)
     @Column(name = "mime_type", length = 64)

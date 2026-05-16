@@ -11,6 +11,7 @@ import {
 import type { PageOptions } from "~/types";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 import SelectUserDialog from "../components/SelectUserDialog.vue";
 
 const { t } = useI18n();
@@ -137,31 +138,51 @@ onMounted(async () => {
 <template>
   <div class="assign-layout">
     <SearchContainer>
-      <el-form inline :model="searchForm" class="search-form">
+      <el-form
+        inline
+        :model="searchForm"
+        class="search-form"
+      >
         <el-form-item :label="t('user.uid')">
-          <el-input v-model="searchForm.userUid" :placeholder="t('user.input.uid')" />
+          <el-input
+            v-model="searchForm.userUid"
+            :placeholder="t('user.input.uid')"
+          />
         </el-form-item>
         <el-form-item :label="t('user.username')">
-          <el-input v-model="searchForm.username" :placeholder="t('user.input.username')" />
+          <el-input
+            v-model="searchForm.username"
+            :placeholder="t('user.input.username')"
+          />
         </el-form-item>
         <el-form-item :label="t('user.nickname')">
-          <el-input v-model="searchForm.nickname" :placeholder="t('user.input.nickname')" />
+          <el-input
+            v-model="searchForm.nickname"
+            :placeholder="t('user.input.nickname')"
+          />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
-          <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+          >
+            {{ t('common.query.title') }}
+          </el-button>
+          <el-button @click="handleReset">
+            {{ t('common.reset.title') }}
+          </el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
 
     <TableContainer
-      :title="assignTitle"
-      :title-i18n="false"
-      showAddBtn
-      :total="pageOpts.total"
-      :disable-delete="selectedIds.length === 0"
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
+      :title="assignTitle"
+      :title-i18n="false"
+      show-add-btn
+      :total="pageOpts.total"
+      :disable-delete="selectedIds.length === 0"
       @change="fetchData"
       @add="handleAdd"
       @remove="handleRemove"
@@ -174,10 +195,22 @@ onMounted(async () => {
         style="width: 100%"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="userUid" :label="t('user.uid')" />
-        <el-table-column prop="username" :label="t('user.username')" />
-        <el-table-column prop="nickname" :label="t('user.nickname')" />
+        <el-table-column
+          type="selection"
+          width="55"
+        />
+        <el-table-column
+          prop="userUid"
+          :label="t('user.uid')"
+        />
+        <el-table-column
+          prop="username"
+          :label="t('user.username')"
+        />
+        <el-table-column
+          prop="nickname"
+          :label="t('user.nickname')"
+        />
       </el-table>
     </TableContainer>
 

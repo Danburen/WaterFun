@@ -1,7 +1,11 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.waterwood.common.jpa.SlugUniquenessChecker;
 
@@ -15,5 +19,16 @@ public interface TagRepository extends JpaRepository<Tag, Integer>, JpaSpecifica
 
   List<Integer> findTagIdsByTagsIdIn(Collection<Integer> tagsIds);
 
-    int removeByIdIn(Collection<Integer> ids);
+  int removeByIdIn(Collection<Integer> ids);
+
+  @Query("SELECT t FROM Tag t ORDER BY t.usageCount DESC LIMIT :limit")
+  List<Tag> findTopByOrderByUsageCountDesc(@Param("limit") Integer limit);
+
+
+  @Query("""
+    SELECT p.id, new org.waterwood.api.VO.OptionVO(t.id, t.slug, t.name, false)
+    FROM Post p JOIN p.tags t
+    WHERE p.id IN :postIds
+""")
+  List<Object[]> findTagsByPostIds(List<Long> postIds);
 }

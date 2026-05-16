@@ -24,7 +24,7 @@ import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.audit.resource.AuditTaskResource;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
@@ -277,7 +277,7 @@ public class ModerationServiceImpl implements ModerationService {
     private ModerationResourceRes toModerationResourceRes(AuditTaskResource resource) {
         CloudResPresignedUrlResp urlResp = null;
         try {
-            urlResp = cloudFileService.getReadUrlCached( CloudStorageRootKey.TEMP,
+            urlResp = cloudFileService.getReadUrlCached(CloudStorageRootKey.MODERATION,
                     resource.getResourceKey(),
                     "audit-res-" + resource.getId(),
                     resource.getTask().getTargetType());

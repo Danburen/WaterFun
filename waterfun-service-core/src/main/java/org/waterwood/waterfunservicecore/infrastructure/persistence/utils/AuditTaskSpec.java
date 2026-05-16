@@ -3,14 +3,14 @@ package org.waterwood.waterfunservicecore.infrastructure.persistence.utils;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
-import org.waterwood.waterfunservicecore.entity.audit.task.AduitTaskType;
+import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class AuditTaskSpec {
-    public static Specification<AuditTask> ofPending(AduitTaskType taskType, Long submitterId, Instant submitAtStart, Instant submitAtEnd) {
+    public static Specification<AuditTask> ofPending(MediaResourceType taskType, Long submitterId, Instant submitAtStart, Instant submitAtEnd) {
         return (root, query, cb) -> {
            List<Predicate> predicates = new ArrayList<>();
            predicates.add(cb.equal(root.get("status"), 1));

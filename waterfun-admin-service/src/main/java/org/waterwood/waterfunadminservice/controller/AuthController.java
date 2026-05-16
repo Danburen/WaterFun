@@ -30,20 +30,12 @@ public class AuthController {
 
     private final CaptchaService captchaService;
     private final LoginService loginService;
-    private final AuthCoreService authCoreService;
-    private final UserCoreService userCoreService;
     private final AuthService authService;
-    private final UserService userService;
-    private final UserProfileCoreService userProfileCoreService;
 
     public AuthController(CaptchaService captchaService, LoginService loginService, AuthCoreService authCoreService, UserCoreService userCoreService, AuthService authService, UserService userService, UserProfileCoreService userProfileCoreService) {
         this.captchaService = captchaService;
         this.loginService = loginService;
-        this.authCoreService = authCoreService;
-        this.userCoreService = userCoreService;
         this.authService = authService;
-        this.userService = userService;
-        this.userProfileCoreService = userProfileCoreService;
     }
 
     @Operation(summary = "获取图形验证码")
@@ -71,20 +63,6 @@ public class AuthController {
                 authService.loginByPwd(body, request, response)
         );
     }
-
-    @PostMapping("/info")
-    public ApiResponse<AdminUserInfoResponse> getCurrentUserInfo(){
-        return ApiResponse.success(
-            userService.getCurrentAdminUserInfo()
-        );
-    }
-
-    @PutMapping("/updateProfile")
-    public ApiResponse<Void> updateProfile(@RequestBody @Valid UpdateUserProfileRequest body){
-        userProfileCoreService.updateProfileByDto(body);
-        return ApiResponse.success();
-    }
-
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@RequestBody String deviceFp, HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = CookieUtil.getCookieValue(request.getCookies(),"REFRESH_TOKEN");

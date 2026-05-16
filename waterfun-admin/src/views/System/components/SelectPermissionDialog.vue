@@ -9,6 +9,7 @@ import {
 } from "~/api/permission";
 import type { PageOptions } from "~/types";
 import { useI18n } from "vue-i18n";
+import { ElMessage } from "element-plus";
 
 const props = withDefaults(
   defineProps<{
@@ -132,23 +133,50 @@ watch(
 </script>
 
 <template>
-  <el-dialog v-model="visible" :title="t('permission.select')" width="1250" destroy-on-close>
+  <el-dialog
+    v-model="visible"
+    :title="t('permission.select')"
+    width="1250"
+    destroy-on-close
+  >
     <div class="picker-layout">
       <SearchContainer>
-        <el-form inline :model="searchForm" class="search-form">
+        <el-form
+          inline
+          :model="searchForm"
+          class="search-form"
+        >
           <el-form-item :label="t('permission.name')">
-            <el-input v-model="searchForm.name" :placeholder="t('permission.input.name')" />
+            <el-input
+              v-model="searchForm.name"
+              :placeholder="t('permission.input.name')"
+            />
           </el-form-item>
           <el-form-item :label="t('permission.code')">
-            <el-input v-model="searchForm.code" :placeholder="t('permission.input.code')" />
+            <el-input
+              v-model="searchForm.code"
+              :placeholder="t('permission.input.code')"
+            />
           </el-form-item>
           <el-form-item :label="t('permission.type.title')">
-            <el-select v-model="searchForm.type" clearable style="width: 140px">
-              <el-option v-for="item in permTypeOptions" :key="item.value" :label="t(item.label)" :value="item.value" />
+            <el-select
+              v-model="searchForm.type"
+              clearable
+              style="width: 140px"
+            >
+              <el-option
+                v-for="item in permTypeOptions"
+                :key="item.value"
+                :label="t(item.label)"
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
           <el-form-item :label="t('permission.resource')">
-            <el-input v-model="searchForm.resource" :placeholder="t('permission.input.resource')" />
+            <el-input
+              v-model="searchForm.resource"
+              :placeholder="t('permission.input.resource')"
+            />
           </el-form-item>
           <el-form-item :label="t('permission.parentId')">
             <el-select
@@ -167,19 +195,26 @@ watch(
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="handleSearch">{{ t('common.query.title') }}</el-button>
-            <el-button @click="handleReset">{{ t('common.reset.title') }}</el-button>
+            <el-button
+              type="primary"
+              @click="handleSearch"
+            >
+              {{ t('common.query.title') }}
+            </el-button>
+            <el-button @click="handleReset">
+              {{ t('common.reset.title') }}
+            </el-button>
           </el-form-item>
         </el-form>
       </SearchContainer>
 
       <TableContainer
+        v-model:page-size="pageOpts.pageSize"
+        v-model:current-page="pageOpts.currentPage"
         title="permission.list"
         :show-add-btn="false"
         :show-remove-btn="false"
         :total="pageOpts.total"
-        v-model:page-size="pageOpts.pageSize"
-        v-model:current-page="pageOpts.currentPage"
         @change="fetchData"
       >
         <el-table
@@ -190,25 +225,63 @@ watch(
           style="width: 100%"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column type="selection" :selectable="selectable" width="55" />
-          <el-table-column prop="id" label="ID" width="80" />
-          <el-table-column prop="name" :label="t('permission.name')" min-width="160" />
-          <el-table-column prop="code" :label="t('permission.code')" min-width="160" />
-          <el-table-column prop="type" :label="t('permission.type.title')" width="120">
-            <template #default="{ row }">{{ t(`permission.type.${row.type?.toLowerCase?.() || 'other'}`) }}</template>
+          <el-table-column
+            type="selection"
+            :selectable="selectable"
+            width="55"
+          />
+          <el-table-column
+            prop="id"
+            label="ID"
+            width="80"
+          />
+          <el-table-column
+            prop="name"
+            :label="t('permission.name')"
+            min-width="160"
+          />
+          <el-table-column
+            prop="code"
+            :label="t('permission.code')"
+            min-width="160"
+          />
+          <el-table-column
+            prop="type"
+            :label="t('permission.type.title')"
+            width="120"
+          >
+            <template #default="{ row }">
+              {{ t(`permission.type.${row.type?.toLowerCase?.() || 'other'}`) }}
+            </template>
           </el-table-column>
-          <el-table-column prop="resource" :label="t('permission.resource')" min-width="220" show-overflow-tooltip />
+          <el-table-column
+            prop="resource"
+            :label="t('permission.resource')"
+            min-width="220"
+            show-overflow-tooltip
+          />
         </el-table>
       </TableContainer>
 
       <div class="dialog-extra">
-        <slot name="footer-extra" :selected-ids="selectedIds" />
+        <slot
+          name="footer-extra"
+          :selected-ids="selectedIds"
+        />
       </div>
     </div>
 
     <template #footer>
-      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
-      <el-button type="primary" :disabled="selectedIds.length === 0" @click="handleConfirm">{{ t('common.action.save') }}</el-button>
+      <el-button @click="visible = false">
+        {{ t('common.action.cancel') }}
+      </el-button>
+      <el-button
+        type="primary"
+        :disabled="selectedIds.length === 0"
+        @click="handleConfirm"
+      >
+        {{ t('common.action.save') }}
+      </el-button>
     </template>
   </el-dialog>
 </template>

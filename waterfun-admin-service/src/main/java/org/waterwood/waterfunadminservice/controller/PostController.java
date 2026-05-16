@@ -9,7 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.VO.BatchResult;
-import org.waterwood.api.enums.PostStatus;
+import org.waterwood.waterfunservicecore.entity.post.PostStatus;
 import org.waterwood.waterfunadminservice.api.request.DeletePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.AssignTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.CreatePostRequest;

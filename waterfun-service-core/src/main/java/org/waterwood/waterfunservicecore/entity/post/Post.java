@@ -8,15 +8,11 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.waterwood.api.enums.PostStatus;
-import org.waterwood.api.enums.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -50,15 +46,6 @@ public class Post {
     @Column(name = "cover_img")
     private String coverImg;
 
-    @ColumnDefault("'DRAFT'")
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private PostStatus status = PostStatus.DRAFT;
-
-    @ColumnDefault("'PUBLIC'")
-    @Column(name = "visibility")
-    @Enumerated(EnumType.STRING)
-    private PostVisibility visibility = PostVisibility.PUBLIC;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -114,5 +101,13 @@ public class Post {
     @ColumnDefault("0")
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
+
+    @ColumnDefault("'0'")
+    @Column(name = "status", columnDefinition = "tinyint UNSIGNED")
+    private PostStatus status = PostStatus.DRAFT;
+
+    @ColumnDefault("'0'")
+    @Column(name = "visibility", columnDefinition = "tinyint UNSIGNED")
+    private PostVisibility visibility = PostVisibility.PUBLIC;
 
 }
