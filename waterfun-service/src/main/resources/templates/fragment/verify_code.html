@@ -1,0 +1,10 @@
+<div th:fragment="content">
+    <h2>尊敬的<span th:test="${target}">用户</span> ，您好！</h2>
+    <p>您正在进行 <b th:text="${action}">账户验证操作</b> 操作，您的验证码是：</p>
+
+    <div class="code" th:text="${verificationCode}">123456</div>
+
+    <p>请在<span th:text="${expireTime}">30</span>分钟内完成验证，不要泄露给其他人。</p>
+
+    <p>如非本人操作，请忽略此邮件或<a href="mailto:${supportMail}">联系客服</a>。</p>
+</div>

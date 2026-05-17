@@ -1,0 +1,26 @@
+-[ ] Auth Service
+  - [ ] Basic  
+    - [x] Sms Service
+    - [x] Email Service
+    - [x] Captcha Service
+    - [x] Role Service
+    - [x] Permission Service
+    - [ ] Jwt
+      - [x] RsaJwt
+      - [ ] HsaJwt
+    - [ ] Token
+      - [ ] AccessToken
+      - [ ] RefreshToken
+  - [x] SignIn
+  - [ ] SignUp
+  - [ ] ForgotPassword
+  - [ ] ResetPassword
+  - [ ] ChangePassword
+  - [ ] SignOut
+  - [ ] Profile
+  - [ ] ProfileEdit
+  - [ ] ProfileDelete
+  - [ ] ProfileAvatar
+  - [ ] ProfilePassword
+- [ ] storage
+  - [x] Redis

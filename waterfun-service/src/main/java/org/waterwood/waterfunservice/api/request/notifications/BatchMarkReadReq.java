@@ -1,0 +1,14 @@
+package org.waterwood.waterfunservice.api.request.notifications;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class BatchMarkReadReq {
+    private List<Long> ids;
+}

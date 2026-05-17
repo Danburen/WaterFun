@@ -1,0 +1,13 @@
+<div th:fragment="content">
+    <h2>尊敬的<span th:text="${target}">用户</span>，您好！</h2>
+    <p>您正在进行 <b th:text="${action}">账户验证操作</b> 操作，请点击下方按钮完成验证：</p>
+
+    <a th:href="${verificationLink}" class="verification-link-outline">点击验证邮箱</a>
+
+    <p>如果链接无法点击，请复制以下链接到浏览器地址栏：</p>
+    <p style="word-break: break-all; font-size: 14px; color: #666;" th:text="${verificationLink}">https://www.waterfun.top/verify?token=xxx</p>
+
+    <p>此链接将在<span th:text="${expireTime}">30</span>分钟内有效，请勿泄露给其他人。</p>
+
+    <p>如非本人操作，请忽略此邮件或<a href="mailto:${supportMail}" class="link-primary">联系客服</a>。</p>
+</div>
