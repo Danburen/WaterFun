@@ -17,13 +17,18 @@ public interface RedisHelperHolder {
 
     void set(String key, String value, Duration expire);
 
-    <T> void hSet(String key, String field, T value);
+    void hSet(String key, String field, String value);
 
-    <T> T hGet(String key, String field, Class<T> clazz);
+    String hGet(String key, String field);
 
-    Map<Object, Object> hGetAll(String key);
+    void hSetMap(String key, Map<String, String> map, Duration expire);
 
-    Set<Object> hKeys(String key);
+    void hSetMap(String key, Map<String, String> map);
+
+    void hSetAll(String key, Map<String, String> map);
+
+    Map<String, String> hGetAll(String key);
+    Set<String> hKeys(String key);
 
     void hDel(String key, String... fields);
     void sAdd(String key, String... values);
@@ -73,4 +78,6 @@ public interface RedisHelperHolder {
      * @param dur duration of key-values.
      */
     void mset(Map<String, String> toCache, Duration dur);
+
+    Map<String, String> hGetAllAndDel(String s);
 }

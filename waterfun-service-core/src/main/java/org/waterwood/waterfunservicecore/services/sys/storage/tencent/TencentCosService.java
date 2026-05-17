@@ -90,7 +90,7 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public PresignedResp buildPutPolicyWithBiz(CloudStorageRootKey keyRoot, String path, String packagedBizTargetId) {
+    public PresignedResp buildPutPolicyWithBiz(CloudStorageRootKey keyRoot, String path, BizPayload payload) {
         String keyPath = buildCosKey(keyRoot, path);
         Date expire = Date.from(Instant.now().plus(Duration.ofSeconds(uploadExpires)));
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName,  keyPath, HttpMethodName.PUT);
@@ -101,8 +101,8 @@ public class TencentCosService implements CloudFileService {
             URL url = client.generatePresignedUrl(request);
             String uuidKey = UUID.randomUUID().toString().replace("-", "");
             // Token
-            redisHelper.set(RedisKeyBuilder.buildKey(KeyConstants.UPLOADS, KeyConstants.TOKEN, uuidKey),
-                    packagedBizTargetId,
+            redisHelper.hSetMap(RedisKeyBuilder.buildKey(KeyConstants.UPLOADS, KeyConstants.TOKEN, uuidKey),
+                    payload.toMap(),
                     Duration.ofSeconds(uploadTokenExpires)
             );
             return new PresignedResp(
@@ -183,19 +183,13 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public <T extends Serializable> BizPayload<T> parseToken(String token, Class<T> idType) {
-        String targetId = redisHelper.getAndDel(
-                RedisKeyBuilder.buildKey(KeyConstants.UPLOADS, KeyConstants.TOKEN, token)
+    public BizPayload parseToken(String token) {
+        BizPayload payload = BizPayload.fromMap(
+                redisHelper.hGetAllAndDel(
+                        RedisKeyBuilder.buildKey(KeyConstants.UPLOADS, KeyConstants.TOKEN, token)
+                )
         );
-        if(targetId == null){
-            throw new BizException(BaseResponseCode.CLOUD_TOKEN_INVALID_OR_EXPIRED);
-        };
-        return BizTargetIdPackager.parseBiz(targetId, idType);
-    }
-
-    @Override
-    public BizPayload<String> parseToken(String token) {
-        return parseToken(token, String.class);
+        return payload;
     }
 
     private String buildCosKey(CloudStorageRootKey root, String... keys){

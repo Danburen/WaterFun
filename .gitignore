@@ -19,5 +19,10 @@ application-*.yml
 application-*.properties
 docker-compose.yml
 
+common.yml
+!*.example.*
+deploy
+
 .gradle
 .vscode
+/sqls/

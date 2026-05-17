@@ -36,24 +36,59 @@ public class RedisHelper implements RedisHelperHolder {
         redisTemplate.opsForValue().set(key, value, expire);
     }
 
-    public <T> void hSet(String key, String field, T value) {
-        redisTemplate.opsForHash().put(key, field, JsonUtil.toJson(value));
-    }
-    public <T> T hGet(String key, String field, Class<T> clazz) {
-        String json = (String) redisTemplate.opsForHash().get(key, field);
-        return JsonUtil.fromJson(json, clazz);
-    }
-
-    public Map<Object,Object> hGetAll(String key) {
-        return redisTemplate.opsForHash().entries(key);
-    }
-
-    public Set<Object> hKeys(String key) {
-        return redisTemplate.opsForHash().keys(key);
-    }
-
+    @Override
     public void hDel(String key, String... fields) {
+        if (fields == null || fields.length == 0) return;
         redisTemplate.opsForHash().delete(key, (Object[]) fields);
+    }
+
+    @Override
+    public void hSetMap(String key, Map<String, String> map, Duration expire) {
+        if (map == null) return;
+        redisTemplate.delete(key);
+        if (!map.isEmpty()) {
+            redisTemplate.opsForHash().putAll(key, map);
+        }
+        redisTemplate.expire(key, expire);
+    }
+
+    @Override
+    public void hSetMap(String key, Map<String, String> map) {
+        if (map == null) return;
+        redisTemplate.delete(key);
+        if (!map.isEmpty()) {
+            redisTemplate.opsForHash().putAll(key, map);
+        }
+    }
+
+    @Override
+    public void hSetAll(String key, Map<String, String> map) {
+        if (map == null || map.isEmpty()) return;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            redisTemplate.opsForHash().putIfAbsent(key, entry.getKey(), entry.getValue());
+        }
+    }
+
+    @Override
+    public void hSet(String key, String field, String value) {
+        redisTemplate.opsForHash().put(key, field, value);
+    }
+
+    @Override
+    public String hGet(String key, String field) {
+        return (String) redisTemplate.opsForHash().get(key, field);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, String> hGetAll(String key) {
+        return (Map<String, String>) (Map<?, ?>) redisTemplate.opsForHash().entries(key);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Set<String> hKeys(String key) {
+        return (Set<String>) (Set<?>) redisTemplate.opsForHash().keys(key);
     }
 
     @Override
@@ -171,5 +206,12 @@ public class RedisHelper implements RedisHelperHolder {
             });
             return null;
         });
+    }
+
+    @Override
+    public Map<String, String> hGetAllAndDel(String key) {
+        Map<String, String> res = Optional.ofNullable(hGetAll(key)).orElse(Collections.emptyMap());
+        del(key);
+        return res;
     }
 }

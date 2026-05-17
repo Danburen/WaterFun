@@ -27,4 +27,6 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     Page<Long> findAllIds(Specification<Post> spec, Pageable pageable);
 
     Optional<Post> findByIdAndAuthorUid(Long postId, Long authorUid);
+
+    Optional<Post> findByIdAndAuthorUidAndIsDeleted(Long id, Long id1, boolean attr0);
 }

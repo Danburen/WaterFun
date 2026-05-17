@@ -80,7 +80,7 @@ public class BannerServiceImpl implements BannerService {
         return cloudFileService.buildPutPolicyWithBiz(
                 CloudStorageRootKey.UPLOADS,
                 resourceKey,
-                ""
+                null
         );
     }
 

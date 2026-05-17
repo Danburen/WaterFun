@@ -1,6 +1,10 @@
 package org.waterwood.waterfunservicecore.infrastructure.utils.context;
 
 
+import org.jspecify.annotations.Nullable;
+
+import java.util.Locale;
+
 /**
  * ThreadLocal Util
  *
@@ -22,6 +26,7 @@ public class UserCtxHolder {
     }
 
 
+
     /**
      * Get jwt identify.
      * @return the java web token id.
@@ -35,5 +40,9 @@ public class UserCtxHolder {
      */
     public static void remove(){
         THREAD_LOCAL.remove();
+    }
+
+    public static Locale getLocale() {
+        return get().getLocale();
     }
 }
