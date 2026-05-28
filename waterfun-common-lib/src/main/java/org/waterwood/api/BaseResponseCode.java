@@ -98,10 +98,12 @@ public enum BaseResponseCode implements ResponseCode {
     FILE_TYPE_NOT_ALLOW("system.file_type_not_allow"),
     COS_UPLOAD_CLIENT_NOT_CONFIGURED("system.cos_upload_client_not_configured"),
     CLOUD_FILE_NOT_FOUND("system.cloud_file_not_found"),
+
     ILLEGAL_FILE_COUNT("system.illegal_upload_file_count"),
     UNSUPPORTED_FILE_EXTENSION("system.unsupported_file_extension"),
     CLOUD_TOKEN_INVALID_OR_EXPIRED("system.cloud_token_invalid_or_expired"),
-    UNSUPPORTED_ID_TYPE("system.unsupported_id_type"),;
+    UNSUPPORTED_ID_TYPE("system.unsupported_id_type"), ILLEGAL_UPLOAD_FILE_EXTENSION("system.illegal_upload_file_extension"),
+    ILLEGAL_UPLOAD_FILE_ARGUMENTS("system.illegal_upload_file_arguments"),;
     private final String code;
     // private final String defaultMessage;
 

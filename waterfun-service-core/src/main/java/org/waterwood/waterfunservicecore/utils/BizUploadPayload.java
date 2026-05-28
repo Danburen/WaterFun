@@ -1,17 +1,15 @@
 package org.waterwood.waterfunservicecore.utils;
 
 import lombok.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BizPayload {
+public class BizUploadPayload {
+    private String uploadId;
     private String biz;
     private String bizId;
     private String type;
@@ -19,6 +17,9 @@ public class BizPayload {
 
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<>();
+        if(uploadId != null) {
+            map.put("uploadId", uploadId);
+        }
         if (biz != null) {
             map.put("biz", biz);
         }
@@ -34,15 +35,16 @@ public class BizPayload {
         return map;
     }
 
-    public static BizPayload fromMap(Map<String, String> map) {
+    public static BizUploadPayload fromMap(Map<String, String> map) {
         if (map == null || map.isEmpty()) {
             return null;
         }
-        BizPayload payload = new BizPayload();
+        BizUploadPayload payload = new BizUploadPayload();
         payload.setBiz(map.get("biz"));
         payload.setBizId(map.get("bizId"));
         payload.setType(map.get("type"));
         payload.setCosKey(map.get("cosKey"));
+        payload.setUploadId(map.get("uploadId"));
         return payload;
     }
 }

@@ -5,11 +5,11 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.CloudStorageRootKey;
+import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.exceptions.BizException;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
-import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
+import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelper;
@@ -69,10 +69,10 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
             return null;
         }
         return cloudFileService.getReadUrlCached(
-                CloudStorageRootKey.UPLOADS,
+                CloudFSRoot.UPLOADS,
                 u.getAvatar(),
                 String.valueOf(userUid),
-                MediaResourceType.USER_AVATAR
+                TargetType.USER_AVATAR
         );
     }
 
@@ -83,10 +83,10 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
                 User::getAvatar
         ).toList();
         return cloudFileService.batchGetReadPublicUrlCached(
-                CloudStorageRootKey.UPLOADS,
+                CloudFSRoot.UPLOADS,
                 paths,
                 userUids,
-                MediaResourceType.USER_AVATAR
+                TargetType.USER_AVATAR
         );
     }
 

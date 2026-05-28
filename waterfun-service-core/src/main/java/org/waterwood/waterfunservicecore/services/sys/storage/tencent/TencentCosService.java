@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.CloudStorageRootKey;
+import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.KeyConstants;
 import org.waterwood.common.exceptions.BizException;
 import org.waterwood.common.io.SimpleCloudObject;
@@ -23,11 +23,10 @@ import org.waterwood.common.cache.RedisKeyBuilder;
 import org.waterwood.waterfunservicecore.api.HttpMethod;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
-import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
+import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
 import org.waterwood.waterfunservicecore.services.sys.CloudKeyBuilder;
 import org.waterwood.waterfunservicecore.services.sys.storage.*;
-import org.waterwood.waterfunservicecore.utils.BizPayload;
-import org.waterwood.waterfunservicecore.utils.BizTargetIdPackager;
+import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -80,7 +79,7 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public CloudResPresignedUrlResp getReadUrlCached(CloudStorageRootKey root, String path, Serializable bizId, MediaResourceType resType) {
+    public CloudResPresignedUrlResp getReadUrlCached(CloudFSRoot root, String path, Serializable bizId, TargetType resType) {
         return getReadUrlCached(
                 buildCosKey(root, path),
                 bizId,
@@ -90,8 +89,8 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public PresignedResp buildPutPolicyWithBiz(CloudStorageRootKey keyRoot, String path, BizPayload payload) {
-        String keyPath = buildCosKey(keyRoot, path);
+    public PresignedResp buildPutPolicyWithPayload(CloudFSRoot root, String path, BizUploadPayload payload) {
+        String keyPath = buildCosKey(root, path);
         Date expire = Date.from(Instant.now().plus(Duration.ofSeconds(uploadExpires)));
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName,  keyPath, HttpMethodName.PUT);
         request.setExpiration(expire);
@@ -99,9 +98,8 @@ public class TencentCosService implements CloudFileService {
         COSClient client = uploadCosClientProvider.getIfAvailable();
         if (client != null) {
             URL url = client.generatePresignedUrl(request);
-            String uuidKey = UUID.randomUUID().toString().replace("-", "");
             // Token
-            redisHelper.hSetMap(RedisKeyBuilder.buildKey(KeyConstants.UPLOADS, KeyConstants.TOKEN, uuidKey),
+            redisHelper.hSetMap(buildUploadRedisKey(payload.getUploadId()),
                     payload.toMap(),
                     Duration.ofSeconds(uploadTokenExpires)
             );
@@ -109,7 +107,7 @@ public class TencentCosService implements CloudFileService {
                     path,
                     url.toString(),
                     HttpMethod.PUT,
-                    uuidKey
+                    payload.getUploadId()
             );
         }else{
             throw new BizException(BaseResponseCode.COS_UPLOAD_CLIENT_NOT_CONFIGURED);
@@ -117,17 +115,58 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public void removeFile(String key) {
-        cosClient.deleteObject(bucketName, key);
+    public PresignedResp buildPutPolicyForUploads(String path, BizUploadPayload payload) {
+        return buildPutPolicyWithPayload(CloudFSRoot.UPLOADS, path, payload);
     }
 
     @Override
-    public void removeFile(CloudStorageRootKey rootKey, String path) {
-        removeFile(buildCosKey(rootKey, path));
+    public List<PresignedResp> batchBuildPutPolicyForUploads(List<String> paths, List<BizUploadPayload> payloads) {
+        if (paths == null || paths.isEmpty()) {
+            return List.of();
+        }
+
+        COSClient client = uploadCosClientProvider.getIfAvailable();
+        if (client == null) {
+            throw new BizException(BaseResponseCode.COS_UPLOAD_CLIENT_NOT_CONFIGURED);
+        }
+
+        Date expire = Date.from(Instant.now().plus(Duration.ofSeconds(uploadExpires)));
+        List<PresignedResp> results = new ArrayList<>(paths.size());
+
+        for (int i = 0; i < paths.size(); i++) {
+            String path = paths.get(i);
+            BizUploadPayload payload = payloads.get(i);
+            String keyPath = buildCosKey(CloudFSRoot.UPLOADS, path);
+            GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, keyPath, HttpMethodName.PUT);
+            request.setExpiration(expire);
+
+            URL url = client.generatePresignedUrl(request);
+
+            // Token
+            redisHelper.hSetMap(
+                    buildUploadRedisKey(payload.getUploadId()),
+                    payload.toMap(),
+                    Duration.ofSeconds(uploadTokenExpires)
+            );
+
+            results.add(new PresignedResp(
+                    path,
+                    url.toString(),
+                    HttpMethod.PUT,
+                    payload.getUploadId()
+            ));
+        }
+
+        return results;
     }
 
     @Override
-    public String getCachedRedisKey(Serializable bizId, MediaResourceType resType, CloudResOperationType operationType) {
+    public void removeFile(CloudFSRoot root, String key) {
+        cosClient.deleteObject(bucketName,buildCosKey(root, key));
+    }
+
+    @Override
+    public String getCachedRedisKey(Serializable bizId, TargetType resType, CloudResOperationType operationType) {
         return RedisKeyBuilder.buildKey(
                 CloudKeyBuilder.fs(),
                 operationType.getKey(),
@@ -137,7 +176,7 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(CloudStorageRootKey rootKey, List<String> paths, List<ID> bizIds, MediaResourceType cloudResType) {
+    public <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(CloudFSRoot rootKey, List<String> paths, List<ID> bizIds, TargetType cloudResType) {
         return batchGetReadPublicUrlCached(
                 paths.stream().map(path -> buildCosKey(rootKey, path)).toList(),
                 bizIds,
@@ -147,9 +186,9 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public SimpleCloudObject detectAndAssertCloudFile(CloudStorageRootKey root, String KeyPath, CloudFileType cloudFileType) {
+    public SimpleCloudObject detectAndAssertCloudFile(String KeyPath, CloudFileType cloudFileType) {
         String suffix = PathUtil.getSuffix(KeyPath);
-        String fullPath = buildCosKey(root, KeyPath);
+        String fullPath = buildCosKey(CloudFSRoot.UPLOADS, KeyPath);
         if(!cloudFileType.matchSuffix(suffix)){
             throw new BizException(BaseResponseCode.FILE_TYPE_NOT_ALLOW, suffix, cloudFileType.getAllowFileExtensions());
         }
@@ -165,38 +204,34 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public void copyFileAndRemoveOld(CloudStorageRootKey originalRoot, String originPath, CloudStorageRootKey targetRoot, String targetPath) {
+    public void copyFileAndRemoveOld(CloudFSRoot originalRoot, String originPath, CloudFSRoot targetRoot, String targetPath) {
         String originFullPath = buildCosKey(originalRoot, originPath);
         String targetFullPath = buildCosKey(targetRoot, targetPath);
         cosClient.copyObject(bucketName, originFullPath, bucketName, targetFullPath);
-        removeFile(originFullPath);
+        removeFile(targetRoot, originFullPath);
     }
 
     @Override
-    public void clearGetCache(Serializable bizId, MediaResourceType mediaResourceType) {
+    public void clearGetCache(Serializable bizId, TargetType targetType) {
         String cacheKey = getCachedRedisKey(
                 bizId,
-                mediaResourceType,
+                targetType,
                 CloudResOperationType.READ
         );
         redisHelper.del(cacheKey);
     }
 
     @Override
-    public BizPayload parseToken(String token) {
-        BizPayload payload = BizPayload.fromMap(
+    public BizUploadPayload parseToken(String token) {
+        BizUploadPayload payload = BizUploadPayload.fromMap(
                 redisHelper.hGetAllAndDel(
-                        RedisKeyBuilder.buildKey(KeyConstants.UPLOADS, KeyConstants.TOKEN, token)
+                        buildUploadRedisKey(token)
                 )
         );
         return payload;
     }
 
-    private String buildCosKey(CloudStorageRootKey root, String... keys){
-        return PathUtil.buildPath(bizPrefix, root.getKey(), keys);
-    }
-
-    private CloudResPresignedUrlResp getReadUrlCached(String fullPath, Serializable bizId, Duration dur, MediaResourceType resType) {
+    private CloudResPresignedUrlResp getReadUrlCached(String fullPath, Serializable bizId, Duration dur, TargetType resType) {
         String cacheKey = getCachedRedisKey(
                 bizId,
                 resType,
@@ -229,7 +264,7 @@ public class TencentCosService implements CloudFileService {
      *
      * @param <ID> id type, e.g. Long, String, or business semantic id like "coverage-<uuid>"
      */
-    private <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(List<String> fullPaths, List<ID> bizIds, Duration dur, MediaResourceType cloudResType) {
+    private <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(List<String> fullPaths, List<ID> bizIds, Duration dur, TargetType cloudResType) {
         if (fullPaths == null || fullPaths.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -276,5 +311,13 @@ public class TencentCosService implements CloudFileService {
         }
 
         return result;
+    }
+
+    private String buildUploadRedisKey(String token){
+        return RedisKeyBuilder.buildKey(KeyConstants.UPLOADS, KeyConstants.TOKEN, token);
+    }
+
+    private String buildCosKey(CloudFSRoot root, String... keys){
+        return PathUtil.buildPath(bizPrefix, root.getKey(), keys);
     }
 }

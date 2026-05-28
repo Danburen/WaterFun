@@ -17,9 +17,9 @@ import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationR
 import org.waterwood.waterfunadminservice.service.ModerationService;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.common.io.ResourceType;
-import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
+import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
-import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
+import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.AuditTaskResourceSpec;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.AuditTaskSpec;
 
@@ -34,7 +34,7 @@ public class ModerationController {
     private final ModerationService moderationService;
 
     @GetMapping("/list")
-    public ApiResponse<Page<ModerateTaskResponse>> list(@RequestParam(required = false) MediaResourceType taskType,
+    public ApiResponse<Page<ModerateTaskResponse>> list(@RequestParam(required = false) TargetType taskType,
                                                         @RequestParam(required = false) Long submitterId,
                                                         @RequestParam(required = false) Instant submitAtStart,
                                                         @RequestParam(required = false) Instant submitAtEnd,
@@ -53,7 +53,7 @@ public class ModerationController {
             @RequestParam(required = false) Instant auditAtEnd,
             @PageableDefault Pageable pageable
     ) {
-        Specification<AuditTaskResource> spec = AuditTaskResourceSpec.of(
+        Specification<AuditResource> spec = AuditTaskResourceSpec.of(
                 taskId,
                 status,
                 resourceType,

@@ -4,7 +4,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class ContentFormatConvertor implements AttributeConverter<AuditContentFormat, Short> {
+public class ContentFormatConverter implements AttributeConverter<AuditContentFormat, Short> {
 
     @Override
     public Short convertToDatabaseColumn(AuditContentFormat auditContentFormat) {

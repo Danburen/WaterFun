@@ -9,8 +9,8 @@ import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerat
 import org.waterwood.waterfunadminservice.api.request.content.audit.ModerateRejectRequest;
 import org.waterwood.waterfunadminservice.api.response.ModerateTaskResponse;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
+import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
-import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public interface ModerationService {
     /**
      * List resources by specification and pageable with assembled payload fields.
      */
-    Page<ModerationResourceRes> listResourcesWithPayload(Specification<AuditTaskResource> spec, Pageable pageable);
+    Page<ModerationResourceRes> listResourcesWithPayload(Specification<AuditResource> spec, Pageable pageable);
 
     /**
      * Get one audit resource detail.

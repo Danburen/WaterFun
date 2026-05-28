@@ -2,6 +2,8 @@ package org.waterwood.common.io;
 
 import lombok.Getter;
 
+import java.io.File;
+
 @Getter
 public enum ResourceType {
     UNKNOWN(0),
@@ -30,5 +32,9 @@ public enum ResourceType {
             case 4 -> OTHER;
             default -> UNKNOWN;
         };
+    }
+
+    public boolean isAllowed(FileExtension ext) {
+        return FileExtension.isAllowed(ext.getExt(), this);
     }
 }

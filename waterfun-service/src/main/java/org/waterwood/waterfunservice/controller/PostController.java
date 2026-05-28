@@ -85,9 +85,15 @@ public class PostController {
         return ApiResponse.success(postService.draftNew());
     }
 
-//    @PutMapping("/{id}")
-//    public ApiResponse<Void> editPost(@PathVariable Long id, @Valid @RequestBody PutUserPostReq req){
-//
-//    }
-    
+    @PutMapping("/{id}")
+    public ApiResponse<Void> editPost(@PathVariable Long id, @Valid @RequestBody PutUserPostReq req){
+        postService.updatePost(id, req);
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/{id}/publish")
+    public ApiResponse<Void> publishPost(@PathVariable Long id){
+        postService.publish(id);
+        return ApiResponse.success();
+    }
 }

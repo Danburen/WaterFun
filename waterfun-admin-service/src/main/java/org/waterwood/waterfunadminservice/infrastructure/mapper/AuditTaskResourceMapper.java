@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
-import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
+import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 
 @Mapper(
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
@@ -15,5 +15,5 @@ import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
 public interface AuditTaskResourceMapper {
     @Mapping(source = "auditor.uid", target = "auditorId")
     @Mapping(source = "task.id", target = "taskId")
-    ModerationResourceRes toModerationResourceRes(AuditTaskResource auditTaskResource);
+    ModerationResourceRes toModerationResourceRes(AuditResource auditResource);
 }

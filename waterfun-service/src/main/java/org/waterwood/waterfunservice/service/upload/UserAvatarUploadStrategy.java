@@ -2,18 +2,14 @@ package org.waterwood.waterfunservice.service.upload;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.waterwood.common.io.FileExtension;
 import org.waterwood.waterfunservice.api.BizType;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
 import org.waterwood.waterfunservice.service.user.UserProfileService;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
-import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
-import org.waterwood.waterfunservicecore.exception.IllegalUploadArgumentException;
-import org.waterwood.waterfunservicecore.exception.UnsupportedFileExtension;
-import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
-import org.waterwood.waterfunservicecore.utils.BizPayload;
+import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
 
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -27,22 +23,12 @@ public class UserAvatarUploadStrategy implements UploadBizStrategy{
     }
 
     @Override
-    public PresignedResp handle(UploadPolicyReq request) {
-        Long userId = UserCtxHolder.getUserUid();
-        if(request.getExts().size() != 1){
-            throw new IllegalUploadArgumentException(1);
-        }
-        FileExtension ext = FileExtension.fromExt(request.getExts().getFirst());
-        if(MediaResourceType.USER_AVATAR.isAllowed(ext)){
-            throw new UnsupportedFileExtension(ext.getExt(), request.getExts().getFirst());
-        }
-        return userProfileService.getUploadPolicyAndSubmitAvatar(
-                userId, ext
-        );
+    public List<PresignedResp> handle(UploadPolicyReq request) {
+        return userProfileService.handleUserAvatarUpload(request);
     }
 
     @Override
-    public void handleCallback(CloudPutCallbackReq request, BizPayload payload) {
+    public void handleCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
         userProfileService.uploadAvatarCallback(request, payload);
     }
 }

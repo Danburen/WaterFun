@@ -3,7 +3,7 @@ package org.waterwood.waterfunservice.service.upload;
 import org.springframework.stereotype.Component;
 import org.waterwood.common.KeyConstants;
 import org.waterwood.waterfunservice.api.BizType;
-import org.waterwood.waterfunservicecore.utils.BizPayload;
+import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +32,7 @@ public class UploadStrategyFactory {
         return strategy;
     }
 
-    public UploadBizStrategy getStrategy(BizPayload payload) {
+    public UploadBizStrategy getStrategy(BizUploadPayload payload) {
         UploadBizStrategy strategy = null;
         if(payload.getBiz().equals(KeyConstants.USER)){
             strategy = switch (payload.getType()) {

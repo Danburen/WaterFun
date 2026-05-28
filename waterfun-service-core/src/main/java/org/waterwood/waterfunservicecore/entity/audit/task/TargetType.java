@@ -7,37 +7,42 @@ import java.util.Locale;
 import java.util.Set;
 
 @Getter
-public enum MediaResourceType {
-    UNKNOWN(0, "unknown", Set.of()),
-    USER_AVATAR(1, "ofUser",
+public enum TargetType {
+    UNKNOWN(0, Set.of()),
+    USER_AVATAR(1,
             Set.of(FileExtension.JPG,
                     FileExtension.JPEG,
                     FileExtension.PNG,
                     FileExtension.WEBP)
     ),
-    COVERAGE(2, "coverage",
+    POST(2, Set.of()),
+    POST_COVERAGE_IMAGE(3,
             Set.of(FileExtension.JPG,
                     FileExtension.JPEG,
                     FileExtension.PNG,
-                    FileExtension.WEBP,
-                    FileExtension.MP4,
-                    FileExtension.MOV
-            ));
+                    FileExtension.WEBP
+            )),
+    POST_CONTENT_IMAGE(4,
+            Set.of(FileExtension.JPG,
+                    FileExtension.JPEG,
+                    FileExtension.PNG,
+                    FileExtension.WEBP
+            )
+    ),
+    POST_CONTENT(5, Set.of(FileExtension.TXT, FileExtension.MD)),;
 
     private final short code;
     private final Set<FileExtension> allowedExts;
-    private final String pathPrefix;
 
-    MediaResourceType(final int code, String pathPrefix , Set<FileExtension> allowedExts) {
+    TargetType(final int code, Set<FileExtension> allowedExts) {
         this.code = (short) code;
-        this.pathPrefix = pathPrefix;
         this.allowedExts = allowedExts;
     }
 
-    public static MediaResourceType fromCode(int code) {
+    public static TargetType fromCode(int code) {
         return switch (code) {
             case 1 -> USER_AVATAR;
-            case 2 -> COVERAGE;
+            case 2 -> POST_COVERAGE_IMAGE;
             default -> UNKNOWN;
         };
     }

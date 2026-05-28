@@ -8,7 +8,7 @@ import java.time.Instant;
 
 @Data
 @AllArgsConstructor
-public class CloudResPresignedUrlResp implements Serializable {
+public class CloudResPresignedUrlResp {
     private String url;
     private Instant expireAt;
 }

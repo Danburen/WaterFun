@@ -58,7 +58,7 @@ public class AuditTask {
     private AuditRejectType rejectType;
 
     @Column(name = "target_type", columnDefinition = "tinyint UNSIGNED not null")
-    private MediaResourceType targetType = MediaResourceType.UNKNOWN;
+    private TargetType targetType = TargetType.UNKNOWN;
 
     @ColumnDefault("'0'")
     @Column(name = "content_format", columnDefinition = "tinyint UNSIGNED not null")

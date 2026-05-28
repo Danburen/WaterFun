@@ -1,18 +1,22 @@
 package org.waterwood.utils;
 
 import cn.hutool.core.date.DateUtil;
+import org.waterwood.common.io.FileExtension;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public final class PathUtil {
-    public static String getUniquePathFile(String fileSuffix) {
+    public static String getUniqueDateStampFilePath(String fileSuffix) {
         String uuid = UUID.randomUUID().toString().replace("-", "");
         return DateUtil.today().replace("-", "/") + "/" + uuid + "." + fileSuffix;
+    }
+
+    public static String getDataStampFilePath(String fileName, FileExtension ext){
+        return DateUtil.today().replace("-", "/") + "/" + fileName + "." + ext.getExt();
     }
 
     public static String buildPath(Serializable... segments){

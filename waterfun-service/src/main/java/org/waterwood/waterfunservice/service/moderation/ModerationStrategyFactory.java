@@ -1,7 +1,7 @@
 package org.waterwood.waterfunservice.service.moderation;
 
 import org.springframework.stereotype.Component;
-import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
+import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Component
 public class ModerationStrategyFactory {
-    private final Map<MediaResourceType, ModerationStrategy> strategies;
+    private final Map<TargetType, ModerationStrategy> strategies;
 
     public ModerationStrategyFactory(List<ModerationStrategy> strategies) {
         this.strategies = new HashMap<>();
@@ -27,7 +27,7 @@ public class ModerationStrategyFactory {
         );
     }
 
-    public ModerationStrategy getStrategy(MediaResourceType type) {
+    public ModerationStrategy getStrategy(TargetType type) {
         ModerationStrategy strategy = strategies.get(type);
         if (strategy == null) {
             throw new UnsupportedOperationException("Unregister moderation type: " + type);

@@ -14,13 +14,11 @@ public enum AuditStatus {
     }
 
     public static AuditStatus fromCode(Short code) {
-        if (code == null) {
-            return PENDING;
-        }
         return switch (code) {
+            case 1 -> PENDING;
             case 2 -> APPROVED;
             case 3 -> REJECTED;
-            default -> PENDING;
+            default -> throw new IllegalArgumentException("Unknown code " + code);
         };
     }
 }

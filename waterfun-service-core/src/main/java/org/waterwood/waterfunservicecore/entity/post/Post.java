@@ -7,12 +7,15 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -109,5 +112,45 @@ public class Post {
     @ColumnDefault("'0'")
     @Column(name = "visibility", columnDefinition = "tinyint UNSIGNED")
     private PostVisibility visibility = PostVisibility.PUBLIC;
+
+    @ColumnDefault("'0'")
+    @Column(name = "edit_status", columnDefinition = "tinyint UNSIGNED")
+    private PostEditStatus editStatus = PostEditStatus.NONE;
+
+    @Size(max = 32)
+    @Column(name = "edited_title", length = 32)
+    private String editedTitle;
+
+    @Size(max = 64)
+    @Column(name = "edited_subtitle", length = 64)
+    private String editedSubtitle;
+
+    @Lob
+    @Column(name = "edited_content")
+    private String editedContent;
+
+    @Size(max = 500)
+    @Column(name = "edited_summary", length = 500)
+    private String editedSummary;
+
+    @Size(max = 255)
+    @Column(name = "edited_cover_img")
+    private String editedCoverImg;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "edited_category_id")
+    private Category editedCategory;
+
+    @Column(name = "edited_tag_ids")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<Integer> editedTagIds;
+
+    @Column(name = "edited_new_tags")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> editedNewTags;
+
+    @ColumnDefault("'1'")
+    @Column(name = "version", columnDefinition = "int UNSIGNED")
+    private Long version = 1L;
 
 }

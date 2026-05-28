@@ -5,9 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.waterwood.common.CloudStorageRootKey;
-import org.waterwood.common.KeyConstants;
-import org.waterwood.utils.PathUtil;
+import org.waterwood.common.CloudFSRoot;
+import org.waterwood.common.io.FileExtension;
 import org.waterwood.waterfunadminservice.api.request.content.CreateBannerRequest;
 import org.waterwood.waterfunadminservice.api.request.content.PutBannerRequest;
 import org.waterwood.waterfunadminservice.api.response.content.BannerResponse;
@@ -16,10 +15,11 @@ import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.Banner;
 import org.waterwood.waterfunservicecore.entity.BannerPosition;
 import org.waterwood.waterfunservicecore.entity.VisibleStatus;
-import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
+import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
 import org.waterwood.waterfunservicecore.exception.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.BannerRepository;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
+import org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -73,13 +73,10 @@ public class BannerServiceImpl implements BannerService {
 
     @Override
     public PresignedResp getCoverageUploadPolicy(String suffix) {
-        String resourceKey = PathUtil.buildPath(
-                KeyConstants.CONTENT,
-                KeyConstants.BANNER,
-                UUID.randomUUID().toString().replace("-", ""));
-        return cloudFileService.buildPutPolicyWithBiz(
-                CloudStorageRootKey.UPLOADS,
-                resourceKey,
+        UUID resourceUUID = UUID.randomUUID();
+        return cloudFileService.buildPutPolicyWithPayload(
+                CloudFSRoot.SYSTEM,
+                CosKeyPathGenerator.of(resourceUUID, FileExtension.fromExt(suffix)),
                 null
         );
     }
@@ -90,10 +87,10 @@ public class BannerServiceImpl implements BannerService {
         BannerResponse res = bannerMapper.toResponse(banner);
         res.setCoverageUrl(
                 cloudFileService.getReadUrlCached(
-                        CloudStorageRootKey.UPLOADS,
+                        CloudFSRoot.UPLOADS,
                         banner.getResourceKey(),
                         "banner-coverage-" + banner.getId(),
-                        MediaResourceType.COVERAGE
+                        TargetType.POST_COVERAGE_IMAGE
                 )
         );
         return res;

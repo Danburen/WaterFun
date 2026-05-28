@@ -19,4 +19,24 @@ public class PresignedResp implements Serializable {
     private String url;
     private HttpMethod method;
     private String token;
+    private Boolean success = true;
+    private String errorMsg = null;
+
+    public PresignedResp(String key, String url, HttpMethod method, String token) {
+        this.key = key;
+        this.url = url;
+        this.method = method;
+        this.token = token;
+    }
+
+    public static PresignedResp ofError(String errorMsg) {
+        return new PresignedResp(
+                null,
+                null,
+                null,
+                null,
+                false,
+                errorMsg
+        );
+    }
 }

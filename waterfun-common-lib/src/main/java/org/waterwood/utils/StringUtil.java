@@ -1,7 +1,11 @@
 package org.waterwood.utils;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.UUID;
 
 public final class StringUtil {
     /**
@@ -67,5 +71,9 @@ public final class StringUtil {
         }
         // 5.  new String 内部直接共用 buf，不拷贝
         return new String(buf);
+    }
+
+    public static String noDashUUIDString(UUID resourceUUID) {
+        return resourceUUID.toString().replace("-", "");
     }
 }

@@ -5,7 +5,7 @@ import jakarta.persistence.Converter;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 
 @Converter(autoApply = true)
-public class AuditTaskStatusConvertor implements AttributeConverter<AuditStatus, Short> {
+public class AuditTaskStatusConverter implements AttributeConverter<AuditStatus, Short> {
 
     @Override
     public Short convertToDatabaseColumn(AuditStatus auditTaskStatus) {

@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationTaskPayloadRes;
 import org.waterwood.waterfunservicecore.entity.audit.AuditContentFormat;
-import org.waterwood.waterfunservicecore.entity.audit.task.MediaResourceType;
+import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
 
 import java.time.Instant;
 
@@ -14,7 +14,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class ModerateTaskResponse {
     private Long id;
-    private MediaResourceType targetType;
+    private TargetType targetType;
     private String targetId;
     private String content;
     private AuditContentFormat contentFormat;

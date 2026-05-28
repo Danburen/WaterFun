@@ -13,7 +13,9 @@ import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
-import org.waterwood.waterfunservicecore.utils.BizPayload;
+import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/upload")
@@ -24,13 +26,13 @@ public class UploadController {
 
     @RateLimit(key = "avatarUpload", permits = 5)
     @GetMapping("/policy")
-    public ApiResponse<PresignedResp> getUploadPolity(@RequestBody @Valid UploadPolicyReq request) {
+    public ApiResponse<List<PresignedResp>> getUploadPolity(@RequestBody @Valid UploadPolicyReq request) {
         return ApiResponse.success(uploadStrategyFactory.getStrategy(request.getBizType()).handle(request));
     }
 
     @GetMapping("/callback")
     public ApiResponse<Void> uploadCallback(@RequestBody @Valid CloudPutCallbackReq request) {
-        BizPayload payload = cloudFileService.parseToken(request.getToken());
+        BizUploadPayload payload = cloudFileService.parseToken(request.getToken());
         uploadStrategyFactory.getStrategy(payload).handleCallback(request, payload);
         return ApiResponse.success();
     }

@@ -122,4 +122,5 @@ public enum FileExtension {
         Set<ResourceType> allowed = Set.of(allowedTypes);
         return allowed.contains(fe.getResourceType());
     }
+
 }

@@ -4,12 +4,14 @@ package org.waterwood.common;
 import lombok.Getter;
 
 @Getter
-public enum CloudStorageRootKey {
+public enum CloudFSRoot {
     UPLOADS("uploads"),
-    TEMP("temp"), MODERATION("moderation");
+    SYSTEM("temp"),
+    MODERATION("moderation"),
+    USER("user");
 
     private final String key;
-    CloudStorageRootKey(String key) {
+    CloudFSRoot(String key) {
         this.key = key;
     }
 

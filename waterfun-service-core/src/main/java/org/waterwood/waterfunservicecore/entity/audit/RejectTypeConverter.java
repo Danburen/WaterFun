@@ -4,7 +4,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class RejectTypeConvertor implements AttributeConverter<AuditRejectType, Short> {
+public class RejectTypeConverter implements AttributeConverter<AuditRejectType, Short> {
     @Override
     public Short convertToDatabaseColumn(AuditRejectType attribute) {
         return attribute == null ? null : (short) attribute.getCode();

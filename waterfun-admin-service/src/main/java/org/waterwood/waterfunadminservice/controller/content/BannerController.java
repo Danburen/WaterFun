@@ -8,7 +8,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
-import org.waterwood.common.CloudStorageRootKey;
 import org.waterwood.waterfunadminservice.api.request.content.CreateBannerRequest;
 import org.waterwood.waterfunadminservice.api.request.content.PutBannerRequest;
 import org.waterwood.waterfunadminservice.api.response.content.BannerResponse;

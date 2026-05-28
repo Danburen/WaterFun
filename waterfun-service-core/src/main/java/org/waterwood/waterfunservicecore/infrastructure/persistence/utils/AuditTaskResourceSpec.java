@@ -4,7 +4,7 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.common.io.ResourceType;
-import org.waterwood.waterfunservicecore.entity.audit.AuditTaskResource;
+import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ public final class AuditTaskResourceSpec {
     private AuditTaskResourceSpec() {
     }
 
-    public static Specification<AuditTaskResource> of(
+    public static Specification<AuditResource> of(
             Long taskId,
             AuditStatus status,
             ResourceType resourceType,
