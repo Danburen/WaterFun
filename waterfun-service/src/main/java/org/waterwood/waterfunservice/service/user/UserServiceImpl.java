@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservice.api.response.UserPublicCardResp;
 import org.waterwood.waterfunservice.api.response.UserPublicInfoResp;
 import org.waterwood.waterfunservice.api.response.UserPublicProfileResp;

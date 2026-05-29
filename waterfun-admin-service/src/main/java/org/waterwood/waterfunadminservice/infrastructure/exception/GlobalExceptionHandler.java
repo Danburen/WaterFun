@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.waterwood.api.ErrorResponse;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.AuthException;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.AuthException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 
 import java.util.*;
 
@@ -182,6 +182,6 @@ public class GlobalExceptionHandler {
                 null,
                 new Date()
         );
-        return ResponseEntity.status(ex.getHttpStatus()).body(response);
+        return ResponseEntity.status(ex.getHttpStatusCode()).body(response);
     }
 }

@@ -2,7 +2,7 @@ package org.waterwood.waterfunservicecore.services.auth.code;
 
 import org.springframework.stereotype.Component;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 
 import java.util.List;

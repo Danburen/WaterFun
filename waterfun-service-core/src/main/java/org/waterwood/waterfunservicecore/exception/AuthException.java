@@ -1,4 +1,4 @@
-package org.waterwood.common.exceptions;
+package org.waterwood.waterfunservicecore.exception;
 
 import org.waterwood.api.BaseResponseCode;
 

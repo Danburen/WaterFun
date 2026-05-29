@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.ApiResponse;
-import org.waterwood.common.exceptions.AuthException;
+import org.waterwood.waterfunservicecore.exception.AuthException;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;

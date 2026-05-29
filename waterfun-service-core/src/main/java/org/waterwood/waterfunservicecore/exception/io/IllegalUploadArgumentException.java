@@ -1,7 +1,7 @@
 package org.waterwood.waterfunservicecore.exception.io;
 
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 
 public class IllegalUploadArgumentException extends BizException {
 

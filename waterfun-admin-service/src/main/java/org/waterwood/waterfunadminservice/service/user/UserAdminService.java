@@ -9,7 +9,7 @@ import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRe
 import org.waterwood.waterfunadminservice.api.response.role.AssignedRoleRes;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
 import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 
 import java.util.List;
 

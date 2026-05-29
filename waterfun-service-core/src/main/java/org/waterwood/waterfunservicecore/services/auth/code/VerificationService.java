@@ -6,7 +6,7 @@ import org.waterwood.waterfunservicecore.api.req.auth.SecurityVerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 
 /**
  * A service for sending verification codes

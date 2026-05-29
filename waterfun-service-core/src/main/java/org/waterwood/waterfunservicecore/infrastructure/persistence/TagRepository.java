@@ -11,6 +11,7 @@ import org.waterwood.common.jpa.SlugUniquenessChecker;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface TagRepository extends JpaRepository<Tag, Integer>, JpaSpecificationExecutor<Tag>, SlugUniquenessChecker {
   boolean existsTagBySlug(String slug);
@@ -31,4 +32,8 @@ public interface TagRepository extends JpaRepository<Tag, Integer>, JpaSpecifica
     WHERE p.id IN :postIds
 """)
   List<Object[]> findTagsByPostIds(List<Long> postIds);
+
+  List<Tag> findAllByNameIn(Set<String> newTagNames);
+
+  int countByCreatorUid(Long userUid);
 }

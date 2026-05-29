@@ -7,7 +7,7 @@ import org.waterwood.waterfunservice.api.response.post.PostCardResp;
 import org.waterwood.waterfunservice.api.response.post.PostDetailResp;
 import org.waterwood.waterfunservice.api.response.post.PostAuthorDetailResp;
 import org.waterwood.waterfunservicecore.entity.post.Post;
-import org.waterwood.waterfunservice.api.request.content.CreatePostRequest;
+import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 
 import java.util.Collection;
@@ -19,12 +19,12 @@ import java.util.Set;
 public interface PostMapper {
 
 
-    Post toEntity(CreatePostRequest createPostRequest);
+    Post toEntity(PostSaveReq postSaveReq);
 
-    CreatePostRequest toCreatePostDto(Post post);
+    PostSaveReq toCreatePostDto(Post post);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Post partialUpdate(CreatePostRequest createPostRequest, @MappingTarget Post post);
+    Post partialUpdate(PostSaveReq postSaveReq, @MappingTarget Post post);
 
 
     Post toEntity(PutUserPostReq putUserPostReq);

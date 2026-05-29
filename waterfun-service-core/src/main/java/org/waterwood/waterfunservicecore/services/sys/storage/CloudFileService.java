@@ -5,6 +5,7 @@ import org.waterwood.common.io.SimpleCloudObject;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
 import org.waterwood.waterfunservicecore.utils.BizTargetIdPackager;
 
@@ -93,7 +94,7 @@ public interface CloudFileService {
      * @param KeyPath       cloud file key path
      * @param cloudFileType asserted cloud file type.
      * @return simple object contains cloud file info, such as content type and size with key.
-     * @throws org.waterwood.common.exceptions.BizException if the cloud file type is not matched.
+     * @throws BizException if the cloud file type is not matched.
      */
     SimpleCloudObject detectAndAssertCloudFile(String KeyPath, CloudFileType cloudFileType);
 

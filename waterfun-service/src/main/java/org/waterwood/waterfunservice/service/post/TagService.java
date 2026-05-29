@@ -43,4 +43,13 @@ public interface TagService {
      * @return list ofPending {@link Tag}
      */
     Set<Tag> getTags(Iterable<Integer> tagIds, boolean strict);
+
+    /**
+     * Create new tags by names
+     *
+     * @param newTags new tags
+     * @param userUid creator uid
+     * @return saved tags
+     */
+    List<Tag> createNewTags(Set<String> newTags, Long userUid);
 }

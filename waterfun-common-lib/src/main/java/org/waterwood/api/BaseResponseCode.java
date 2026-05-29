@@ -23,7 +23,6 @@ public enum BaseResponseCode implements ResponseCode {
     // Other general
     UNKNOWN_ERROR("general.unknown_error"),
     VALIDATION_ERROR("general.validation_error"),
-    RESOURCE_NOT_FOUND("general.resource_not_found"),
     PARENT_NOT_FOUND("general.parent_not_found"),
     PARENT_MUST_DIFFERENT("general.parent_must_diff"),
     // Validation
@@ -40,8 +39,12 @@ public enum BaseResponseCode implements ResponseCode {
     PHONE_NUMBER_ALREADY_USED("general.verification.already_exists"),
     VERIFY_CODE_INVALID("verify.code.invalid"),
     CAPTCHA_INVALID("verify.captcha.incorrect"),
+
     USER_ALREADY_EXISTS("user.verify.already_exists"),
     USER_NOT_FOUND("user.not_found"),
+    USER_NOT_FOUND_ARGS("user.not_found.args"),
+    USER_TAG_QUOTA_EXCEEDED("user.tag_quota_exceeded"),
+
     EMAIL_INVALID("email.verify.invalid"),
     EMAIL_NOT_FOUND("email.not.found"),
     VERIFY_TARGET_UNSUPPORTED("verify.target.unsupported"),
@@ -59,7 +62,7 @@ public enum BaseResponseCode implements ResponseCode {
     PERMISSION_NOT_FOUND("permission.not_found"),
     PERMISSION_NOT_FOUND_ARGS("permission.not_found.args"),
     PERMISSION_ALREADY_EXISTS("permission.already_exists"),
-    PERMISSION_ALREADY_EXISTS_WITH_ARGS("permission.already_exists.args"),
+    PERMISSION_ALREADY_EXISTS_ARGS("permission.already_exists.args"),
 
     // System
     REDUNDANT_OPERATION("system.redundant_operation"),
@@ -78,8 +81,17 @@ public enum BaseResponseCode implements ResponseCode {
     DUPLICATE_ENTITY("system.duplicate_entity"),
 
     // Post
+    POST_NOT_FOUND("post.not_found"),
+    POST_NOT_FOUND_ARGS("post.not_found.args"),
     POST_CATEGORY_EXISTS("post.category.exists" ),
     POST_TAG_EXISTS("post.tag.exists"),
+    POST_CATEGORY_NOT_FOUND("post.category.not_found"),
+    POST_CATEGORY_NOT_FOUND_ARGS("post.category.not_found.args"),
+    POST_TAG_NOT_FOUND("post.tag.not_found"),
+    POST_TAG_NOT_FOUND_ARGS("post.tag.not_found.args"),
+
+    RESOURCE_NOT_FOUND("resource_not_found"),
+    RESOURCE_NOT_FOUND_ARGS("resource_not_found.args"),
 
     INVALID_VERIFY_SCENE("verify.invalid.scene"),
     CHANNEL_NOT_SUPPORT("error.channel.not.supported" ),
@@ -87,7 +99,6 @@ public enum BaseResponseCode implements ResponseCode {
     NEED_FILE_TYPE("valid.file_type_required"),
     USER_ROLE_NOT_FOUND("user.role.not_found"),
     USER_PERMISSION_NOT_FOUND("user.permission.not_found"),
-    USER_NOT_FOUND_WITH_ARGS("user.not_found.args"),
     CAN_NOT_DELETE_SUPER_ADMIN_USER("system.cannot_delete_super_admin_user"),
     CAN_NOT_DELETE_SYS_ROLE("system.cannot_delete_sys_role"),
     CAN_NOT_UPDATE_SYS_ROLE_CODE("system.cannot_update_sys_role_code"),
@@ -102,8 +113,10 @@ public enum BaseResponseCode implements ResponseCode {
     ILLEGAL_FILE_COUNT("system.illegal_upload_file_count"),
     UNSUPPORTED_FILE_EXTENSION("system.unsupported_file_extension"),
     CLOUD_TOKEN_INVALID_OR_EXPIRED("system.cloud_token_invalid_or_expired"),
-    UNSUPPORTED_ID_TYPE("system.unsupported_id_type"), ILLEGAL_UPLOAD_FILE_EXTENSION("system.illegal_upload_file_extension"),
-    ILLEGAL_UPLOAD_FILE_ARGUMENTS("system.illegal_upload_file_arguments"),;
+    UNSUPPORTED_ID_TYPE("system.unsupported_id_type"),
+    ILLEGAL_UPLOAD_FILE_EXTENSION("system.illegal_upload_file_extension"),
+    ILLEGAL_UPLOAD_FILE_ARGUMENTS("system.illegal_upload_file_arguments"),
+    INVALID_REFERENCE("system.invalid_reference"),;
     private final String code;
     // private final String defaultMessage;
 

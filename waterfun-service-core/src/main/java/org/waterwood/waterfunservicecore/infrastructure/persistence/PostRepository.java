@@ -1,5 +1,6 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,4 +28,6 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     Optional<Post> findByIdAndAuthorUidAndIsDeleted(Long id, Long id1, boolean attr0);
 
     Optional<Post> findByIdAndAuthorUidAndIsDeletedAndStatus(Long id, Long authorUid, Boolean isDeleted, PostStatus status);
+
+    Optional<Post> findByIdAndIsDeleted(@NotNull Long id, Boolean isDeleted);
 }

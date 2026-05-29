@@ -4,8 +4,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BizException;
-import org.waterwood.common.exceptions.ServiceException;
+import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserContext;
 
 @Deprecated

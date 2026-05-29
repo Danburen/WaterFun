@@ -11,6 +11,7 @@ import org.waterwood.waterfunadminservice.api.response.ModerateTaskResponse;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ public interface ModerationService {
     /**
      * Approve a audit task
      * @param id target audit task id.
-     * @throws org.waterwood.waterfunservicecore.exception.NotFoundException if the audit task is not found or not in pending status.
+     * @throws NotFoundException if the audit task is not found or not in pending status.
      */
     void approve(Long id);
 
@@ -69,7 +70,7 @@ public interface ModerationService {
      *
      * @param id  id target audit task id.
      * @param req request body
-     * @throws org.waterwood.waterfunservicecore.exception.NotFoundException if the audit task is not found or not in pending status.
+     * @throws NotFoundException if the audit task is not found or not in pending status.
      */
     void reject(Long id, ModerateRejectRequest req);
 

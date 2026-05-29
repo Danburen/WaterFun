@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
+import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.post.PostAuthorCardResp;
 import org.waterwood.waterfunservice.api.response.post.PostAuthorDetailResp;
 import org.waterwood.waterfunservice.api.response.post.PostCardResp;
@@ -98,4 +99,12 @@ public interface PostService {
      * @param payload payload which stored in redis
      */
     void handlePostImageUploadCallback(CloudPutCallbackReq request, BizUploadPayload payload);
+
+    /**
+     * Temporarily save the post content, which is in DRAFT status.
+     *
+     * @param id      target id
+     * @param request request body to save
+     */
+    void tempSave(Long id, PostSaveReq request);
 }

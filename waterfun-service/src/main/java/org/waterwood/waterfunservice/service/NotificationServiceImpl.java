@@ -3,14 +3,14 @@ package org.waterwood.waterfunservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.VO.BatchResult;
-import org.waterwood.common.exceptions.ForbiddenException;
+import org.waterwood.waterfunservicecore.exception.ForbiddenException;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.waterfunservice.api.response.SystemNotificationRes;
 import org.waterwood.waterfunservice.api.request.notifications.BatchMarkReadReq;
 import org.waterwood.waterfunservice.infrastructure.mapper.InboxSystemMapper;
 import org.waterwood.waterfunservicecore.api.CursorPage;
 import org.waterwood.waterfunservicecore.entity.notification.InboxSystem;
-import org.waterwood.waterfunservicecore.exception.NotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.notification.InboxSystemRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 

@@ -11,7 +11,7 @@ import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.common.constratin.UserKeyBuilder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;

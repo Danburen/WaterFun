@@ -3,7 +3,7 @@ package org.waterwood.waterfunservicecore.services.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.entity.user.UserCounter;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
 

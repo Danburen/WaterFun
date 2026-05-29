@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
+import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.post.PostAuthorCardResp;
 import org.waterwood.waterfunservice.api.response.post.PostAuthorDetailResp;
 import org.waterwood.waterfunservice.api.response.post.PostCardResp;
@@ -80,20 +81,26 @@ public class PostController {
         return ApiResponse.success();
     }
 
-    @PostMapping("/draft")
-    public ApiResponse<Long> draftNewPost(){
-        return ApiResponse.success(postService.draftNew());
-    }
-
     @PutMapping("/{id}")
     public ApiResponse<Void> editPost(@PathVariable Long id, @Valid @RequestBody PutUserPostReq req){
         postService.updatePost(id, req);
         return ApiResponse.success();
     }
 
+    @PostMapping("/draft")
+    public ApiResponse<Long> draftNewPost(){
+        return ApiResponse.success(postService.draftNew());
+    }
+
     @PostMapping("/{id}/publish")
     public ApiResponse<Void> publishPost(@PathVariable Long id){
         postService.publish(id);
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/{id}/temp-save")
+    public ApiResponse<Void> tempSavePost(@PathVariable Long id, PostSaveReq req){
+        postService.tempSave(id, req);
         return ApiResponse.success();
     }
 }

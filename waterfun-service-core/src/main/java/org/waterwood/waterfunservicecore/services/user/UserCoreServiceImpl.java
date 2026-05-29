@@ -15,13 +15,13 @@ import org.waterwood.waterfunservicecore.entity.RolePermission;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
 import org.waterwood.waterfunservicecore.entity.user.UserRole;
-import org.waterwood.waterfunservicecore.exception.NotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RolePermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRoleRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.UserPermSpec;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.UserSpec;
@@ -45,6 +45,7 @@ public class UserCoreServiceImpl implements UserCoreService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final RolePermRepo rolePermRepo;
     private final PermissionRepo permissionRepo;
+    private final UserRoleCoreService userRoleCoreService;
 
     @Override
     public User getUserByUsername(String username) {
@@ -153,6 +154,14 @@ public class UserCoreServiceImpl implements UserCoreService {
     @Override
     public String getUserAvatar(Long userUid) {
         return userRepository.getUserAvatarByUid(userUid);
+    }
+
+    @Override
+    public boolean isCurrentUserAdmin() {
+        return userRoleCoreService.getUserRoles(UserCtxHolder.getUserUid()).stream()
+                .anyMatch(role -> role.getCode().equalsIgnoreCase(
+                        userRoleCoreService.getAdminRoleCode()
+                ));
     }
 
     private List<Permission> getRolePermissions(int roleId){

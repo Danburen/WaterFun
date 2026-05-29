@@ -1,4 +1,4 @@
-package org.waterwood.common.exceptions;
+package org.waterwood.waterfunservicecore.exception;
 
 public class ServiceException extends RuntimeException {
     public ServiceException(String message) {

@@ -9,6 +9,7 @@ import org.waterwood.waterfunadminservice.api.request.content.AssignTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.CreatePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.PutPostReq;
 import org.waterwood.waterfunservicecore.entity.post.Post;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 
 public interface PostService {
     /**
@@ -23,7 +24,7 @@ public interface PostService {
      * Get a post
      * @param pid target post id(pid)
      * @return post entity
-     * @throws org.waterwood.waterfunservicecore.exception.NotFoundException if post not found
+     * @throws NotFoundException if post not found
      */
     Post getPostById(Long pid);
 

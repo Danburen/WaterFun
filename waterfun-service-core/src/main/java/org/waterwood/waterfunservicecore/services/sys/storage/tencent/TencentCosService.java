@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.KeyConstants;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.common.io.SimpleCloudObject;
 import org.waterwood.utils.PathUtil;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;

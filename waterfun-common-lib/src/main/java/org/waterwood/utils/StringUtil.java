@@ -1,13 +1,11 @@
 package org.waterwood.utils;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class StringUtil {
+    private static final Pattern RES_PATTERN = Pattern.compile("res://([a-fA-F0-9\\-]+)");
     /**
      * Get non null string array
      * @param strings strings
@@ -75,5 +73,18 @@ public final class StringUtil {
 
     public static String noDashUUIDString(UUID resourceUUID) {
         return resourceUUID.toString().replace("-", "");
+    }
+
+    public static Set<String> extraResPlaceholders(String content) {
+        if(isBlank(content)){
+            return Collections.emptySet();
+        }
+
+        Set<String> result = new HashSet<>();
+        Matcher m = RES_PATTERN.matcher(content);
+        while (m.find()) {
+            result.add(m.group(1));
+        }
+        return result;
     }
 }

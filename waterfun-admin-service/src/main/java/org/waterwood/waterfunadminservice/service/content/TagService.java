@@ -9,6 +9,7 @@ import org.waterwood.waterfunadminservice.api.request.content.CreateTagRequest;
 import org.waterwood.waterfunadminservice.api.request.content.DeleteTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.UpdateTagReq;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public interface TagService {
      * Get a tag
      * @param id target tag id
      * @return tag entity
-     * @throws org.waterwood.waterfunservicecore.exception.NotFoundException if tag not found
+     * @throws NotFoundException if tag not found
      */
     Tag getTag(Integer id);
 

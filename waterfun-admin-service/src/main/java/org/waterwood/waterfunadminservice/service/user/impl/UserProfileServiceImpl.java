@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
-import org.waterwood.common.exceptions.AuthException;
+import org.waterwood.waterfunservicecore.exception.AuthException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunadminservice.service.user.UserProfileService;

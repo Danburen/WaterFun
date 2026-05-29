@@ -7,7 +7,8 @@ import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 
 import java.time.Instant;
 import java.util.Set;
@@ -47,7 +48,7 @@ public interface UserCoreService {
      * Get a user by user uid
      * @param userUid target userUid
      * @return user entity
-     * @throws org.waterwood.waterfunservicecore.exception.NotFoundException if user not found
+     * @throws NotFoundException if user not found
      */
     User getUser(long userUid);
 
@@ -101,4 +102,9 @@ public interface UserCoreService {
      * @return string of ofUser null if user's ofUser or user is not exists.
      */
     String getUserAvatar(Long userUid);
+
+    /**
+     * Whether a user is admin
+     */
+    boolean isCurrentUserAdmin();
 }

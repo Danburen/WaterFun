@@ -13,7 +13,7 @@ import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.services.auth.VerifyKeyBuilder;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeVerifier;
-import org.waterwood.common.exceptions.ServiceException;
+import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSender;
 
 import java.time.Duration;

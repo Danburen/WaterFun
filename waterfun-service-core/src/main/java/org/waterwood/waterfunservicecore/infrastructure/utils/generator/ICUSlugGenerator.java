@@ -6,7 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.common.constratin.UniquenessChecker;
-import org.waterwood.common.exceptions.ServiceException;
+import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.utils.generator.IdentifierGenerator;

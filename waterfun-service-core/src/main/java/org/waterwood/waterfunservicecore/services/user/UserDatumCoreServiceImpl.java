@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.utils.MaskUtil;
 import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.waterfunservicecore.api.resp.AccountResp;

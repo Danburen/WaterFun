@@ -14,7 +14,7 @@ import org.waterwood.waterfunadminservice.api.request.content.RemoveCategoriesRe
 import org.waterwood.waterfunadminservice.api.request.content.UpdateCategoryRequest;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.CategoryMapper;
 import org.waterwood.waterfunservicecore.entity.post.Category;
-import org.waterwood.waterfunservicecore.exception.NotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CategoryRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;

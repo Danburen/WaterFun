@@ -1,7 +1,7 @@
 package org.waterwood.waterfunadminservice.infrastructure.exception;
 
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 
 public class RoleException extends BizException {
 

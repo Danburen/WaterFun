@@ -1,5 +1,6 @@
 package org.waterwood.waterfunservice.service.post.impl;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -22,18 +23,27 @@ import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.BizType;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
+import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.post.PostAuthorCardResp;
 import org.waterwood.waterfunservice.api.response.post.PostAuthorDetailResp;
 import org.waterwood.waterfunservice.api.response.post.PostCardResp;
 import org.waterwood.waterfunservice.api.response.post.PostDetailResp;
 import org.waterwood.waterfunservice.infrastructure.mapper.PostMapper;
+import org.waterwood.waterfunservice.service.post.TagService;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
+import org.waterwood.waterfunservicecore.entity.audit.AuditContentFormat;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
+import org.waterwood.waterfunservicecore.entity.post.*;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.entity.resource.SourceType;
+import org.waterwood.waterfunservicecore.exception.notfound.CategoryNotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.PostNotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.ResourceNotFoundException;
+import org.waterwood.waterfunservicecore.exception.reference.CategoryReferenceInvalidException;
+import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
@@ -43,15 +53,11 @@ import org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
-import org.waterwood.waterfunservicecore.entity.post.PostStatus;
-import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
-import org.waterwood.waterfunservicecore.entity.post.Tag;
-import org.waterwood.common.exceptions.BizException;
-import org.waterwood.waterfunservicecore.exception.NotFoundException;
+import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.exception.io.IllegalUploadCountException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CategoryRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
-import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;
 import org.waterwood.waterfunservice.service.post.PostService;
@@ -84,6 +90,7 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
     private final AuditTaskResourceRepository auditTaskResourceRepository;
+    private final TagService tagService;
 
     @Override
     public void add(Post post, Set<Integer> tagIds) {
@@ -211,7 +218,7 @@ public class PostServiceImpl implements PostService {
     public void publish(Long id) {
         Post p = postRepository.findByIdAndAuthorUidAndIsDeletedAndStatus(
                 id, UserCtxHolder.getUserUid(), false, PostStatus.DRAFT
-        ).orElseThrow(() -> new BizException(BaseResponseCode.NOT_FOUND));
+        ).orElseThrow(PostNotFoundException::new);
 
         String targetId = id.toString();
         AuditTask task = auditTaskRepository
@@ -224,10 +231,73 @@ public class PostServiceImpl implements PostService {
                     newTask.setSubmitter(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
                     return newTask;
                 });
+        task.setStatus(AuditStatus.PENDING);
+        task.setUserLocale(UserCtxHolder.getLocale().getLanguage());
+        task.setContentFormat(AuditContentFormat.MARKDOWN); // TODO supposed need to determines content format
 
 
 
-        // TODO
+        auditTaskRepository.save(task);
+    }
+
+    @Transactional
+    @Override
+    public void tempSave(Long id, PostSaveReq request) {
+        Post p = postRepository.findByIdAndIsDeleted(id, false)
+                .orElseThrow(NotFoundException::new);
+
+        if (!p.getAuthor().getUid().equals(UserCtxHolder.getUserUid())) {
+            throw new NotFoundException();
+        }
+
+        p.setEditedTitle(request.getTitle());
+        p.setEditedSubtitle(request.getSubtitle());
+
+        syncResources(p.getEditedContent(), request.getContent());
+        p.setEditedContent(request.getContent());
+        p.setEditedSummary(request.getSummary());
+        if(request.getCoverageImgId() != null) {
+            Resource res = resourceRepository.findByUuidAndStatus(request.getCoverageImgId(), ResourceStatus.ORPHAN)
+                    .orElseThrow(() -> new ResourceReferenceInvalidException(request.getCoverageImgId()));
+            p.setCoverImg(res.getResourceKey());
+            res.setStatus(ResourceStatus.ACTIVE);
+        }
+        Category c = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new CategoryReferenceInvalidException(request.getCategoryId()));
+        p.setEditedCategory(c);
+        // Below should be create when public, not in temporary saving.
+        // List<Tag> newTagCreated = tagService.createNewTags(request.getNewTags(), UserCtxHolder.getUserUid());
+        if(request.getTagIds() != null) {
+            List<Tag> tags = tagRepository.findAllById(request.getTagIds());
+            p.setEditedTagIds(tags.stream().map(Tag::getId).toList());
+        }
+        p.setEditedNewTags(request.getNewTags().stream().toList());
+        postRepository.save(p);
+    }
+
+    /**
+     * Synchronize resource for given content
+     * must run in transactional
+     * @param originContent original content
+     * @param newContent new content
+     */
+    private void syncResources(String originContent, String newContent) {
+        // original resources should all be ACTIVE(attached) instead of ORPHAN
+        Set<String> originResUuids = StringUtil.extraResPlaceholders(originContent);
+        Set<String> newResUuids = StringUtil.extraResPlaceholders(newContent);
+        if (originResUuids.equals(newResUuids)) {
+            return;
+        }
+        Set<String> toOrphanUuids = new HashSet<>(originResUuids);
+        toOrphanUuids.removeAll(newResUuids);
+        Set<String> toActivateUuids = new HashSet<>(newResUuids);
+        toActivateUuids.removeAll(originResUuids);
+        if (!toActivateUuids.isEmpty()) {
+            resourceRepository.batchUpdateStatus(ResourceStatus.ACTIVE, toActivateUuids);
+        }
+        if (!toOrphanUuids.isEmpty()) {
+            resourceRepository.batchUpdateStatus(ResourceStatus.ORPHAN, toOrphanUuids);
+        }
     }
 
     @Override
@@ -244,7 +314,7 @@ public class PostServiceImpl implements PostService {
 
         postRepository.findByIdAndAuthorUidAndIsDeleted(
                 bizId, UserCtxHolder.getUserUid(),false
-        ).orElseThrow(() -> new NotFoundException("Post: " + bizId));
+        ).orElseThrow(PostNotFoundException::new);
 
 
         UUID resourceUUID = UUID.randomUUID();
@@ -362,7 +432,7 @@ public class PostServiceImpl implements PostService {
                         res.setSizeBytes(obj.getFileMeta().getSize());
                         res.setMimeType(obj.getFileMeta().getMimeType());
                         res.setSourceType(SourceType.USER_UPLOADED);
-                        res.setStatus(ResourceStatus.ACTIVE);
+                        res.setStatus(ResourceStatus.ORPHAN);
                         return resourceRepository.save(res);
                     }
             ).orElseThrow(() -> new NotFoundException("Resource with uuid: " + payload.getUploadId()));

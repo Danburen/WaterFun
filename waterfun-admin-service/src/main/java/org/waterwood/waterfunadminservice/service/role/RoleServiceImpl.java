@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
-import org.waterwood.common.exceptions.BizException;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunadminservice.api.request.role.*;

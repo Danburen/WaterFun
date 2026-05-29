@@ -10,6 +10,7 @@ import org.waterwood.waterfunadminservice.api.request.content.CreateCategoryRequ
 import org.waterwood.waterfunadminservice.api.request.content.RemoveCategoriesRequest;
 import org.waterwood.waterfunadminservice.api.request.content.UpdateCategoryRequest;
 import org.waterwood.waterfunservicecore.entity.post.Category;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public interface CategoryService {
      * Get a category by id.
      * @param id target category id
      * @return category entity
-     * @throws org.waterwood.waterfunservicecore.exception.NotFoundException if category not found
+     * @throws NotFoundException if category not found
      */
     Category getById(Integer id);
 
@@ -47,7 +48,7 @@ public interface CategoryService {
      * Update a category by id
      * @param id target id
      * @param req request body
-     * @throws org.waterwood.waterfunservicecore.exception.NotFoundException if category not found
+     * @throws NotFoundException if category not found
      */
     void update(Integer id, UpdateCategoryRequest req);
 
