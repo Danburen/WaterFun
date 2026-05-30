@@ -11,9 +11,9 @@ import java.util.List;
 public interface PostTagRepository extends JpaRepository<PostTag, Long> {
   List<PostTag> findAllByPostId(@NotNull Long postId);
 
-  List<Integer> findTagIdsByPostId(@NotNull Long postId);
+  List<Long> findTagIdsByPostId(@NotNull Long postId);
 
   int deleteByPostId(@NotNull Long postId);
 
-  int deleteByPostIdAndTagIdIn(@NotNull Long postId, Collection<Integer> tagIds);
+  int deleteByPostIdAndTagIdIn(@NotNull Long post_id, Collection<Long> tag_id);
 }

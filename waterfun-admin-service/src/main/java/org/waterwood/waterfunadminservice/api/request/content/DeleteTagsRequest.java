@@ -13,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 public class DeleteTagsRequest{
     @NotNull
-    private List<Integer> tagIds;
+    private List<Long> tagIds;
 }

@@ -10,9 +10,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class BizUploadPayload {
     private String uploadId;
-    private String biz;
+    private String bizType;
     private String bizId;
-    private String type;
     private String cosKey;
 
     public Map<String, String> toMap() {
@@ -20,14 +19,11 @@ public class BizUploadPayload {
         if(uploadId != null) {
             map.put("uploadId", uploadId);
         }
-        if (biz != null) {
-            map.put("biz", biz);
+        if (bizType != null) {
+            map.put("bizType", bizType);
         }
         if (bizId != null) {
             map.put("bizId", bizId);
-        }
-        if (type != null) {
-            map.put("type", type);
         }
         if (cosKey != null) {
             map.put("cosKey", cosKey);
@@ -40,9 +36,8 @@ public class BizUploadPayload {
             return null;
         }
         BizUploadPayload payload = new BizUploadPayload();
-        payload.setBiz(map.get("biz"));
+        payload.setBizType(map.get("biz"));
         payload.setBizId(map.get("bizId"));
-        payload.setType(map.get("type"));
         payload.setCosKey(map.get("cosKey"));
         payload.setUploadId(map.get("uploadId"));
         return payload;

@@ -22,6 +22,7 @@ import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,12 +66,12 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     @Override
     public @Nullable CloudResPresignedUrlResp getUserAvatar(long userUid) {
         User u = userCoreService.getUser(userUid);
-        if(u.getAvatar() == null){
+        if(u.getAvatarResourceUuid() == null){
             return null;
         }
         return cloudFileService.getReadUrlCached(
                 CloudFSRoot.UPLOADS,
-                u.getAvatar(),
+                u.getAvatarResourceUuid().getUuid(),
                 String.valueOf(userUid),
                 TargetType.USER_AVATAR
         );
@@ -80,12 +81,17 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     public Map<Long, CloudResPresignedUrlResp> listUserAvatars(List<Long> userUids) {
         List<User> users = userRepository.findAllVisibleUsersByIds(userUids);
         List<String> paths = users.stream().map(
-                User::getAvatar
+                u -> u.getAvatarResourceUuid().getUuid()
         ).toList();
+        Map<Long, String> userIdCosPathMap = users.stream().collect(
+                Collectors.toMap(
+                        User::getUid,
+                        u -> u.getAvatarResourceUuid().getUuid()
+                )
+        );
         return cloudFileService.batchGetReadPublicUrlCached(
                 CloudFSRoot.UPLOADS,
-                paths,
-                userUids,
+                userIdCosPathMap,
                 TargetType.USER_AVATAR
         );
     }

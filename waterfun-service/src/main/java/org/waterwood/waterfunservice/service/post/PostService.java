@@ -3,17 +3,14 @@ package org.waterwood.waterfunservice.service.post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.waterwood.waterfunservice.api.UploadContext;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
-import org.waterwood.waterfunservice.api.response.post.PostAuthorCardResp;
-import org.waterwood.waterfunservice.api.response.post.PostAuthorDetailResp;
-import org.waterwood.waterfunservice.api.response.post.PostCardResp;
-import org.waterwood.waterfunservice.api.response.post.PostDetailResp;
+import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.post.Post;
-import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
 
 import java.util.List;
 import java.util.Set;
@@ -23,7 +20,7 @@ public interface PostService {
      * Add a post
      * @param entity post entity ofPending {@link  Post} to add
      */
-    void add(Post entity, Set<Integer> tagIds);
+    void add(Post entity, Set<Long> tagIds);
 
     /**
      * List posts ofPending target author for user.
@@ -75,9 +72,11 @@ public interface PostService {
 
     /**
      * User publish self post
-     * @param id target post id
+     *
+     * @param id  target post id
+     * @param req post save request body
      */
-    void publish(Long id);
+    void publish(Long id, PostSaveReq req);
 
     /**
      * Handle post coverage image upload
@@ -96,9 +95,9 @@ public interface PostService {
     /**
      * Handle post content image upload callback
      * @param request request body
-     * @param payload payload which stored in redis
+     * @param ctx business upload context resolved from stored payload
      */
-    void handlePostImageUploadCallback(CloudPutCallbackReq request, BizUploadPayload payload);
+    void handlePostImageUploadCallback(CloudPutCallbackReq request, UploadContext<Long> ctx);
 
     /**
      * Temporarily save the post content, which is in DRAFT status.
@@ -106,5 +105,19 @@ public interface PostService {
      * @param id      target id
      * @param request request body to save
      */
-    void tempSave(Long id, PostSaveReq request);
+    void save(Long id, PostSaveReq request);
+
+    /**
+     * Preview a post content
+     * must be user self post,
+     * and the content is saved by {@link #save(Long, PostSaveReq)}
+     *
+     * @param id target post id context
+     * @param content content to preview could be any content
+     * @return rendered string with placed resource url
+     */
+    String contentPreview(Long id, String content);
+
+    
+    PostDraftResp getEditPostDraft(Long id);
 }

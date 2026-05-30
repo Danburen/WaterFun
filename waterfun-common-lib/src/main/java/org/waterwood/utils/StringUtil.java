@@ -75,6 +75,11 @@ public final class StringUtil {
         return resourceUUID.toString().replace("-", "");
     }
 
+    /**
+     * Extra resource placeholders in format of res://{uuid} from content, and return the uuid set
+     * @param content raw content
+     * @return set of uuids
+     */
     public static Set<String> extraResPlaceholders(String content) {
         if(isBlank(content)){
             return Collections.emptySet();
@@ -86,5 +91,54 @@ public final class StringUtil {
             result.add(m.group(1));
         }
         return result;
+    }
+
+    /**
+     * Extra resource urls in format of res://xxx
+     * @param content raw content
+     * @return set of urls
+     */
+    public static Set<String> extractResUrls(String content) {
+        if (content == null || content.isEmpty()) {
+            return Set.of();
+        }
+        Set<String> result = new HashSet<>();
+        Matcher matcher = RES_PATTERN.matcher(content);
+        while (matcher.find()) {
+            result.add(matcher.group(0));
+        }
+        return result;
+    }
+
+    /**
+     * Replaces all {@code res://<uuid>} placeholders in the given content with their corresponding URLs.
+     *
+     * <p>Scans the content incrementally using regex matching. For each matched {@code res://<<uuid>},
+     * looks up the UUID in the provided map and substitutes it with the associated URL.
+     * If a UUID is not found in the map, the original placeholder is preserved as fallback.
+     *
+     * <p>Uses {@link Matcher#quoteReplacement} to safely escape special characters ({@code $} or {@code \})
+     * in replacement URLs, preventing regex substitution syntax errors.
+     *
+     * @param content   the raw content containing {@code res://<<uuid>} placeholders;
+     *                  may be null or blank, returned as-is
+     * @param uuidToUrl a map of UUID strings to their resolved URLs; missing keys are ignored
+     * @return the content with all resolvable placeholders replaced by URLs,
+     *         or the original string if no placeholders exist
+     *
+     * @see Matcher#appendReplacement(StringBuffer, String)
+     * @see Matcher#appendTail(StringBuffer)
+     */
+    public static String replaceResPlaceholders(String content, Map<String, String> uuidToUrl) {
+        if(isBlank(content)) return content;
+        StringBuffer sb = new StringBuffer();
+        Matcher matcher = RES_PATTERN.matcher(content);
+        while (matcher.find()) {
+            String uuid = matcher.group(1);
+            String url = uuidToUrl.getOrDefault(uuid, matcher.group(0));
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(url));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 }

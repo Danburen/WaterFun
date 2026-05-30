@@ -32,14 +32,14 @@ public interface TagService {
      * Delete a tag by id
      * @param id target tag id
      */
-    void deleteTagById(Integer id);
+    void deleteTagById(Long id);
 
     /**
      * update a tag
      * @param id target tag id
      * @param req put tag request
      */
-    void updateTag(Integer id, UpdateTagReq req);
+    void updateTag(Long id, UpdateTagReq req);
 
     /**
      * Get a tag
@@ -47,7 +47,7 @@ public interface TagService {
      * @return tag entity
      * @throws NotFoundException if tag not found
      */
-    Tag getTag(Integer id);
+    Tag getTag(Long id);
 
     /**
      * Batch remove tags
@@ -58,7 +58,8 @@ public interface TagService {
 
     /**
      * Get the tag options
+     *
      * @return list ofPending optionVOs
      */
-    List<OptionVO<Integer>> getOptions();
+    List<OptionVO<Long>> getOptions();
 }

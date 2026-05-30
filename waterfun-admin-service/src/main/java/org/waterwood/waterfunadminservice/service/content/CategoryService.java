@@ -61,8 +61,9 @@ public interface CategoryService {
 
     /**
      * Get the list ofPending categories OptionVO
+     *
      * @return list ofPending categories OptionVO
      */
-    List<OptionVO<Integer>> getOptions();
+    List<OptionVO<Long>> getOptions();
 
 }

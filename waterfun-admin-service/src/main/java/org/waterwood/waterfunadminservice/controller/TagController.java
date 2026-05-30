@@ -54,25 +54,25 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<TagResponse> getTag(@PathVariable Integer id){
+    public ApiResponse<TagResponse> getTag(@PathVariable Long id){
         Tag tag = tagService.getTag(id);
         return ApiResponse.success(tagMapper.toResponseDto(tag));
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> deleteTag(@PathVariable Integer id) {
+    public ApiResponse<Void> deleteTag(@PathVariable Long id) {
         tagService.deleteTagById(id);
         return ApiResponse.success();
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Void> putTag(@PathVariable Integer id, @RequestBody @Valid UpdateTagReq req){
+    public ApiResponse<Void> putTag(@PathVariable Long id, @RequestBody @Valid UpdateTagReq req){
         tagService.updateTag(id, req);
         return ApiResponse.success();
     }
 
     @GetMapping("/options")
-    public ApiResponse<List<OptionVO<Integer>>> getOptions() {
+    public ApiResponse<List<OptionVO<Long>>> getOptions() {
         return ApiResponse.success(
                 tagService.getOptions()
         );

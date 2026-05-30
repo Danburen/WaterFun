@@ -10,17 +10,21 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
+import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "post")
+@NamedEntityGraph(
+        name = "Post.withCoverageResource",
+        attributeNodes = @NamedAttributeNode("coverageResourceUuid")
+)
 public class Post {
     @Id
     @NotNull
@@ -45,9 +49,9 @@ public class Post {
     @Column(name = "summary", length = 500)
     private String summary;
 
-    @Size(max = 255)
-    @Column(name = "cover_img")
-    private String coverImg;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coverage_resource_uuid", referencedColumnName = "uuid")
+    private Resource coverageResourceUuid;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -143,7 +147,7 @@ public class Post {
 
     @Column(name = "edited_tag_ids")
     @JdbcTypeCode(SqlTypes.JSON)
-    private List<Integer> editedTagIds;
+    private List<Long> editedTagIds;
 
     @Column(name = "edited_new_tags")
     @JdbcTypeCode(SqlTypes.JSON)

@@ -16,8 +16,6 @@ public class ModerateTaskResponse {
     private Long id;
     private TargetType targetType;
     private String targetId;
-    private String content;
-    private AuditContentFormat contentFormat;
     private ModerationTaskPayloadRes payload;
     private Long submitterId;
     private Instant submitAt;

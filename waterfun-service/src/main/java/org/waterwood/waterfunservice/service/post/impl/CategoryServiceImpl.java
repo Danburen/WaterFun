@@ -4,18 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.post.Category;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
 import org.waterwood.waterfunservicecore.exception.notfound.CategoryNotFoundException;
-import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservice.infrastructure.mapper.CategoryMapper;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CategoryRepository;
 import org.waterwood.waterfunservice.service.post.CategoryService;
-import org.waterwood.waterfunservicecore.infrastructure.security.AuthContextHelper;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.util.List;
@@ -50,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category getCategory(Integer id) {
+    public Category getCategory(Long id) {
         return categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
     }
 
@@ -73,7 +70,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void deleteCategory(Integer id) {
+    public void deleteCategory(Long id) {
         Category c = categoryRepository.findById(id).orElseThrow(
                 CategoryNotFoundException::new
         );

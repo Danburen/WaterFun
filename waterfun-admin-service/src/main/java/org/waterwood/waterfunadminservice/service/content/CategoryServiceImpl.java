@@ -78,11 +78,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<OptionVO<Integer>> getOptions() {
+    public List<OptionVO<Long>> getOptions() {
         return categoryRepository.findAll().stream()
                 .filter(c -> ! c.getIsDeleted())
                 .map(c -> {
-                  return OptionVO.<Integer>builder()
+                  return OptionVO.<Long>builder()
                           .id(c.getId())
                           .name(c.getName())
                           .code(c.getSlug())

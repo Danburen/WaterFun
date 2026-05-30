@@ -48,7 +48,7 @@ public interface RedisHelperHolder {
      * Redis pipeline mget
      *
      * @param keys redis keys
-     * @return redis value
+     * @return redis value, same size of input
      */
     List<String> mget(List<String> keys);
 

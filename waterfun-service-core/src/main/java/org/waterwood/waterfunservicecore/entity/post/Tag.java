@@ -22,7 +22,7 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "int UNSIGNED not null")
-    private Integer id;
+    private Long id;
 
     @Size(max = 30)
     @NotNull

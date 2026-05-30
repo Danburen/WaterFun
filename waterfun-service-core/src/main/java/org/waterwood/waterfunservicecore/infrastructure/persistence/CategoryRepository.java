@@ -10,15 +10,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface CategoryRepository extends JpaRepository<Category, Integer>, JpaSpecificationExecutor<Category>,SlugUniquenessChecker {
+public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSpecificationExecutor<Category>,SlugUniquenessChecker {
     boolean existsTagBySlug(String slug);
     List<Category> findAllByCreatorUid(Long creatorId);
 
     Optional<Category> findByName(String name);
 
-    void removeCategoryById(Integer id);
+    void removeCategoryById(Long id);
 
-    int deleteByIdIn(Collection<Integer> ids);
+    int deleteByIdIn(Collection<Long> ids);
 
     @Query("""
         SELECT p.id, new org.waterwood.api.VO.OptionVO(c.id, c.slug, c.name, false)

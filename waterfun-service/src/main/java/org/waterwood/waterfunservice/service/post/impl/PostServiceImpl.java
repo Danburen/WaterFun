@@ -1,6 +1,5 @@
 package org.waterwood.waterfunservice.service.post.impl;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -21,16 +20,16 @@ import org.waterwood.common.io.ResourceType;
 import org.waterwood.common.io.SimpleCloudObject;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.BizType;
+import org.waterwood.waterfunservice.api.UploadContext;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
-import org.waterwood.waterfunservice.api.response.post.PostAuthorCardResp;
-import org.waterwood.waterfunservice.api.response.post.PostAuthorDetailResp;
-import org.waterwood.waterfunservice.api.response.post.PostCardResp;
-import org.waterwood.waterfunservice.api.response.post.PostDetailResp;
+import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservice.infrastructure.mapper.PostMapper;
 import org.waterwood.waterfunservice.service.post.TagService;
+import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
+import org.waterwood.waterfunservicecore.entity.PostResource;
 import org.waterwood.waterfunservicecore.entity.audit.AuditContentFormat;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
@@ -39,12 +38,10 @@ import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.entity.resource.SourceType;
-import org.waterwood.waterfunservicecore.exception.notfound.CategoryNotFoundException;
 import org.waterwood.waterfunservicecore.exception.notfound.PostNotFoundException;
-import org.waterwood.waterfunservicecore.exception.notfound.ResourceNotFoundException;
 import org.waterwood.waterfunservicecore.exception.reference.CategoryReferenceInvalidException;
 import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.*;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
@@ -56,10 +53,7 @@ import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.exception.io.IllegalUploadCountException;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.CategoryRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
 import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;
 import org.waterwood.waterfunservice.service.post.PostService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
@@ -91,9 +85,10 @@ public class PostServiceImpl implements PostService {
     private final ResourceRepository resourceRepository;
     private final AuditTaskResourceRepository auditTaskResourceRepository;
     private final TagService tagService;
+    private final PostResourceRepository postResourceRepository;
 
     @Override
-    public void add(Post post, Set<Integer> tagIds) {
+    public void add(Post post, Set<Long> tagIds) {
         List<Tag> tags = tagRepository.findAllById(tagIds);
         User u = userCoreService.getUserByUid(UserCtxHolder.getUserUid());
         post.setAuthor(u);
@@ -214,11 +209,14 @@ public class PostServiceImpl implements PostService {
         postRepository.save(p);
     }
 
+    @Transactional
     @Override
-    public void publish(Long id) {
+    public void publish(Long id, PostSaveReq req) {
         Post p = postRepository.findByIdAndAuthorUidAndIsDeletedAndStatus(
                 id, UserCtxHolder.getUserUid(), false, PostStatus.DRAFT
         ).orElseThrow(PostNotFoundException::new);
+
+        this.save(id, req); // save edited content to temp fields, and sync resources status
 
         String targetId = id.toString();
         AuditTask task = auditTaskRepository
@@ -234,15 +232,34 @@ public class PostServiceImpl implements PostService {
         task.setStatus(AuditStatus.PENDING);
         task.setUserLocale(UserCtxHolder.getLocale().getLanguage());
         task.setContentFormat(AuditContentFormat.MARKDOWN); // TODO supposed need to determines content format
+        String editedContent =  p.getEditedContent();
+        task.setPayload(new PostAuditPayload(
+                p.getEditedTitle(),
+                p.getEditedSubtitle(),
+                editedContent,
+                p.getEditedSummary(),
+                p.getCoverageResourceUuid() != null ? p.getCoverageResourceUuid().getUuid() : null,
+                p.getEditedCategory() != null ? p.getEditedCategory().getId() : null,
+                p.getEditedTagIds() != null ? p.getEditedTagIds() : null,
+                p.getEditedNewTags() != null ? p.getEditedNewTags() : null
+        ).toJson());
 
+        Set<String> resourceUuids = StringUtil.extraResPlaceholders(editedContent);
+        List<Resource> resources = resourceRepository.findByUuidIn(resourceUuids);
+        List<AuditResource> auditResources = resources.stream().map(res -> {
+            AuditResource ar = new AuditResource();
+            ar.setTask(task);
+            ar.setResource(res);
+            return ar;
+        }).toList();
 
-
+        auditTaskResourceRepository.saveAll(auditResources);
         auditTaskRepository.save(task);
     }
 
     @Transactional
     @Override
-    public void tempSave(Long id, PostSaveReq request) {
+    public void save(Long id, PostSaveReq request) {
         Post p = postRepository.findByIdAndIsDeleted(id, false)
                 .orElseThrow(NotFoundException::new);
 
@@ -259,13 +276,13 @@ public class PostServiceImpl implements PostService {
         if(request.getCoverageImgId() != null) {
             Resource res = resourceRepository.findByUuidAndStatus(request.getCoverageImgId(), ResourceStatus.ORPHAN)
                     .orElseThrow(() -> new ResourceReferenceInvalidException(request.getCoverageImgId()));
-            p.setCoverImg(res.getResourceKey());
+            p.setCoverageResourceUuid(res);
             res.setStatus(ResourceStatus.ACTIVE);
         }
         Category c = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryReferenceInvalidException(request.getCategoryId()));
         p.setEditedCategory(c);
-        // Below should be create when public, not in temporary saving.
+        // Below should be created when public, and must after audition, not in temporary saving.
         // List<Tag> newTagCreated = tagService.createNewTags(request.getNewTags(), UserCtxHolder.getUserUid());
         if(request.getTagIds() != null) {
             List<Tag> tags = tagRepository.findAllById(request.getTagIds());
@@ -301,6 +318,77 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public String contentPreview(Long id, String content) {
+        if(content.isBlank()) return "";
+        long userUid = UserCtxHolder.getUserUid();
+        Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
+                id, userUid, false
+        ).orElseThrow(PostNotFoundException::new);
+
+        Set<String> resourceUuids = StringUtil.extraResPlaceholders(content);
+        List<PostResource> postResources = postResourceRepository.findAllByPostIdAndResourceUuidUuidIn(
+                p.getId(), resourceUuids
+        );
+
+        Map<String, String> resourceMap = postResources.stream()
+                .collect(Collectors.toMap(
+                        pr -> pr.getResourceUuid().getUuid(),
+                        pr -> pr.getResourceUuid().getResourceKey()
+                ));
+
+        Map<String, CloudResPresignedUrlResp> respMap = cloudFileService.batchGetReadPublicUrlCached(
+                CloudFSRoot.UPLOADS,
+                resourceMap,
+                TargetType.POST_CONTENT_IMAGE
+        );
+
+        return StringUtil.replaceResPlaceholders(
+                content,
+                respMap.entrySet().stream()
+                        .filter(e -> e.getValue() != null && e.getValue().getUrl() != null)
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                e -> e.getValue().getUrl()
+                        ))
+        );
+    }
+
+    @Override
+    public PostDraftResp getEditPostDraft(Long id) {
+        Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
+                id, UserCtxHolder.getUserUid(), false
+        ).orElseThrow(PostNotFoundException::new);
+
+        PostDraftResp resp = postMapper.toPostDraftResp(p);
+        resp.setCoverageImgPresignedUrl(cloudFileService.getReadUrlCached(
+                CloudFSRoot.UPLOADS,
+                p.getEditedCoverImg(),
+                p.getId(),
+                TargetType.POST_CONTENT_IMAGE
+        ));
+
+        if(p.getEditedCategory() != null) {
+            resp.setEditedCategoryId(OptionVO.<Long>builder()
+                    .id(p.getEditedCategory().getId())
+                    .name(p.getEditedCategory().getName())
+                    .build());
+        }
+        if(p.getTags() != null) {
+            resp.setEditedTagIds(p.getTags().stream()
+                    .map(tag -> OptionVO.<Long>builder()
+                            .id(tag.getId())
+                            .name(tag.getName())
+                            .build())
+                    .toList());
+        }
+        if(p.getEditedNewTags() != null) {
+            resp.setEditedNewTagIds(p.getEditedNewTags());
+        }
+
+        return resp;
+    }
+
+    @Override
     public List<PresignedResp> handlePostCoverageImageUpload(UploadPolicyReq request) {
         Long bizId = Long.parseLong(request.getBizId());
         if(request.getExts().size() != 1){
@@ -318,7 +406,12 @@ public class PostServiceImpl implements PostService {
 
 
         UUID resourceUUID = UUID.randomUUID();
-        BizUploadPayload payload = BizTargetIdPackager.ofPost(bizId, BizType.POST_COVERAGE_IMAGE.name(), resourceUUID);
+        BizUploadPayload payload = UploadContext.<Long>builder()
+                .bizId(bizId)
+                .bizType(request.getBizType())
+                .uploadId(resourceUUID.toString().replace("-", ""))
+                .build()
+                .toPayload();
         String cosPath = CosKeyPathGenerator.of(resourceUUID, ext);
 
         Resource res = new Resource();
@@ -336,7 +429,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PresignedResp> handlePostContentImageUpload(UploadPolicyReq request) {
         Long bizId = Long.parseLong(request.getBizId());
-        postRepository.findByIdAndAuthorUidAndIsDeleted(
+        Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
                 bizId, UserCtxHolder.getUserUid(),false
         ).orElseThrow(() -> new NotFoundException("Post: " + bizId));
 
@@ -362,7 +455,6 @@ public class PostServiceImpl implements PostService {
         }
 
         if(! validItems.isEmpty()){
-
             List<Resource> resources = validItems.stream()
                     .map(item -> {
                         Resource res = new Resource();
@@ -371,11 +463,20 @@ public class PostServiceImpl implements PostService {
                         res.setResourceType(ResourceType.IMAGE);
                         res.setUploaderId(UserCtxHolder.getUserUid());
                         res.setSourceType(SourceType.USER_UPLOADED);
+                        res.setStatus(ResourceStatus.ACTIVE);
                         return res;
                     })
                     .toList();
-
+            List<PostResource> postResources = resources.stream()
+                    .map(res -> {
+                        PostResource pr = new PostResource();
+                        pr.setPost(p);
+                        pr.setResourceUuid(res);
+                        return pr;
+                    })
+                    .toList();
             resourceRepository.saveAll(resources);
+            postResourceRepository.saveAll(postResources);
 
             List<BizUploadPayload> payloads = validItems.stream()
                     .map(item -> BizTargetIdPackager.ofPost(
@@ -400,67 +501,58 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     @Override
-    public void handlePostImageUploadCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
-        Assert.isTrue(payload.getType().equals(BizType.POST_COVERAGE_IMAGE.name())
-                || payload.getType().equals(BizType.POST_CONTENT_IMAGE.name()),
-                "Invalid biz type: " + payload.getType()
+    public void handlePostImageUploadCallback(CloudPutCallbackReq request, UploadContext<Long> ctx) {
+        Assert.isTrue(ctx.getBizType() == BizType.POST_COVERAGE_IMAGE
+                        || ctx.getBizType() == BizType.POST_CONTENT_IMAGE,
+                "Invalid biz type: " + ctx.getBizType()
         );
 
-        Long postId = Long.parseLong(payload.getBizId());
+        Long postId = ctx.getBizId();
         Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
                 postId, UserCtxHolder.getUserUid(),false
         ).orElseThrow(() -> new NotFoundException("Post: " + postId));
 
-        SimpleCloudObject obj = cloudFileService.detectAndAssertCloudFile(payload.getCosKey(), CloudFileType.IMAGE);
+        SimpleCloudObject obj = cloudFileService.detectAndAssertCloudFile(ctx.getCosKey(), CloudFileType.IMAGE);
+        TargetType type =  ctx.getBizType() == BizType.POST_CONTENT_IMAGE ? TargetType.POST_CONTENT_IMAGE : TargetType.POST_COVERAGE_IMAGE;
 
-        TargetType type =  payload.getType().equals(BizType.POST_CONTENT_IMAGE.name()) ? TargetType.POST_CONTENT_IMAGE : TargetType.POST_COVERAGE_IMAGE;
-        AuditTask task = auditTaskRepository
-                .findByTargetIdAndTargetTypeAndStatus(payload.getBizId(), type, AuditStatus.PENDING)
-                .orElseGet(() -> {
-                    AuditTask newTask = new AuditTask();
-                    newTask.setTargetId(payload.getBizId());
-                    newTask.setSubmitAt(Instant.now());
-                    newTask.setTargetType(type);
-                    newTask.setSubmitter(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
-                    return newTask;
-                });
-        auditTaskRepository.save(task);
-
-        if(payload.getType().equals(BizType.POST_CONTENT_IMAGE.name())) {
-            resourceRepository.findByUuidAndStatus(payload.getUploadId(), ResourceStatus.UPLOAD_PENDING).map(
+        if(ctx.getBizType() == BizType.POST_CONTENT_IMAGE) {
+            resourceRepository.findByUuidAndStatus(ctx.getUploadId(), ResourceStatus.UPLOAD_PENDING).map(
                     res-> {
                         res.setSizeBytes(obj.getFileMeta().getSize());
                         res.setMimeType(obj.getFileMeta().getMimeType());
                         res.setSourceType(SourceType.USER_UPLOADED);
-                        res.setStatus(ResourceStatus.ORPHAN);
+                        res.setStatus(ResourceStatus.ORPHAN); // only bind when temporary saving or publishing.
                         return resourceRepository.save(res);
                     }
-            ).orElseThrow(() -> new NotFoundException("Resource with uuid: " + payload.getUploadId()));
-        } else {
-            AuditResource auditRes = auditTaskResourceRepository
-                    .findByTaskId(task.getId())
-                    .orElseGet(() -> {
-                        AuditResource ar = new AuditResource();
-                        ar.setTask(task);
-                        return auditTaskResourceRepository.save(ar);
-                    });
-
-            Resource res = auditRes.getResource();
-            if(res == null) throw new NotFoundException("Audit resource not found: " + auditRes.getId());
-            if ( res.getResourceKey() != null) {
-                final String oldKey = res.getResourceKey();
-                TransactionSynchronizationManager.registerSynchronization(
-                        new TransactionSynchronization() {
-                            @Override
-                            public void afterCommit() {
-                                try {
-                                    cloudFileService.removeFile(CloudFSRoot.UPLOADS, oldKey);
-                                } catch (Exception e) {
-                                    log.error("Failed to remove old cloud file: {}", oldKey, e);
+            ).orElseThrow(() -> new ResourceReferenceInvalidException(ctx.getUploadId()));
+        } else if(ctx.getBizType() == BizType.POST_COVERAGE_IMAGE){
+            AuditTask task = auditTaskRepository.findByTargetIdAndTargetTypeAndStatus(String.valueOf(ctx.getBizId()), type, AuditStatus.PENDING).orElse(null);
+            Resource res = new Resource();
+            if(task != null){ // task is already exists, simply update resource and register old resource deletion after commit if exists
+                AuditResource auditRes = auditTaskResourceRepository
+                        .findByTaskId(task.getId())
+                        .orElseGet(() -> {
+                            AuditResource ar = new AuditResource();
+                            ar.setTask(task);
+                            return auditTaskResourceRepository.save(ar);
+                        });
+                res = auditRes.getResource();
+                if(res == null) throw new ResourceReferenceInvalidException(ctx.getUploadId());
+                if (res.getResourceKey() != null) {
+                    final String oldKey = res.getResourceKey();
+                    TransactionSynchronizationManager.registerSynchronization(
+                            new TransactionSynchronization() {
+                                @Override
+                                public void afterCommit() {
+                                    try {
+                                        cloudFileService.removeFile(CloudFSRoot.UPLOADS, oldKey);
+                                    } catch (Exception e) {
+                                        log.error("Failed to remove old cloud file: {}", oldKey, e);
+                                    }
                                 }
                             }
-                        }
-                );
+                    );
+                }
             }
 
             res.setResourceKey(obj.getKey());
@@ -472,7 +564,6 @@ public class PostServiceImpl implements PostService {
             res.setStatus(ResourceStatus.ACTIVE);
             resourceRepository.save(res);
         }
-
     }
 
     private <T> T buildPostDetailResp(
@@ -488,12 +579,16 @@ public class PostServiceImpl implements PostService {
                 .map(arr -> (OptionVO<Integer>) arr[1])
                 .findFirst()
                 .orElse(null);
-        CloudResPresignedUrlResp coverImg = cloudFileService.getReadUrlCached(
-                CloudFSRoot.UPLOADS,
-                post.getCoverImg(),
-                post.getId(),
-                TargetType.POST_COVERAGE_IMAGE
-        );
+        Resource coverageImgRes = post.getCoverageResourceUuid();
+        CloudResPresignedUrlResp coverImg = null;
+        if(coverageImgRes != null) {
+            coverImg = cloudFileService.getReadUrlCached(
+                    CloudFSRoot.UPLOADS,
+                    coverageImgRes.getUuid(),
+                    post.getId(),
+                    TargetType.POST_COVERAGE_IMAGE
+            );
+        }
         applier.apply(res, tags, category, coverImg);
         return res;
     }
@@ -531,13 +626,16 @@ public class PostServiceImpl implements PostService {
                         (a, b) -> a
                 ));
 
+        Map<Long, String> postIdCoverImgKeyMap = new HashMap<>();
+        for(int i = 0; i < postIds.size(); i++){
+            postIdCoverImgKeyMap.put(postIds.get(i), posts.get(i).getCoverageResourceUuid().getResourceKey());
+        }
+
         Map<Long, CloudResPresignedUrlResp> postCoverageImgMap = cloudFileService.batchGetReadPublicUrlCached(
                 CloudFSRoot.UPLOADS,
-                posts.stream()
-                        .map(Post::getCoverImg)
-                        .toList(),
-                postIds,
-                TargetType.POST_COVERAGE_IMAGE);
+                postIdCoverImgKeyMap,
+                TargetType.POST_COVERAGE_IMAGE
+        );
 
         return new PageImpl<>(
                 posts.stream().map(post -> {

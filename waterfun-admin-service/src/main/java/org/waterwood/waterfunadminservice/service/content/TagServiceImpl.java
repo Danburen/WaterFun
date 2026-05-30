@@ -15,7 +15,7 @@ import org.waterwood.waterfunadminservice.api.request.content.DeleteTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.UpdateTagReq;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.TagMapper;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
-import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.TagNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
@@ -44,22 +44,20 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void deleteTagById(Integer id) {
+    public void deleteTagById(Long id) {
         tagRepository.deleteById(id);
     }
 
     @Override
-    public void updateTag(Integer id, UpdateTagReq req) {
+    public void updateTag(Long id, UpdateTagReq req) {
         Tag tag = getTag(id);
         tagMapper.partialUpdate(req, tag);
         tagRepository.save(tag);
     }
 
     @Override
-    public Tag getTag(Integer id) {
-        return tagRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Tag ID: " + id)
-        );
+    public Tag getTag(Long id) {
+        return tagRepository.findById(id).orElseThrow(TagNotFoundException::new);
     }
 
     @Transactional
@@ -73,11 +71,11 @@ public class TagServiceImpl implements TagService {
     }
     @Transactional
     @Override
-    public List<OptionVO<Integer>> getOptions() {
+    public List<OptionVO<Long>> getOptions() {
         return tagRepository.findAll().stream()
                 .filter(t -> ! t.getIsDeleted())
                 .map(t -> {
-                    return OptionVO.<Integer>builder()
+                    return OptionVO.<Long>builder()
                             .id(t.getId())
                             .code(t.getSlug())
                             .name(t.getName())

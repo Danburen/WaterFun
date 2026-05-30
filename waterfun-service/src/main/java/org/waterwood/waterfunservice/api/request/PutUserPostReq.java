@@ -27,6 +27,6 @@ public class PutUserPostReq {
     @Size(max = 500)
     private String summary;
     private PostVisibility visibility;
-    private Integer categoryId;
-    private Set<Integer> tagIds;
+    private Long categoryId;
+    private Set<Long> tagIds;
 }

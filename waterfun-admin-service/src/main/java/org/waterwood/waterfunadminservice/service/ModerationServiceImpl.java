@@ -26,7 +26,10 @@ import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.user.User;
+import org.waterwood.waterfunservicecore.exception.notfound.AuditTaskNotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.AuditTaskResourceNotFoundException;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
+import org.waterwood.waterfunservicecore.exception.reference.AuditTaskReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
@@ -76,7 +79,7 @@ public class ModerationServiceImpl implements ModerationService {
     @Override
     public List<ModerationResourceRes> listTaskResources(Long taskId) {
         if (!auditTaskRepository.existsById(taskId)) {
-            throw new NotFoundException("Task UID: " + taskId);
+            throw new AuditTaskReferenceInvalidException(taskId);
         }
         List<AuditResource> auditResources = auditTaskResourceRepository.findAllByTask_IdOrderBySortNoAsc(taskId);
         return auditResources.stream().map(this::toModerationResourceRes).toList();
@@ -89,9 +92,8 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Override
     public ModerationResourceRes getTaskResource(Long resourceId) {
-        AuditResource auditResource = auditTaskResourceRepository.findById(resourceId).orElseThrow(
-                () -> new NotFoundException("Audit Resource UID: " + resourceId)
-        );
+        AuditResource auditResource = auditTaskResourceRepository.findById(resourceId)
+                .orElseThrow(AuditTaskResourceNotFoundException::new);
         return toModerationResourceRes(auditResource);
     }
 
@@ -136,9 +138,8 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Override
     public void approve(Long id) {
-        AuditTask task = auditTaskRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Task UID: " + id)
-        );
+        AuditTask task = auditTaskRepository.findById(id)
+                .orElseThrow(AuditTaskNotFoundException::new);
         User auditor = userCoreService.getUser(UserCtxHolder.getUserUid());
         task.setAuditor(auditor);
         task.setStatus(AuditStatus.APPROVED);
@@ -148,9 +149,8 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Override
     public void reject(Long id, ModerateRejectRequest req) {
-        AuditTask task = auditTaskRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Task UID: " + id)
-        );
+        AuditTask task = auditTaskRepository.findById(id)
+                .orElseThrow(AuditTaskNotFoundException::new);
         User auditor = userCoreService.getUser(UserCtxHolder.getUserUid());
         task.setStatus(AuditStatus.REJECTED);
         task.setAuditor(auditor);
@@ -163,9 +163,8 @@ public class ModerationServiceImpl implements ModerationService {
     @Transactional
     @Override
     public void approveResource(Long resourceId) {
-        AuditResource auditResource = auditTaskResourceRepository.findByIdAndStatus(resourceId, AuditStatus.PENDING).orElseThrow(
-                () -> new NotFoundException("Pending audit resource UID: " + resourceId)
-        );
+        AuditResource auditResource = auditTaskResourceRepository.findByIdAndStatus(resourceId, AuditStatus.PENDING)
+                .orElseThrow(() -> new AuditTaskReferenceInvalidException(resourceId));
         User auditor = userCoreService.getUser(UserCtxHolder.getUserUid());
         auditResource.setStatus(AuditStatus.APPROVED);
         auditResource.setAuditor(auditor);
@@ -179,9 +178,8 @@ public class ModerationServiceImpl implements ModerationService {
     @Transactional
     @Override
     public void rejectResource(Long resourceId, ModerateRejectRequest req) {
-        AuditResource auditResource = auditTaskResourceRepository.findByIdAndStatus(resourceId, AuditStatus.PENDING).orElseThrow(
-                () -> new NotFoundException("Pending audit resource UID: " + resourceId)
-        );
+        AuditResource auditResource = auditTaskResourceRepository.findByIdAndStatus(resourceId, AuditStatus.PENDING)
+                .orElseThrow(() -> new AuditTaskReferenceInvalidException(resourceId));
         User auditor = userCoreService.getUser(UserCtxHolder.getUserUid());
         auditResource.setStatus(AuditStatus.REJECTED);
         auditResource.setAuditor(auditor);
@@ -230,16 +228,8 @@ public class ModerationServiceImpl implements ModerationService {
     }
 
     private ModerationTaskPayloadRes buildPayload(AuditTask task, List<AuditResource> auditResources) {
-        if (CollectionUtil.isEmpty(auditResources)) {
-            return new ModerationTaskPayloadRes(
-                    ModerationTaskPayloadRes.PayloadType.PLAIN_TEXT,
-                    null,
-                    List.of(),
-                    task.getContent()
-            );
-        }
         if (auditResources.size() == 1) {
-            ModerationResourceRes single = toModerationResourceRes(auditResources.get(0));
+            ModerationResourceRes single = toModerationResourceRes(auditResources.getFirst());
             return new ModerationTaskPayloadRes(
                     ModerationTaskPayloadRes.PayloadType.SINGLE_RESOURCE,
                     single,

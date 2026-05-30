@@ -77,7 +77,7 @@ public class CategoryController {
     }
 
     @GetMapping("/options")
-    public ApiResponse<List<OptionVO<Integer>>> getOptions() {
+    public ApiResponse<List<OptionVO<Long>>> getOptions() {
         return ApiResponse.success(
                 categoryService.getOptions()
         );

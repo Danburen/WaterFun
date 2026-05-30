@@ -1,7 +1,6 @@
 package org.waterwood.waterfunservice.service.upload;
 
 import org.springframework.stereotype.Component;
-import org.waterwood.common.KeyConstants;
 import org.waterwood.waterfunservice.api.BizType;
 import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
 
@@ -33,16 +32,13 @@ public class UploadStrategyFactory {
     }
 
     public UploadBizStrategy getStrategy(BizUploadPayload payload) {
-        UploadBizStrategy strategy = null;
-        if(payload.getBiz().equals(KeyConstants.USER)){
-            strategy = switch (payload.getType()) {
-                case KeyConstants.AVATAR -> this.strategies.get(BizType.AVATAR);
-                default -> throw new IllegalStateException("No UploadBizStrategy for payload: " + payload);
-            };
+        try{
+            UploadBizStrategy strategy;
+            BizType type = BizType.valueOf(payload.getBizType().toUpperCase());
+            strategy = this.strategies.get(type);
+            return strategy;
+        }  catch (Exception e) {
+            throw new IllegalStateException("Invalid bizType in payload: " + payload.getBizType(), e);
         }
-        if(strategy == null) {
-            throw new IllegalStateException("No UploadBizStrategy for payload: " + payload);
-        }
-        return strategy;
     }
 }

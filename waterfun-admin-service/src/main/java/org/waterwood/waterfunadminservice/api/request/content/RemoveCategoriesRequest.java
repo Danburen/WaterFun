@@ -10,5 +10,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RemoveCategoriesRequest {
-    private List<Integer> categoryIds;
+    private List<Long> categoryIds;
 }

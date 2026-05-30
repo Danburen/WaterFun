@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AssignTagsRequest {
-    private List<Integer> tagIds;
+    private List<Long> tagIds;
 }

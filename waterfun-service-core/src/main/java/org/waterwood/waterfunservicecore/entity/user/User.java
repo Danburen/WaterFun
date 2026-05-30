@@ -1,23 +1,27 @@
 package org.waterwood.waterfunservicecore.entity.user;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 import org.hibernate.proxy.HibernateProxy;
 import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunservicecore.entity.resource.Resource;
 
 import java.time.Instant;
 import java.util.Objects;
 
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @Entity
 @Table(name = "user", schema = "waterfun")
+@NamedEntityGraph(
+        name = "User.withAvatarResource",
+        attributeNodes = @NamedAttributeNode("avatarResourceUuid")
+)
 public class User {
     @Id
     @Column(name = "uid", nullable = false)
@@ -50,9 +54,10 @@ public class User {
     @Column(name = "nickname", length = 12)
     private String nickname;
 
-    @Size(max = 64)
-    @Column(name = "avatar")
-    private String avatar;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "avatar_resource_uuid", referencedColumnName = "uuid")
+    private Resource avatarResourceUuid;
 
     @Column(name = "last_active_at")
     private Instant lastActiveAt;

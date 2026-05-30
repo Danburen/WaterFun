@@ -66,7 +66,7 @@ public interface CloudFileService {
     /**
      * Remove file from cloud storage
      *
-     * @param root
+     * @param root root key
      * @param key  the key ofPending the file
      */
     void removeFile(CloudFSRoot root, String key);
@@ -75,15 +75,14 @@ public interface CloudFileService {
      * Batch get file from cloud storage
      * <b>BizIds</b> must correspond with paths
      *
-     * @param rootKey     cloud resource key root
-     * @param paths        url paths
-     * @param bizIds       business ids
-     * @param cloudResType resource type
+     * @param rootKey             cloud resource key root
+     * @param bizIdNonRootPathMap bizId and no root path map.
+     * @param cloudResType        resource type
      * @return map of Pending direct url which can be used to access the file,
-     *         null value in map means the file is not exist or failed to get url,
-     *         or paths is null, and the key of map is the bizId provided in parameter.
+     * null value in map means the file is not exist or failed to get url,
+     * or paths is null, and the key of map is the bizId provided in parameter.
      */
-    <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(CloudFSRoot rootKey, List<String> paths, List<ID> bizIds, TargetType cloudResType);
+    <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(CloudFSRoot rootKey, Map<ID, String> bizIdNonRootPathMap, TargetType cloudResType);
 
     String getCachedRedisKey(Serializable bizId, TargetType resType, CloudResOperationType operationType);
 

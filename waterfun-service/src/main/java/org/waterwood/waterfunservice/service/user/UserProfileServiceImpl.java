@@ -7,11 +7,11 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.waterwood.common.CloudFSRoot;
-import org.waterwood.common.KeyConstants;
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.ResourceType;
 import org.waterwood.common.io.SimpleCloudObject;
 import org.waterwood.waterfunservice.api.BizType;
+import org.waterwood.waterfunservice.api.UploadContext;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
@@ -34,7 +34,6 @@ import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHol
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileType;
 import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
-import org.waterwood.waterfunservicecore.utils.BizTargetIdPackager;
 import org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator;
 
 import java.time.Instant;
@@ -53,15 +52,15 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Transactional
     @Override
-    public void uploadAvatarCallback(CloudPutCallbackReq req, BizUploadPayload payload) {;
-        Assert.isTrue(payload.getBiz().equals(KeyConstants.USER) && KeyConstants.AVATAR.equals(payload.getType()),
-                "Invalid payload for avatar upload callback");
-        SimpleCloudObject obj = cloudFileService.detectAndAssertCloudFile(payload.getCosKey(), CloudFileType.IMAGE);
+    public void uploadAvatarCallback(CloudPutCallbackReq req, UploadContext<Long> ctx) {
+        Assert.isTrue(ctx.getBizType() == BizType.AVATAR,
+                "Invalid payload for avatar upload callback: " + ctx.getBizType());
+        SimpleCloudObject obj = cloudFileService.detectAndAssertCloudFile(ctx.getCosKey(), CloudFileType.IMAGE);
         AuditTask task = auditTaskRepository
-                .findByTargetIdAndTargetTypeAndStatus(payload.getBizId(), TargetType.USER_AVATAR,AuditStatus.PENDING)
+                .findByTargetIdAndTargetTypeAndStatus(String.valueOf(ctx.getUploadId()), TargetType.USER_AVATAR,AuditStatus.PENDING)
                 .orElseGet(() -> {
                     AuditTask newTask = new AuditTask();
-                    newTask.setTargetId(payload.getBizId());
+                    newTask.setTargetId(String.valueOf(ctx.getUploadId()));
                     newTask.setSubmitAt(Instant.now());
                     newTask.setTargetType(TargetType.USER_AVATAR);
                     newTask.setSubmitter(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
@@ -116,7 +115,12 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
 
         UUID resourceUUID = UUID.randomUUID();
-        BizUploadPayload payload = BizTargetIdPackager.ofUser(userUid, BizType.AVATAR.name(), resourceUUID);
+        BizUploadPayload payload = UploadContext.<Long>builder()
+                .bizId(userUid)
+                .bizType(request.getBizType())
+                .uploadId(resourceUUID.toString().replace("-", ""))
+                .build()
+                .toPayload();
         String cosPath = CosKeyPathGenerator.ofUser(userUid, resourceUUID, ext);
 
         Resource res = new Resource();

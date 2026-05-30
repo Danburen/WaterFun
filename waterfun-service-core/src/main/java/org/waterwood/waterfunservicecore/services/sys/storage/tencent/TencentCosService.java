@@ -34,7 +34,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.IntStream;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -176,16 +176,6 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(CloudFSRoot rootKey, List<String> paths, List<ID> bizIds, TargetType cloudResType) {
-        return batchGetReadPublicUrlCached(
-                paths.stream().map(path -> buildCosKey(rootKey, path)).toList(),
-                bizIds,
-                Duration.ofSeconds(defaultExpires),
-                cloudResType
-        );
-    }
-
-    @Override
     public SimpleCloudObject detectAndAssertCloudFile(String KeyPath, CloudFileType cloudFileType) {
         String suffix = PathUtil.getSuffix(KeyPath);
         String fullPath = buildCosKey(CloudFSRoot.UPLOADS, KeyPath);
@@ -260,55 +250,99 @@ public class TencentCosService implements CloudFileService {
     }
 
     /**
+     * Batch get presigned URLs with Redis cache with default expiration.
+     *
+     * @param <ID>                id type, e.g. Long, String, or business semantic id like "coverage-<uuid>"
+     * @param rootKey             cloud resource key root
+     * @param bizIdNonRootPathMap bizId and path map, where path is the key path under cloud root, e.g. "2024/06/01/xxx.jpg"
+     * @param cloudResType        resource type for building cache key, e.g. "coverage", "avatar", etc.
+     * @return map of bizId and presigned URL response, where null value means the file is not exist or failed to get url. The bizId is the key of map, which is provided in parameter, and the URL is the value of map.
+     * e.g., if bizIdPathMap is {123L: "2024/06/01/xxx.jpg"}, the returned map will be {123L: CloudResPresignedUrlResp}, where CloudResPresignedUrlResp contains the presigned URL and its expiration time.
+     * @see CloudResPresignedUrlResp
+     */
+    @Override
+    public <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(CloudFSRoot rootKey, Map<ID, String> bizIdNonRootPathMap, TargetType cloudResType) {
+        Map<ID, String> bizIdFullPathMap = bizIdNonRootPathMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> buildCosKey(rootKey, e.getValue())
+                ));
+        return batchGetReadPublicUrlCached(
+                bizIdFullPathMap,
+                Duration.ofSeconds(defaultExpires),
+                cloudResType
+        );
+    }
+
+    /**
      * Batch get presigned URLs with Redis cache.
      *
-     * @param <ID> id type, e.g. Long, String, or business semantic id like "coverage-<uuid>"
+     * @param <ID>         id type, e.g. Long, String, or business semantic id like "coverage-<uuid>"
+     * @param bizIdCosPathMap bizId and cos path map, where path is the key path under cloud root, e.g. "root/2024/06/01/xxx.jpg"
+     * @param dur          presigned URL duration, which also used as cache duration for hitting cache. Cache will have a safety marge to avoid returning expired URL.
+     * @param cloudResType   resource type for building cache key, e.g. "coverage", "avatar", etc.
+     * @return map of bizId and presigned URL response, where null value means the file is not exist or failed to get url. The bizId is the key of map, which is provided in parameter, and the URL is the value of map.
+     *          e.g., if bizIdPathMap is {123L: "2024/06/01/xxx.jpg"}, the returned map will be {123L: CloudResPresignedUrlResp}, where CloudResPresignedUrlResp contains the presigned URL and its expiration time.
+     * @see CloudResPresignedUrlResp
      */
-    private <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(List<String> fullPaths, List<ID> bizIds, Duration dur, TargetType cloudResType) {
-        if (fullPaths == null || fullPaths.isEmpty()) {
+    private <ID extends Serializable> Map<ID, CloudResPresignedUrlResp> batchGetReadPublicUrlCached(Map<ID, String> bizIdCosPathMap, Duration dur, TargetType cloudResType) {
+        if (bizIdCosPathMap == null || bizIdCosPathMap.isEmpty()) {
             return Collections.emptyMap();
         }
+        // build redis key
+        List<Map.Entry<ID, String>> entries = new ArrayList<>(bizIdCosPathMap.entrySet());
+        List<String> keys = new ArrayList<>(entries.size());
 
-        List<String> keys = IntStream.range(0, fullPaths.size())
-                .filter(i -> bizIds.get(i) != null)
-                .mapToObj(i -> getCachedRedisKey(bizIds.get(i), cloudResType, CloudResOperationType.READ))
-                .toList();
-
+        for (Map.Entry<ID, String> entry : entries) {
+            ID bizId = entry.getKey();
+            String redisKey = getCachedRedisKey(bizId, cloudResType, CloudResOperationType.READ);
+            keys.add(redisKey);
+        }
+        // batch try hit cache
         List<String> cached = redisHelper.mget(keys);
-        Map<ID, CloudResPresignedUrlResp> result = new HashMap<>(fullPaths.size());
-        List<Integer> missIdx = new ArrayList<>();
+        Map<ID, CloudResPresignedUrlResp> result = new HashMap<>(bizIdCosPathMap.size());
+        List<Integer> missIndices = new ArrayList<>();
 
-        for (int i = 0; i < cached.size(); i++) {
-            ID bizId = bizIds.get(i);
-            if (cached.get(i) != null) {
+        for (int i = 0; i < entries.size(); i++) {
+            String cachedUrl = cached.get(i);
+            if (cachedUrl != null) {
+                ID bizId = entries.get(i).getKey();
+                long expireSeconds = redisHelper.getExpire(keys.get(i));
                 result.put(bizId, new CloudResPresignedUrlResp(
-                        cached.get(i),
-                        Date.from(Instant.now().plusSeconds(redisHelper.getExpire(keys.get(i)))).toInstant()
+                        cachedUrl,
+                        Instant.now().plusSeconds(expireSeconds)
                 ));
-
             } else {
-                missIdx.add(i);
+                missIndices.add(i);
             }
         }
-
-        if(! missIdx.isEmpty()) {
+        // process miss indices
+        if (!missIndices.isEmpty()) {
             Date expiration = Date.from(Instant.now().plus(dur));
             Map<String, String> toCache = new HashMap<>();
-            for(int idx : missIdx) {
-                ID bizId = bizIds.get(idx);
-                if(fullPaths.get(idx) != null){
+
+            for (int idx : missIndices) {
+                Map.Entry<ID, String> entry = entries.get(idx);
+                ID bizId = entry.getKey();
+                String fullPath = entry.getValue();
+
+                if (fullPath != null) {
                     String url = cosClient.generatePresignedUrl(
-                            bucketName, fullPaths.get(idx), expiration, HttpMethodName.GET
+                            bucketName, fullPath, expiration, HttpMethodName.GET
                     ).toString();
+
                     result.put(bizId, new CloudResPresignedUrlResp(url, expiration.toInstant()));
                     toCache.put(keys.get(idx), url);
-                }else{
+                } else {
                     result.put(bizId, null);
                 }
             }
 
-            redisHelper.mset(toCache, dur);
+            if (!toCache.isEmpty()) {
+                redisHelper.mset(toCache, dur.minusSeconds(safetyMarge));
+            }
         }
+
 
         return result;
     }

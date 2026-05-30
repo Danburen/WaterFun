@@ -118,11 +118,11 @@ public class PostServiceImpl implements PostService {
     public BatchResult assignTags(Long postId, AssignTagsRequest req) {
         int success = 0;
         if(CollectionUtil.isNotEmpty(req.getTagIds())) {
-            Set<Integer> dict = new HashSet<>(req.getTagIds());
-            List<Integer> existsIds = postTagRepository.findTagIdsByPostId(postId);
-            List<Integer> validTagIds = tagRepository.findTagIdsByTagsIdIn(dict);
+            Set<Long> dict = new HashSet<>(req.getTagIds());
+            List<Long> existsIds = postTagRepository.findTagIdsByPostId(postId);
+            List<Long> validTagIds = tagRepository.findTagIdsByTagsIdIn(dict);
 
-            Set<Integer> toSaved = validTagIds.stream()
+            Set<Long> toSaved = validTagIds.stream()
                     .filter(id -> !existsIds.contains(id))
                     .collect(Collectors.toSet());
 

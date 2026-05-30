@@ -3,6 +3,7 @@ package org.waterwood.waterfunservice.service.upload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.waterwood.waterfunservice.api.BizType;
+import org.waterwood.waterfunservice.api.UploadContext;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
 import org.waterwood.waterfunservice.service.user.UserProfileService;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
@@ -29,6 +30,6 @@ public class UserAvatarUploadStrategy implements UploadBizStrategy{
 
     @Override
     public void handleCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
-        userProfileService.uploadAvatarCallback(request, payload);
+        userProfileService.uploadAvatarCallback(request, UploadContext.fromPayload(payload, Long.class));
     }
 }

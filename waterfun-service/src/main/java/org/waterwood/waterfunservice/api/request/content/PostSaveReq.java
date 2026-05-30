@@ -30,7 +30,7 @@ public class PostSaveReq {
     private String coverageImgId;
 
     private Set<String> newTags;
-    private Set<Integer> tagIds;
+    private Set<Long> tagIds;
     @NotNull
-    private Integer categoryId;
+    private Long categoryId;
 }

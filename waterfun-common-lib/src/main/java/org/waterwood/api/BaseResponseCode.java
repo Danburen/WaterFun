@@ -50,6 +50,11 @@ public enum BaseResponseCode implements ResponseCode {
     VERIFY_TARGET_UNSUPPORTED("verify.target.unsupported"),
     TWO_VALUE_MUST_DIFFERENT("verify.two_value_must_diff"),
 
+    AUDIT_TASK_NOT_FOUND("audit.task.not_found"),
+    AUDIT_TASK_NOT_FOUND_ARGS("audit.task.not_found.args"),
+    AUDIT_TASK_RESOURCE_NOT_FOUND("audit.task.resource_not_found"),
+    AUDIT_TASK_RESOURCE_NOT_FOUND_ARGS("audit.task.resource_not_found.args"),
+
 
 
     // Role & Permissions

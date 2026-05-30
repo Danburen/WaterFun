@@ -23,4 +23,6 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     @Query("UPDATE Resource r SET r.status = :status WHERE r.uuid IN :uuids")
     void batchUpdateStatus(@Param("status") ResourceStatus status,
                            @Param("uuids") Collection<String> uuids);
+
+    List<Resource> findByUuidInAndUploaderId(Collection<String> uuids, Long uploaderId);
 }

@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
-import org.waterwood.waterfunservice.api.response.post.PostAuthorCardResp;
-import org.waterwood.waterfunservice.api.response.post.PostAuthorDetailResp;
-import org.waterwood.waterfunservice.api.response.post.PostCardResp;
-import org.waterwood.waterfunservice.api.response.post.PostDetailResp;
+import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservice.infrastructure.mapper.PostMapper;
 import org.waterwood.waterfunservicecore.entity.post.PostStatus;
@@ -27,15 +24,12 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/post")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 @Validated
 public class PostController {
     private final PostService postService;
     private final PostMapper postMapper;
-
-
-
 
     /***
      * Get All the posts by page and optional params;
@@ -92,15 +86,25 @@ public class PostController {
         return ApiResponse.success(postService.draftNew());
     }
 
+    @GetMapping("/{id}/edit")
+    public ApiResponse<PostDraftResp> getEditPostDraft(@PathVariable Long id){
+        return ApiResponse.success(postService.getEditPostDraft(id));
+    }
+
     @PostMapping("/{id}/publish")
-    public ApiResponse<Void> publishPost(@PathVariable Long id){
-        postService.publish(id);
+    public ApiResponse<Void> publishPost(@PathVariable Long id, PostSaveReq req){
+        postService.publish(id, req);
         return ApiResponse.success();
+    }
+
+    @GetMapping("/{id}/content/preview")
+    public ApiResponse<String> previewContent(@PathVariable Long id, String content){
+        return ApiResponse.success(postService.contentPreview(id, content));
     }
 
     @PostMapping("/{id}/temp-save")
     public ApiResponse<Void> tempSavePost(@PathVariable Long id, PostSaveReq req){
-        postService.tempSave(id, req);
+        postService.save(id, req);
         return ApiResponse.success();
     }
 }
