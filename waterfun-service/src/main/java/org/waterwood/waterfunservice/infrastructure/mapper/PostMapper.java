@@ -1,5 +1,6 @@
 package org.waterwood.waterfunservice.infrastructure.mapper;
 
+import org.hibernate.boot.internal.Target;
 import org.mapstruct.*;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
 import org.waterwood.waterfunservice.api.response.post.*;
@@ -41,5 +42,7 @@ public interface PostMapper {
 
     PostAuthorDetailResp toPostAuthorDetailResp(Post post);
 
+    @Mapping(target = "editedTagIds", ignore = true)
+    @Mapping(target = "editedCategoryId", ignore = true)
     PostDraftResp toPostDraftResp(Post p);
 }

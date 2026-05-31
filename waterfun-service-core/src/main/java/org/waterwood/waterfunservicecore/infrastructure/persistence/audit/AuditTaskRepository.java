@@ -2,9 +2,9 @@ package org.waterwood.waterfunservicecore.infrastructure.persistence.audit;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 
 import java.util.Collection;
 import java.util.List;

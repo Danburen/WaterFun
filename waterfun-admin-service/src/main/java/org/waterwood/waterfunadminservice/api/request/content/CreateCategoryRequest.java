@@ -26,7 +26,7 @@ public class CreateCategoryRequest implements Serializable {
     @Size(max = 500)
     private String description;
 
-    private Integer parentId;
+    private Long parentId;
 
     private Integer sortOrder;
 

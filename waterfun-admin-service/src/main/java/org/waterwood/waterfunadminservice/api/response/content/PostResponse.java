@@ -27,8 +27,8 @@ public class PostResponse implements Serializable {
     private String coverImg;
     private PostStatus status;
     private PostVisibility visibility;
-    private Integer categoryId;
-    private List<Integer> tagIds;
+    private Long categoryId;
+    private List<Long> tagIds;
     private Long viewCount;
     private Long likeCount;
     private Long commentCount;

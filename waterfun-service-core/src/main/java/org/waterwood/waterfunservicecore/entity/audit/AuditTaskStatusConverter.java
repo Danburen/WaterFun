@@ -1,8 +1,7 @@
-package org.waterwood.waterfunservicecore.entity.audit.task;
+package org.waterwood.waterfunservicecore.entity.audit;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 
 @Converter(autoApply = true)
 public class AuditTaskStatusConverter implements AttributeConverter<AuditStatus, Short> {

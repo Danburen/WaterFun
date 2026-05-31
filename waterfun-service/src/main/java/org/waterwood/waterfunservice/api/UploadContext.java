@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 public class UploadContext<T extends Serializable>{
-    private String uploadId;
+    private String resourceUuid;
     private T bizId;
     @Builder.Default
     private String cosKey = null;
@@ -19,16 +19,17 @@ public class UploadContext<T extends Serializable>{
 
     public BizUploadPayload toPayload() {
         BizUploadPayload payload = new BizUploadPayload();
-        payload.setUploadId(this.getUploadId());
+        payload.setResourceUuid(this.getResourceUuid());
         payload.setCosKey(this.getCosKey());
         payload.setBizId(String.valueOf(this.getBizId()));
+        payload.setBizType(this.getBizType().name());
         return payload;
     }
 
     @SuppressWarnings("unchecked")
     public static <T extends Serializable> UploadContext<T> fromPayload(BizUploadPayload payload,  Class<T> targetType) {
         UploadContext<T> context = new UploadContext<T>();
-        context.setUploadId(payload.getUploadId());
+        context.setResourceUuid(payload.getResourceUuid());
         context.setCosKey(payload.getCosKey());
         if (StringUtil.isBlank(payload.getBizId())) {
             context.setBizId(null);

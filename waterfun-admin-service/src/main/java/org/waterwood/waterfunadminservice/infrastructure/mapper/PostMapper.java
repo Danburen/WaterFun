@@ -40,7 +40,7 @@ public interface PostMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Post partialUpdate(PatchUserPostReq patchUserPostReq, @MappingTarget Post post);
 
-    default List<Integer> tagsToTagIds(Collection<Tag> tags) {
+    default List<Long> tagsToTagIds(Collection<Tag> tags) {
         return tags.stream().map(Tag::getId).toList();
     }
 

@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.entity;
+package org.waterwood.waterfunservicecore.entity.post;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 
 import java.time.Instant;
@@ -26,9 +25,8 @@ public class PostResource {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @MapsId("resourceUuid")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "resource_uuid", nullable = false, referencedColumnName = "uuid")
+    @JoinColumn(name = "resource_uuid", nullable = false, referencedColumnName = "uuid", insertable = false, updatable = false)
     private Resource resourceUuid;
 
     @NotNull
@@ -36,4 +34,9 @@ public class PostResource {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
+    public void initId() {
+        if (this.post != null && this.resourceUuid != null) {
+            this.id = new PostResourceId(this.post.getId(), this.resourceUuid.getUuid());
+        }
+    }
 }

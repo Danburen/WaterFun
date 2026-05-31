@@ -2,9 +2,8 @@ import request from "../utils/axiosRequest";
 import type { 
     PromiseResBody,
     CloudResourceUrlResp,
-    UploadPolicyResponse,
-    UploadCallbackRequest
  } from "@waterfun/web-core/src/types/api/response.d.ts";
+import { getUploadPolicy, uploadCallback, uploadFileToCos as genericUploadFileToCos, type PresignedResp } from "./uploadApi";
 
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -63,22 +62,20 @@ export const updateUserProfile = (data: Partial<UserProfileDto>): PromiseResBody
     return request.put(`/user/updateProfile`, data)
 }
 
-export const getAvatarUploadPolicy = (suffix: string): PromiseResBody<UploadPolicyResponse> => {
-    return request.get(`/user/avatar/upload?suffix=${encodeURIComponent(suffix)}`)
+export const getAvatarUploadPolicy = (suffix: string): PromiseResBody<PresignedResp[]> => {
+    // 自动将后缀处理成大写并不带点，以符合通用的 exts 格式要求
+    const ext = suffix.startsWith('.') ? suffix.slice(1) : suffix;
+    return getUploadPolicy({
+        bizType: 'AVATAR',
+        exts: [ext.toUpperCase()]
+    });
 }
 
-export const uploadFileToCos = (url: string, method: HttpMethod | string, file: File): Promise<Response> => {
-    const uppercaseMethod = method.toUpperCase();
-    const fetchOptions: RequestInit = {
-        method: uppercaseMethod,
-        body: file,
-        headers: {}
-    };
-    return fetch(url, fetchOptions)
-}
+// 导出通用的上传API，防止如果原来的业务组件里正在用它产生冲突
+export const uploadFileToCos = genericUploadFileToCos;
 
-export const callbackAvatarUpload = (data: UploadCallbackRequest): PromiseResBody<null> => {
-    return request.post(`/user/avatar/upload/callback`, data)
+export const callbackAvatarUpload = (data: { key: string; token: string }): PromiseResBody<null> => {
+    return uploadCallback(data);
 }
 
 export const getAvatar = (): PromiseResBody<CloudResourceUrlResp> => {

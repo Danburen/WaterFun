@@ -45,8 +45,6 @@ public interface AuthTokenService {
 
     String buildAccessUserDeviceKey(long userUid, String deviceId);
 
-    String generateFamilyId();
-
     Set<String> getFamilyIds(long userUid);
 
     /**

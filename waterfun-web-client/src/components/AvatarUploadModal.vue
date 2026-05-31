@@ -118,20 +118,21 @@ const handleSave = async () => {
     const suffix = selectedFile.value.name.split('.').pop()?.toLowerCase() || '';
     const policyResponse = (await getAvatarUploadPolicy(suffix));
     
-    if (!policyResponse.data) {
+    if (!policyResponse.data || policyResponse.data.length === 0) {
       throw new Error(policyResponse.message || '获取上传策略失败');
     }
     
-    const { key, url: cosUrl, method } = policyResponse.data;
+    const { key, url: cosUrl, method, token } = policyResponse.data[0];
+    console.log('获取上传策略成功:', { key, cosUrl, method, token });
     const response = await uploadFileToCos(cosUrl, method, selectedFile.value);
-    
+    console.log('上传到COS成功:', response);
     if (!response.ok) {
       throw new Error('上传到COS失败');
     }
 
     await callbackAvatarUpload({
       key,
-      token: policyResponse.data.token,
+      token: token || '',
     });
 
     emit('submitted');

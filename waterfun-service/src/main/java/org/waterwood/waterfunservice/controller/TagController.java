@@ -34,7 +34,7 @@ public class TagController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<TagResponse> getTag(@PathVariable Integer id){
+    public ApiResponse<TagResponse> getTag(@PathVariable Long id){
         Tag tag = tagService.getTag(id);
         return ApiResponse.success(tagMapper.toResponseDto(tag));
     }
@@ -46,7 +46,7 @@ public class TagController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> deleteTag(@PathVariable Integer id){
+    public ApiResponse<Void> deleteTag(@PathVariable Long id){
         tagService.deleteTag(id);
         return ApiResponse.success();
     }

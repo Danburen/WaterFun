@@ -17,6 +17,8 @@ public enum BaseResponseCode implements ResponseCode {
     HTTP_CONFLICT("http.conflict"),
     INTERNAL_SERVER_ERROR("http.internal_server_error"),
 
+    INTERNAL_VALIDATION_LEAK("system.internal_validation_leak"),
+
     NOT_FOUND("general.not_found"),
     FORBIDDEN("general.forbidden"),
     CONFLICT("general.conflict"),
@@ -33,12 +35,10 @@ public enum BaseResponseCode implements ResponseCode {
     EMAIL_ADDRESS_EMPTY_OR_INVALID("valid.email_address.invalid"),
 
     // Verification
-    USERNAME_OR_PASSWORD_INCORRECT("user.verify.credentials_incorrect"),
     USERNAME_ALREADY_REGISTERED("general.verification.already_exists"),
     EMAIL_ALREADY_USED("general.verification.already_exists"),
     PHONE_NUMBER_ALREADY_USED("general.verification.already_exists"),
     VERIFY_CODE_INVALID("verify.code.invalid"),
-    CAPTCHA_INVALID("verify.captcha.incorrect"),
 
     USER_ALREADY_EXISTS("user.verify.already_exists"),
     USER_NOT_FOUND("user.not_found"),
@@ -47,15 +47,12 @@ public enum BaseResponseCode implements ResponseCode {
 
     EMAIL_INVALID("email.verify.invalid"),
     EMAIL_NOT_FOUND("email.not.found"),
-    VERIFY_TARGET_UNSUPPORTED("verify.target.unsupported"),
     TWO_VALUE_MUST_DIFFERENT("verify.two_value_must_diff"),
 
     AUDIT_TASK_NOT_FOUND("audit.task.not_found"),
     AUDIT_TASK_NOT_FOUND_ARGS("audit.task.not_found.args"),
     AUDIT_TASK_RESOURCE_NOT_FOUND("audit.task.resource_not_found"),
     AUDIT_TASK_RESOURCE_NOT_FOUND_ARGS("audit.task.resource_not_found.args"),
-
-
 
     // Role & Permissions
     ROLE_NOT_FOUND("role.not_found"),
@@ -111,7 +108,8 @@ public enum BaseResponseCode implements ResponseCode {
     RATE_LIMIT_EXCEEDED("system.rate_limit_exceeded"),
     INVALID_TOKEN_OR_EXPIRED("system.invalid_token_or_expired"),
     INVALID_KEY("system.invalid_key"),
-    FILE_TYPE_NOT_ALLOW("system.file_type_not_allow"),
+    FILE_TYPE_NOT_ALLOW("system.file_type_not_allowed"),
+    FILE_TYPE_NOT_ALLOW_ARGS("system.file_type_not_allowed_args"),
     COS_UPLOAD_CLIENT_NOT_CONFIGURED("system.cos_upload_client_not_configured"),
     CLOUD_FILE_NOT_FOUND("system.cloud_file_not_found"),
 

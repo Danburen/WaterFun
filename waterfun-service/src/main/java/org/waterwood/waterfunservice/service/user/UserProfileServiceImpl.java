@@ -9,30 +9,27 @@ import org.springframework.util.Assert;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.ResourceType;
-import org.waterwood.common.io.SimpleCloudObject;
+import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.BizType;
 import org.waterwood.waterfunservice.api.UploadContext;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
-import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
-import org.waterwood.waterfunservicecore.entity.resource.SourceType;
-import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.exception.io.IllegalUploadCountException;
 import org.waterwood.waterfunservicecore.exception.io.UnsupportedFileExtension;
+import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
-import org.waterwood.waterfunservicecore.infrastructure.RedisHelper;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
-import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
-import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileType;
 import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
 import org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator;
 
@@ -45,63 +42,9 @@ import java.util.UUID;
 public class UserProfileServiceImpl implements UserProfileService {
     private final AuditTaskRepository auditTaskRepository;
     private final CloudFileService cloudFileService;
-    private final RedisHelper redisHelper;
     private final UserRepository userRepository;
     private final AuditTaskResourceRepository auditTaskResourceRepository;
     private final ResourceRepository resourceRepository;
-
-    @Transactional
-    @Override
-    public void uploadAvatarCallback(CloudPutCallbackReq req, UploadContext<Long> ctx) {
-        Assert.isTrue(ctx.getBizType() == BizType.AVATAR,
-                "Invalid payload for avatar upload callback: " + ctx.getBizType());
-        SimpleCloudObject obj = cloudFileService.detectAndAssertCloudFile(ctx.getCosKey(), CloudFileType.IMAGE);
-        AuditTask task = auditTaskRepository
-                .findByTargetIdAndTargetTypeAndStatus(String.valueOf(ctx.getUploadId()), TargetType.USER_AVATAR,AuditStatus.PENDING)
-                .orElseGet(() -> {
-                    AuditTask newTask = new AuditTask();
-                    newTask.setTargetId(String.valueOf(ctx.getUploadId()));
-                    newTask.setSubmitAt(Instant.now());
-                    newTask.setTargetType(TargetType.USER_AVATAR);
-                    newTask.setSubmitter(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
-                    return newTask;
-                });
-
-        auditTaskRepository.save(task);
-
-        AuditResource auditRes = auditTaskResourceRepository
-                .findByTaskId(task.getId())
-                .orElseGet(() -> {
-                    AuditResource ar = new AuditResource();
-                    ar.setTask(task);
-                    return auditTaskResourceRepository.save(ar);
-                });
-        Resource res = auditRes.getResource();
-        if(res == null) throw new NotFoundException("Audit resource not found: " + auditRes.getId());
-        // clean old pending cloud resource if exists, to ensure no floating resource
-        auditTaskResourceRepository.save(auditRes);
-        if ( res.getResourceKey() != null) {
-            final String oldKey = res.getResourceKey();
-            TransactionSynchronizationManager.registerSynchronization(
-                    new TransactionSynchronization() {
-                        @Override
-                        public void afterCommit() {
-                            cloudFileService.removeFile(CloudFSRoot.USER, oldKey);
-                        }
-                    }
-            );
-        }
-
-        res.setResourceKey(obj.getKey());
-        res.setResourceType(ResourceType.IMAGE);
-        res.setMimeType(obj.getFileMeta().getMimeType());
-        res.setSizeBytes(obj.getFileMeta().getSize());
-        res.setUploaderId(UserCtxHolder.getUserUid());
-        res.setSourceType(SourceType.USER_UPLOADED);
-        res.setStatus(ResourceStatus.ACTIVE);
-        resourceRepository.save(res);
-    }
-
     @Transactional
     @Override
     public List<PresignedResp> handleUserAvatarUpload(UploadPolicyReq request) {
@@ -110,7 +53,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new IllegalUploadCountException(1);
         }
         FileExtension ext = FileExtension.fromExt(request.getExts().getFirst());
-        if(TargetType.USER_AVATAR.isAllowed(ext)){
+        if(! TargetType.USER_AVATAR.isAllowed(ext)){
             throw new UnsupportedFileExtension(ext.getExt(), request.getExts().getFirst());
         }
 
@@ -118,17 +61,15 @@ public class UserProfileServiceImpl implements UserProfileService {
         BizUploadPayload payload = UploadContext.<Long>builder()
                 .bizId(userUid)
                 .bizType(request.getBizType())
-                .uploadId(resourceUUID.toString().replace("-", ""))
+                .resourceUuid(resourceUUID.toString().replace("-", ""))
                 .build()
                 .toPayload();
         String cosPath = CosKeyPathGenerator.ofUser(userUid, resourceUUID, ext);
-
-        Resource res = new Resource();
-        res.setUuid(resourceUUID.toString());
-        res.setResourceKey(cosPath);
-        res.setResourceType(ResourceType.IMAGE);
-        res.setUploaderId(UserCtxHolder.getUserUid());
-        resourceRepository.save(res);
+        resourceRepository.save(cloudFileService.CreateAndSetUpUploadRes(
+                StringUtil.noDashUUIDString(resourceUUID),
+                cosPath,
+                UserCtxHolder.getUserUid()
+        ));
 
         return List.of(cloudFileService.buildPutPolicyWithPayload(
                 CloudFSRoot.USER,
@@ -136,4 +77,63 @@ public class UserProfileServiceImpl implements UserProfileService {
                 payload)
         );
     }
+
+    @Transactional
+    @Override
+    public void uploadAvatarCallback(CloudPutCallbackReq req, UploadContext<Long> ctx) {
+        Assert.isTrue(ctx.getBizType() == BizType.AVATAR,
+                "Invalid payload for avatar upload callback: " + ctx.getBizType());
+        String resourceUuid = ctx.getResourceUuid();
+        AuditTask task = auditTaskRepository
+                .findByTargetIdAndTargetTypeAndStatus(String.valueOf(resourceUuid), TargetType.USER_AVATAR,AuditStatus.PENDING)
+                .orElseGet(() -> {
+                    AuditTask newTask = new AuditTask();
+                    newTask.setTargetId(UserCtxHolder.getUserUid().toString());
+                    newTask.setSubmitAt(Instant.now());
+                    newTask.setTargetType(TargetType.USER_AVATAR);
+                    newTask.setSubmitter(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
+                    return newTask;
+                });
+
+        auditTaskRepository.save(task);
+        Resource res;
+        AuditResource auditRes = auditTaskResourceRepository
+                .findByTaskId(task.getId())
+                .orElseGet(() -> {
+                    AuditResource ar = new AuditResource();
+                    ar.setTask(task);
+                    return ar;
+                });
+        res = auditRes.getResource();
+        if(res != null){ // old resource
+            // clean old pending cloud resource if exists, to ensure no floating resource
+            if (res.getResourceKey() != null) {
+                final String oldKey = res.getResourceKey();
+                TransactionSynchronizationManager.registerSynchronization(
+                        new TransactionSynchronization() {
+                            @Override
+                            public void afterCommit() {
+                                cloudFileService.removeFile(CloudFSRoot.USER, oldKey);
+                            }
+                        }
+                );
+            }
+            res.setStatus(ResourceStatus.DELETED);
+        }
+
+        res = resourceRepository.findByUuidAndStatus(resourceUuid, ResourceStatus.UPLOAD_PENDING)
+                .orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid));
+        auditRes.setResource(res);
+
+        cloudFileService.setAndValidResourceForCallback(
+                res,
+                CloudFSRoot.USER,
+                ResourceStatus.ACTIVE,
+                ResourceType.IMAGE
+        );
+
+        resourceRepository.save(res);
+        auditTaskResourceRepository.save(auditRes);
+    }
+
 }

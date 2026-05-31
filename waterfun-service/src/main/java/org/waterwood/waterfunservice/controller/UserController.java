@@ -64,7 +64,7 @@ public class UserController {
 
 //    @RateLimit(key = "avatarUpload", permits = 5)
 //    @GetMapping("/avatar/upload")
-//    public ApiResponse<PresignedResp> updateAvatar(@RequestParam @Valid @NotEmpty String suffix){
+//    public ApiResponse<PresignedResp> updateAvatarResourceUuid(@RequestParam @Valid @NotEmpty String suffix){
 //        return ApiResponse.success(
 //                userProfileService.getUploadPolicyAndSubmitAvatar(UserCtxHolder.getUserUid(), suffix)
 //        );

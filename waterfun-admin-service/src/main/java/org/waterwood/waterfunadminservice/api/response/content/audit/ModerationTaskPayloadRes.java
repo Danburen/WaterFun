@@ -22,7 +22,8 @@ public class ModerationTaskPayloadRes {
 
     public enum PayloadType {
         SINGLE_RESOURCE,
-        RICH_TEXT
+        RICH_TEXT,
+        PLAIN_TEXT,
     }
 }
 

@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.waterwood.waterfunadminservice.api.response.ModerateTaskResponse;
 import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
-import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = "spring",
@@ -13,7 +13,7 @@ import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
 public interface AuditTaskMapper {
 
     @Mapping(source = "submitter.uid", target = "submitterId")
-    @Mapping(target = "content", ignore = true)
+    @Mapping(target = "payload", ignore = true)
     ModerateTaskResponse toModerateTaskResponse(AuditTask auditTask);
 
     @Mapping(source = "submitter.uid", target = "submitterId")

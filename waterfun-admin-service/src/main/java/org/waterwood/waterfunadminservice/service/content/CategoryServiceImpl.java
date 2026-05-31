@@ -46,19 +46,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category getById(Integer id) {
+    public Category getById(Long id) {
         return categoryRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Category ID: " + id)
         );
     }
 
     @Override
-    public void removeById(Integer id) {
+    public void removeById(Long id) {
         categoryRepository.deleteById(id);
     }
 
     @Override
-    public void update(Integer id, UpdateCategoryRequest req) {
+    public void update(Long id, UpdateCategoryRequest req) {
         Category category = getById(id);
         categoryMapper.partialUpdate(req, category);
         if(req.getParentId() != null) {

@@ -69,20 +69,27 @@ export interface CloudResPresignedUrlResp {
   expireAt?: InstantLike | string | null;
 }
 
+export interface FileMeta {
+  eTag?: string;
+}
+
+export interface FileProbeResult {
+  size?: number | string;
+  mimeType?: string;
+  meta?: FileMeta;
+}
+
 export interface ModerationResourceResp {
   id?: string;
   taskId?: string;
   placeholder?: string;
-  resourceKey?: string;
-  resourceType?: AuditResourceType;
-  mimeType?: string;
-  sizeBytes?: number | string;
   sortNo?: number;
   status?: AuditStatus;
   auditAt?: InstantLike | string | null;
   auditorId?: string;
   rejectType?: ModerateRejectType;
   rejectReason?: string;
+  fileProbeResult?: FileProbeResult | null;
   presignedUrl?: CloudResPresignedUrlResp | null;
 }
 

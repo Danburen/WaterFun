@@ -9,12 +9,13 @@ import org.waterwood.common.CloudFSRoot;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
-import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelper;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserCoreMapper;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserProfileCoreMapper;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
@@ -35,6 +36,7 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     private final UserCoreService userCoreService;
     private final RedisHelper redisHelper;
     private final UserProfileRepo userProfileRepo;
+    private final ResourceRepository resourceRepository;
 
     @Override
     public void addUserProfile(UserProfile up) {
@@ -69,12 +71,14 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
         if(u.getAvatarResourceUuid() == null){
             return null;
         }
-        return cloudFileService.getReadUrlCached(
-                CloudFSRoot.UPLOADS,
-                u.getAvatarResourceUuid().getUuid(),
-                String.valueOf(userUid),
-                TargetType.USER_AVATAR
-        );
+        return resourceRepository.getByUuid(u.getAvatarResourceUuid().getUuid()).map(
+                res -> cloudFileService.getReadUrlCached(
+                        CloudFSRoot.USER,
+                        res.getResourceKey(),
+                        String.valueOf(userUid),
+                        TargetType.USER_AVATAR)
+        ).orElse(null);
+
     }
 
     @Override

@@ -52,8 +52,8 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public String generateAndStoreDeviceId(Long userUid, String dfp) {
-        String deviceId = this.calculaateDid(userUid,dfp);
-        redisHelper.sAdd(getDevicesKey(userUid),deviceId, String.valueOf(System.currentTimeMillis()));
+        String deviceId = this.calculaateDid(userUid, dfp);
+        redisHelper.sAdd(getDevicesKey(userUid), deviceId, String.valueOf(System.currentTimeMillis()));
         return deviceId;
     }
 
@@ -64,7 +64,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public String calculaateDid(long userUid, String dfp){
-        return HashUtil.hashWithSalt(dfp+userUid, deviceHashSalt);
+        return HashUtil.hashWithSalt(dfp + userUid, deviceHashSalt);
     }
 
     @Async
@@ -95,7 +95,11 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void updateUserDeviceActive(long userUid, String did){
-        redisHelper.set(getDeviceLastActiveKey(userUid,did), String.valueOf(System.currentTimeMillis()), Duration.ofDays(30));
+        redisHelper.set(
+                getDeviceLastActiveKey(userUid,did),
+                String.valueOf(System.currentTimeMillis()),
+                Duration.ofDays(30)
+        );
     }
 
     @Override

@@ -162,7 +162,7 @@ watch(resourceId, fetchDetail);
             <img
               v-if="previewUrl"
               :src="previewUrl"
-              :alt="detail.resourceKey || String(detail.id || '')"
+              :alt="detail.placeholder || String(detail.id || '')"
               class="full-image"
             >
             <el-empty
@@ -201,13 +201,10 @@ watch(resourceId, fetchDetail);
               </el-tag>
             </el-descriptions-item>
             <el-descriptions-item :label="t('moderation.field.mimeType')">
-              {{ detail.mimeType || t('common.none.title') }}
+              {{ detail.fileProbeResult?.mimeType || t('common.none.title') }}
             </el-descriptions-item>
             <el-descriptions-item :label="t('moderation.field.fileSize')">
-              {{ formatFileSize(detail.sizeBytes) }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="t('moderation.field.resourceKey')">
-              <span class="break-all">{{ detail.resourceKey || t('common.none.title') }}</span>
+              {{ formatFileSize(detail.fileProbeResult?.size) }}
             </el-descriptions-item>
             <el-descriptions-item :label="t('moderation.field.auditorId')">
               {{ detail.auditorId || t('common.none.title') }}

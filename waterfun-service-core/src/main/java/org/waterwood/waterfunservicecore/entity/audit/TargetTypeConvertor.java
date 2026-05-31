@@ -2,7 +2,6 @@ package org.waterwood.waterfunservicecore.entity.audit;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
 
 @Converter(autoApply = true)
 public class TargetTypeConvertor implements AttributeConverter<TargetType, Short> {

@@ -36,13 +36,13 @@ public interface CategoryService {
      * @return category entity
      * @throws NotFoundException if category not found
      */
-    Category getById(Integer id);
+    Category getById(Long id);
 
     /**
      * Remove a category.
      * @param id target id
      */
-    void removeById(Integer id);
+    void removeById(Long id);
 
     /**
      * Update a category by id
@@ -50,7 +50,7 @@ public interface CategoryService {
      * @param req request body
      * @throws NotFoundException if category not found
      */
-    void update(Integer id, UpdateCategoryRequest req);
+    void update(Long id, UpdateCategoryRequest req);
 
     /**
      * Batch delete categories by ids

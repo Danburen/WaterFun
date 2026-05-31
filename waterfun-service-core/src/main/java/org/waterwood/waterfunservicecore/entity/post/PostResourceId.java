@@ -1,20 +1,23 @@
-package org.waterwood.waterfunservicecore.entity;
+package org.waterwood.waterfunservicecore.entity.post;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.Hibernate;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Embeddable
 public class PostResourceId implements Serializable {
+    @Serial
     private static final long serialVersionUID = -5824495977730836706L;
     @NotNull
     @Column(name = "post_id", nullable = false)
@@ -38,5 +41,4 @@ public class PostResourceId implements Serializable {
     public int hashCode() {
         return Objects.hash(postId, resourceUuid);
     }
-
 }

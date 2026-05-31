@@ -25,4 +25,10 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
                            @Param("uuids") Collection<String> uuids);
 
     List<Resource> findByUuidInAndUploaderId(Collection<String> uuids, Long uploaderId);
+
+    List<Resource> findByUuidInAndStatus(Collection<String> uuids, ResourceStatus status);
+
+    Resource getReferenceByUuid(@Size(max = 36) @NotNull String uuid);
+
+    Optional<Resource> getByUuid(String uuid);
 }

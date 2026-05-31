@@ -75,6 +75,10 @@ public final class StringUtil {
         return resourceUUID.toString().replace("-", "");
     }
 
+    public static String noDashRandomUUIDString() {
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+
     /**
      * Extra resource placeholders in format of res://{uuid} from content, and return the uuid set
      * @param content raw content

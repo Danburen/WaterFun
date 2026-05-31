@@ -2,8 +2,8 @@ package org.waterwood.waterfunservicecore.infrastructure.persistence.utils;
 
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
-import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 
 import java.time.Instant;
 import java.util.ArrayList;

@@ -1,6 +1,7 @@
 package org.waterwood.waterfunservice.infrastructure;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotBlank;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.waterwood.api.ErrorResponse;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.waterfunservicecore.exception.AuthException;
+import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.exception.BizException;
 
 import java.util.*;
@@ -86,14 +89,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex){
         List<String> errors = new ArrayList<>();
+        List<String> internalErrors = new ArrayList<>();
         for(ConstraintViolation<?> violation : ex.getConstraintViolations()){
-            String msg = msgSrc.getMessage(
-                    violation.getMessageTemplate(),
-                    violation.getExecutableParameters(),
-                    violation.getMessage(),
-                    LOCALE
-            );
-            errors.add(violation.getPropertyPath() + ": " + msg);
+            Class<?> rootBeanClass = violation.getRootBeanClass();
+            String beanName = rootBeanClass.getName();
+
+            boolean isEntity = isEntityClass(rootBeanClass);
+            if(isEntity){
+                internalErrors.add(beanName + "." + violation.getPropertyPath() + ": " + violation.getMessage());
+            }else{
+                String msg = msgSrc.getMessage(
+                        violation.getMessageTemplate(),
+                        violation.getExecutableParameters(),
+                        violation.getMessage(),
+                        LOCALE
+                );
+                errors.add(violation.getPropertyPath() + ": " + msg);
+            }
         }
 
         ErrorResponse response = new ErrorResponse(
@@ -105,9 +117,48 @@ public class GlobalExceptionHandler {
                 errors,
                 new Date()
         );
-        log.info(String.valueOf(errors));
+        if (!internalErrors.isEmpty()) {
+            log.error("[VALIDATION_LEAK] Entity validation exposed to frontend!\n" +
+                            "  Request URI: {}\n" +
+                            "  Internal errors: {}\n" +
+                            "  Stack trace:",
+                    getCurrentRequestUri(),
+                    internalErrors,
+                    ex
+            );
+        }
+
+        if(errors.isEmpty() && !internalErrors.isEmpty()){ // entity violent error
+            log.warn("Validation failed for entity {}, but no user-facing error message found. Internal errors: {}",
+                    internalErrors.stream().map(s -> s.split("\\.")[0]).distinct(), internalErrors);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse(BaseResponseCode.INTERNAL_VALIDATION_LEAK.getCode(),
+                            msgSrc.getMessage(BaseResponseCode.INTERNAL_VALIDATION_LEAK.getCode(),
+                                    null,
+                                    "Error occurred when validate parameters, please try again",
+                                    LOCALE),
+                            null,
+                            new Date()
+                    ));
+        }
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    private boolean isEntityClass(Class<?> clazz) {
+        return clazz.isAnnotationPresent(jakarta.persistence.Entity.class)
+                || clazz.isAnnotationPresent(jakarta.persistence.MappedSuperclass.class);
+    }
+
+    private String getCurrentRequestUri() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs != null) {
+            HttpServletRequest request = attrs.getRequest();
+            return request.getRequestURI();
+        }
+        return "N/A";
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageNotReadableException ex){
         Throwable cause = ex.getCause();

@@ -17,6 +17,7 @@ import org.waterwood.waterfunservicecore.entity.user.UserPermission;
 import org.waterwood.waterfunservicecore.entity.user.UserRole;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RolePermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPermRepo;
@@ -46,6 +47,7 @@ public class UserCoreServiceImpl implements UserCoreService {
     private final RolePermRepo rolePermRepo;
     private final PermissionRepo permissionRepo;
     private final UserRoleCoreService userRoleCoreService;
+    private final ResourceRepository resourceRepository;
 
     @Override
     public User getUserByUsername(String username) {
@@ -147,8 +149,11 @@ public class UserCoreServiceImpl implements UserCoreService {
     }
 
     @Override
-    public int updateAvatar(Long userUid, String avatar) {
-        return userRepository.updateAvatar(userUid, avatar);
+    public int updateAvatarResourceUuid(Long userUid, String uuid) {
+        return userRepository.updateAvatarResourceUuidByUid(
+                uuid == null ? null : resourceRepository.getReferenceByUuid(uuid),
+                userUid
+        );
     }
 
     @Override

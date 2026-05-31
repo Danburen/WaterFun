@@ -5,8 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.waterwood.api.BaseResponseCode;
-import org.waterwood.waterfunservicecore.exception.AuthException;
+import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.entity.user.User;
@@ -34,8 +33,8 @@ public class AuthServiceImpl implements AuthService {
                 }).toList();
 //        return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp()).getData();
         if(roles.contains("ADMIN")) {
-            return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp()).getData();
+            return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp());
         }
-        throw new AuthException(BaseResponseCode.FORBIDDEN);
+        throw new AuthException();
     }
 }

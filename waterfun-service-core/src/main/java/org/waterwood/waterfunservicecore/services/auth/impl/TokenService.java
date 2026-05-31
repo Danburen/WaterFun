@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
+import org.waterwood.api.AuthCode;
 import org.waterwood.api.BaseResponseCode;
+import org.waterwood.common.exceptions.AuthException;
+import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.common.TokenResult;
@@ -43,7 +46,7 @@ public class TokenService implements AuthTokenService {
 
     @Override
     public TokenResult genCacheNewAccTokenRevokeOlds(Long userUid, String deviceId) {
-        String jti = UUID.randomUUID().toString();
+        String jti = StringUtil.noDashRandomUUIDString();
         Map<String, String> claims = new HashMap<>();
         claims.put(Claims.SUBJECT,String.valueOf(userUid));
         claims.put(Claims.ID,jti);
@@ -61,13 +64,33 @@ public class TokenService implements AuthTokenService {
     public TokenResult genAndCacheRefToken(long userUid, String deviceId) {
         String family = redisHelper.getValue(buildRtFamilyCacheKey(userUid,deviceId));
         if(family == null) { // no family ,we create a new one
-            family = generateFamilyId();
-            redisHelper.set(buildRtFamilyCacheKey(userUid, deviceId), family, Duration.ofSeconds(refFamilyExpire));
-            redisHelper.sAdd(buildRtFamiliesCacheKey(userUid), family, String.valueOf(System.currentTimeMillis()));
+            family = StringUtil.noDashRandomUUIDString();
+            redisHelper.sAdd( // a user only have one rt-families
+                    buildRtFamiliesCacheKey(userUid),
+                    family,
+                    String.valueOf(System.currentTimeMillis())
+            );
+            redisHelper.set( // a user could have more than one rt-family in a rt-families
+                    buildRtFamilyCacheKey(userUid, deviceId),
+                    family,
+                    Duration.ofSeconds(refFamilyExpire)
+            );
+        } else {
+            String oldRefRedisKey = buildRefCacheKey(userUid, deviceId, family);
+            String oldRefCache = redisHelper.getValue(oldRefRedisKey);
+            if(oldRefCache == null) { // new device login in or a refresh token is expired
+                throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
+            } else { // revoke the old refresh token
+                redisHelper.del(oldRefRedisKey);
+            }
         }
-        String RT = UUID.randomUUID().toString();
-        redisHelper.set(buildRefCacheKey(userUid, deviceId, family) , RT, Duration.ofSeconds(refRotateExpire));
-        return new TokenResult(RT,refRotateExpire);
+        String RT = StringUtil.noDashUUIDString(UUID.randomUUID());
+        redisHelper.set( // rotate via creating new refresh token
+                buildRefCacheKey(userUid, deviceId, family),
+                RT,
+                Duration.ofSeconds(refRotateExpire)
+        );
+        return new TokenResult(RT, refRotateExpire);
     }
 
     /**
@@ -135,11 +158,6 @@ public class TokenService implements AuthTokenService {
     @Override
     public String buildAccessUserDeviceKey(long userUid, String deviceId){
         return UserKeyBuilder.userAccessDevice(userUid, deviceId);
-    }
-
-    @Override
-    public String generateFamilyId() {
-        return UUID.randomUUID().toString().replace("-", "");
     }
 
     @Override

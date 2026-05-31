@@ -4,20 +4,30 @@ import lombok.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class BizUploadPayload {
-    private String uploadId;
+    private String resourceUuid;
     private String bizType;
     private String bizId;
     private String cosKey;
 
+    public static BizUploadPayload of(Long bizId, String name, UUID uuid) {
+        return new BizUploadPayload(
+                uuid.toString().replace("-", ""),
+                name,
+                String.valueOf(bizId),
+                null
+        );
+    }
+
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<>();
-        if(uploadId != null) {
-            map.put("uploadId", uploadId);
+        if(resourceUuid != null) {
+            map.put("resourceUuid", resourceUuid);
         }
         if (bizType != null) {
             map.put("bizType", bizType);
@@ -36,10 +46,10 @@ public class BizUploadPayload {
             return null;
         }
         BizUploadPayload payload = new BizUploadPayload();
-        payload.setBizType(map.get("biz"));
+        payload.setBizType(map.get("bizType"));
         payload.setBizId(map.get("bizId"));
         payload.setCosKey(map.get("cosKey"));
-        payload.setUploadId(map.get("uploadId"));
+        payload.setResourceUuid(map.get("resourceUuid"));
         return payload;
     }
 }

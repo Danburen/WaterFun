@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.entity.audit.task;
+package org.waterwood.waterfunservicecore.entity.audit;
 
 import lombok.Getter;
 import org.waterwood.common.io.FileExtension;

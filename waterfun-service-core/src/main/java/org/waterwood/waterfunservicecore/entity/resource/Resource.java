@@ -1,17 +1,17 @@
 package org.waterwood.waterfunservicecore.entity.resource;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.waterwood.common.io.ResourceType;
 
 import java.time.Instant;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -20,6 +20,7 @@ import java.time.Instant;
 public class Resource {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Size(max = 255)
@@ -42,7 +43,7 @@ public class Resource {
     private SourceType sourceType = SourceType.SYSTEM;
 
     @Column(name = "uploader_id")
-    private Long uploaderId;
+    private Long uploaderId = 0L;
 
     @Column(name = "expired_at")
     private Instant expiredAt;
@@ -50,12 +51,12 @@ public class Resource {
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+    private Instant updatedAt = Instant.now();
 
     @Size(max = 36)
     @NotNull
@@ -65,5 +66,9 @@ public class Resource {
     @ColumnDefault("'0'")
     @Column(name = "status", columnDefinition = "tinyint UNSIGNED not null")
     private ResourceStatus status = ResourceStatus.UPLOAD_PENDING;
+
+    @Column(name = "file_meta", columnDefinition = "json")
+//    @JdbcTypeCode(SqlTypes.JSON)
+    private String fileMeta;
 
 }

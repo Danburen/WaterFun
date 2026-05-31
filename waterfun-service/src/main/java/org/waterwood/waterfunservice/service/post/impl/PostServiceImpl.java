@@ -17,7 +17,6 @@ import org.waterwood.api.VO.OptionVO;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.ResourceType;
-import org.waterwood.common.io.SimpleCloudObject;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.BizType;
 import org.waterwood.waterfunservice.api.UploadContext;
@@ -29,27 +28,28 @@ import org.waterwood.waterfunservice.infrastructure.mapper.PostMapper;
 import org.waterwood.waterfunservice.service.post.TagService;
 import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
-import org.waterwood.waterfunservicecore.entity.PostResource;
+import org.waterwood.waterfunservicecore.entity.post.PostResource;
 import org.waterwood.waterfunservicecore.entity.audit.AuditContentFormat;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.post.*;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.entity.resource.SourceType;
+import org.waterwood.waterfunservicecore.exception.ForbiddenException;
 import org.waterwood.waterfunservicecore.exception.notfound.PostNotFoundException;
+import org.waterwood.waterfunservicecore.exception.reference.AuditTaskReferenceInvalidException;
 import org.waterwood.waterfunservicecore.exception.reference.CategoryReferenceInvalidException;
 import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.*;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
-import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileType;
 import org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
-import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.exception.io.IllegalUploadCountException;
@@ -60,7 +60,6 @@ import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
-import org.waterwood.waterfunservicecore.utils.BizTargetIdPackager;
 import org.waterwood.waterfunservicecore.utils.ContentIdGenerator;
 
 import java.time.Instant;
@@ -187,6 +186,10 @@ public class PostServiceImpl implements PostService {
                 null,
                 "Untitled Post",
                 UserCtxHolder.getLocale()));
+        p.setContent("");
+        p.setTitle("");
+        p.setEditedContent("");
+        p.setAuthor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
         postRepository.save(p);
         return id;
     }
@@ -215,9 +218,7 @@ public class PostServiceImpl implements PostService {
         Post p = postRepository.findByIdAndAuthorUidAndIsDeletedAndStatus(
                 id, UserCtxHolder.getUserUid(), false, PostStatus.DRAFT
         ).orElseThrow(PostNotFoundException::new);
-
         this.save(id, req); // save edited content to temp fields, and sync resources status
-
         String targetId = id.toString();
         AuditTask task = auditTaskRepository
                 .findByTargetIdAndTargetTypeAndStatus(targetId, TargetType.POST, AuditStatus.PENDING)
@@ -245,8 +246,8 @@ public class PostServiceImpl implements PostService {
         ).toJson());
 
         Set<String> resourceUuids = StringUtil.extraResPlaceholders(editedContent);
-        List<Resource> resources = resourceRepository.findByUuidIn(resourceUuids);
-        List<AuditResource> auditResources = resources.stream().map(res -> {
+        List<Resource> resources = resourceRepository.findByUuidInAndStatus(resourceUuids, ResourceStatus.ACTIVE);
+        List<AuditResource> auditResources = resources.stream().map(res -> { // bind audit - resource
             AuditResource ar = new AuditResource();
             ar.setTask(task);
             ar.setResource(res);
@@ -360,12 +361,14 @@ public class PostServiceImpl implements PostService {
         ).orElseThrow(PostNotFoundException::new);
 
         PostDraftResp resp = postMapper.toPostDraftResp(p);
-        resp.setCoverageImgPresignedUrl(cloudFileService.getReadUrlCached(
-                CloudFSRoot.UPLOADS,
-                p.getEditedCoverImg(),
-                p.getId(),
-                TargetType.POST_CONTENT_IMAGE
-        ));
+        resp.setCoverageImgPresignedUrl(p.getEditedCoverImg() == null ? null :
+                cloudFileService.getReadUrlCached(
+                        CloudFSRoot.UPLOADS,
+                        p.getEditedCoverImg(),
+                        p.getId(),
+                        TargetType.POST_CONTENT_IMAGE
+                )
+        );
 
         if(p.getEditedCategory() != null) {
             resp.setEditedCategoryId(OptionVO.<Long>builder()
@@ -388,6 +391,7 @@ public class PostServiceImpl implements PostService {
         return resp;
     }
 
+    @Transactional
     @Override
     public List<PresignedResp> handlePostCoverageImageUpload(UploadPolicyReq request) {
         Long bizId = Long.parseLong(request.getBizId());
@@ -396,11 +400,11 @@ public class PostServiceImpl implements PostService {
         }
 
         FileExtension ext = FileExtension.fromExt(request.getExts().getFirst());
-        if(TargetType.POST_COVERAGE_IMAGE.isAllowed(ext)){
+        if(! TargetType.POST_COVERAGE_IMAGE.isAllowed(ext)){
             throw new UnsupportedOperationException("File type not allowed: " + ext.getExt());
         }
 
-        postRepository.findByIdAndAuthorUidAndIsDeleted(
+        Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
                 bizId, UserCtxHolder.getUserUid(),false
         ).orElseThrow(PostNotFoundException::new);
 
@@ -409,7 +413,7 @@ public class PostServiceImpl implements PostService {
         BizUploadPayload payload = UploadContext.<Long>builder()
                 .bizId(bizId)
                 .bizType(request.getBizType())
-                .uploadId(resourceUUID.toString().replace("-", ""))
+                .resourceUuid(resourceUUID.toString().replace("-", ""))
                 .build()
                 .toPayload();
         String cosPath = CosKeyPathGenerator.of(resourceUUID, ext);
@@ -417,10 +421,20 @@ public class PostServiceImpl implements PostService {
         Resource res = new Resource();
         res.setUuid(StringUtil.noDashUUIDString(resourceUUID));
         res.setResourceKey(cosPath);
-        res.setResourceType(ResourceType.IMAGE);
         res.setUploaderId(UserCtxHolder.getUserUid());
         res.setSourceType(SourceType.USER_UPLOADED);
+
+        PostResource postResource = new PostResource();
+        PostResourceId postResourceId = new PostResourceId();
+        postResourceId.setResourceUuid(res.getUuid());
+        postResourceId.setPostId(p.getId());
+
+        postResource.setId(postResourceId);
+        postResource.setResourceUuid(res);
+        postResource.setPost(p);
+
         resourceRepository.save(res);
+        postResourceRepository.save(postResource);
 
         return List.of(cloudFileService.buildPutPolicyForUploads(cosPath, payload));
     }
@@ -435,7 +449,6 @@ public class PostServiceImpl implements PostService {
 
         List<PresignedResp> results = new ArrayList<>();
         List<UploadItem> validItems = new ArrayList<>();
-
 
         List<FileExtension> exts = request.getExts().stream().map(FileExtension::fromExt).toList();
         for(int i = 0; i < exts.size(); i++){
@@ -457,44 +470,40 @@ public class PostServiceImpl implements PostService {
         if(! validItems.isEmpty()){
             List<Resource> resources = validItems.stream()
                     .map(item -> {
-                        Resource res = new Resource();
-                        res.setUuid(item.uuidPlain());
-                        res.setResourceKey(item.path());
-                        res.setResourceType(ResourceType.IMAGE);
-                        res.setUploaderId(UserCtxHolder.getUserUid());
-                        res.setSourceType(SourceType.USER_UPLOADED);
-                        res.setStatus(ResourceStatus.ACTIVE);
-                        return res;
+                        return cloudFileService.CreateAndSetUpUploadRes(item.uuidPlain, item.path, UserCtxHolder.getUserUid());
                     })
                     .toList();
             List<PostResource> postResources = resources.stream()
                     .map(res -> {
                         PostResource pr = new PostResource();
+                        PostResourceId prId = new PostResourceId();
+                        prId.setResourceUuid(res.getUuid());
+                        prId.setPostId(p.getId());
+
+                        pr.setId(prId);
                         pr.setPost(p);
                         pr.setResourceUuid(res);
                         return pr;
                     })
                     .toList();
-            resourceRepository.saveAll(resources);
-            postResourceRepository.saveAll(postResources);
-
             List<BizUploadPayload> payloads = validItems.stream()
-                    .map(item -> BizTargetIdPackager.ofPost(
+                    .map(item -> BizUploadPayload.of(
                             bizId,
                             BizType.POST_CONTENT_IMAGE.name(),
                             item.uuid()
                     ))
                     .toList();
-
             List<PresignedResp> signed = cloudFileService.batchBuildPutPolicyForUploads(
                     validItems.stream().map(UploadItem::path).toList(),
                     payloads
             );
-
             for (int i = 0; i < signed.size(); i++) {
                 int originalIndex = validItems.get(i).originalIndex();
                 results.set(originalIndex, signed.get(i));
             }
+
+            resourceRepository.saveAll(resources);
+            postResourceRepository.saveAll(postResources);
         }
         return results;
     }
@@ -512,38 +521,50 @@ public class PostServiceImpl implements PostService {
                 postId, UserCtxHolder.getUserUid(),false
         ).orElseThrow(() -> new NotFoundException("Post: " + postId));
 
-        SimpleCloudObject obj = cloudFileService.detectAndAssertCloudFile(ctx.getCosKey(), CloudFileType.IMAGE);
         TargetType type =  ctx.getBizType() == BizType.POST_CONTENT_IMAGE ? TargetType.POST_CONTENT_IMAGE : TargetType.POST_COVERAGE_IMAGE;
 
+        String resourceUuid = ctx.getResourceUuid();
+        postResourceRepository.findByPostIdAndResourceUuidUuid(
+                postId, resourceUuid
+        ).orElseThrow(ForbiddenException::new); // ensure the resource is indeed attached to the post, and belongs to current post.
+
         if(ctx.getBizType() == BizType.POST_CONTENT_IMAGE) {
-            resourceRepository.findByUuidAndStatus(ctx.getUploadId(), ResourceStatus.UPLOAD_PENDING).map(
+            resourceRepository.findByUuidAndStatus(resourceUuid, ResourceStatus.UPLOAD_PENDING).map(
                     res-> {
-                        res.setSizeBytes(obj.getFileMeta().getSize());
-                        res.setMimeType(obj.getFileMeta().getMimeType());
-                        res.setSourceType(SourceType.USER_UPLOADED);
-                        res.setStatus(ResourceStatus.ORPHAN); // only bind when temporary saving or publishing.
+                        cloudFileService.setAndValidResourceForCallback(
+                                res,
+                                CloudFSRoot.UPLOADS,
+                                ResourceStatus.ORPHAN,// only bind when temporary saving or publishing.
+                                ResourceType.IMAGE);
                         return resourceRepository.save(res);
                     }
-            ).orElseThrow(() -> new ResourceReferenceInvalidException(ctx.getUploadId()));
+            ).orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid));
         } else if(ctx.getBizType() == BizType.POST_COVERAGE_IMAGE){
-            AuditTask task = auditTaskRepository.findByTargetIdAndTargetTypeAndStatus(String.valueOf(ctx.getBizId()), type, AuditStatus.PENDING).orElse(null);
-            Resource res = new Resource();
+            AuditTask task = auditTaskRepository.findByTargetIdAndTargetTypeAndStatus(String.valueOf(ctx.getBizId()), type, AuditStatus.PENDING)
+                    .orElse(null);
+            Resource res;
             if(task != null){ // task is already exists, simply update resource and register old resource deletion after commit if exists
                 AuditResource auditRes = auditTaskResourceRepository
                         .findByTaskId(task.getId())
                         .orElseGet(() -> {
                             AuditResource ar = new AuditResource();
                             ar.setTask(task);
+                            ar.setResource(resourceRepository.findByUuidAndStatus(resourceUuid, ResourceStatus.UPLOAD_PENDING)
+                                    .orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid))
+                            );
                             return auditTaskResourceRepository.save(ar);
                         });
                 res = auditRes.getResource();
-                if(res == null) throw new ResourceReferenceInvalidException(ctx.getUploadId());
+                if(res == null) throw new ResourceReferenceInvalidException(resourceUuid);
                 if (res.getResourceKey() != null) {
                     final String oldKey = res.getResourceKey();
                     TransactionSynchronizationManager.registerSynchronization(
                             new TransactionSynchronization() {
                                 @Override
                                 public void afterCommit() {
+                                    // todo supposed to be after completion of whole transaction including audit task
+                                    // creation, but currently no such callback, need to ensure no exception throw after this point
+                                    // to avoid the case that old resource is removed but new resource is not set successfully.
                                     try {
                                         cloudFileService.removeFile(CloudFSRoot.UPLOADS, oldKey);
                                     } catch (Exception e) {
@@ -553,16 +574,17 @@ public class PostServiceImpl implements PostService {
                             }
                     );
                 }
+                cloudFileService.setAndValidResourceForCallback(
+                        res,
+                        CloudFSRoot.UPLOADS,
+                        ResourceStatus.ACTIVE,
+                        ResourceType.IMAGE);
+                resourceRepository.save(res);
+            } else {
+                // Audit task supposes to be created before callback, at the phase of
+                // preparing uploading(policy requesting)
+                throw new AuditTaskReferenceInvalidException(String.valueOf(ctx.getBizId()));
             }
-
-            res.setResourceKey(obj.getKey());
-            res.setResourceType(ResourceType.IMAGE);
-            res.setSizeBytes(obj.getFileMeta().getSize());
-            res.setMimeType(obj.getFileMeta().getMimeType());
-            res.setSourceType(SourceType.USER_UPLOADED);
-            res.setUploaderId(UserCtxHolder.getUserUid());
-            res.setStatus(ResourceStatus.ACTIVE);
-            resourceRepository.save(res);
         }
     }
 

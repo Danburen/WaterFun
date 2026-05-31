@@ -5,6 +5,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseCookie;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.services.auth.*;
 import org.waterwood.waterfunservicecore.api.req.auth.*;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
@@ -33,20 +36,15 @@ import java.time.Duration;
 @RestController
 @Validated
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
     private final CaptchaServiceImpl captchaService;
     private final LoginServiceImpl loginService;
     private final RegisterServiceImpl registerService;
     private final AuthCoreServiceImpl authService;
     private final VerificationService verificationService;
+    private final UserRepository userRepository;
 
-    public AuthController(CaptchaServiceImpl cs, LoginServiceImpl ls, RegisterServiceImpl rs, AuthCoreServiceImpl as, VerificationService verificationService) {
-        this.captchaService = cs;
-        this.loginService = ls;
-        this.registerService = rs;
-        this.authService = as;
-        this.verificationService = verificationService;
-    }
 
     @Operation(summary = "获取图形验证码")
     @GetMapping("/captcha")
@@ -100,31 +98,43 @@ public class AuthController {
 
     @Operation(summary = "密码登陆")
     @PostMapping("/login-by-password")
+    @RateLimit(key = "user.login", permits = 5)
     public ApiResponse<LoginClientData> loginByPassword(@Valid @RequestBody PwdLoginReq body, HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
         User user = loginService.login(body, CookieUtil.getCookieValue(cookies, "CAPTCHA_KEY"));
-        return authService.BuildLoginResponse(response, user, body.getDeviceFp());
+        return ApiResponse.success(
+                authService.BuildLoginResponse(response, user, body.getDeviceFp())
+        );
     }
 
 
     @Operation(summary = "手机登陆")
     @PostMapping("/login-by-code")
+    @RateLimit(key = "user.login", permits = 5)
     public ApiResponse<LoginClientData> loginByCode(@Valid @RequestBody VerifyCodeDto dto, HttpServletRequest request, HttpServletResponse response) {
         String codeKey = dto.getChannel() == VerifyChannel.SMS ? "SMS_CODE_KEY" : "EMAIL_CODE_KEY";
         User user = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
-        return authService.BuildLoginResponse(response, user, dto.getDeviceFp());
+        return ApiResponse.success(
+                authService.BuildLoginResponse(response, user, body.getDeviceFp())
+        );
     }
 
     @Operation(summary = "注册")
     @PostMapping("/register")
+    @RateLimit(key = "user.login", permits = 5)
     public ApiResponse<LoginClientData> register(@Valid @RequestBody RegisterRequest dto, HttpServletRequest request, HttpServletResponse response) {
-        User user = registerService.register(dto,
-                CookieUtil.getCookieValue(request.getCookies(), "SMS_CODE_KEY"));
-        return getLoginClientDataApiResponse(dto, response, user);
+        User user = registerService.register(
+                dto,
+                CookieUtil.getCookieValue(request.getCookies(), "SMS_CODE_KEY")
+        );
+        return ApiResponse.success(
+                authService.BuildLoginResponse(response, user, dto.getVerify().getDeviceFp())
+        );
     }
 
-    private @NotNull ApiResponse<LoginClientData> getLoginClientDataApiResponse(RegisterRequest dto, HttpServletResponse response, User user) {
-        return authService.BuildLoginResponse(response, user, dto.getVerify().getDeviceFp());
+    @PostMapping("/refresh")
+    public ApiResponse<LoginClientData> refresh(@Valid @NotNull String deviceFp, HttpServletRequest request, HttpServletResponse response) {
+        return authService.refreshAccessToken();
     }
 
 }

@@ -8,10 +8,10 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.waterwood.common.io.ResourceType;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
@@ -20,6 +20,10 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "audit_task_resource")
+@NamedEntityGraph(
+        name = "AuditResource.withAuditTask",
+        attributeNodes = @NamedAttributeNode("task")
+)
 public class AuditResource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

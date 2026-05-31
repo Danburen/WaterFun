@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.entity.audit.task;
+package org.waterwood.waterfunservicecore.entity.audit;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -6,15 +6,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
-import org.waterwood.waterfunservicecore.entity.audit.AuditContentFormat;
-import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -86,7 +80,7 @@ public class AuditTask {
 
     @Size(max = 64)
     @ColumnDefault("(case when (`status` = 1) then `target_id` else NULL end)")
-    @Column(name = "pending_target_id", length = 64)
+    @Column(name = "pending_target_id", length = 64, updatable = false, insertable = false) // the application usually won't use this
     private String pendingTargetId;
 
 }

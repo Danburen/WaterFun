@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.api.VO.BatchResult;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.waterfunservice.service.user.UserService;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
@@ -57,7 +56,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag getTag(Integer id) {
+    public Tag getTag(Long id) {
         return tagRepository.findById(id).orElseThrow(TagNotFoundException::new);
     }
 
@@ -73,7 +72,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void deleteTag(Integer id) {
+    public void deleteTag(Long id) {
         Tag t = tagRepository.findById(id).orElseThrow(TagNotFoundException::new);
 
         if(! t.getCreator().getUid().equals(UserCtxHolder.getUserUid())){
@@ -84,7 +83,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Set<Tag> getTags(Iterable<Integer> tagIds, boolean strict) {
+    public Set<Tag> getTags(Iterable<Long> tagIds, boolean strict) {
         return new HashSet<>(tagRepository.findAllById(tagIds));
     }
 

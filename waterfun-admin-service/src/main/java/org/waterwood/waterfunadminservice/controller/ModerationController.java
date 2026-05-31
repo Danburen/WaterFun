@@ -18,8 +18,8 @@ import org.waterwood.waterfunadminservice.service.ModerationService;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.common.io.ResourceType;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
-import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
-import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.AuditTaskResourceSpec;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.AuditTaskSpec;
 

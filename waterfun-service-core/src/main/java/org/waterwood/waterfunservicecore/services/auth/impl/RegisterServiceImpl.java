@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.waterwood.api.AuthCode;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.entity.user.*;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
-import org.waterwood.waterfunservicecore.exception.AuthException;
+import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
@@ -52,13 +53,13 @@ public class RegisterServiceImpl implements RegisterService {
         // STEP 1: Verify phone
         VerifyCodeDto verify = body.getVerify();
         if(! verify.getTarget().equals(phone)){
-            throw new AuthException(BaseResponseCode.VERIFY_TARGET_UNSUPPORTED);
+            throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
         }
         verificationService.verifyCode(smsCodeKey, verify);
 
         userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(phone, hmacKey.getEncryptedKey())).ifPresent(
                 _->{
-                    throw new AuthException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
+                    throw new BizException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
                 }
         );
         // STEP 2: Verify email
@@ -66,7 +67,7 @@ public class RegisterServiceImpl implements RegisterService {
         if (emailNotBlank) {
             userDatumRepo.findByEmailHash(HashUtil.Sha256HmacString(email, hmacKey.getEncryptedKey())).ifPresent(
                     _ -> {
-                        throw new AuthException(BaseResponseCode.EMAIL_ALREADY_USED);
+                        throw new BizException(BaseResponseCode.EMAIL_ALREADY_USED);
                     }
             );
         }

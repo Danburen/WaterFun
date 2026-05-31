@@ -29,7 +29,6 @@ public class PostUploadStrategy implements UploadBizStrategy{
         );
     }
 
-    // TODO
     @Override
     public List<PresignedResp> handle(UploadPolicyReq request) {
         return switch (request.getBizType()){

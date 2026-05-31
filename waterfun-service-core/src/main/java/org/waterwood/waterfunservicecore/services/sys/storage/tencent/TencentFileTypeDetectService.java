@@ -8,9 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
+import org.waterwood.common.io.FileMeta;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
-import org.waterwood.common.io.FileMeta;
+import org.waterwood.common.io.FileProbeResult;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileTypeDetector;
 
 import java.io.IOException;
@@ -62,22 +63,24 @@ public class TencentFileTypeDetectService implements CloudFileTypeDetector {
 
 
     @Override
-    public FileMeta detectByMagicNumber(String fullCloudFilePathKey) {
+    public FileProbeResult detectByMagicNumber(String fullCloudFilePathKey) {
         GetObjectRequest rangeRequest = new GetObjectRequest(bucketName, fullCloudFilePathKey);
         rangeRequest.setRange(0, 15);  // bytes=0-15
         try (COSObject cosObject = cosClient.getObject(rangeRequest);
              InputStream is = cosObject.getObjectContent()) {
             long totalSize = cosObject.getObjectMetadata().getInstanceLength();
             byte[] header = is.readNBytes(16);
-            return new FileMeta(
-                    cosObject.getObjectMetadata().getETag(),
+            return new FileProbeResult(
                     totalSize,
-                    matchMagicNumber(header)
+                    matchMagicNumber(header),
+                    new FileMeta(
+                            cosObject.getObjectMetadata().getETag()
+                    )
             );
 
         } catch (CosServiceException e) {
             if (e.getStatusCode() == 404) {
-                throw new BizException(BaseResponseCode.CLOUD_FILE_NOT_FOUND, fullCloudFilePathKey);
+                throw new ServiceException("Cloud file cos key path not found " + fullCloudFilePathKey);
             }
             throw new ServiceException("Failed to read COS object header: " + e.getMessage());
         } catch (IOException e) {

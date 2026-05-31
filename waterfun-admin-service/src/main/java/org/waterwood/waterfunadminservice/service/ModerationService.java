@@ -10,7 +10,7 @@ import org.waterwood.waterfunadminservice.api.request.content.audit.ModerateReje
 import org.waterwood.waterfunadminservice.api.response.ModerateTaskResponse;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
-import org.waterwood.waterfunservicecore.entity.audit.task.AuditTask;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 
 import java.util.List;

@@ -58,20 +58,20 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<CategoryResponse> get(@PathVariable Integer id) {
+    public ApiResponse<CategoryResponse> get(@PathVariable Long id) {
         return ApiResponse.success(
                 categoryMapper.toResponse(categoryService.getById(id))
         );
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Integer id) {
+    public ApiResponse<Void> delete(@PathVariable Long id) {
         categoryService.removeById(id);
         return ApiResponse.success();
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Void> update(@PathVariable Integer id, @RequestBody @Valid UpdateCategoryRequest req) {
+    public ApiResponse<Void> update(@PathVariable Long id, @RequestBody @Valid UpdateCategoryRequest req) {
         categoryService.update(id, req);
         return ApiResponse.success();
     }

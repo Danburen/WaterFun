@@ -3,11 +3,10 @@ package org.waterwood.waterfunadminservice.api.response.content.audit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.common.io.FileMeta;
+import org.waterwood.common.io.FileProbeResult;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.common.io.ResourceType;
 
 import java.time.Instant;
 
@@ -24,7 +23,7 @@ public class ModerationResourceRes {
     private Long auditorId;
     private AuditRejectType rejectType;
     private String rejectReason;
-    private FileMeta fileMeta;
+    private FileProbeResult fileProbeResult;
     private CloudResPresignedUrlResp presignedUrl;
 }
 

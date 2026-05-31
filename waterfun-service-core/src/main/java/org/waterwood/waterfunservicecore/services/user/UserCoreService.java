@@ -91,10 +91,10 @@ public interface UserCoreService {
      * Update user' ofUser
      *
      * @param userUid     target uid
-     * @param resourceKey string key
+     * @param uuid        target resource uuid
      * @return
      */
-    int updateAvatar(Long userUid, String resourceKey);
+    int updateAvatarResourceUuid(Long userUid, String uuid);
 
     /**
      * Return target user ofUser

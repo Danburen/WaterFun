@@ -8,7 +8,6 @@ import org.waterwood.api.ResponseCode;
 
 @Getter
 public class BizException extends RuntimeException{
-    private final String MESSAGE_KEY_PREFIX = "error";
     private final String  errorCode;
     private final Object[] params;
     @Setter
@@ -49,10 +48,6 @@ public class BizException extends RuntimeException{
         this.errorCode = code.getCode();
         this.params = null;
         this.httpStatusCode = httpStatus.value();
-    }
-
-    public String getFullMessageKey(){
-        return MESSAGE_KEY_PREFIX + "." + getMessage();
     }
 
 }

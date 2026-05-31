@@ -69,30 +69,78 @@
         "security": []
       }
     },
-    "/api/admin/moderations/approve": {
-      "post": {
-        "summary": "approveAll",
+    "/api/admin/moderations/resources/list": {
+      "get": {
+        "summary": "listResources",
         "deprecated": false,
         "description": "",
         "tags": [],
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BatchModerateRequest",
-                "description": ""
-              }
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": " PENDING :PENDING\nAPPROVED :APPROVED\nREJECTED :REJECTED",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceType",
+            "in": "query",
+            "description": " UNKNOWN :UNKNOWN\nIMAGE :IMAGE\nVIDEO :VIDEO\nAUDIO :AUDIO\nTEXT :TEXT\nDOCUMENT :DOCUMENT\nARCHIVE :ARCHIVE\nEXECUTABLE :EXECUTABLE\nOTHER :OTHER",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "auditorId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "seconds",
+            "in": "query",
+            "description": "The number of seconds from the epoch of 1970-01-01T00:00:00Z.",
+            "required": false,
+            "example": [],
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "nanos",
+            "in": "query",
+            "description": "The number of nanoseconds, later along the time-line, from the seconds field.\nThis is always positive, and never exceeds 999,999,999.",
+            "required": false,
+            "example": [],
+            "schema": {
+              "type": "integer"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                  "$ref": "#/components/schemas/ApiResponsePageModerationResourceRes"
                 }
               }
             }
@@ -103,7 +151,7 @@
     },
     "/api/admin/moderations/{id}/resources": {
       "get": {
-        "summary": "listResources",
+        "summary": "listResourcesByTask",
         "deprecated": false,
         "description": "",
         "tags": [],
@@ -125,38 +173,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseListModerationResourceRes"
-                }
-              }
-            }
-          }
-        },
-        "security": []
-      }
-    },
-    "/api/admin/moderations/reject": {
-      "post": {
-        "summary": "rejectAll",
-        "deprecated": false,
-        "description": "",
-        "tags": [],
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BatchModerateRejectRequest",
-                "description": ""
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseBatchResult"
                 }
               }
             }
@@ -197,38 +213,6 @@
         "security": []
       }
     },
-    "/api/admin/moderations/{id}/approve": {
-      "post": {
-        "summary": "approve",
-        "deprecated": false,
-        "description": "",
-        "tags": [],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseBatchResult"
-                }
-              }
-            }
-          }
-        },
-        "security": []
-      }
-    },
     "/api/admin/moderations/resources/{resourceId}/approve": {
       "post": {
         "summary": "approveResource",
@@ -253,48 +237,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        },
-        "security": []
-      }
-    },
-    "/api/admin/moderations/{id}/reject": {
-      "post": {
-        "summary": "reject",
-        "deprecated": false,
-        "description": "",
-        "tags": [],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ModerateRejectRequest",
-                "description": ""
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseBatchResult"
                 }
               }
             }
@@ -337,6 +279,144 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/moderations/approve": {
+      "post": {
+        "summary": "approveAll",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchModerateRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/moderations/reject": {
+      "post": {
+        "summary": "rejectAll",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchModerateRejectRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/moderations/{id}/approve": {
+      "post": {
+        "summary": "approve",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/admin/moderations/{id}/reject": {
+      "post": {
+        "summary": "reject",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModerateRejectRequest",
+                "description": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
                 }
               }
             }
@@ -515,26 +595,16 @@
             "description": "",
             "enum": [
               "UNKNOWN",
-              "USER_AVATAR"
+              "USER_AVATAR",
+              "POST",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE",
+              "POST_CONTENT"
             ]
           },
           "targetId": {
             "type": "string",
             "description": ""
-          },
-          "content": {
-            "type": "string",
-            "description": ""
-          },
-          "contentFormat": {
-            "type": "string",
-            "description": "",
-            "enum": [
-              "DEFAULT",
-              "PLAINTEXT",
-              "HTML",
-              "MARKDOWN"
-            ]
           },
           "payload": {
             "$ref": "#/components/schemas/ModerationTaskPayloadRes",
@@ -649,11 +719,11 @@
             "type": "string",
             "description": "",
             "enum": [
-              "PORN",
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
               "VIOLENCE",
-              "POLITICAL",
-              "ADVERTISING",
-              "SPAM",
+              "SENSITIVE",
               "OTHER"
             ]
           },
@@ -674,11 +744,11 @@
             "type": "string",
             "description": "",
             "enum": [
-              "PORN",
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
               "VIOLENCE",
-              "POLITICAL",
-              "ADVERTISING",
-              "SPAM",
+              "SENSITIVE",
               "OTHER"
             ]
           },
@@ -709,30 +779,6 @@
             "type": "string",
             "description": ""
           },
-          "resourceKey": {
-            "type": "string",
-            "description": ""
-          },
-          "resourceType": {
-            "type": "string",
-            "description": "",
-            "enum": [
-              "UNKNOWN",
-              "IMAGE",
-              "VIDEO",
-              "AUDIO",
-              "OTHER"
-            ]
-          },
-          "mimeType": {
-            "type": "string",
-            "description": ""
-          },
-          "sizeBytes": {
-            "type": "integer",
-            "description": "",
-            "format": "int64"
-          },
           "sortNo": {
             "type": "integer",
             "description": "",
@@ -760,16 +806,20 @@
             "type": "string",
             "description": "",
             "enum": [
-              "PORN",
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
               "VIOLENCE",
-              "POLITICAL",
-              "ADVERTISING",
-              "SPAM",
+              "SENSITIVE",
               "OTHER"
             ]
           },
           "rejectReason": {
             "type": "string",
+            "description": ""
+          },
+          "fileProbeResult": {
+            "$ref": "#/components/schemas/FileProbeResult",
             "description": ""
           },
           "presignedUrl": {
@@ -802,8 +852,22 @@
             },
             "description": ""
           },
-          "renderedContent": {
+          "content": {
             "type": "string",
+            "description": ""
+          },
+          "contentFormat": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "DEFAULT",
+              "PLAINTEXT",
+              "HTML",
+              "MARKDOWN"
+            ]
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AuditPayload",
             "description": ""
           }
         }
@@ -842,6 +906,109 @@
           },
           "data": {
             "$ref": "#/components/schemas/ModerationResourceRes",
+            "description": ""
+          }
+        }
+      },
+      "FileMeta": {
+        "type": "object",
+        "properties": {
+          "eTag": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "FileProbeResult": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": ""
+          },
+          "meta": {
+            "$ref": "#/components/schemas/FileMeta",
+            "description": ""
+          }
+        }
+      },
+      "AuditPayload": {
+        "type": "object",
+        "properties": {}
+      },
+      "PageModerationResourceRes": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModerationResourceRes",
+              "description": "org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes"
+            },
+            "description": ""
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/Pageable",
+            "description": ""
+          },
+          "total": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          },
+          "empty": {
+            "type": "boolean",
+            "description": "Returns whether the current{@link Streamable} is empty."
+          },
+          "number": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "numberOfElements": {
+            "type": "integer"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sort",
+              "description": "org.springframework.data.domain.Sort"
+            }
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponsePageModerationResourceRes": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": ""
+          },
+          "message": {
+            "type": "string",
+            "description": ""
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageModerationResourceRes",
             "description": ""
           }
         }

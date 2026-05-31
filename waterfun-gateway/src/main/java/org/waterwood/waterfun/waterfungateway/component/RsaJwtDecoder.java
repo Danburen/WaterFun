@@ -9,7 +9,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.stereotype.Component;
+import org.waterwood.api.AuthCode;
 import org.waterwood.common.constratin.UserKeyBuilder;
+import org.waterwood.common.exceptions.AuthException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -51,9 +53,15 @@ public class RsaJwtDecoder implements ReactiveJwtDecoder {
 
     @Override
     public Mono<Jwt> decode(String token) throws JwtException {
-        return Mono.fromCallable(() -> parseToken(token))
-                .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(claims -> validateToken(claims, token));
+        if (token == null || token.isEmpty())
+            throw new AuthException(AuthCode.TOKEN_MISSING);
+        try {
+            return Mono.fromCallable(() -> parseToken(token))
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .flatMap(claims -> validateToken(claims, token));
+        } catch (JwtException e) {
+            return Mono.error(new AuthException(AuthCode.TOKEN_INVALID));
+        }
     }
 
     private Jwt buildJwt(Claims claims, String token) {
@@ -78,7 +86,9 @@ public class RsaJwtDecoder implements ReactiveJwtDecoder {
                 .get(deviceKey)
                 .filter(savedJti -> savedJti.equals(claims.getId()))
                 .map(_ -> claims)
-                .switchIfEmpty(Mono.error(new JwtException("Invalid token")))
+                .switchIfEmpty( // Token is invalid if jti does not match or no jti found
+                        Mono.error(new AuthException(AuthCode.TOKEN_INVALID))
+                )
                 .map(savedJti -> buildJwt(claims, token));
     }
 }

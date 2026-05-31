@@ -8,7 +8,7 @@ import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import java.util.List;
 
 public interface UserProfileService {
-
+    List<PresignedResp> handleUserAvatarUpload(UploadPolicyReq request);
     /**
      * Callback procession for avatar callback.
      *
@@ -16,5 +16,4 @@ public interface UserProfileService {
      */
     void uploadAvatarCallback(CloudPutCallbackReq req, UploadContext<Long> ctx);
 
-    List<PresignedResp> handleUserAvatarUpload(UploadPolicyReq request);
 }

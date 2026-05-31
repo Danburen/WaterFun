@@ -31,7 +31,7 @@ public final class AuditTaskResourceSpec {
                 predicates.add(cb.equal(root.get("status"), status));
             }
             if (resourceType != null) {
-                predicates.add(cb.equal(root.get("resourceType"), resourceType));
+                predicates.add(cb.equal(root.get("resource").get("resourceType"), resourceType));
             }
             if (auditorId != null) {
                 predicates.add(cb.equal(root.get("auditor").get("uid"), auditorId));

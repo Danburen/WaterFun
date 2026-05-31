@@ -33,5 +33,5 @@ public class PutPostReq implements Serializable {
     private Long authorId;
     @Size(max = 200)
     private String slug;
-    private Integer categoryId;
+    private Long categoryId;
 }

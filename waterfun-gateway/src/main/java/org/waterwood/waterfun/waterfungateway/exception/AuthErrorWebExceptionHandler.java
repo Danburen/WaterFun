@@ -11,6 +11,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebExceptionHandler;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.ErrorResponse;
+import org.waterwood.common.exceptions.AuthException;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
@@ -27,16 +28,28 @@ public class AuthErrorWebExceptionHandler implements WebExceptionHandler {
         }
         if (!(ex instanceof AuthenticationException
                 || ex instanceof JwtException
-                || ex instanceof ExpiredJwtException)) {
+                || ex instanceof ExpiredJwtException
+                || ex instanceof AuthException)) {
             return Mono.error(ex);
+        } // non-auth exceptions will be handled by other handlers, here we just pass.
+        ErrorResponse body;
+        if(ex instanceof AuthException authException) {
+            body = new ErrorResponse(
+                    authException.getErrorCode(),
+                    ex.getMessage(),
+                    null,
+                    new Date()
+            );
+        } else { // original auth exception via spring security and other librarys,
+            // we just return a generic message to avoid leaking details.
+            // TODO REMOVE WHEN ONLINE
+            body = new ErrorResponse(
+                    BaseResponseCode.INVALID_TOKEN_OR_EXPIRED.getCode(),
+                    ex.getMessage(),
+                    null,
+                    new Date()
+            );
         }
-
-        ErrorResponse body = new ErrorResponse(
-                BaseResponseCode.INVALID_TOKEN_OR_EXPIRED.getCode(),
-                ex.getMessage(),
-                null,
-                new Date()
-        );
         return writeJson(exchange, HttpStatus.UNAUTHORIZED, body);
     }
 

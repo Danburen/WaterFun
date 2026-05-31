@@ -1,11 +1,11 @@
 package org.waterwood.waterfunservice.service.moderation;
 
 import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
-import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 
 import java.util.Set;
 
-public interface ModerationStrategy {
+public interface ModerationCallbackStrategy {
     Set<TargetType> getTargetTypes();
     void handle(ModerationConsumerMessage msg);
 }

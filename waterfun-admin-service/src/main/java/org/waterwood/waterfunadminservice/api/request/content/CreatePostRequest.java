@@ -40,7 +40,7 @@ public class CreatePostRequest implements Serializable {
     @NotNull
     private Long authorId;
     @NotNull
-    private Integer categoryId;
+    private Long categoryId;
     private String slug;
-    private List<Integer> tagIds;
+    private List<Long> tagIds;
 }

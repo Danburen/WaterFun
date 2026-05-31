@@ -270,20 +270,20 @@ onMounted(fetchData);
 
         <div
           v-else
-          class="resource-grid"
+          class="resource-list"
         >
           <el-card
             v-for="item in cardData"
             :key="item.id"
-            class="resource-card"
+            class="resource-card-horizontal"
             shadow="hover"
             @click="gotoDetail(item.id)"
           >
-            <div class="image-box">
+            <div class="image-box-small">
               <img
                 v-if="previewUrl(item)"
                 :src="previewUrl(item)"
-                :alt="item.resourceKey || String(item.id || '')"
+                :alt="item.placeholder || String(item.id || '')"
                 class="preview-image"
               >
               <div
@@ -297,7 +297,7 @@ onMounted(fetchData);
               </div>
             </div>
 
-            <div class="card-main">
+            <div class="card-main-horizontal">
               <div class="title-row">
                 <span class="resource-id">#{{ item.id || t('common.none.title') }}</span>
                 <el-tag :type="statusTagType(item.status)">
@@ -306,16 +306,19 @@ onMounted(fetchData);
               </div>
 
               <div class="meta-row">
-                <span>{{ t('moderation.field.mimeType') }}: {{ item.mimeType || t('common.none.title') }}</span>
+                <span>{{ t('moderation.field.taskId') }}: {{ item.taskId || t('common.none.title') }}</span>
               </div>
               <div class="meta-row">
-                <span>{{ t('moderation.field.fileSize') }}: {{ formatFileSize(item.sizeBytes) }}</span>
+                <span>{{ t('moderation.field.mimeType') }}: {{ item.fileProbeResult?.mimeType || t('common.none.title') }}</span>
+              </div>
+              <div class="meta-row">
+                <span>{{ t('moderation.field.fileSize') }}: {{ formatFileSize(item.fileProbeResult?.size) }}</span>
               </div>
               <div class="meta-row">
                 <span>{{ t('moderation.field.auditAt') }}: {{ formatISOData(getInstantIso(item.auditAt)) || t('common.none.title') }}</span>
               </div>
 
-              <div class="action-row">
+              <div class="action-row-horizontal">
                 <el-button
                   size="small"
                   type="success"
@@ -395,27 +398,30 @@ onMounted(fetchData);
   min-height: 520px;
 }
 
-.resource-grid {
-  display: grid;
+.resource-list {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  align-items: stretch;
 }
 
-.resource-card {
+.resource-card-horizontal {
   cursor: pointer;
-  border-radius: 10px;
-}
-
-.resource-card :deep(.el-card__body) {
-  padding: 10px;
-}
-
-.image-box {
-  position: relative;
-  width: 100%;
-  height: 180px;
   border-radius: 8px;
+}
+
+.resource-card-horizontal :deep(.el-card__body) {
+  display: flex;
+  padding: 12px;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.image-box-small {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  border-radius: 6px;
   overflow: hidden;
   background: #f5f7fa;
 }
@@ -423,11 +429,11 @@ onMounted(fetchData);
 .preview-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   transition: transform 0.2s ease;
 }
 
-.resource-card:hover .preview-image {
+.resource-card-horizontal:hover .preview-image {
   transform: scale(1.04);
 }
 
@@ -453,12 +459,16 @@ onMounted(fetchData);
   font-size: 13px;
 }
 
-.resource-card:hover .hover-mask {
+.resource-card-horizontal:hover .hover-mask {
   opacity: 1;
 }
 
-.card-main {
-  margin-top: 10px;
+.card-main-horizontal {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
 }
 
 .title-row {
@@ -466,25 +476,27 @@ onMounted(fetchData);
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .resource-id {
   color: #303133;
   font-weight: 600;
+  font-size: 15px;
 }
 
 .meta-row {
-  font-size: 12px;
+  font-size: 13px;
   color: #606266;
-  line-height: 1.6;
+  line-height: 1.8;
   word-break: break-all;
 }
 
-.action-row {
+.action-row-horizontal {
   display: flex;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 12px;
+  align-self: flex-start;
 }
 
 .empty-box {
@@ -492,11 +504,5 @@ onMounted(fetchData);
   align-items: center;
   justify-content: center;
   min-height: 420px;
-}
-
-@media (max-width: 768px) {
-  .image-box {
-    height: 210px;
-  }
 }
 </style>

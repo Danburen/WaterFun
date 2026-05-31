@@ -4,13 +4,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.waterwood.api.ApiResponse;
-import org.waterwood.waterfunservicecore.exception.AuthException;
+import org.waterwood.api.AuthCode;
+import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.api.TokenPair;
-import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.TokenResult;
 import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPayload;
 import org.waterwood.utils.StringUtil;
@@ -29,14 +28,14 @@ public class AuthCoreServiceImpl implements AuthCoreService {
     private final CodeSenderFactory codeSenderFactory;
 
     @Override
-    public ApiResponse<LoginClientData> BuildLoginResponse( HttpServletResponse response, User user, String dfp) {
+    public LoginClientData BuildLoginResponse(HttpServletResponse response, User user, String dfp) {
         TokenPair tokenPair = createNewTokens(user.getUid(), dfp);
         CookieUtil.setTokenCookie(response,tokenPair);
         response.setContentType("application/json");
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("X-Content-Type-Options", "nosniff");response.setHeader("X-Frame-Options", "DENY");
-        return  ApiResponse.success(new LoginClientData(tokenPair.accessToken(),tokenPair.accessExp()));
+        return  new LoginClientData(tokenPair.accessToken(),tokenPair.accessExp());
     }
 
     @Override
@@ -59,13 +58,13 @@ public class AuthCoreServiceImpl implements AuthCoreService {
     @Override
     public TokenResult refreshAccessToken(String refreshToken, String dfp) {
         StringUtil.isBlankThen(refreshToken, () -> {
-            throw new AuthException(BaseResponseCode.REAUTHENTICATE_REQUIRED);
+            throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
         });// Missing refresh token
         long userUid = UserCtxHolder.getUserUid();
         RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
         String deviceId = payload.deviceId();
         return userRepository.findById(userUid).map(_ ->
                         tokenService.genAndCacheRefToken(userUid, deviceId))
-                .orElseThrow(() -> new AuthException(BaseResponseCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AuthException(AuthCode.USER_NOT_FOUND));
     }
 }

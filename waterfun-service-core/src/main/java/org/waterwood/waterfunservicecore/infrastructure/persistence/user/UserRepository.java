@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
+import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.util.Collection;
@@ -33,11 +34,11 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
 
     int deleteUserByUidIn(Collection<Long> uids);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE User u set u.avatar = :avatar where u.uid = :uid")
-    int updateAvatar(@Param("uid") Long userUid,@Param("ofUser") String avatar);
 
-    @Query("SELECT u.avatar FROM User u WHERE u.uid = :uid")
+    @Query("SELECT u.avatarResourceUuid.uuid FROM User u WHERE u.uid = :uid")
     String getUserAvatarByUid(@Param("uid") Long uid);
+
+    @Query("update User u set u.avatarResourceUuid = :avatarResourceUuid where u.uid = :uid")
+    @Modifying
+    int updateAvatarResourceUuidByUid(Resource avatarResourceUuid, Long uid);
 }

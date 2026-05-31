@@ -21,7 +21,7 @@ public class UpdateCategoryRequest implements Serializable {
     @Size(max = 50)
     private String slug;
     private String description;
-    private Integer parentId;
+    private Long parentId;
     private Integer sortOrder;
     private Boolean isActive;
 }

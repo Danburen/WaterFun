@@ -125,7 +125,7 @@ export const validatePassword = (allowEmpty?: boolean) => {
             return;
         }
 
-        if (value.length <= 8) {
+        if (value.length < 8) {
             callback(new Error(translate(keyPrefix + 'passwordTooShort')));
             return;
         }

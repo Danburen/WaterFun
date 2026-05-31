@@ -74,12 +74,10 @@ public class TagServiceImpl implements TagService {
     public List<OptionVO<Long>> getOptions() {
         return tagRepository.findAll().stream()
                 .filter(t -> ! t.getIsDeleted())
-                .map(t -> {
-                    return OptionVO.<Long>builder()
-                            .id(t.getId())
-                            .code(t.getSlug())
-                            .name(t.getName())
-                            .build();
-                }).toList();
+                .map(t -> OptionVO.<Long>builder()
+                        .id(t.getId())
+                        .code(t.getSlug())
+                        .name(t.getName())
+                        .build()).toList();
     }
 }

@@ -7,6 +7,7 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,15 +16,22 @@ import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.KeyConstants;
+import org.waterwood.common.io.FileProbeResult;
+import org.waterwood.common.io.ResourceType;
+import org.waterwood.waterfunservicecore.entity.resource.Resource;
+import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
+import org.waterwood.waterfunservicecore.entity.resource.SourceType;
 import org.waterwood.waterfunservicecore.exception.BizException;
-import org.waterwood.common.io.SimpleCloudObject;
 import org.waterwood.utils.PathUtil;
+import org.waterwood.waterfunservicecore.exception.ForbiddenException;
+import org.waterwood.waterfunservicecore.exception.io.FileTypeNotAllowException;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.common.cache.RedisKeyBuilder;
 import org.waterwood.waterfunservicecore.api.HttpMethod;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
-import org.waterwood.waterfunservicecore.entity.audit.task.TargetType;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.CloudKeyBuilder;
 import org.waterwood.waterfunservicecore.services.sys.storage.*;
 import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
@@ -99,7 +107,7 @@ public class TencentCosService implements CloudFileService {
         if (client != null) {
             URL url = client.generatePresignedUrl(request);
             // Token
-            redisHelper.hSetMap(buildUploadRedisKey(payload.getUploadId()),
+            redisHelper.hSetMap(buildUploadRedisKey(payload.getResourceUuid()),
                     payload.toMap(),
                     Duration.ofSeconds(uploadTokenExpires)
             );
@@ -107,7 +115,7 @@ public class TencentCosService implements CloudFileService {
                     path,
                     url.toString(),
                     HttpMethod.PUT,
-                    payload.getUploadId()
+                    payload.getResourceUuid()
             );
         }else{
             throw new BizException(BaseResponseCode.COS_UPLOAD_CLIENT_NOT_CONFIGURED);
@@ -144,7 +152,7 @@ public class TencentCosService implements CloudFileService {
 
             // Token
             redisHelper.hSetMap(
-                    buildUploadRedisKey(payload.getUploadId()),
+                    buildUploadRedisKey(payload.getResourceUuid()),
                     payload.toMap(),
                     Duration.ofSeconds(uploadTokenExpires)
             );
@@ -153,7 +161,7 @@ public class TencentCosService implements CloudFileService {
                     path,
                     url.toString(),
                     HttpMethod.PUT,
-                    payload.getUploadId()
+                    payload.getResourceUuid()
             ));
         }
 
@@ -176,21 +184,21 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public SimpleCloudObject detectAndAssertCloudFile(String KeyPath, CloudFileType cloudFileType) {
+    public FileProbeResult detectAndAssertCloudFile(CloudFSRoot root, String KeyPath, CloudFileType cloudFileType) {
         String suffix = PathUtil.getSuffix(KeyPath);
-        String fullPath = buildCosKey(CloudFSRoot.UPLOADS, KeyPath);
+        String fullPath = buildCosKey(root, KeyPath);
         if(!cloudFileType.matchSuffix(suffix)){
-            throw new BizException(BaseResponseCode.FILE_TYPE_NOT_ALLOW, suffix, cloudFileType.getAllowFileExtensions());
+            throw new FileTypeNotAllowException(suffix, cloudFileType.getAllowFileExtensions());
         }
-        SimpleCloudObject object = new SimpleCloudObject();
-        object.setKey(KeyPath);
-        object.setFileMeta(cloudFileTypeDetector.detectByMagicNumber(fullPath));
-        ContentType contentType = ContentType.getByMimeType(object.getFileMeta().getMimeType());
+        new FileProbeResult();
+        FileProbeResult meta;
+        meta = cloudFileTypeDetector.detectByMagicNumber(fullPath);
+        ContentType contentType = ContentType.getByMimeType(meta.getMimeType());
 //        log.info(contentType.getMimeType());
         if(! cloudFileType.matchContentType(contentType.getMimeType())){
-            throw new BizException(BaseResponseCode.FILE_TYPE_NOT_ALLOW, contentType.getMimeType(), cloudFileType.name());
+            throw new FileTypeNotAllowException(contentType.getMimeType(), cloudFileType.name());
         }
-        return object;
+        return meta;
     }
 
     @Override
@@ -213,12 +221,48 @@ public class TencentCosService implements CloudFileService {
 
     @Override
     public BizUploadPayload parseToken(String token) {
-        BizUploadPayload payload = BizUploadPayload.fromMap(
-                redisHelper.hGetAllAndDel(
+        return BizUploadPayload.fromMap(
+//                redisHelper.hGetAllAndDel(
+//                        buildUploadRedisKey(token)
+//                )
+                redisHelper.hGetAll(
                         buildUploadRedisKey(token)
                 )
         );
-        return payload;
+    }
+
+    @Override
+    public void CreateAndSetUpUploadRes(Resource res, String uuidPlain, String path, Long userUid) {
+        if(res == null){
+            res = new Resource();
+        }
+        res.setUuid(uuidPlain);
+        res.setResourceKey(path);
+        res.setUploaderId(userUid == null ? 0L : userUid);
+        res.setSourceType(userUid == null ? SourceType.SYSTEM : SourceType.USER_UPLOADED);
+    }
+
+    @Override
+    public Resource CreateAndSetUpUploadRes(String uuidPlain, String path, Long userUid) {
+        Resource res = new Resource();
+        res.setUuid(uuidPlain);
+        res.setResourceKey(path);
+        res.setUploaderId(userUid == null ? 0L : userUid);
+        res.setSourceType(userUid == null ? SourceType.SYSTEM : SourceType.USER_UPLOADED);
+        return res;
+    }
+
+    @Override
+    public void setAndValidResourceForCallback(@NotNull Resource res, CloudFSRoot root, ResourceStatus resourceStatus, ResourceType resourceType) {
+        if(res.getUploaderId() == null || ! res.getUploaderId().equals(UserCtxHolder.getUserUid())){
+            throw new ForbiddenException();
+        }
+        FileProbeResult probeResult = detectAndAssertCloudFile(root, res.getResourceKey(), CloudFileType.IMAGE);
+        res.setResourceType(resourceType);
+        res.setSizeBytes(probeResult.getSize());
+        res.setMimeType(probeResult.getMimeType());
+        res.setFileMeta(probeResult.getMeta().toJson());
+        res.setStatus(resourceStatus); // only bind when temporary saving or publishing.
     }
 
     private CloudResPresignedUrlResp getReadUrlCached(String fullPath, Serializable bizId, Duration dur, TargetType resType) {

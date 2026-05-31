@@ -98,7 +98,7 @@ public class PostServiceImpl implements PostService {
         postRepository.save(p);
 
         if(CollectionUtil.isNotEmpty(req.getTagIds())) {
-            List<Integer> distinctTagIds = req.getTagIds().stream().distinct().toList();
+            List<Long> distinctTagIds = req.getTagIds().stream().distinct().toList();
             List<Tag> tags = tagRepository.findAllById(distinctTagIds);
             if(CollectionUtil.isNotEmpty(tags)) {
                 p.setTags(tags);

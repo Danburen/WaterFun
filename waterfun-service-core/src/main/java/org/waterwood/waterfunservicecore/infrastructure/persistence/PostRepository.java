@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.waterwood.waterfunservicecore.entity.post.PostStatus;
 import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.post.Post;
@@ -23,7 +24,7 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     int deleteByIdIn(List<Long> attr0);
 
     Optional<Post> findByIdAndVisibilityAndIsDeleted(Long id, PostVisibility visibility, Boolean isDeleted);
-
+    @Query("SELECT p.id FROM Post p")
     Page<Long> findAllIds(Specification<Post> spec, Pageable pageable);
 
     Optional<Post> findByIdAndAuthorUidAndIsDeleted(Long id, Long id1, boolean attr0);

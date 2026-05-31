@@ -1,6 +1,6 @@
 package org.waterwood.waterfunservicecore.services.sys.storage;
 
-import org.waterwood.common.io.FileMeta;
+import org.waterwood.common.io.FileProbeResult;
 
 public interface CloudFileTypeDetector {
     /**
@@ -9,5 +9,5 @@ public interface CloudFileTypeDetector {
      * @param fullCloudFilePathKey path key
      * @return MIME type ofPending file and size, <b>application/octet-stream</b> if unknown
      */
-    FileMeta detectByMagicNumber(String fullCloudFilePathKey);
+    FileProbeResult detectByMagicNumber(String fullCloudFilePathKey);
 }

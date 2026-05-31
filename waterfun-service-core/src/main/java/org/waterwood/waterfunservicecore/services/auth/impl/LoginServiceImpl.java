@@ -4,15 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.waterwood.api.BaseResponseCode;
+import org.waterwood.api.AuthCode;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
-import org.waterwood.waterfunservicecore.exception.AuthException;
-import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
@@ -34,27 +33,23 @@ public class LoginServiceImpl implements LoginService {
     private final UserDatumRepo userDatumRepo;
     private final EncryptedKeyService encryptedKeyService;
     private final CaptchaServiceImpl captchaService;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final VerificationService verificationService;
 
-
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
     public User login(PwdLoginReq body, String verifyUUIDKey){
         Optional<User> user = userRepo.findByUsername(body.getUsername());
         return user.map(u->{
-            if(! captchaService.verifyCode(verifyUUIDKey,body.getCaptcha())){
-                throw new AuthException(BaseResponseCode.CAPTCHA_INVALID);
-            }
-            if(! encoder.matches(body.getPassword(), u.getPasswordHash())){
-                throw new AuthException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
-            }
+            if(! captchaService.verifyCode(verifyUUIDKey,body.getCaptcha()))
+                throw new AuthException(AuthCode.CAPTCHA_INVALID);
+            if(! encoder.matches(body.getPassword(), u.getPasswordHash()))
+                throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
             // User didn't set password so they are not allow to log in by password.
-            if( u.getPasswordHash() == null){
-                throw new BizException(BaseResponseCode.FORBIDDEN);
-            }
+            if( u.getPasswordHash() == null)
+                throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
             return u;
-        }).orElseThrow(()-> new BizException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT));
+        }).orElseThrow(()-> new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
     }
 
     @Override
@@ -70,20 +65,20 @@ public class LoginServiceImpl implements LoginService {
     public User login(VerifyCodeDto dto, String codeKey) {
         EncryptionDataKey key= encryptedKeyService.pickEncryptionKey(1);
         if(dto.getScene() != VerifyScene.LOGIN){
-            throw new BizException(BaseResponseCode.INVALID_VERIFY_SCENE);
+            throw new AuthException(AuthCode.INVALID_VERIFY_SCENE);
         }
         UserDatum userDatum = null;
         VerifyChannel channel = dto.getChannel();
         if(channel == VerifyChannel.SMS){
             userDatum = userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(dto.getTarget(),key.getEncryptedKey()))
-                    .orElseThrow(() ->  new BizException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT));
+                    .orElseThrow(() ->  new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
         }else if(channel == VerifyChannel.EMAIL){
             userDatum = userDatumRepo.findByEmailHash(HashUtil.Sha256HmacString(dto.getTarget(),key.getEncryptedKey()))
-                    .orElseThrow(() ->  new BizException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT));
+                    .orElseThrow(() ->  new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
         }
         verificationService.verifyCode(dto.getTarget(),dto.getScene(),channel,codeKey,dto.getCode());
 
-        if(userDatum ==  null) throw new BizException(BaseResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
+        if(userDatum ==  null) throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
         return userDatum.getUser();
     }
 }
