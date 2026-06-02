@@ -32,4 +32,6 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     Optional<Post> findByIdAndAuthorUidAndIsDeletedAndStatus(Long id, Long authorUid, Boolean isDeleted, PostStatus status);
 
     Optional<Post> findByIdAndIsDeleted(@NotNull Long id, Boolean isDeleted);
+
+    Optional<Post> findByIdAndIsDeletedAndStatus(@NotNull Long id, Boolean isDeleted, PostStatus status);
 }

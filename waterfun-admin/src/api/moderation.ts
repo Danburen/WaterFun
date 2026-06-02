@@ -2,7 +2,14 @@ import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
-export type ModerateTaskType = "IMAGE" | "TEXT" | "RICH" | "URL" | "FILE";
+export type TargetType =
+  | "UNKNOWN"
+  | "USER_AVATAR"
+  | "POST"
+  | "POST_COVERAGE_IMAGE"
+  | "POST_CONTENT_IMAGE"
+  | "POST_CONTENT";
+
 export type ModerateRejectType =
   | "VIOLATION_OF_GUIDELINES"
   | "INAPPROPRIATE_CONTENT"
@@ -10,53 +17,34 @@ export type ModerateRejectType =
   | "VIOLENCE"
   | "SENSITIVE"
   | "OTHER";
+
 export type AuditStatus = "PENDING" | "APPROVED" | "REJECTED";
-export type AuditResourceType = "UNKNOWN" | "IMAGE" | "VIDEO" | "AUDIO" | "OTHER";
 
-export interface SimpleCloudObject {
-  key?: string;
-  type?: string;
-  size?: string | number;
+export type ResourceType = "UNKNOWN" | "IMAGE" | "VIDEO" | "AUDIO" | "TEXT" | "DOCUMENT" | "ARCHIVE" | "EXECUTABLE" | "OTHER";
+
+export type PayloadType = "SINGLE_RESOURCE" | "RICH_TEXT" | "PLAIN_TEXT";
+
+export type AuditContentFormat = "DEFAULT" | "PLAINTEXT" | "HTML" | "MARKDOWN";
+
+export interface PostAuditPayload {
+  title?: string;
+  subTitle?: string;
+  content?: string;
+  summary?: string;
+  coverageResUuid?: string;
+  categoryId?: number;
+  tagIds?: number[];
+  newTagNames?: string[];
 }
 
-export interface ModerateTaskResp {
-  id?: string;
-  taskType: ModerateTaskType;
-  targetId: string;
-  content?: SimpleCloudObject | string | null;
-  submitterId: string;
-  submitAt?: string | null;
+export interface FileMeta {
+  eTag?: string;
 }
 
-export interface ListModerationParams {
-  page?: number;
+export interface FileProbeResult {
   size?: number;
-  taskType: ModerateTaskType;
-  submitterId: string;
-  submitAtStart?: string;
-  submitAtEnd?: string;
-}
-
-export interface BatchModerateRequest {
-  auditTaskIds: string[];
-}
-
-export interface BatchModerateRejectRequest {
-  auditTaskIds: string[];
-  rejectType: ModerateRejectType;
-  rejectReason?: string;
-}
-
-export interface ModerateRejectRequest {
-  rejectType: ModerateRejectType;
-  rejectReason?: string;
-}
-
-export interface BatchResult {
-  requested: number;
-  success: number;
-  ignored: number;
-  failed: number;
+  mimeType?: string;
+  meta?: FileMeta;
 }
 
 export interface InstantLike {
@@ -69,51 +57,91 @@ export interface CloudResPresignedUrlResp {
   expireAt?: InstantLike | string | null;
 }
 
-export interface FileMeta {
-  eTag?: string;
-}
-
-export interface FileProbeResult {
-  size?: number | string;
-  mimeType?: string;
-  meta?: FileMeta;
-}
-
-export interface ModerationResourceResp {
-  id?: string;
-  taskId?: string;
-  placeholder?: string;
-  sortNo?: number;
+export interface ModerationResourceRes {
+  taskId?: number;
+  resourceUuid?: string;
   status?: AuditStatus;
   auditAt?: InstantLike | string | null;
-  auditorId?: string;
+  auditorId?: number;
   rejectType?: ModerateRejectType;
   rejectReason?: string;
   fileProbeResult?: FileProbeResult | null;
   presignedUrl?: CloudResPresignedUrlResp | null;
 }
 
-export interface SpringPage<T> {
-  content: T[];
-  totalElements?: number;
-  totalPages?: number;
-  number?: number;
+export interface ModerationTaskPayloadRes {
+  type?: PayloadType;
+  resources?: ModerationResourceRes[];
+  content?: string;
+  contentFormat?: AuditContentFormat;
+  meta?: Record<string, unknown>;
+}
+
+export interface ModerateTaskResp {
+  id?: number;
+  targetType?: TargetType;
+  targetId?: string;
+  payload?: ModerationTaskPayloadRes;
+  submitterId?: number;
+  submitAt?: InstantLike | string | null;
+}
+
+export interface BatchResult {
+  requested: number;
+  success: number;
+  ignored: number;
+  failed: number;
+}
+
+export interface ListModerationParams {
+  page?: number;
   size?: number;
+  taskType?: TargetType;
+  submitterId?: number;
+  submitAtStart?: string;
+  submitAtEnd?: string;
 }
 
 export interface ListModerationResourceParams {
   page?: number;
   size?: number;
-  taskId?: string;
+  taskId?: number;
   status?: AuditStatus;
-  resourceType?: AuditResourceType;
-  auditorId?: string;
+  resourceType?: ResourceType;
+  auditorId?: number;
   auditAtStart?: string;
   auditAtEnd?: string;
 }
 
+export interface BatchModerateRequest {
+  auditTaskIds: number[];
+}
+
+export interface BatchModerateRejectRequest {
+  auditTaskIds: number[];
+  rejectType: ModerateRejectType;
+  rejectReason?: string;
+}
+
+export interface ModerateRejectRequest {
+  rejectType: ModerateRejectType;
+  rejectReason?: string;
+}
+
+export const getModerationTaskById = (id: number): PromiseResBody<ModerateTaskResp> => {
+  return request.get<ModerateTaskResp>(`/moderations/${id}`);
+};
+
 export const listModerations = (params: ListModerationParams): PromiseResBody<Page<ModerateTaskResp>> => {
   return request.get<Page<ModerateTaskResp>>("/moderations/list", { params });
+};
+
+export const approveModerationById = (id: number): PromiseResBody<BatchResult> => {
+  return request.post<BatchResult>(`/moderations/${id}/approve`);
+};
+
+export const rejectModerationById = (id: number, data: ModerateRejectRequest): PromiseResBody<BatchResult> => {
+  return request.post<BatchResult>(`/moderations/${id}/reject`, data);
 };
 
 export const approveModerations = (data: BatchModerateRequest): PromiseResBody<BatchResult> => {
@@ -124,31 +152,28 @@ export const rejectModerations = (data: BatchModerateRejectRequest): PromiseResB
   return request.post<BatchResult>("/moderations/reject", data);
 };
 
-export const approveModerationById = (id: string): PromiseResBody<BatchResult> => {
-  return request.post<BatchResult>(`/moderations/${id}/approve`);
-};
-
-export const rejectModerationById = (id: string, data: ModerateRejectRequest): PromiseResBody<BatchResult> => {
-  return request.post<BatchResult>(`/moderations/${id}/reject`, data);
+export const listResourcesByTask = (id: number): PromiseResBody<ModerationResourceRes[]> => {
+  return request.get<ModerationResourceRes[]>(`/moderations/${id}/resources`);
 };
 
 export const listModerationResources = (
   params: ListModerationResourceParams
-): PromiseResBody<SpringPage<ModerationResourceResp>> => {
-  return request.get<SpringPage<ModerationResourceResp>>("/moderations/resources/list", { params });
+): PromiseResBody<Page<ModerationResourceRes>> => {
+  return request.get<Page<ModerationResourceRes>>("/moderations/resources/list", { params });
 };
 
-export const getModerationResource = (resourceId: string): PromiseResBody<ModerationResourceResp> => {
-  return request.get<ModerationResourceResp>(`/moderations/resources/${resourceId}`);
+export const getModerationResource = (taskId: number, resourceUuid: string): PromiseResBody<ModerationResourceRes> => {
+  return request.get<ModerationResourceRes>(`/moderations/${taskId}/resources/${resourceUuid}`);
 };
 
-export const approveModerationResource = (resourceId: string): PromiseResBody<void> => {
-  return request.post<void>(`/moderations/resources/${resourceId}/approve`);
+export const approveModerationResource = (taskId: number, resourceUuid: string): PromiseResBody<void> => {
+  return request.post<void>(`/moderations/${taskId}/resources/${resourceUuid}/approve`);
 };
 
 export const rejectModerationResource = (
-  resourceId: string,
+  taskId: number,
+  resourceUuid: string,
   data: ModerateRejectRequest
 ): PromiseResBody<void> => {
-  return request.post<void>(`/moderations/resources/${resourceId}/reject`, data);
+  return request.post<void>(`/moderations/${taskId}/resources/${resourceUuid}/reject`, data);
 };

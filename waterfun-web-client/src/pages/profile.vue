@@ -40,20 +40,25 @@ const userInfo = computed(() => userInfoStore.userInfo);
 const userProfile = computed(() => userProfileStore.userProfile);
 
 const userProfileData = ref({
-  nickname: userProfile.value.nickname || userInfo.value.username,
+  nickname: userInfo.value.username,
   avatar: '',
-  joinDate: userInfo.value.createAt
+  joinDate: userInfo.value.createdAt
 });
 
 onMounted(async () => {
+  await userProfileStore.fetchAndUpdateUserProfile().catch(console.error);
+
   try {
     userProfileData.value.avatar = await userProfileStore.getAvatarUrl();
   } catch (error) {
     console.error('Failed to load avatar:', error);
   }
-  userProfileData.value.nickname = userProfile.value.nickname || userInfo.value.username;
-  userProfileData.value.joinDate = userInfo.value.createAt;
-  router.push('/profile/info');
+  userProfileData.value.nickname = userInfo.value.username;
+  userProfileData.value.joinDate = userInfo.value.createdAt;
+  
+  if (route.path === '/profile') {
+    router.push('/profile/info');
+  }
 });
 
 const activeTab = computed(() => {

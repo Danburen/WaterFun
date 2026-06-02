@@ -2,7 +2,7 @@ package org.waterwood.waterfunservice.service.upload;
 
 import org.springframework.stereotype.Component;
 import org.waterwood.waterfunservice.api.BizType;
-import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
+import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
 
 import java.util.HashMap;
 import java.util.List;

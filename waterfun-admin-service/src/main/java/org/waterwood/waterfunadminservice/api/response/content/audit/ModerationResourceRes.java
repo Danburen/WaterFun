@@ -14,10 +14,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModerationResourceRes {
-    private Long id;
     private Long taskId;
-    private String placeholder;
-    private Long sortNo;
+    private String resourceUuid;
     private AuditStatus status;
     private Instant auditAt;
     private Long auditorId;

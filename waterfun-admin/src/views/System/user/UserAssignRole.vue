@@ -10,12 +10,12 @@ import {
   type AssignedRoleRes,
 } from "~/api/user";
 import type { PageOptions } from "~/types";
-import { useI18n } from "vue-i18n";
+
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import SelectRoleDialog from "../components/SelectRoleDialog.vue";
 
-const { t } = useI18n();
+
 const route = useRoute();
 const router = useRouter();
 
@@ -42,16 +42,12 @@ const pageOpts = ref<PageOptions>({
 });
 
 const assignTitle = computed(() =>
-  t("assign.forTarget", {
-    target: t("user.entity"),
-    name: userName.value || uid.value,
-    item: t("role.entity"),
-  })
+  '为用户 ' + (userName.value || uid.value) + ' 分配角色'
 );
 
 const fetchUserBase = async () => {
   if (!isValidUid.value) {
-    ElMessage.error(t("user.error.invalidId"));
+    ElMessage.error('无效的用户UID');
     router.back();
     return;
   }
@@ -60,7 +56,7 @@ const fetchUserBase = async () => {
     userName.value = res.data.info.username || "";
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("user.error.fetchDetail"));
+    ElMessage.error('获取用户详情失败');
   }
 };
 
@@ -80,7 +76,7 @@ const fetchData = async () => {
     pageOpts.value.total = res.data.page.totalElements || 0;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.fetch"));
+    ElMessage.error('获取角色信息失败');
   } finally {
     loading.value = false;
   }
@@ -99,12 +95,12 @@ const handleConfirmAddRoles = async (ids: number[]) => {
       uid.value,
       ids.map((roleId) => ({ roleId, expiresAt }))
     );
-    ElMessage.success(t("role.success.update"));
+    ElMessage.success('角色更新成功');
     await fetchData();
     assignExpiresAt.value = null;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.save"));
+    ElMessage.error('保存角色失败');
   }
 };
 
@@ -113,11 +109,11 @@ const handleRemove = async () => {
   try {
     await removeUserRoles(uid.value, selectedIds.value);
     selectedIds.value = [];
-    ElMessage.success(t("role.success.update"));
+    ElMessage.success('角色更新成功');
     await fetchData();
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.save"));
+    ElMessage.error('保存角色失败');
   }
 };
 
@@ -155,16 +151,16 @@ onMounted(async () => {
             placeholder="ID"
           />
         </el-form-item>
-        <el-form-item :label="t('role.name')">
+        <el-form-item label="角色名称">
           <el-input
             v-model="searchForm.name"
-            :placeholder="t('role.input.name')"
+            placeholder="请输入角色名称"
           />
         </el-form-item>
-        <el-form-item :label="t('role.code')">
+        <el-form-item label="角色编码">
           <el-input
             v-model="searchForm.code"
-            :placeholder="t('role.input.code')"
+            placeholder="请输入角色编码"
           />
         </el-form-item>
         <el-form-item>
@@ -172,10 +168,10 @@ onMounted(async () => {
             type="primary"
             @click="handleSearch"
           >
-            {{ t('common.query.title') }}
+            查询
           </el-button>
           <el-button @click="handleReset">
-            {{ t('common.reset.title') }}
+            重置
           </el-button>
         </el-form-item>
       </el-form>
@@ -185,7 +181,6 @@ onMounted(async () => {
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
       :title="assignTitle"
-      :title-i18n="false"
       show-add-btn
       :total="pageOpts.total"
       :disable-delete="selectedIds.length === 0"
@@ -212,15 +207,15 @@ onMounted(async () => {
         />
         <el-table-column
           prop="name"
-          :label="t('role.name')"
+          label="角色名称"
         />
         <el-table-column
           prop="code"
-          :label="t('role.code')"
+          label="角色编码"
         />
         <el-table-column
           prop="assignedAt"
-          :label="t('common.time.create')"
+          label="创建时间"
         >
           <template #default="{ row }">
             {{ formatISOData(row.assignedAt) }}
@@ -228,10 +223,10 @@ onMounted(async () => {
         </el-table-column>
         <el-table-column
           prop="expiresAt"
-          :label="t('expiresAt.title')"
+          label="过期时间"
         >
           <template #default="{ row }">
-            {{ row.expiresAt ? formatISOData(row.expiresAt) : t('common.none.title') }}
+            {{ row.expiresAt ? formatISOData(row.expiresAt) : '无' }}
           </template>
         </el-table-column>
       </el-table>
@@ -244,12 +239,12 @@ onMounted(async () => {
     >
       <template #footer-extra>
         <el-form inline>
-          <el-form-item :label="t('expiresAt.title')">
+          <el-form-item label="过期时间">
             <el-date-picker
               v-model="assignExpiresAt"
               type="datetime"
               clearable
-              :placeholder="t('expiresAt.placeholder')"
+              placeholder="请选择过期时间（可选）"
             />
           </el-form-item>
         </el-form>

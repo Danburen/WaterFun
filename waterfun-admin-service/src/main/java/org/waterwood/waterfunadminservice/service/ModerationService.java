@@ -42,7 +42,7 @@ public interface ModerationService {
     /**
      * Get one audit resource detail.
      */
-    ModerationResourceRes getTaskResource(Long resourceId);
+    ModerationResourceRes getTaskResource(Long taskId, String resourceIUuid);
 
     /**
      * Batch approve audit tasks by ids in request, and return the result of batch operation
@@ -60,10 +60,13 @@ public interface ModerationService {
 
     /**
      * Approve a audit task
+     *
      * @param id target audit task id.
+     * @return if one of the task resources belong to the target task is suspect or rejected
+     * then return the not passed task resources
      * @throws NotFoundException if the audit task is not found or not in pending status.
      */
-    void approve(Long id);
+    List<ModerationResourceRes> approve(Long id);
 
     /**
      * Reject a audit task
@@ -77,10 +80,17 @@ public interface ModerationService {
     /**
      * Approve one task resource then aggregate task status.
      */
-    void approveResource(Long resourceId);
+    void approveResource(Long taskId, String resourceUuid);
 
     /**
      * Reject one task resource then aggregate task status.
      */
-    void rejectResource(Long resourceId, ModerateRejectRequest req);
+    void rejectResource(Long taskId, String resourceUuid, ModerateRejectRequest req);
+
+    /**
+     * Return a moderation task response
+     * @param id target task id
+     * @return ModerationTaskResponse of target post
+     */
+    ModerateTaskResponse getTask(Long id);
 }

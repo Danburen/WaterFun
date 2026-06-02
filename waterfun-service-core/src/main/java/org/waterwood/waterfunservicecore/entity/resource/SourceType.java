@@ -15,11 +15,11 @@ public enum SourceType {
     }
 
     public static SourceType fromCode(final short code) {
-        return switch (code) {
-            case 0 -> SYSTEM;
-            case 1 -> CONTENT_ATTACHED;
-            case 2 -> USER_UPLOADED;
-            default -> throw new IllegalArgumentException("Invalid SourceType code: " + code);
-        };
+      for (final SourceType sourceType : SourceType.values()) {
+          if (sourceType.value == code) {
+              return sourceType;
+          }
+      }
+      throw new IllegalArgumentException("No SourceType found for code " + code);
     }
 }

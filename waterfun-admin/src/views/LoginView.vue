@@ -3,12 +3,83 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/authStore'
-import {validateAuthname, validatePassword, validateVerifyCode} from "@/utils/validator";
-import { useI18n } from 'vue-i18n'
+import { REGEX } from '@waterfun/web-core/src/regex'
 import { generateFingerprint } from '@waterfun/web-core/src/fingerprint';
 import { APIError } from '@waterfun/web-core/src/errors/APIError';
 
-const { t } = useI18n()
+type ValidatorRule = unknown;
+type ValidatorCallback = (error?: Error | string) => void;
+
+const validateAuthname = (loginType: string) => {
+  return (rule: ValidatorRule, value: string, callback: ValidatorCallback) => {
+    if (value === '') {
+      callback(new Error('登录名不能为空'));
+      return;
+    }
+    switch (loginType) {
+      case 'email':
+        if (!REGEX.email.test(value)) {
+          callback(new Error('邮箱格式有误'));
+        }
+        break;
+      case 'sms':
+        if (!REGEX.phone.test(value)) {
+          callback(new Error('手机号有误'));
+        }
+        break;
+      case 'password':
+        if (value.length < 4 || value.length > 20) {
+          callback(new Error('用户名长度超出限制(4-20字符)'));
+        } else if (!REGEX.username.test(value)) {
+          callback(new Error('用户名格式有误'));
+        }
+        break;
+    }
+    callback();
+  }
+}
+
+const validatePassword = (allowEmpty?: boolean) => {
+  return (_rule: ValidatorRule, value: string, callback: ValidatorCallback) => {
+    if (!value && !allowEmpty) {
+      callback(new Error('密码不能为空'));
+      return;
+    }
+
+    if (allowEmpty && !value) {
+      callback();
+      return;
+    }
+
+    if (value.length < 8) {
+      callback(new Error('密码长度必须大于8个字符'));
+      return;
+    }
+
+    if (value.length > 20) {
+      callback(new Error('密码长度不能超过20个字符'));
+      return;
+    }
+
+    if (!/[a-z]/.test(value) || !/[A-Z]/.test(value) || !/[0-9]/.test(value)) {
+      callback(new Error('密码必须包含大小写字母和数字!'));
+      return;
+    }
+
+    callback();
+  };
+}
+
+const validateVerifyCode = (allowEmpty: boolean) => {
+  return (rule: ValidatorRule, value: string, callback: ValidatorCallback) => {
+    if (!value && !allowEmpty) {
+      callback(new Error('验证码不能为空'));
+    } else {
+      callback();
+    }
+  }
+}
+
 const router = useRouter()
 const authStore = useAuthStore()
 const loginFormRef = ref(null)
@@ -37,11 +108,11 @@ const handleCaptchaConfirm = (code: string, callback: (success: boolean) => void
           ...loginForm.value,
           deviceFp: deviceFp,
         }).then(_ => {
-          ElMessage.success(t('message.success.loginSuccess'));
+          ElMessage.success('登录成功');
           router.push({ name: 'dashboard' })
         }).catch((err: APIError) => {
-        
-          ElMessage.error(t(err.code));
+
+          ElMessage.error(err.message || '登录失败');
           console.log(err);
         })
       })
@@ -80,21 +151,21 @@ const submitLoginForm = () => {
         >
           <el-form-item
             prop="username"
-            :label="$t('auth.username')"
+            label="用户名"
           >
             <el-input
               v-model="loginForm.username"
-              :placeholder="$t('auth.username')"
+              placeholder="用户名"
             />
           </el-form-item>
           <el-form-item
             prop="password"
-            :label="$t('auth.password')"
+            label="密码"
           >
             <el-input
               v-model="loginForm.password"
               type="password"
-              :placeholder="$t('auth.password')"
+              placeholder="密码"
             />
           </el-form-item>
           <el-form-item>
@@ -103,7 +174,7 @@ const submitLoginForm = () => {
               type="primary" 
               @click="submitLoginForm"
             >
-              {{ $t('auth.btn.login') }}
+              登录
             </el-button>
           </el-form-item>
         </el-form>

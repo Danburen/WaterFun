@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { formatDate } from "@waterfun/web-core/src/timer";
 import type { OptionResItem } from "@waterfun/web-core/src/types/api/response";
-import { useI18n } from "vue-i18n";
+
 import { useRoute, useRouter } from "vue-router";
 import { getCategory, getCategoryOptions, type CategoryResp } from "~/api/category";
 import { getUserOptions } from "~/api/user";
 import CategoryCreateDialog from "~/views/Content/components/CategoryCreateDialog.vue";
 import { ElMessage } from "element-plus";
 
-const { t } = useI18n();
+
 const route = useRoute();
 const router = useRouter();
 
@@ -39,13 +39,13 @@ const fetchOptions = async () => {
     userOptions.value = userRes.data || [];
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   }
 };
 
 const fetchDetail = async () => {
   if (Number.isNaN(categoryId.value)) {
-    ElMessage.error(t("content.category.error.invalidId"));
+    ElMessage.error('无效的分类ID');
     router.back();
     return;
   }
@@ -56,7 +56,7 @@ const fetchDetail = async () => {
     categoryDetail.value = res.data;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("content.category.error.fetchDetail"));
+    ElMessage.error('获取分类详情失败');
   } finally {
     loading.value = false;
   }
@@ -76,20 +76,20 @@ onMounted(async () => {
     v-loading="loading"
     class="category-detail"
   >
-    <CardContainer title="content.category.detail">
+    <CardContainer title="分类详情">
       <template #header-right>
         <el-button
           text
           @click="router.back()"
         >
-          {{ t("common.action.back") }}
+          返回
         </el-button>
         <el-button
           type="primary"
           plain
           @click="editDialogVisible = true"
         >
-          {{ t("common.action.edit") }}
+          编辑
         </el-button>
       </template>
 
@@ -101,42 +101,42 @@ onMounted(async () => {
         <el-descriptions-item label="ID">
           {{ categoryDetail.id }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.category.field.name')">
+        <el-descriptions-item label="分类名">
           {{ categoryDetail.name }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.category.field.slug')">
-          {{ categoryDetail.slug || t('common.none.title') }}
+        <el-descriptions-item label="唯一标识符">
+          {{ categoryDetail.slug || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.category.field.parentId')">
+        <el-descriptions-item label="父级ID">
           <span v-if="categoryDetail.parentId">
-            {{ categoryDetail.parentId }} ({{ categoryNameMap.get(categoryDetail.parentId) || t('common.none.title') }})
+            {{ categoryDetail.parentId }} ({{ categoryNameMap.get(categoryDetail.parentId) || '无' }})
           </span>
-          <span v-else>{{ t('common.none.title') }}</span>
+          <span v-else>无</span>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.category.field.sortOrder')">
-          {{ categoryDetail.sortOrder ?? t('common.none.title') }}
+        <el-descriptions-item label="排序">
+          {{ categoryDetail.sortOrder ?? '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.category.field.creatorId')">
+        <el-descriptions-item label="创建人ID">
           <span v-if="categoryDetail.creatorId">
-            {{ categoryDetail.creatorId }} ({{ userNameMap.get(categoryDetail.creatorId) || t('common.none.title') }})
+            {{ categoryDetail.creatorId }} ({{ userNameMap.get(categoryDetail.creatorId) || '无' }})
           </span>
-          <span v-else>{{ t('common.none.title') }}</span>
+          <span v-else>无</span>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.category.field.isActive')">
+        <el-descriptions-item label="是否启用">
           <el-tag
             size="small"
             :type="categoryDetail.isActive ? 'success' : 'info'"
           >
-            {{ categoryDetail.isActive ? t('common.boolean.yes') : t('common.boolean.no') }}
+            {{ categoryDetail.isActive ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.category.field.description')">
-          {{ categoryDetail.description || t('common.none.title') }}
+        <el-descriptions-item label="描述">
+          {{ categoryDetail.description || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">
+        <el-descriptions-item label="创建时间">
           {{ formatDate(categoryDetail.createdAt) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">
+        <el-descriptions-item label="更新时间">
           {{ formatDate(categoryDetail.updateAt) }}
         </el-descriptions-item>
       </el-descriptions>

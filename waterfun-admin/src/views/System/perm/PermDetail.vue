@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import type { OptionResItem } from "@waterfun/web-core/src/types";
 import { formatISOData } from "@waterfun/web-core/src/timer";
-import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { getPermOptions, getPermUsers, getPermission, type PermissionResp } from "~/api/permission";
 import { ElMessage } from "element-plus";
 import PermEditDialog from "./components/PermEditDialog.vue";
 
-const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
@@ -27,13 +25,13 @@ const fetchPermOptions = async () => {
     permOptions.value = res.data;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("permission.error.fetch"));
+    ElMessage.error('获取权限信息失败');
   }
 };
 
 const fetchPermDetail = async () => {
   if (Number.isNaN(permissionId.value)) {
-    ElMessage.error(t("permission.error.invalidId"));
+    ElMessage.error('无效的权限 ID');
     router.back();
     return;
   }
@@ -44,7 +42,7 @@ const fetchPermDetail = async () => {
     permissionDetail.value = res.data;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("permission.error.fetch"));
+    ElMessage.error('获取权限信息失败');
   } finally {
     loading.value = false;
   }
@@ -80,7 +78,7 @@ const fetchPermUsersPreview = async () => {
     assignedUserOptions.value = all;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("permission.error.fetchUsers"));
+    ElMessage.error('获取权限用户失败');
   }
 };
 
@@ -98,20 +96,20 @@ onMounted(async () => {
     v-loading="loading"
     class="perm-detail"
   >
-    <CardContainer title="permission.detail">
+    <CardContainer title="权限详情">
       <template #header-right>
         <el-button
           text
           @click="router.back()"
         >
-          {{ t("common.action.back") }}
+          返回
         </el-button>
         <el-button
           type="primary"
           plain
           @click="openEditDialog"
         >
-          {{ t("common.action.edit") }}
+          编辑
         </el-button>
       </template>
 
@@ -123,19 +121,19 @@ onMounted(async () => {
         <el-descriptions-item label="ID">
           {{ permissionDetail.id }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.name')">
+        <el-descriptions-item label="权限名称">
           {{ permissionDetail.name }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.code')">
-          {{ permissionDetail.code || t('common.none.title') }}
+        <el-descriptions-item label="权限编码">
+          {{ permissionDetail.code || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.type.title')">
-          {{ t(`permission.type.${permissionDetail.type.toLowerCase()}`) }}
+        <el-descriptions-item label="权限类型">
+          {{ ({ menu: '菜单', button: '按钮', api: '接口', data: '数据', other: '其他' })[permissionDetail.type.toLowerCase()] || '其他' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.resource')">
-          {{ permissionDetail.resource || t('common.none.title') }}
+        <el-descriptions-item label="资源标识">
+          {{ permissionDetail.resource || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.parentId')">
+        <el-descriptions-item label="父级权限ID">
           <el-link
             v-if="permissionDetail.parentId != null"
             type="primary"
@@ -144,26 +142,26 @@ onMounted(async () => {
           >
             {{ permissionDetail.parentId }}
           </el-link>
-          <span v-else>{{ t('common.none.title') }}</span>
+          <span v-else>无</span>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.weight')">
-          {{ permissionDetail.orderWeight ?? t('common.none.title') }}
+        <el-descriptions-item label="排序权重">
+          {{ permissionDetail.orderWeight ?? '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.isSystem')">
+        <el-descriptions-item label="系统权限">
           <el-tag
             size="small"
             :type="permissionDetail.isSystem ? 'warning' : 'info'"
           >
-            {{ permissionDetail.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
+            {{ permissionDetail.isSystem ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('permission.description')">
-          {{ permissionDetail.description || t('common.none.title') }}
+        <el-descriptions-item label="权限描述">
+          {{ permissionDetail.description || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">
+        <el-descriptions-item label="创建时间">
           {{ formatISOData(permissionDetail.createdAt) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">
+        <el-descriptions-item label="更新时间">
           {{ formatISOData(permissionDetail.updatedAt) }}
         </el-descriptions-item>
       </el-descriptions>
@@ -171,11 +169,11 @@ onMounted(async () => {
 
     <CardContainer
       style="margin-top: 12px"
-      title="permission.assignedUsers"
+      title="已分配用户"
     >
       <el-collapse v-model="collapseActive">
         <el-collapse-item
-          :title="t('permission.assignedUsers')"
+          title="已分配用户"
           name="users"
         >
           <el-row :gutter="10">
@@ -200,7 +198,7 @@ onMounted(async () => {
               v-if="assignedUserOptions.length === 0"
               :span="24"
             >
-              {{ t('common.none.description') }}
+              暂无数据
             </el-col>
           </el-row>
         </el-collapse-item>

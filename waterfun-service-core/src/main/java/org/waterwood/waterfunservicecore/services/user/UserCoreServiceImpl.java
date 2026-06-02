@@ -162,8 +162,8 @@ public class UserCoreServiceImpl implements UserCoreService {
     }
 
     @Override
-    public boolean isCurrentUserAdmin() {
-        return userRoleCoreService.getUserRoles(UserCtxHolder.getUserUid()).stream()
+    public boolean isUserAdmin(Long userUid) {
+        return userRoleCoreService.getUserRoles(userUid).stream()
                 .anyMatch(role -> role.getCode().equalsIgnoreCase(
                         userRoleCoreService.getAdminRoleCode()
                 ));

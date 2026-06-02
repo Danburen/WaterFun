@@ -83,4 +83,8 @@ public class AuditTask {
     @Column(name = "pending_target_id", length = 64, updatable = false, insertable = false) // the application usually won't use this
     private String pendingTargetId;
 
+    @Size(max = 255)
+    @Column(name = "suspect_reason")
+    private String suspectReason;
+
 }

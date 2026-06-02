@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
@@ -64,4 +65,11 @@ public class InboxSystem {
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();
+
+    @Column(name = "target_type", columnDefinition = "tinyint UNSIGNED")
+    private TargetType targetType;
+
+    @Column(name = "target_id")
+    private Long targetId;
+
 }

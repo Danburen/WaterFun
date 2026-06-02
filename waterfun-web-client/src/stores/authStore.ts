@@ -38,7 +38,7 @@ export const useAuthStore = defineStore('accessStore', ()=>{
     }
 },{
     persist: process.client ? {
-        storage: sessionStorage
+        storage: localStorage
     } : false
 })
 

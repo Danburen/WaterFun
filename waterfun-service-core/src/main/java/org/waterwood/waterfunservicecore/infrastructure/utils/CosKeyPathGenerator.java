@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.utils;
+package org.waterwood.waterfunservicecore.infrastructure.utils;
 
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.utils.PathUtil;

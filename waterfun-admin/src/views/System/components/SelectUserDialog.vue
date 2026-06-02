@@ -4,7 +4,6 @@ import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
 import { getUserList, type AccountStatus, type UserAdminDto } from "~/api/user";
 import type { PageOptions } from "~/types";
-import { useI18n } from "vue-i18n";
 import { ElMessage } from "element-plus";
 
 const props = withDefaults(
@@ -22,7 +21,6 @@ const emit = defineEmits<{
   confirm: [ids: string[]];
 }>();
 
-const { t } = useI18n();
 
 const visible = computed({
   get: () => props.modelValue,
@@ -56,7 +54,8 @@ const statusTypeMap: Record<AccountStatus, "success" | "warning" | "danger" | "i
   DELETED: "info",
 };
 
-const statusLabel = (status: AccountStatus) => t(`user.statusMap.${status.toLowerCase()}`);
+const statusLabel = (status: AccountStatus) =>
+  ({ ACTIVE: '正常', SUSPENDED: '已停用', DEACTIVATED: '已注销', DELETED: '已删除' })[status];
 
 const selectable = (row: UserAdminDto) => !props.disabledUserUids.includes(row.uid);
 
@@ -74,7 +73,7 @@ const fetchData = async () => {
     pageOpts.value.total = res.data.page.totalElements || 0;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("user.error.fetchList"));
+    ElMessage.error('获取用户列表失败');
   } finally {
     loading.value = false;
   }
@@ -118,7 +117,7 @@ watch(
 <template>
   <el-dialog
     v-model="visible"
-    :title="t('user.select')"
+    title="选择用户"
     width="1200"
     destroy-on-close
   >
@@ -129,19 +128,19 @@ watch(
           :model="searchForm"
           class="search-form"
         >
-          <el-form-item :label="t('user.username')">
+          <el-form-item label="用户名">
             <el-input
               v-model="searchForm.username"
-              :placeholder="t('user.input.username')"
+              placeholder="请输入用户名"
             />
           </el-form-item>
-          <el-form-item :label="t('user.nickname')">
+          <el-form-item label="昵称">
             <el-input
               v-model="searchForm.nickname"
-              :placeholder="t('user.input.nickname')"
+              placeholder="请输入昵称"
             />
           </el-form-item>
-          <el-form-item :label="t('user.status')">
+          <el-form-item label="用户状态">
             <el-select
               v-model="searchForm.accountStatus"
               clearable
@@ -170,10 +169,10 @@ watch(
               type="primary"
               @click="handleSearch"
             >
-              {{ t('common.query.title') }}
+              查询
             </el-button>
             <el-button @click="handleReset">
-              {{ t('common.reset.title') }}
+              重置
             </el-button>
           </el-form-item>
         </el-form>
@@ -182,7 +181,7 @@ watch(
       <TableContainer
         v-model:page-size="pageOpts.pageSize"
         v-model:current-page="pageOpts.currentPage"
-        title="user.list"
+        title="用户列表"
         :show-add-btn="false"
         :show-remove-btn="false"
         :total="pageOpts.total"
@@ -209,21 +208,21 @@ watch(
           />
           <el-table-column
             prop="username"
-            :label="t('user.username')"
+            label="用户名"
             min-width="180"
           />
           <el-table-column
             prop="nickname"
-            :label="t('user.nickname')"
+            label="昵称"
             min-width="180"
           >
             <template #default="{ row }">
-              {{ row.nickname || t('common.none.title') }}
+              {{ row.nickname || '无' }}
             </template>
           </el-table-column>
           <el-table-column
             prop="accountStatus"
-            :label="t('user.status')"
+            label="用户状态"
             width="140"
           >
             <template #default="{ row }">
@@ -237,7 +236,7 @@ watch(
           </el-table-column>
           <el-table-column
             prop="createdAt"
-            :label="t('common.time.create')"
+            label="创建时间"
             min-width="170"
           >
             <template #default="{ row }">
@@ -257,14 +256,14 @@ watch(
 
     <template #footer>
       <el-button @click="visible = false">
-        {{ t('common.action.cancel') }}
+        取消
       </el-button>
       <el-button
         type="primary"
         :disabled="selectedIds.length === 0"
         @click="handleConfirm"
       >
-        {{ t('common.action.save') }}
+        保存
       </el-button>
     </template>
   </el-dialog>

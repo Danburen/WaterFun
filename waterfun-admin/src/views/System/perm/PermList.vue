@@ -2,7 +2,6 @@
 import type { OptionResItem } from "@waterfun/web-core/src/types";
 import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
@@ -18,7 +17,6 @@ import { ElMessage } from "element-plus";
 import type { PageOptions } from "~/types";
 import PermEditDialog from "./components/PermEditDialog.vue";
 
-const { t } = useI18n();
 const router = useRouter();
 
 const permissionList = ref<PermissionResp[]>([]);
@@ -51,11 +49,11 @@ const currentPermId = ref<number | null>(null);
 const selectedPermIds = ref<number[]>([]);
 
 const permTypeOptions: { label: string; value: PermissionType }[] = [
-  { label: "permission.type.menu", value: "MENU" },
-  { label: "permission.type.button", value: "BUTTON" },
-  { label: "permission.type.api", value: "API" },
-  { label: "permission.type.data", value: "DATA" },
-  { label: "permission.type.other", value: "OTHER" },
+  { label: "菜单", value: "MENU" },
+  { label: "按钮", value: "BUTTON" },
+  { label: "接口", value: "API" },
+  { label: "数据", value: "DATA" },
+  { label: "其他", value: "OTHER" },
 ];
 
 const selectable = (row: PermissionResp) => row.isSystem === false;
@@ -66,7 +64,7 @@ const fetchPermOptions = async () => {
     permOptions.value = res.data;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("permission.error.fetch"));
+    ElMessage.error('获取权限信息失败');
   }
 };
 
@@ -87,7 +85,7 @@ const fetchData = async () => {
     pageOpts.value.total = res.data.page.totalElements || 0;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   } finally {
     loading.value = false;
   }
@@ -107,16 +105,16 @@ const handleEdit = (row: PermissionResp) => {
 
 const handleDelete = async (row: PermissionResp) => {
   try {
-    await ElMessageBox.confirm(t("permission.confirm.delete"), t("common.action.delete"), {
+    await ElMessageBox.confirm('确定删除该权限吗？', '删除', {
       type: "warning",
     });
     await deletePermission(row.id);
-    ElMessage.success(t("permission.success.delete"));
+    ElMessage.success('权限删除成功');
     await fetchData();
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("permission.error.delete"));
+      ElMessage.error('删除权限失败');
     }
   }
 };
@@ -132,8 +130,8 @@ const handleBatchDelete = async () => {
 
   try {
     await ElMessageBox.confirm(
-      t("permission.confirm.batchDelete", { count: selectedPermIds.value.length }),
-      t("common.action.delete"),
+      `确定删除选中的 ${selectedPermIds.value.length} 个权限吗？`,
+      '删除',
       { type: "warning" }
     );
 
@@ -141,11 +139,11 @@ const handleBatchDelete = async () => {
     const result = res.data;
 
     if (result.success === result.requested) {
-      ElMessage.success(t("permission.success.delete"));
+      ElMessage.success('权限删除成功');
     } else if (result.success === 0) {
-      ElMessage.error(t("permission.error.delete"));
+      ElMessage.error('删除权限失败');
     } else {
-      ElMessage.warning(`${t("permission.success.delete")} ${result.success}/${result.requested}`);
+      ElMessage.warning(`${'权限删除成功'} ${result.success}/${result.requested}`);
     }
 
     selectedPermIds.value = [];
@@ -153,7 +151,7 @@ const handleBatchDelete = async () => {
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("permission.error.delete"));
+      ElMessage.error('删除权限失败');
     }
   }
 };
@@ -197,21 +195,21 @@ onMounted(async () => {
         class="search-form"
         :model="searchForm"
       >
-        <el-form-item :label="t('permission.name')">
+        <el-form-item label="权限名称">
           <el-input
             v-model="searchForm.name"
-            :placeholder="t('permission.input.name')"
+            placeholder="请输入权限名称"
           />
         </el-form-item>
 
-        <el-form-item :label="t('permission.code')">
+        <el-form-item label="权限编码">
           <el-input
             v-model="searchForm.code"
-            :placeholder="t('permission.input.code')"
+            placeholder="请输入权限编码"
           />
         </el-form-item>
 
-        <el-form-item :label="t('permission.type.title')">
+        <el-form-item label="权限类型">
           <el-select
             v-model="searchForm.type"
             clearable
@@ -220,24 +218,24 @@ onMounted(async () => {
             <el-option
               v-for="item in permTypeOptions"
               :key="item.value"
-              :label="t(item.label)"
+              :label="item.label"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="t('permission.resource')">
+        <el-form-item label="资源标识">
           <el-input
             v-model="searchForm.resource"
-            :placeholder="t('permission.input.resource')"
+            placeholder="请输入资源标识"
           />
         </el-form-item>
 
-        <el-form-item :label="t('permission.parentId')">
+        <el-form-item label="父级权限ID">
           <el-select
             v-model="searchForm.parentId"
             clearable
-            :placeholder="t('permission.input.parentId')"
+            placeholder="请选择父级权限"
             style="width: 180px"
           >
             <el-option
@@ -255,10 +253,10 @@ onMounted(async () => {
             type="primary"
             @click="handleSearch"
           >
-            {{ t('common.query.title') }}
+            查询
           </el-button>
           <el-button @click="handleReset">
-            {{ t('common.reset.title') }}
+            重置
           </el-button>
         </el-form-item>
       </el-form>
@@ -267,7 +265,7 @@ onMounted(async () => {
     <TableContainer
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
-      title="permission.title"
+      title="权限管理"
       show-add-btn
       :show-remove-btn="true"
       :disable-delete="selectedPermIds.length === 0"
@@ -298,7 +296,7 @@ onMounted(async () => {
 
         <el-table-column
           prop="name"
-          :label="t('permission.name')"
+          label="权限名称"
           min-width="140"
         >
           <template #default="{ row }">
@@ -314,30 +312,30 @@ onMounted(async () => {
 
         <el-table-column
           prop="code"
-          :label="t('permission.code')"
+          label="权限编码"
           min-width="140"
         />
 
         <el-table-column
           prop="type"
-          :label="t('permission.type.title')"
+          label="权限类型"
           width="110"
         >
           <template #default="{ row }">
-            {{ t(`permission.type.${row.type?.toLowerCase?.() || 'other'}`) }}
+            {{ ({ menu: '菜单', button: '按钮', api: '接口', data: '数据', other: '其他' })[row.type?.toLowerCase?.() || 'other'] }}
           </template>
         </el-table-column>
 
         <el-table-column
           prop="resource"
-          :label="t('permission.resource')"
+          label="资源标识"
           min-width="180"
           show-overflow-tooltip
         />
 
         <el-table-column
           prop="parentId"
-          :label="t('permission.parentId')"
+          label="父级权限ID"
           width="120"
         >
           <template #default="{ row }">
@@ -349,19 +347,19 @@ onMounted(async () => {
             >
               {{ row.parentId }}
             </el-link>
-            <span v-else>{{ t('common.none.title') }}</span>
+            <span v-else>无</span>
           </template>
         </el-table-column>
 
         <el-table-column
           prop="orderWeight"
-          :label="t('permission.weight')"
+          label="排序权重"
           width="90"
         />
 
         <el-table-column
           prop="isSystem"
-          :label="t('permission.isSystem')"
+          label="系统权限"
           width="100"
         >
           <template #default="{ row }">
@@ -369,21 +367,21 @@ onMounted(async () => {
               size="small"
               :type="row.isSystem ? 'warning' : 'info'"
             >
-              {{ row.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
+              {{ row.isSystem ? '是' : '否' }}
             </el-tag>
           </template>
         </el-table-column>
 
         <el-table-column
           prop="description"
-          :label="t('permission.description')"
+          label="权限描述"
           min-width="180"
           show-overflow-tooltip
         />
 
         <el-table-column
           prop="createdAt"
-          :label="t('common.time.create')"
+          label="创建时间"
           min-width="170"
         >
           <template #default="{ row }">
@@ -392,7 +390,7 @@ onMounted(async () => {
         </el-table-column>
 
         <el-table-column
-          :label="t('common.operation.title')"
+          label="操作"
           width="150"
           fixed="right"
         >
@@ -402,14 +400,14 @@ onMounted(async () => {
               size="small"
               @click="handleEdit(scope.row)"
             >
-              {{ t('common.action.edit') }}
+              编辑
             </el-button>
             <el-button
               type="danger"
               size="small"
               @click="handleDelete(scope.row)"
             >
-              {{ t('common.action.delete') }}
+              删除
             </el-button>
           </template>
         </el-table-column>

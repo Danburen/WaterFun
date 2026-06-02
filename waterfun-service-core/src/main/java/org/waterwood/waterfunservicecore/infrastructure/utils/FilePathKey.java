@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.utils;
+package org.waterwood.waterfunservicecore.infrastructure.utils;
 
 public final class FilePathKey {
     public static final String IMG_PATH = "img";

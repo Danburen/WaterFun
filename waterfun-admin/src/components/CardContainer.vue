@@ -1,16 +1,11 @@
 <script setup lang="ts">
-
-import {useI18n} from "vue-i18n";
-
-const {t} = useI18n();
-
 const props = withDefaults(defineProps<{
   title: string;
   showTitle?: boolean;
-  titleI18n?: boolean;
+  fixedHeader?: boolean;
 }>(), {
   showTitle: true,
-  titleI18n: true
+  fixedHeader: false,
 })
 </script>
 
@@ -18,11 +13,11 @@ const props = withDefaults(defineProps<{
   <div class="table-container">
     <div
       v-if="props.showTitle"
-      class="header"
+      :class="['header', { 'is-fixed': props.fixedHeader }]"
     >
       <div class="table-header">
         <div class="header-left">
-          <span>{{ props.titleI18n ? t(title) : title }}</span>
+          <span>{{ title }}</span>
         </div>
         <slot
           class="header-right"
@@ -43,6 +38,16 @@ const props = withDefaults(defineProps<{
   box-shadow: #ccc 2px 2px 12px;
   border-radius: 4px;
   width: 100%;
+  background: #fff;
+}
+
+.header.is-fixed {
+  position: sticky;
+  top: -1px;
+  z-index: 100;
+  background: #fff;
+  margin: -1px -1px 0;
+  padding: 0 1px;
 }
 
 .table-header {
@@ -58,7 +63,7 @@ const props = withDefaults(defineProps<{
 .header-divider {
   height: 1px;
   background-color: #ccc;
-  margin: 0; /* 控制边距 */
+  margin: 0;
 }
 
 .table-content {

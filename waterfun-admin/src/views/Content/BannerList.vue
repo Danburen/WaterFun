@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { formatDate } from "@waterfun/web-core/src/timer";
-import { useI18n } from "vue-i18n";
 import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
 import { listBanners, getBannerCoverageUpload, type BannerPosition, type BannerResp, type BannerStatus } from "~/api/banner";
@@ -8,7 +7,6 @@ import type { PageOptions } from "~/types/api";
 import BannerCreateDialog from "~/views/Content/components/BannerCreateDialog.vue";
 import { ElMessage } from "element-plus";
 
-const { t } = useI18n();
 
 const loading = ref(false);
 const bannerList = ref<BannerResp[]>([]);
@@ -35,13 +33,13 @@ const pageOpts = ref<PageOptions>({
 });
 
 const positionOptions: { label: string; value: BannerPosition }[] = [
-  { label: "content.banner.position.home", value: "HOME" },
-  { label: "content.banner.position.side", value: "SIDE" },
+  { label: "首页", value: "HOME" },
+  { label: "侧边栏", value: "SIDE" },
 ];
 
 const statusOptions: { label: string; value: BannerStatus }[] = [
-  { label: "content.banner.status.show", value: "SHOW" },
-  { label: "content.banner.status.hide", value: "HIDE" },
+  { label: "显示", value: "SHOW" },
+  { label: "隐藏", value: "HIDE" },
 ];
 
 const fetchData = async () => {
@@ -59,7 +57,7 @@ const fetchData = async () => {
     pageOpts.value.total = res.data.page?.totalElements || 0;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   } finally {
     loading.value = false;
   }
@@ -131,19 +129,19 @@ onMounted(() => {
         class="search-form"
         :model="searchForm"
       >
-        <el-form-item :label="t('content.banner.field.title')">
+        <el-form-item label="标题">
           <el-input
             v-model="searchForm.title"
-            :placeholder="t('content.banner.input.title')"
+            placeholder="请输入标题"
           />
         </el-form-item>
-        <el-form-item :label="t('content.banner.field.subtitle')">
+        <el-form-item label="副标题">
           <el-input
             v-model="searchForm.subtitle"
-            :placeholder="t('content.banner.input.subtitle')"
+            placeholder="请输入副标题"
           />
         </el-form-item>
-        <el-form-item :label="t('content.banner.field.position')">
+        <el-form-item label="位置">
           <el-select
             v-model="searchForm.position"
             clearable
@@ -152,12 +150,12 @@ onMounted(() => {
             <el-option
               v-for="item in positionOptions"
               :key="item.value"
-              :label="t(item.label)"
+              :label="item.label"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('content.banner.field.status')">
+        <el-form-item label="状态">
           <el-select
             v-model="searchForm.status"
             clearable
@@ -166,7 +164,7 @@ onMounted(() => {
             <el-option
               v-for="item in statusOptions"
               :key="item.value"
-              :label="t(item.label)"
+              :label="item.label"
               :value="item.value"
             />
           </el-select>
@@ -176,10 +174,10 @@ onMounted(() => {
             type="primary"
             @click="handleSearch"
           >
-            {{ t("common.query.title") }}
+            查询
           </el-button>
           <el-button @click="handleReset">
-            {{ t("common.reset.title") }}
+            重置
           </el-button>
         </el-form-item>
       </el-form>
@@ -188,7 +186,7 @@ onMounted(() => {
     <TableContainer
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
-      title="content.banner.title"
+      title="轮播图管理"
       show-add-btn
       :show-remove-btn="false"
       :total="pageOpts.total"
@@ -210,42 +208,42 @@ onMounted(() => {
         />
         <el-table-column
           prop="title"
-          :label="t('content.banner.field.title')"
+          label="标题"
           min-width="160"
           show-overflow-tooltip
         />
         <el-table-column
           prop="subtitle"
-          :label="t('content.banner.field.subtitle')"
+          label="副标题"
           min-width="180"
           show-overflow-tooltip
         />
         <el-table-column
           prop="position"
-          :label="t('content.banner.field.position')"
+          label="位置"
           width="110"
         >
           <template #default="{ row }">
-            {{ row.position ? t(`content.banner.position.${row.position.toLowerCase()}`) : t('common.none.title') }}
+            {{ ({ home: '首页', side: '侧边栏' })[row.position?.toLowerCase()] || '无' }}
           </template>
         </el-table-column>
         <el-table-column
           prop="status"
-          :label="t('content.banner.field.status')"
+          label="状态"
           width="110"
         >
           <template #default="{ row }">
-            {{ row.status ? t(`content.banner.status.${row.status.toLowerCase()}`) : t('common.none.title') }}
+            {{ ({ show: '显示', hide: '隐藏' })[row.status?.toLowerCase()] || '无' }}
           </template>
         </el-table-column>
         <el-table-column
           prop="sortNo"
-          :label="t('content.banner.field.sortNo')"
+          label="排序"
           width="110"
         />
         <el-table-column
           prop="linkUrl"
-          :label="t('content.banner.field.linkUrl')"
+          label="跳转链接"
           min-width="220"
           show-overflow-tooltip
         >
@@ -258,47 +256,47 @@ onMounted(() => {
             >
               {{ row.linkUrl }}
             </el-link>
-            <span v-else>{{ t('common.none.title') }}</span>
+            <span v-else>无</span>
           </template>
         </el-table-column>
         <el-table-column
           prop="startAt"
-          :label="t('content.banner.field.startAt')"
+          label="开始时间"
           min-width="170"
         >
           <template #default="{ row }">
-            {{ formatDate(row.startAt) || t('common.none.title') }}
+            {{ formatDate(row.startAt) || '无' }}
           </template>
         </el-table-column>
         <el-table-column
           prop="endAt"
-          :label="t('content.banner.field.endAt')"
+          label="结束时间"
           min-width="170"
         >
           <template #default="{ row }">
-            {{ formatDate(row.endAt) || t('common.none.title') }}
+            {{ formatDate(row.endAt) || '无' }}
           </template>
         </el-table-column>
         <el-table-column
           prop="createdAt"
-          :label="t('common.time.create')"
+          label="创建时间"
           min-width="170"
         >
           <template #default="{ row }">
-            {{ formatDate(row.createdAt) || t('common.none.title') }}
+            {{ formatDate(row.createdAt) || '无' }}
           </template>
         </el-table-column>
         <el-table-column
           prop="updatedAt"
-          :label="t('common.time.update')"
+          label="更新时间"
           min-width="170"
         >
           <template #default="{ row }">
-            {{ formatDate(row.updatedAt) || t('common.none.title') }}
+            {{ formatDate(row.updatedAt) || '无' }}
           </template>
         </el-table-column>
         <el-table-column
-          :label="t('common.operation.title')"
+          label="操作"
           width="140"
           fixed="right"
         >
@@ -308,7 +306,7 @@ onMounted(() => {
               type="primary"
               @click="handleEdit(row.id)"
             >
-              {{ t('common.action.edit') }}
+              编辑
             </el-button>
           </template>
         </el-table-column>

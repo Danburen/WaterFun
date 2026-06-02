@@ -8,42 +8,33 @@ import { useAuthStore } from '~/stores/authStore';
 export const routes: RouteRecordRaw[] = [
     {
         path: '/login',
-        component: () => import('@/layouts/EmptyLayout.vue'),  // 裸布局
+        component: () => import('@/layouts/EmptyLayout.vue'),
         children: [{ path: '', component: () => import('@/views/LoginView.vue') }]
     },
     {
         path: '/',
-        component: () => import('@/layouts/MainLayout.vue'),     // 完整布局
+        component: () => import('@/layouts/MainLayout.vue'),
         children: [
-            { path: 'dashboard', component: () => import('~/views/DashBoardView.vue') },
             {
-                path: '/', redirect: '/dashboard',
+                path: '', redirect: '/dashboard',
             },
             {
-                path: '/dashboard' , component: ()=> import("~/views/DashBoardView.vue"),
+                path: '/dashboard', component: () => import("~/views/DashBoardView.vue"),
                 name: "dashboard",
                 meta: {
-                    locale: 'dashboard',
+                    locale: '仪表盘',
                     icon: 'DashBoard',
                 }
             },
-            // {
-            //     path: '/login', component: ()=> import("@/views/LoginView.vue"),
-            //     name: "login",
-            //     meta: {
-            //         public: true,
-            //         layout: false,
-            //     }
-            // },
             {
                 path: '/system',
                 component: () => import('@/layouts/EmptyLayout.vue'),
-                meta: { locale:'system.title', icon: 'el-Edit' },
+                meta: { locale:'系统管理', icon: 'el-Edit' },
                 children: [
                     {
                         path: 'user',
                         name: 'userManager',
-                        meta: { locale:'system.user' },
+                        meta: { locale:'用户管理' },
                         component: () => import("@/views/System/user/UserList.vue")
                     },
                     {
@@ -52,7 +43,7 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('@/views/System/user/UserDetail.vue'),
                         props: true,
                         meta: {
-                            locale: 'user.detail',
+                            locale: '用户详情',
                             isDetail: true,
                         }
                     },
@@ -62,7 +53,7 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('~/views/System/user/UserAssignRole.vue'),
                         props: true,
                         meta: {
-                            locale: 'user.roleAssign',
+                            locale: '分配角色',
                             isDetail: true,
                         }
                     },
@@ -72,14 +63,14 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('~/views/System/user/UserAssignPerm.vue'),
                         props: true,
                         meta: {
-                            locale: 'user.permissionAssign',
+                            locale: '分配权限',
                             isDetail: true,
                         }
                     },
                     {
                         path: 'role',
                         name: 'roleManager',
-                        meta: { locale:'system.role'},
+                        meta: { locale:'角色管理'},
                         component: () => import("~/views/System/role/RoleList.vue")
                     },
                     {
@@ -88,7 +79,7 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('~/views/System/role/RoleDetail.vue'),
                         props: true,
                         meta: {
-                            locale: 'role.detail',
+                            locale: '角色详情',
                             isDetail: true,
                         }
                     },
@@ -98,7 +89,7 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('~/views/System/role/RoleAssignPerm.vue'),
                         props: true,
                         meta: {
-                            locale: 'roleAssignPermission',
+                            locale: '分配权限',
                             isDetail: true,
                         }
                     },
@@ -108,14 +99,14 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('~/views/System/role/RoleAssignUser.vue'),
                         props: true,
                         meta: {
-                            locale: 'roleAssignUser',
+                            locale: '分配用户',
                             isDetail: true,
                         }
                     },
                     {
                         path: 'permission',
                         name: 'permissionManager',
-                        meta: { locale:'system.permission' },
+                        meta: { locale:'权限管理' },
                         component: () => import("~/views/System/perm/PermList.vue")
                     },
                     {
@@ -124,7 +115,7 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('~/views/System/perm/PermDetail.vue'),
                         props: true,
                         meta: {
-                            locale: 'permission.detail',
+                            locale: '权限详情',
                             isDetail: true,
                         }
                     }
@@ -133,24 +124,24 @@ export const routes: RouteRecordRaw[] = [
             {
                 path: '/monitor',
                 component: () => import('@/layouts/EmptyLayout.vue'),
-                meta: { locale: 'monitor.title' ,icon: 'el-VideoCamera' },
+                meta: { locale: '系统监控' ,icon: 'el-VideoCamera' },
                 children: [
                     {
                         path: 'online-users',
                         name: 'online-users',
-                        meta: { locale: 'monitor.online' },
+                        meta: { locale: '在线用户' },
                         component: () => import("@/views/System/OnlineMonitorView.vue")
                     },
                     {
                         path: 'status',
                         name: 'status',
-                        meta: { locale: 'monitor.status' },
+                        meta: { locale: '系统状态' },
                         component: () => import("@/views/System/StatusMonitorView.vue")
                     },
                     {
                         path: 'global',
                         name: 'global',
-                        meta: { locale: 'monitor.globalView' },
+                        meta: { locale: '全局视图' },
                         component: () => import('@/views/System/GlobalViewMonitorView.vue')
                     }
                 ]
@@ -158,35 +149,51 @@ export const routes: RouteRecordRaw[] = [
             {
                 path: '/moderation',
                 component: () => import('@/layouts/EmptyLayout.vue'),
-                meta: { locale: 'moderation.title', icon: 'el-Check' },
+                meta: { locale: '内容审核', icon: 'el-Check' },
                 children: [
                     {
                         path: 'workbench',
                         name: 'moderationWorkbench',
-                        meta: { locale: 'moderation.workbench' },
+                        meta: { locale: '审核工作台' },
                         component: () => import('@/views/Moderation/ContentModerationWorkbench.vue')
                     },
                     {
-                        path: 'resources/:resourceId',
+                        path: 'tasks/:taskId',
+                        name: 'moderationTaskDetail',
+                        component: () => import('@/views/Moderation/ModerationDetail.vue'),
+                        props: true,
+                        meta: {
+                            locale: '任务详情',
+                            isDetail: true,
+                        }
+                    },
+                    {
+                        path: 'tasks/:taskId/resources/:resourceUuid',
                         name: 'moderationResourceDetail',
                         component: () => import('@/views/Moderation/ModerationResourceDetail.vue'),
                         props: true,
                         meta: {
-                            locale: 'moderation.resourceDetail',
+                            locale: '资源详情',
                             isDetail: true,
                         }
+                    },
+                    {
+                        path: 'resources',
+                        name: 'moderationResourceList',
+                        meta: { locale: '资源列表' },
+                        component: () => import('@/views/Moderation/ResourceModerationList.vue')
                     }
                 ]
             },
             {
                 path: '/content',
                 component: () => import('@/layouts/EmptyLayout.vue'),
-                meta: { locale: 'content.title', icon: 'el-Document' },
+                meta: { locale: '内容管理', icon: 'el-Document' },
                 children: [
                     {
                         path: 'post',
                         name: 'contentPostList',
-                        meta: { locale: 'content.post.title' },
+                        meta: { locale: '帖子管理' },
                         component: () => import('@/views/Content/PostList.vue')
                     },
                     {
@@ -195,14 +202,14 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('@/views/Content/PostDetail.vue'),
                         props: true,
                         meta: {
-                            locale: 'content.post.detail',
+                            locale: '帖子详情',
                             isDetail: true,
                         }
                     },
                     {
                         path: 'tag',
                         name: 'contentTagList',
-                        meta: { locale: 'content.tag.title' },
+                        meta: { locale: '标签管理' },
                         component: () => import('@/views/Content/TagList.vue')
                     },
                     {
@@ -211,14 +218,14 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('@/views/Content/TagDetail.vue'),
                         props: true,
                         meta: {
-                            locale: 'content.tag.detail',
+                            locale: '标签详情',
                             isDetail: true,
                         }
                     },
                     {
                         path: 'category',
                         name: 'contentCategoryList',
-                        meta: { locale: 'content.category.title' },
+                        meta: { locale: '分类管理' },
                         component: () => import('@/views/Content/CategoryList.vue')
                     },
                     {
@@ -227,14 +234,14 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('@/views/Content/CategoryDetail.vue'),
                         props: true,
                         meta: {
-                            locale: 'content.category.detail',
+                            locale: '分类详情',
                             isDetail: true,
                         }
                     },
                     {
                         path: 'banner',
                         name: 'contentBannerList',
-                        meta: { locale: 'content.banner.title' },
+                        meta: { locale: '横幅管理' },
                         component: () => import('@/views/Content/BannerList.vue')
                     }
                 ]
@@ -251,7 +258,7 @@ export const router = createRouter({
 router.beforeEach((to, from, next) => {
     console.log('Router beforeEach:', { to, from });
     const authStore = useAuthStore();
-    const whiteList = ['/login', '/register', '/forgot-password']; // no redirect whitelist
+    const whiteList = ['/login', '/register', '/forgot-password'];
     console.log('Is user authenticated?', authStore.isValid);
     if (whiteList.includes(to.path)) {
         if (authStore.isValid) {
@@ -291,7 +298,6 @@ function extractMenuRoutes(routes: RouteRecordRaw[]): RouteRecordRaw[] {
     
     return result
 }
-// export const menuRoutes = routes.filter(route => route.meta && route.meta.public !== true );
 export const menuRoutes = extractMenuRoutes(routes);
 
 export type routeType = typeof routes[number];

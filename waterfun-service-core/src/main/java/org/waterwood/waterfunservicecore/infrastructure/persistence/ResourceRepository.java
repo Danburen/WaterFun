@@ -1,7 +1,5 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ResourceRepository extends JpaRepository<Resource, Long> {
-    Optional<Resource> findByUuidAndStatus(@Size(max = 36) @NotNull String uuid, ResourceStatus status);
+    Optional<Resource> findByUuidAndStatus(String uuid, ResourceStatus status);
 
     List<Resource> findByUuidIn(Collection<String> uuids);
 
@@ -28,7 +26,9 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
 
     List<Resource> findByUuidInAndStatus(Collection<String> uuids, ResourceStatus status);
 
-    Resource getReferenceByUuid(@Size(max = 36) @NotNull String uuid);
+    Resource getReferenceByUuid(String uuid);
 
     Optional<Resource> getByUuid(String uuid);
+
+    Optional<Resource> findByUuidAndStatusNot(String uuid, ResourceStatus status);
 }

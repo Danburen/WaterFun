@@ -30,8 +30,8 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditT
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
-import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
-import org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator;
+import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
+import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerator;
 
 import java.time.Instant;
 import java.util.List;

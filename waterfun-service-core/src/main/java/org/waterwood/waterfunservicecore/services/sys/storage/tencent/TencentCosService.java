@@ -34,7 +34,7 @@ import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.CloudKeyBuilder;
 import org.waterwood.waterfunservicecore.services.sys.storage.*;
-import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
+import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
 
 import java.io.InputStream;
 import java.io.Serializable;

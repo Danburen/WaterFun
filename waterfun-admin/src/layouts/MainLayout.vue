@@ -28,7 +28,7 @@ const breadList = computed(() => {
 
 const dashboardTagItem:TagNavItemType = {
   name: 'dashboard',
-  locale: 'nav.dashboard',
+  locale: '仪表盘',
   to: 'dashboard',
   closeable: false
 }
@@ -40,7 +40,7 @@ const addNavTags = (to: any) =>{
         to: to.name,
         params: to.params,
         closeable: true,
-        locale: `nav.${to.meta.locale}`,
+        locale: to.meta.locale,
       })
   }
 }
@@ -77,7 +77,7 @@ onBeforeMount(() => {
 
 router.afterEach((to) => {
   addNavTags(to);
-  activeTags.value = to.name as string;
+  activeTags.value = (to.name as string) || 'dashboard';
 })
 
 watch(()=>tagStore.getTags,
@@ -115,7 +115,7 @@ watch(()=>tagStore.getTags,
           />
         </div>
         <div class="content-main">
-          <RouterView />
+          <RouterView :key="$route.fullPath" />
         </div>
         <div class="content-footer default-border-top">
           <div class="copyright">

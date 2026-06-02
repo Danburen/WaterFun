@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.template;
+package org.waterwood.waterfunservicecore.services.email.template;
 
 import lombok.Getter;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;

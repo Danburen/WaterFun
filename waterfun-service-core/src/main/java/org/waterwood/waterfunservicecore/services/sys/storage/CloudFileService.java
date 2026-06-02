@@ -10,7 +10,8 @@ import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.exception.BizException;
-import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
+import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
+import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerator;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -42,7 +43,7 @@ public interface CloudFileService {
      * Build put policy with business key
      *
      * @param root    root key of cloud file service
-     * @param path    path of the resource must contain, Usually generate by{@link org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator}
+     * @param path    path of the resource must contain, Usually generate by{@link CosKeyPathGenerator}
      * @param payload packaged biz target id
      * @return Presigned request response contains the url and key for file upload, and the key will be used for file access after upload success.
      */
@@ -51,7 +52,7 @@ public interface CloudFileService {
     /**
      * Build put policy with business key with key root = {@link CloudFSRoot#UPLOADS}
      * also see {@link #buildPutPolicyWithPayload(CloudFSRoot, String, BizUploadPayload)}
-     * @param path    path of the resource must contain, Usually generate by{@link org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator}
+     * @param path    path of the resource must contain, Usually generate by{@link CosKeyPathGenerator}
      * @param payload packaged biz target id
      * @return Presigned request response contains the url and key for file upload, and the key will be used for file access after upload success.
      */
@@ -60,7 +61,7 @@ public interface CloudFileService {
     /**
      * Batch build put policy with business key with key root = {@link CloudFSRoot#UPLOADS}
      *
-     * @param paths    List paths of the resource must contain, Usually generate by{@link org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator}
+     * @param paths    List paths of the resource must contain, Usually generate by{@link CosKeyPathGenerator}
      * @param payloads packaged biz target id
      * @return List of Presigned request response contains the url and key for file upload, and the key will be used for file access after upload success.
      */

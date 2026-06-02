@@ -1,26 +1,26 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import {
-  approveModerationResource,
   getModerationResource,
+  approveModerationResource,
   rejectModerationResource,
   type AuditStatus,
   type ModerateRejectType,
-  type ModerationResourceResp,
+  type ModerationResourceRes,
 } from "~/api/moderation";
 import { ElMessage } from "element-plus";
+import CardContainer from "~/components/CardContainer.vue";
 
-const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
 const loading = ref(false);
-const detail = ref<ModerationResourceResp | null>(null);
+const detail = ref<ModerationResourceRes | null>(null);
 
-const resourceId = computed(() => String(route.params.resourceId || ""));
+const taskId = computed(() => Number(route.params.taskId));
+const resourceUuid = computed(() => String(route.params.resourceUuid || ""));
 
 const rejectDialogVisible = ref(false);
 const rejectSubmitting = ref(false);
@@ -30,12 +30,12 @@ const rejectForm = ref<{ rejectType: ModerateRejectType; rejectReason: string }>
 });
 
 const rejectTypeOptions: Array<{ label: string; value: ModerateRejectType }> = [
-  { label: "moderation.rejectType.violation_of_guidelines", value: "VIOLATION_OF_GUIDELINES" },
-  { label: "moderation.rejectType.inappropriate_content", value: "INAPPROPRIATE_CONTENT" },
-  { label: "moderation.rejectType.advertisement", value: "ADVERTISEMENT" },
-  { label: "moderation.rejectType.violence", value: "VIOLENCE" },
-  { label: "moderation.rejectType.sensitive", value: "SENSITIVE" },
-  { label: "moderation.rejectType.other", value: "OTHER" },
+  { label: "违反社区准则", value: "VIOLATION_OF_GUIDELINES" },
+  { label: "不当内容", value: "INAPPROPRIATE_CONTENT" },
+  { label: "广告", value: "ADVERTISEMENT" },
+  { label: "暴力内容", value: "VIOLENCE" },
+  { label: "敏感内容", value: "SENSITIVE" },
+  { label: "其他", value: "OTHER" },
 ];
 
 const getInstantIso = (value?: { seconds?: number; nanos?: number } | string | null): string => {
@@ -50,10 +50,27 @@ const getInstantIso = (value?: { seconds?: number; nanos?: number } | string | n
 
 const formatFileSize = (size?: number | string): string => {
   const parsed = Number(size);
-  if (!parsed || Number.isNaN(parsed) || parsed < 0) return t("common.none.title");
+  if (!parsed || Number.isNaN(parsed) || parsed < 0) return "无";
   if (parsed < 1024) return `${parsed} B`;
   if (parsed < 1024 * 1024) return `${(parsed / 1024).toFixed(2)} KB`;
   return `${(parsed / (1024 * 1024)).toFixed(2)} MB`;
+};
+
+const statusLabel = (status?: string): string => {
+  if (status === "PENDING") return "待审核";
+  if (status === "APPROVED") return "已通过";
+  if (status === "REJECTED") return "已驳回";
+  return status || "未知";
+};
+
+const rejectTypeLabel = (type?: string): string => {
+  if (type === "VIOLATION_OF_GUIDELINES") return "违反社区准则";
+  if (type === "INAPPROPRIATE_CONTENT") return "不当内容";
+  if (type === "ADVERTISEMENT") return "广告";
+  if (type === "VIOLENCE") return "暴力内容";
+  if (type === "SENSITIVE") return "敏感内容";
+  if (type === "OTHER") return "其他";
+  return type || "无";
 };
 
 const statusTagType = (status?: AuditStatus): "warning" | "success" | "danger" | "info" => {
@@ -66,32 +83,30 @@ const statusTagType = (status?: AuditStatus): "warning" | "success" | "danger" |
 const previewUrl = computed(() => detail.value?.presignedUrl?.url || "");
 
 const fetchDetail = async () => {
-  if (!resourceId.value) return;
+  if (!taskId.value || !resourceUuid.value) return;
   loading.value = true;
   try {
-    const res = await getModerationResource(resourceId.value);
+    const res = await getModerationResource(taskId.value, resourceUuid.value);
     detail.value = res.data;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("moderation.error.fetch"));
+    ElMessage.error("获取资源详情失败");
   } finally {
     loading.value = false;
   }
 };
 
 const handleApprove = async () => {
-  if (!resourceId.value) return;
+  if (!taskId.value || !resourceUuid.value) return;
   try {
-    await ElMessageBox.confirm(t("moderation.confirm.approveResource"), t("moderation.action.approve"), {
-      type: "warning",
-    });
-    await approveModerationResource(resourceId.value);
-    ElMessage.success(t("moderation.success.approve"));
+    await ElMessageBox.confirm("确定通过该审核资源吗？", "通过", { type: "warning" });
+    await approveModerationResource(taskId.value, resourceUuid.value);
+    ElMessage.success("审核通过成功");
     await fetchDetail();
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("moderation.error.approve"));
+      ElMessage.error("审核通过失败");
     }
   }
 };
@@ -102,172 +117,110 @@ const openRejectDialog = () => {
 };
 
 const submitReject = async () => {
-  if (!resourceId.value) return;
+  if (!taskId.value || !resourceUuid.value) return;
   rejectSubmitting.value = true;
   try {
-    await rejectModerationResource(resourceId.value, {
+    await rejectModerationResource(taskId.value, resourceUuid.value, {
       rejectType: rejectForm.value.rejectType,
       rejectReason: rejectForm.value.rejectReason || undefined,
     });
-    ElMessage.success(t("moderation.success.reject"));
+    ElMessage.success("审核驳回成功");
     rejectDialogVisible.value = false;
     await fetchDetail();
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("moderation.error.reject"));
+    ElMessage.error("审核驳回失败");
   } finally {
     rejectSubmitting.value = false;
   }
 };
 
 onMounted(fetchDetail);
-watch(resourceId, fetchDetail);
+watch([taskId, resourceUuid], fetchDetail);
 </script>
 
 <template>
-  <div
-    v-loading="loading"
-    class="resource-detail"
-  >
-    <CardContainer title="moderation.resourceDetail">
+  <div v-loading="loading" class="resource-detail">
+    <CardContainer title="资源详情">
       <template #header-right>
-        <el-button
-          text
-          @click="router.back()"
-        >
-          {{ t('common.action.back') }}
-        </el-button>
-        <el-button
-          type="success"
-          :disabled="!resourceId"
-          @click="handleApprove"
-        >
-          {{ t('moderation.action.approve') }}
-        </el-button>
-        <el-button
-          type="warning"
-          :disabled="!resourceId"
-          @click="openRejectDialog"
-        >
-          {{ t('moderation.action.reject') }}
-        </el-button>
+        <el-button text @click="router.back()">返回</el-button>
+        <el-button type="success" :disabled="!resourceUuid" @click="handleApprove">通过</el-button>
+        <el-button type="warning" :disabled="!resourceUuid" @click="openRejectDialog">驳回</el-button>
       </template>
 
-      <div
-        v-if="detail"
-        class="detail-layout"
-      >
+      <div v-if="detail" class="detail-layout">
         <div class="image-pane">
           <div class="image-stage">
             <img
               v-if="previewUrl"
               :src="previewUrl"
-              :alt="detail.placeholder || String(detail.id || '')"
+              :alt="detail.resourceUuid || ''"
               class="full-image"
             >
-            <el-empty
-              v-else
-              :description="t('common.none.description')"
-            />
+            <el-empty v-else description="暂无数据" />
           </div>
-          <div
-            v-if="previewUrl"
-            class="image-actions"
-          >
-            <el-link
-              :href="previewUrl"
-              target="_blank"
-              type="primary"
-            >
-              {{ t('moderation.action.openOriginal') }}
-            </el-link>
+          <div v-if="previewUrl" class="image-actions">
+            <el-link :href="previewUrl" target="_blank" type="primary">打开原图</el-link>
           </div>
         </div>
 
         <div class="info-pane">
-          <el-descriptions
-            :column="1"
-            border
-          >
-            <el-descriptions-item label="ID">
-              {{ detail.id || t('common.none.title') }}
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="资源UUID">
+              {{ detail.resourceUuid || "无" }}
             </el-descriptions-item>
-            <el-descriptions-item :label="t('moderation.field.taskId')">
-              {{ detail.taskId || t('common.none.title') }}
+            <el-descriptions-item label="所属任务ID">
+              {{ detail.taskId || "无" }}
             </el-descriptions-item>
-            <el-descriptions-item :label="t('moderation.field.status')">
+            <el-descriptions-item label="审核状态">
               <el-tag :type="statusTagType(detail.status)">
-                {{ t(`moderation.status.${(detail.status || 'pending').toLowerCase()}`) }}
+                {{ statusLabel(detail.status) }}
               </el-tag>
             </el-descriptions-item>
-            <el-descriptions-item :label="t('moderation.field.mimeType')">
-              {{ detail.fileProbeResult?.mimeType || t('common.none.title') }}
+            <el-descriptions-item label="MIME类型">
+              {{ detail.fileProbeResult?.mimeType || "无" }}
             </el-descriptions-item>
-            <el-descriptions-item :label="t('moderation.field.fileSize')">
+            <el-descriptions-item label="文件大小">
               {{ formatFileSize(detail.fileProbeResult?.size) }}
             </el-descriptions-item>
-            <el-descriptions-item :label="t('moderation.field.auditorId')">
-              {{ detail.auditorId || t('common.none.title') }}
+            <el-descriptions-item label="审核人ID">
+              {{ detail.auditorId || "无" }}
             </el-descriptions-item>
-            <el-descriptions-item :label="t('moderation.field.auditAt')">
-              {{ formatISOData(getInstantIso(detail.auditAt)) || t('common.none.title') }}
+            <el-descriptions-item label="审核时间">
+              {{ formatISOData(getInstantIso(detail.auditAt)) || "无" }}
             </el-descriptions-item>
-            <el-descriptions-item :label="t('moderation.field.rejectType')">
-              {{ detail.rejectType ? t(`moderation.rejectType.${detail.rejectType.toLowerCase()}`) : t('common.none.title') }}
+            <el-descriptions-item label="驳回类型">
+              {{ rejectTypeLabel(detail.rejectType) }}
             </el-descriptions-item>
-            <el-descriptions-item :label="t('moderation.field.rejectReason')">
-              {{ detail.rejectReason || t('common.none.title') }}
+            <el-descriptions-item label="驳回原因">
+              {{ detail.rejectReason || "无" }}
             </el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
 
-      <el-empty
-        v-else
-        :description="t('common.none.description')"
-      />
+      <el-empty v-else description="暂无数据" />
     </CardContainer>
 
-    <el-dialog
-      v-model="rejectDialogVisible"
-      :title="t('moderation.dialog.rejectTitle')"
-      width="520"
-    >
+    <el-dialog v-model="rejectDialogVisible" title="驳回审核资源" width="520">
       <el-form label-width="100px">
-        <el-form-item :label="t('moderation.field.rejectType')">
-          <el-select
-            v-model="rejectForm.rejectType"
-            style="width: 100%"
-          >
+        <el-form-item label="驳回类型">
+          <el-select v-model="rejectForm.rejectType" style="width: 100%">
             <el-option
               v-for="item in rejectTypeOptions"
               :key="item.value"
-              :label="t(item.label)"
+              :label="item.label"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('moderation.field.rejectReason')">
-          <el-input
-            v-model="rejectForm.rejectReason"
-            type="textarea"
-            :rows="4"
-            :placeholder="t('moderation.input.rejectReason')"
-          />
+        <el-form-item label="驳回原因">
+          <el-input v-model="rejectForm.rejectReason" type="textarea" :rows="4" placeholder="请输入驳回原因（可选）" />
         </el-form-item>
       </el-form>
-
       <template #footer>
-        <el-button @click="rejectDialogVisible = false">
-          {{ t('common.action.cancel') }}
-        </el-button>
-        <el-button
-          type="primary"
-          :loading="rejectSubmitting"
-          @click="submitReject"
-        >
-          {{ t('common.action.save') }}
-        </el-button>
+        <el-button @click="rejectDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="rejectSubmitting" @click="submitReject">保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -317,10 +270,6 @@ watch(resourceId, fetchDetail);
 
 .info-pane {
   overflow: hidden;
-}
-
-.break-all {
-  word-break: break-all;
 }
 
 @media (max-width: 992px) {

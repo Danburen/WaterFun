@@ -19,7 +19,7 @@ import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.BannerRepository;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
-import org.waterwood.waterfunservicecore.utils.CosKeyPathGenerator;
+import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerator;
 
 import java.time.Instant;
 import java.util.UUID;

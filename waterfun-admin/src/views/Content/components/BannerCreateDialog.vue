@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { FormInstance, FormRules } from "element-plus";
-import { useI18n } from "vue-i18n";
 import {
   createBanner,
   getBannerById,
@@ -36,7 +35,6 @@ const emit = defineEmits<{
   success: [];
 }>();
 
-const { t } = useI18n();
 const formRef = ref<FormInstance>();
 const submitting = ref(false);
 const uploaderVisible = ref(false);
@@ -71,23 +69,23 @@ const coveragePreviewUrl = ref("");
 const hasImage = computed(() => !!(coveragePreviewUrl.value || formModel.value.resourceKey));
 
 const rules: FormRules = {
-  title: [{ required: true, message: t("content.banner.input.title"), trigger: "blur" }],
+  title: [{ required: true, message: '请输入标题', trigger: "blur" }],
   subtitle: [{ max: 128, message: "Max 128", trigger: "blur" }],
   linkUrl: [{ max: 255, message: "Max 255", trigger: "blur" }],
 };
 
 const positionOptions: { label: string; value: BannerPosition }[] = [
-  { label: "content.banner.position.home", value: "HOME" },
-  { label: "content.banner.position.side", value: "SIDE" },
+  { label: "首页", value: "HOME" },
+  { label: "侧边栏", value: "SIDE" },
 ];
 
 const statusOptions: { label: string; value: BannerStatus }[] = [
-  { label: "content.banner.status.show", value: "SHOW" },
-  { label: "content.banner.status.hide", value: "HIDE" },
+  { label: "显示", value: "SHOW" },
+  { label: "隐藏", value: "HIDE" },
 ];
 
 const dialogTitle = computed(() =>
-  props.mode === "edit" ? t("content.banner.edit") : t("content.banner.create")
+  props.mode === "edit" ? '编辑轮播图' : '新增轮播图'
 );
 
 const visible = computed({
@@ -155,7 +153,7 @@ const loadDetail = async () => {
     }
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   }
 };
 
@@ -177,7 +175,7 @@ const handleSave = async () => {
   if (!valid) return;
 
   if (!hasImage.value) {
-    ElMessage.error(t("content.banner.error.missingUpload"));
+    ElMessage.error('请先获取上传凭证');
     return;
   }
 
@@ -199,7 +197,7 @@ const handleSave = async () => {
         resourceKey: formModel.value.resourceKey || undefined,
       };
       await updateBanner(props.bannerId, payload);
-      ElMessage.success(t("content.banner.success.update"));
+      ElMessage.success('轮播图更新成功');
     } else {
       const payload: CreateBannerRequest = {
         title: formModel.value.title,
@@ -216,14 +214,14 @@ const handleSave = async () => {
         },
       };
       await createBanner(payload);
-      ElMessage.success(t("content.banner.success.create"));
+      ElMessage.success('轮播图创建成功');
     }
 
     visible.value = false;
     emit("success");
   } catch (e) {
     console.error(e);
-    ElMessage.error(props.mode === "edit" ? t("content.banner.error.save") : t("content.banner.error.create"));
+    ElMessage.error(props.mode === "edit" ? '轮播图保存失败' : '轮播图创建失败');
   } finally {
     submitting.value = false;
   }
@@ -233,47 +231,47 @@ const handleSave = async () => {
 <template>
   <el-dialog v-model="visible" :title="dialogTitle" width="720" destroy-on-close @closed="resetForm">
     <el-form ref="formRef" :model="formModel" :rules="rules" label-width="110px" status-icon>
-      <el-form-item prop="title" :label="t('content.banner.field.title')">
-        <el-input v-model="formModel.title" :placeholder="t('content.banner.input.title')"/>
+      <el-form-item prop="title" label="标题">
+        <el-input v-model="formModel.title" placeholder="请输入标题"/>
       </el-form-item>
-      <el-form-item prop="subtitle" :label="t('content.banner.field.subtitle')">
-        <el-input v-model="formModel.subtitle" :placeholder="t('content.banner.input.subtitle')"/>
+      <el-form-item prop="subtitle" label="副标题">
+        <el-input v-model="formModel.subtitle" placeholder="请输入副标题"/>
       </el-form-item>
-      <el-form-item prop="resourceKey" :label="t('content.banner.field.img')">
+      <el-form-item prop="resourceKey" label="轮播图图片">
         <div class="banner-coverage">
           <img v-if="coveragePreviewUrl" class="banner-coverage-img" :src="coveragePreviewUrl" alt="" @click="uploaderVisible = true"/>
-          <el-button v-else type="primary" plain @click="uploaderVisible = true">{{ t('common.action.select') }}</el-button>
-          <el-button v-if="coveragePreviewUrl" @click="uploaderVisible = true">{{ t('common.action.change') }}</el-button>
+          <el-button v-else type="primary" plain @click="uploaderVisible = true">选择</el-button>
+          <el-button v-if="coveragePreviewUrl" @click="uploaderVisible = true">更换</el-button>
         </div>
         <SingleImageUploader v-model:visible="uploaderVisible" v-model:resourceKey="formModel.resourceKey" v-model:uploadToken="uploadToken" v-model:previewUrl="coveragePreviewUrl" :get-upload-policy="getBannerCoverageUpload"/>
       </el-form-item>
-      <el-form-item prop="linkUrl" :label="t('content.banner.field.linkUrl')">
-        <el-input v-model="formModel.linkUrl" :placeholder="t('content.banner.input.linkUrl')"/>
+      <el-form-item prop="linkUrl" label="跳转链接">
+        <el-input v-model="formModel.linkUrl" placeholder="请输入跳转链接"/>
       </el-form-item>
-      <el-form-item prop="position" :label="t('content.banner.field.position')">
+      <el-form-item prop="position" label="位置">
         <el-select v-model="formModel.position" style="width: 220px">
-          <el-option v-for="item in positionOptions" :key="item.value" :label="t(item.label)" :value="item.value"/>
+          <el-option v-for="item in positionOptions" :key="item.value" :label="item.label" :value="item.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item prop="status" :label="t('content.banner.field.status')">
+      <el-form-item prop="status" label="状态">
         <el-select v-model="formModel.status" style="width: 220px">
-          <el-option v-for="item in statusOptions" :key="item.value" :label="t(item.label)" :value="item.value"/>
+          <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item prop="sortNo" :label="t('content.banner.field.sortNo')">
+      <el-form-item prop="sortNo" label="排序">
         <el-input-number v-model="formModel.sortNo" :min="0" :max="99999"/>
       </el-form-item>
-      <el-form-item prop="startAt" :label="t('content.banner.field.startAt')">
+      <el-form-item prop="startAt" label="开始时间">
         <el-date-picker v-model="formModel.startAt" type="datetime" clearable style="width: 220px"/>
       </el-form-item>
-      <el-form-item prop="endAt" :label="t('content.banner.field.endAt')">
+      <el-form-item prop="endAt" label="结束时间">
         <el-date-picker v-model="formModel.endAt" type="datetime" clearable style="width: 220px"/>
       </el-form-item>
       
     </el-form>
     <template #footer>
-      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('common.action.save') }}</el-button>
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" :loading="submitting" @click="handleSave">保存</el-button>
     </template>
   </el-dialog>
 </template>

@@ -1,9 +1,13 @@
 package org.waterwood.waterfunservicecore.api.moderation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.waterwood.utils.JsonUtil;
+import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 
 import java.util.List;
 
@@ -21,11 +25,11 @@ public class PostAuditPayload implements AuditPayload{
     private List<Long> tagIds;
     private List<String> newTagNames;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private CloudResPresignedUrlResp coverResPresignedUrl;
+
+    @Override
     public String toJson() {
         return JsonUtil.toJson(this);
-    }
-
-    public static PostAuditPayload fromJson(String json) {
-        return JsonUtil.fromJson(json, PostAuditPayload.class);
     }
 }

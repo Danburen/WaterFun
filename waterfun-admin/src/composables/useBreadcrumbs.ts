@@ -12,7 +12,7 @@ export const useBreadcrumbs = () => {
                 return {
                     name: 'dashboard',
                     to: '/',
-                    locale: 'nav.dashboard',
+                    locale: '仪表盘',
                 } as BreadNavItemType;
             }
 
@@ -27,7 +27,7 @@ export const useBreadcrumbs = () => {
             return {
                 name: matchedRoute.name,
                 to: matchedRoute.name ? { name: matchedRoute.name } : path,
-                locale: `nav.${matchedRoute.meta?.locale}`,
+                locale: matchedRoute.meta?.locale,
             } as BreadNavItemType
         })
     })

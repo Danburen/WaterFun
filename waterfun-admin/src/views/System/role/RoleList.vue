@@ -9,7 +9,7 @@ import {
   listRoles,
   RoleResp,
 } from "~/api/role";
-import {useI18n} from "vue-i18n";
+
 import {formatISOData} from "@waterfun/web-core/src/timer";
 import { ElMessage } from "element-plus";
 import {OptionResItem} from "@waterfun/web-core/src/types/api/response";
@@ -17,7 +17,6 @@ import {useRouter} from "vue-router";
 import RoleEditDialog from "./components/RoleEditDialog.vue";
 import {ElMessageBox} from "element-plus";
 
-const {t} = useI18n()
 const router = useRouter();
 
 const roleList = ref<RoleResp[]>([]);
@@ -54,7 +53,7 @@ const fetchRoleIds = () => {
       })
       .catch(e => {
         console.error(e);
-        ElMessage.error(t("role.error.fetch"));
+        ElMessage.error('获取角色信息失败');
       });
 }
 
@@ -71,7 +70,7 @@ const fetchData = () => {
     pageOpts.value.total = res.data.page.totalElements || 0;
   }).catch(e => {
     console.log(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   }).finally(() => {
     loading.value = false;
   });
@@ -99,16 +98,16 @@ const handleEdit = async (row: RoleResp) => {
 
 const handleDelete = async (row: RoleResp) => {
   try {
-    await ElMessageBox.confirm(t("role.confirm.delete"), t("common.action.delete"), {
+    await ElMessageBox.confirm('确定删除该角色吗？', '删除', {
       type: "warning",
     });
     await deleteRole(row.id);
-    ElMessage.success(t("role.success.delete"));
+    ElMessage.success('角色删除成功');
     fetchData();
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("role.error.delete"));
+      ElMessage.error('删除角色失败');
     }
   }
 }
@@ -123,7 +122,7 @@ const handleBatchDelete = async () => {
   }
 
   try {
-    await ElMessageBox.confirm(t("role.confirm.batchDelete", { count: selectedRoleIds.value.length }), t("common.action.delete"), {
+    await ElMessageBox.confirm(`确定删除选中的 ${selectedRoleIds.value.length} 个角色吗？`, '删除', {
       type: "warning",
     });
 
@@ -131,11 +130,11 @@ const handleBatchDelete = async () => {
     const result = res.data;
 
     if (result.success === result.requested) {
-      ElMessage.success(t("role.success.delete"));
+      ElMessage.success('角色删除成功');
     } else if (result.success === 0) {
-      ElMessage.error(t("role.error.delete"));
+      ElMessage.error('删除角色失败');
     } else {
-      ElMessage.warning(`${t("role.success.delete")} ${result.success}/${result.requested}`);
+      ElMessage.warning(`${'角色删除成功'} ${result.success}/${result.requested}`);
     }
 
     selectedRoleIds.value = [];
@@ -143,7 +142,7 @@ const handleBatchDelete = async () => {
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("role.error.delete"));
+      ElMessage.error('删除角色失败');
     }
   }
 }
@@ -160,7 +159,7 @@ const gotoDetail = (id: number) => {
 const getParentRoleName = (parentId: number | null | undefined) => {
   if (parentId == null) return "";
   const option = roleOptions.value.find((r) => r.id === parentId);
-  return option?.name || t("common.none.title");
+  return option?.name || '无';
 };
 
 
@@ -178,22 +177,22 @@ onMounted(() => {
         class="search-form"
         :model="searchForm"
       >
-        <el-form-item :label="t('role.name')">
+        <el-form-item label="角色名称">
           <el-input
             v-model="searchForm.name"
-            :placeholder="t('role.input.name')"
+            placeholder="请输入角色名称"
           />
         </el-form-item>
-        <el-form-item :label="t('role.code')">
+        <el-form-item label="角色编码">
           <el-input
             v-model="searchForm.code"
-            :placeholder="t('role.input.code')"
+            placeholder="请输入角色编码"
           />
         </el-form-item>
-        <el-form-item :label="t('role.parentId')">
+        <el-form-item label="父级角色ID">
           <el-select
             v-model="searchForm.parentId"
-            :placeholder="t('role.input.parentId')"
+            placeholder="请选择父级角色"
             style="width: 150px"
           >
             <el-option
@@ -210,10 +209,10 @@ onMounted(() => {
             type="primary"
             @click="handleSearch"
           >
-            {{ t('common.query.title') }}
+            查询
           </el-button>
           <el-button @click="handleReset">
-            {{ t('common.reset.title') }}
+            重置
           </el-button>
         </el-form-item>
       </el-form>
@@ -252,7 +251,7 @@ onMounted(() => {
         />
         <el-table-column
           prop="name"
-          :label="t('role.name')"
+          label="角色名称"
         >
           <template #default="{ row }">
             <el-link
@@ -266,11 +265,11 @@ onMounted(() => {
         </el-table-column>
         <el-table-column
           prop="code"
-          :label="t('role.code')"
+          label="角色编码"
         />
         <el-table-column
           prop="parentId"
-          :label="t('role.parentId')"
+          label="父级角色ID"
         >
           <template #default="{ row }">
             <el-link
@@ -281,31 +280,31 @@ onMounted(() => {
             >
               {{ row.parentId }} ({{ getParentRoleName(row.parentId) }})
             </el-link>
-            <span v-else>{{ t('common.none.title') }}</span>
+            <span v-else>无</span>
           </template>
         </el-table-column>
         <el-table-column
           prop="orderWeight"
           sortable
-          :label="t('order.title')"
+          label="角色排序"
           width="80px"
         />
         <el-table-column
           prop="description"
-          :label="t('role.description')"
+          label="角色描述"
         />
         <el-table-column
           prop="createdAt"
           sortable
           column-key="date"
-          :label="t('common.time.create')"
+          label="创建时间"
         >
           <template #default="scope">
             <span>{{ formatISOData(scope.row.createdAt) }}</span>
           </template>
         </el-table-column>
         <el-table-column
-          :label="t('common.operation.title')"
+          label="操作"
           width="260px"
           fixed="right"
         >
@@ -315,7 +314,7 @@ onMounted(() => {
               size="small"
               @click="handleEdit(scope.row)"
             >
-              {{ t('common.action.edit') }}
+              编辑
             </el-button>
             <el-button
               v-if="! scope.row.isSystem"
@@ -323,7 +322,7 @@ onMounted(() => {
               size="small"
               @click="handleDelete(scope.row)"
             >
-              {{ t('common.action.delete') }}
+              删除
             </el-button>
             <el-popover
               placement="bottom"
@@ -336,7 +335,7 @@ onMounted(() => {
                   size="small"
                   type="success"
                 >
-                  {{ t("common.action.more") }}
+                  更多
                 </el-button>
               </template>
               <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -347,7 +346,7 @@ onMounted(() => {
                   style="margin: 0; width: 100%;"
                   @click="router.push({ name: 'rolePermissionAssign', params: { id: scope.row.id } })"
                 >
-                  {{ t("permission.assign") }}
+                  分配权限
                 </el-button>
                 <el-button
                   size="small"
@@ -356,7 +355,7 @@ onMounted(() => {
                   style="margin: 0; width: 100%;"
                   @click="router.push({ name: 'roleUserAssign', params: { id: scope.row.id } })"
                 >
-                  {{ t("user.assign") }}
+                  分配用户
                 </el-button>
               </div>
             </el-popover>

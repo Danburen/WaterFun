@@ -25,8 +25,7 @@ public interface PostMapper {
     Post partialUpdate(PostSaveReq postSaveReq, @MappingTarget Post post);
 
 
-    Post toEntity(PutUserPostReq putUserPostReq);
-
+    @Mapping(target = "coverageResourceUuid", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Post partialUpdate(PutUserPostReq putUserPostReq, @MappingTarget Post post);
 

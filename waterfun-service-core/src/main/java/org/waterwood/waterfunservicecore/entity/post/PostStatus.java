@@ -19,14 +19,12 @@ public enum PostStatus {
     }
 
     public static PostStatus fromCode(short code) {
-        return switch (code) {
-            case 0 -> DRAFT;
-            case 1 -> PENDING;
-            case 2 -> PUBLISHED;
-            case 3 -> REJECTED;
-            case 4 -> ARCHIVED;
-            default -> throw new IllegalArgumentException("Invalid PostStatus code: " + code);
-        };
+       for (PostStatus postStatus : PostStatus.values()) {
+           if (postStatus.value == code) {
+               return postStatus;
+           }
+       }
+       throw new IllegalArgumentException("No PostStatus for code " + code);
     }
 
     public static final Map<PostStatus, Set<PostStatus>> ADMIN_TRANSITIONS = Map.of(

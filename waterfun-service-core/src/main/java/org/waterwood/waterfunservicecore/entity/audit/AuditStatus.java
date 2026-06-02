@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum AuditStatus {
     PENDING(1),
     APPROVED(2),
-    REJECTED(3),;
+    REJECTED(3),
+    SUSPECT(4);
 
     private final short code;
     private AuditStatus(int code) {
@@ -14,11 +15,11 @@ public enum AuditStatus {
     }
 
     public static AuditStatus fromCode(Short code) {
-        return switch (code) {
-            case 1 -> PENDING;
-            case 2 -> APPROVED;
-            case 3 -> REJECTED;
-            default -> throw new IllegalArgumentException("Unknown code " + code);
-        };
+        for (AuditStatus status : AuditStatus.values()) {
+            if (status.getCode() == code.intValue()) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("No AuditStatus with code " + code);
     }
 }

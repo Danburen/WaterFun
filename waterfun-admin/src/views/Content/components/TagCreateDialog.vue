@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormInstance, FormRules } from "element-plus";
-import { useI18n } from "vue-i18n";
+
 import { createTag, getTag, putTag, type CreateTagRequest } from "~/api/tag";
 import { ElMessage } from "element-plus";
 
@@ -21,7 +21,7 @@ const emit = defineEmits<{
   success: [];
 }>();
 
-const { t } = useI18n();
+
 const formRef = ref<FormInstance>();
 const submitting = ref(false);
 
@@ -33,7 +33,7 @@ const formModel = ref<CreateTagRequest>({
 
 const rules: FormRules<CreateTagRequest> = {
   name: [
-    { required: true, message: t("content.tag.input.name"), trigger: "blur" },
+    { required: true, message: '请输入标签名', trigger: "blur" },
     { max: 30, message: "Max 30", trigger: "blur" },
   ],
   slug: [{ max: 50, message: "Max 50", trigger: "blur" }],
@@ -41,7 +41,7 @@ const rules: FormRules<CreateTagRequest> = {
 };
 
 const dialogTitle = computed(() =>
-  props.mode === "edit" ? t("content.tag.edit") : t("content.tag.create")
+  props.mode === "edit" ? '编辑标签' : '新增标签'
 );
 
 const visible = computed({
@@ -60,7 +60,7 @@ const loadDetail = async () => {
     };
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   }
 };
 
@@ -96,17 +96,17 @@ const handleSave = async () => {
 
     if (props.mode === "edit" && props.tagId) {
       await putTag(props.tagId, payload);
-      ElMessage.success(t("content.tag.success.update"));
+      ElMessage.success('标签更新成功');
     } else {
       await createTag(payload);
-      ElMessage.success(t("content.tag.success.create"));
+      ElMessage.success('标签创建成功');
     }
 
     visible.value = false;
     emit("success");
   } catch (e) {
     console.error(e);
-    ElMessage.error(props.mode === "edit" ? t("content.tag.error.save") : t("content.tag.error.create"));
+    ElMessage.error(props.mode === "edit" ? '标签保存失败' : '标签创建失败');
   } finally {
     submitting.value = false;
   }
@@ -116,19 +116,19 @@ const handleSave = async () => {
 <template>
   <el-dialog v-model="visible" :title="dialogTitle" width="560" destroy-on-close @closed="resetForm">
     <el-form ref="formRef" :model="formModel" :rules="rules" label-width="100px" status-icon>
-      <el-form-item prop="name" :label="t('content.tag.field.name')">
-        <el-input v-model="formModel.name" :placeholder="t('content.tag.input.name')" />
+      <el-form-item prop="name" label="标签名">
+        <el-input v-model="formModel.name" placeholder="请输入标签名" />
       </el-form-item>
-      <el-form-item prop="slug" :label="t('content.tag.field.slug')">
-        <el-input v-model="formModel.slug" :placeholder="t('content.tag.input.slug')" />
+      <el-form-item prop="slug" label="唯一标识符">
+        <el-input v-model="formModel.slug" placeholder="请输入唯一标识符" />
       </el-form-item>
-      <el-form-item prop="description" :label="t('content.tag.field.description')">
+      <el-form-item prop="description" label="描述">
         <el-input v-model="formModel.description" type="textarea" :rows="4" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('common.action.save') }}</el-button>
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" :loading="submitting" @click="handleSave">保存</el-button>
     </template>
   </el-dialog>
 </template>

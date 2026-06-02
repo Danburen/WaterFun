@@ -2,7 +2,7 @@
 import type { OptionResItem } from "@waterfun/web-core/src/types/api/response";
 import { formatDate } from "@waterfun/web-core/src/timer";
 import { ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
+
 import { useRouter } from "vue-router";
 import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
@@ -12,7 +12,7 @@ import type { PageOptions } from "~/types/api";
 import CategoryCreateDialog from "~/views/Content/components/CategoryCreateDialog.vue";
 import { ElMessage } from "element-plus";
 
-const { t } = useI18n();
+
 const router = useRouter();
 
 const loading = ref(false);
@@ -58,7 +58,7 @@ const fetchData = async () => {
     pageOpts.value.total = res.data.page?.totalElements || 0;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   } finally {
     loading.value = false;
   }
@@ -72,7 +72,7 @@ const loadOptions = async () => {
     userOptions.value = userRes.data || [];
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   } finally {
     loadingOptions.value = false;
   }
@@ -120,16 +120,16 @@ const handleSelectionChange = (rows: CategoryResp[]) => {
 
 const handleDelete = async (id: number) => {
   try {
-    await ElMessageBox.confirm(t("content.category.confirm.delete"), t("common.action.delete"), {
+    await ElMessageBox.confirm('确定删除该分类吗？', '删除', {
       type: "warning",
     });
     await deleteCategory(id);
-    ElMessage.success(t("content.category.success.delete"));
+    ElMessage.success('分类删除成功');
     fetchData();
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("content.category.error.delete"));
+      ElMessage.error('分类删除失败');
     }
   }
 };
@@ -139,8 +139,8 @@ const handleBatchDelete = async () => {
 
   try {
     await ElMessageBox.confirm(
-      t("content.category.confirm.batchDelete", { count: selectedCategoryIds.value.length }),
-      t("common.action.delete"),
+      `确定删除选中的 ${selectedCategoryIds.value.length} 个分类吗？`,
+      '删除',
       { type: "warning" }
     );
 
@@ -148,11 +148,11 @@ const handleBatchDelete = async () => {
     const result = res.data;
 
     if (result.success === result.requested) {
-      ElMessage.success(t("content.category.success.delete"));
+      ElMessage.success('分类删除成功');
     } else if (result.success === 0) {
-      ElMessage.error(t("content.category.error.delete"));
+      ElMessage.error('分类删除失败');
     } else {
-      ElMessage.warning(`${t("content.category.success.delete")} ${result.success}/${result.requested}`);
+      ElMessage.warning(`${'分类删除成功'} ${result.success}/${result.requested}`);
     }
 
     selectedCategoryIds.value = [];
@@ -160,7 +160,7 @@ const handleBatchDelete = async () => {
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("content.category.error.delete"));
+      ElMessage.error('分类删除失败');
     }
   }
 };
@@ -179,25 +179,25 @@ onMounted(() => {
         class="search-form"
         :model="searchForm"
       >
-        <el-form-item :label="t('content.category.field.name')">
+        <el-form-item label="分类名">
           <el-input
             v-model="searchForm.name"
-            :placeholder="t('content.category.input.name')"
+            placeholder="请输入分类名"
           />
         </el-form-item>
-        <el-form-item :label="t('content.category.field.slug')">
+        <el-form-item label="唯一标识符">
           <el-input
             v-model="searchForm.slug"
-            :placeholder="t('content.category.input.slug')"
+            placeholder="请输入唯一标识符"
           />
         </el-form-item>
-        <el-form-item :label="t('content.category.field.parentId')">
+        <el-form-item label="父级ID">
           <el-select
             v-model="searchForm.parentId"
             clearable
             filterable
             :loading="loadingOptions"
-            :placeholder="t('content.category.field.parentId')"
+            placeholder="父级ID"
             style="width: 220px"
           >
             <el-option
@@ -209,13 +209,13 @@ onMounted(() => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('content.category.field.creatorId')">
+        <el-form-item label="创建人ID">
           <el-select
             v-model="searchForm.creatorId"
             clearable
             filterable
             :loading="loadingOptions"
-            :placeholder="t('content.category.field.creatorId')"
+            placeholder="创建人ID"
             style="width: 220px"
           >
             <el-option
@@ -232,10 +232,10 @@ onMounted(() => {
             type="primary"
             @click="handleSearch"
           >
-            {{ t('common.query.title') }}
+            查询
           </el-button>
           <el-button @click="handleReset">
-            {{ t('common.reset.title') }}
+            重置
           </el-button>
         </el-form-item>
       </el-form>
@@ -244,7 +244,7 @@ onMounted(() => {
     <TableContainer
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
-      title="content.category.title"
+      title="分类管理"
       show-add-btn
       :show-remove-btn="true"
       :disable-delete="selectedCategoryIds.length === 0"
@@ -273,7 +273,7 @@ onMounted(() => {
         />
         <el-table-column
           prop="name"
-          :label="t('content.category.field.name')"
+          label="分类名"
           min-width="150"
           show-overflow-tooltip
         >
@@ -289,28 +289,28 @@ onMounted(() => {
         </el-table-column>
         <el-table-column
           prop="slug"
-          :label="t('content.category.field.slug')"
+          label="唯一标识符"
           min-width="160"
           show-overflow-tooltip
         />
         <el-table-column
           prop="parentId"
-          :label="t('content.category.field.parentId')"
+          label="父级ID"
           width="110"
         />
         <el-table-column
           prop="sortOrder"
-          :label="t('content.category.field.sortOrder')"
+          label="排序"
           width="110"
         />
         <el-table-column
           prop="creatorId"
-          :label="t('content.category.field.creatorId')"
+          label="创建人ID"
           width="110"
         />
         <el-table-column
           prop="isActive"
-          :label="t('content.category.field.isActive')"
+          label="是否启用"
           width="100"
         >
           <template #default="{ row }">
@@ -318,21 +318,21 @@ onMounted(() => {
               size="small"
               :type="row.isActive ? 'success' : 'info'"
             >
-              {{ row.isActive ? t('common.boolean.yes') : t('common.boolean.no') }}
+              {{ row.isActive ? '是' : '否' }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column
           prop="createdAt"
-          :label="t('common.time.create')"
+          label="创建时间"
           min-width="170"
         >
           <template #default="{ row }">
-            {{ formatDate(row.createdAt) || t('common.none.title') }}
+            {{ formatDate(row.createdAt) || '无' }}
           </template>
         </el-table-column>
         <el-table-column
-          :label="t('common.operation.title')"
+          label="操作"
           width="180"
           fixed="right"
         >
@@ -342,14 +342,14 @@ onMounted(() => {
               type="primary"
               @click="handleEdit(row.id)"
             >
-              {{ t('common.action.edit') }}
+              编辑
             </el-button>
             <el-button
               size="small"
               type="danger"
               @click="handleDelete(row.id)"
             >
-              {{ t('common.action.delete') }}
+              删除
             </el-button>
           </template>
         </el-table-column>

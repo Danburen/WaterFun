@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox, ElMessage } from "element-plus";
-import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
@@ -9,7 +8,6 @@ import { deleteUser, deleteUsers, getUserList, type AccountStatus, type UserAdmi
 import type { PageOptions } from "~/types";
 import UserEditDialog from "./components/UserEditDialog.vue";
 
-const { t } = useI18n();
 const router = useRouter();
 
 const loading = ref(false);
@@ -42,7 +40,8 @@ const statusTypeMap: Record<AccountStatus, "success" | "warning" | "danger" | "i
   DELETED: "info",
 };
 
-const statusLabel = (status: AccountStatus) => t(`user.statusMap.${status.toLowerCase()}`);
+const statusLabel = (status: AccountStatus) =>
+  ({ ACTIVE: '正常', SUSPENDED: '已停用', DEACTIVATED: '已注销', DELETED: '已删除' })[status];
 
 const userTypeTagTypeMap: Record<number, "primary" | "success" | "warning" | "danger" | "info"> = {
   0: "primary",
@@ -60,7 +59,8 @@ const userTypeI18nKeyMap: Record<number, string> = {
   4: "superAdmin",
 };
 
-const userTypeLabel = (userType: number) => t(`user.typeMap.${userTypeI18nKeyMap[userType] ?? "normal"}`);
+const userTypeLabel = (userType: number) =>
+  ({ 0: '普通用户', 1: '测试用户', 2: '管理员', 3: '系统', 4: '超级管理员' })[userType] ?? '普通用户';
 
 const fetchData = async () => {
   loading.value = true;
@@ -76,7 +76,7 @@ const fetchData = async () => {
     pageOpts.value.total = res.data.page.totalElements || 0;
   } catch (error) {
     console.error(error);
-    ElMessage.error(t("user.error.fetchList"));
+    ElMessage.error('获取用户列表失败');
   } finally {
     loading.value = false;
   }
@@ -115,16 +115,16 @@ const handleAdd = () => {
 
 const handleDelete = async (uid: string) => {
   try {
-    await ElMessageBox.confirm(t("user.confirm.delete"), t("common.action.delete"), {
+    await ElMessageBox.confirm('确定删除该用户吗？', '删除', {
       type: "warning",
     });
     await deleteUser(uid);
-    ElMessage.success(t("user.success.delete"));
+    ElMessage.success('用户删除成功');
     fetchData();
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("user.error.delete"));
+      ElMessage.error('删除用户失败');
     }
   }
 };
@@ -140,8 +140,8 @@ const handleBatchDelete = async () => {
 
   try {
     await ElMessageBox.confirm(
-      t("user.confirm.batchDelete", { count: selectedUserUids.value.length }),
-      t("common.action.delete"),
+      `确定删除选中的 ${selectedUserUids.value.length} 个用户吗？`,
+      '删除',
       { type: "warning" }
     );
 
@@ -149,11 +149,11 @@ const handleBatchDelete = async () => {
     const result = res.data;
 
     if (result.success === result.requested) {
-      ElMessage.success(t("user.success.delete"));
+      ElMessage.success('用户删除成功');
     } else if (result.success === 0) {
-      ElMessage.error(t("user.error.delete"));
+      ElMessage.error('删除用户失败');
     } else {
-      ElMessage.warning(`${t("user.success.delete")} ${result.success}/${result.requested}`);
+      ElMessage.warning(`${'用户删除成功'} ${result.success}/${result.requested}`);
     }
 
     selectedUserUids.value = [];
@@ -161,7 +161,7 @@ const handleBatchDelete = async () => {
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("user.error.delete"));
+      ElMessage.error('删除用户失败');
     }
   }
 };
@@ -181,19 +181,19 @@ onMounted(fetchData);
         :model="searchForm"
         class="search-form"
       >
-        <el-form-item :label="t('user.username')">
+        <el-form-item label="用户名">
           <el-input
             v-model="searchForm.username"
-            :placeholder="t('user.input.username')"
+            placeholder="请输入用户名"
           />
         </el-form-item>
-        <el-form-item :label="t('user.nickname')">
+        <el-form-item label="昵称">
           <el-input
             v-model="searchForm.nickname"
-            :placeholder="t('user.input.nickname')"
+            placeholder="请输入昵称"
           />
         </el-form-item>
-        <el-form-item :label="t('user.status')">
+        <el-form-item label="用户状态">
           <el-select
             v-model="searchForm.accountStatus"
             clearable
@@ -222,10 +222,10 @@ onMounted(fetchData);
             type="primary"
             @click="handleSearch"
           >
-            {{ t("common.query.title") }}
+            查询
           </el-button>
           <el-button @click="handleReset">
-            {{ t("common.reset.title") }}
+            重置
           </el-button>
         </el-form-item>
       </el-form>
@@ -234,7 +234,7 @@ onMounted(fetchData);
     <TableContainer
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
-      title="user.title"
+      title="用户管理"
       show-add-btn
       :show-remove-btn="true"
       :disable-delete="selectedUserUids.length === 0"
@@ -264,7 +264,7 @@ onMounted(fetchData);
         />
         <el-table-column
           prop="username"
-          :label="t('user.username')"
+          label="用户名"
         >
           <template #default="{ row }">
             <el-link
@@ -278,15 +278,15 @@ onMounted(fetchData);
         </el-table-column>
         <el-table-column
           prop="nickname"
-          :label="t('user.nickname')"
+          label="昵称"
         >
           <template #default="{ row }">
-            {{ row.nickname || t('common.none.title') }}
+            {{ row.nickname || '无' }}
           </template>
         </el-table-column>
         <el-table-column
           prop="userType"
-          :label="t('user.type')"
+          label="用户类型"
           min-width="120"
         >
           <template #default="{ row }">
@@ -300,7 +300,7 @@ onMounted(fetchData);
         </el-table-column>
         <el-table-column
           prop="accountStatus"
-          :label="t('user.status')"
+          label="用户状态"
         >
           <template #default="{ row }">
             <el-tag
@@ -313,14 +313,14 @@ onMounted(fetchData);
         </el-table-column>
         <el-table-column
           prop="createdAt"
-          :label="t('common.time.create')"
+          label="创建时间"
         >
           <template #default="{ row }">
             {{ formatISOData(row.createdAt) }}
           </template>
         </el-table-column>
         <el-table-column
-          :label="t('common.operation.title')"
+          label="操作"
           min-width="120"
           fixed="right"
         >
@@ -330,14 +330,14 @@ onMounted(fetchData);
               type="primary"
               @click="gotoEdit(row.uid)"
             >
-              {{ t("common.action.edit") }}
+              编辑
             </el-button>
             <el-button
               size="small"
               type="danger"
               @click="handleDelete(row.uid)"
             >
-              {{ t("common.action.delete") }}
+              删除
             </el-button>
             <el-popover
               placement="bottom"
@@ -351,7 +351,7 @@ onMounted(fetchData);
                   type="success"
                   style="margin-left: 12px;"
                 >
-                  {{ t("common.action.more") }}
+                  更多
                 </el-button>
               </template>
               <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -362,7 +362,7 @@ onMounted(fetchData);
                   style="margin: 0; width: 100%;"
                   @click="router.push({ name: 'userRoleAssign', params: { uid: String(row.uid) } })"
                 >
-                  {{ t("role.assign") }}
+                  分配角色
                 </el-button>
                 <el-button
                   size="small"
@@ -371,7 +371,7 @@ onMounted(fetchData);
                   style="margin: 0; width: 100%;"
                   @click="router.push({ name: 'userPermissionAssign', params: { uid: String(row.uid) } })"
                 >
-                  {{ t("permission.assign") }}
+                  分配权限
                 </el-button>
               </div>
             </el-popover>

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { formatDate } from "@waterfun/web-core/src/timer";
 import type { OptionResItem } from "@waterfun/web-core/src/types/api/response";
-import { useI18n } from "vue-i18n";
+
 import { useRoute, useRouter } from "vue-router";
 import { getTag, type TagResp } from "~/api/tag";
 import { getUserOptions } from "~/api/user";
 import TagCreateDialog from "~/views/Content/components/TagCreateDialog.vue";
 import { ElMessage } from "element-plus";
 
-const { t } = useI18n();
+
 const route = useRoute();
 const router = useRouter();
 
@@ -30,13 +30,13 @@ const fetchOptions = async () => {
     userOptions.value = res.data || [];
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   }
 };
 
 const fetchDetail = async () => {
   if (Number.isNaN(tagId.value)) {
-    ElMessage.error(t("content.tag.error.invalidId"));
+    ElMessage.error('无效的标签ID');
     router.back();
     return;
   }
@@ -47,7 +47,7 @@ const fetchDetail = async () => {
     tagDetail.value = res.data;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("content.tag.error.fetchDetail"));
+    ElMessage.error('获取标签详情失败');
   } finally {
     loading.value = false;
   }
@@ -67,20 +67,20 @@ onMounted(async () => {
     v-loading="loading"
     class="tag-detail"
   >
-    <CardContainer title="content.tag.detail">
+    <CardContainer title="标签详情">
       <template #header-right>
         <el-button
           text
           @click="router.back()"
         >
-          {{ t("common.action.back") }}
+          返回
         </el-button>
         <el-button
           type="primary"
           plain
           @click="editDialogVisible = true"
         >
-          {{ t("common.action.edit") }}
+          编辑
         </el-button>
       </template>
 
@@ -92,28 +92,28 @@ onMounted(async () => {
         <el-descriptions-item label="ID">
           {{ tagDetail.id }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.tag.field.name')">
+        <el-descriptions-item label="标签名">
           {{ tagDetail.name }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.tag.field.slug')">
-          {{ tagDetail.slug || t('common.none.title') }}
+        <el-descriptions-item label="唯一标识符">
+          {{ tagDetail.slug || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.tag.field.usageCount')">
-          {{ tagDetail.usageCount ?? t('common.none.title') }}
+        <el-descriptions-item label="使用次数">
+          {{ tagDetail.usageCount ?? '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.tag.field.creatorId')">
+        <el-descriptions-item label="创建人ID">
           <span v-if="tagDetail.creatorId">
-            {{ tagDetail.creatorId }} ({{ userNameMap.get(tagDetail.creatorId) || t('common.none.title') }})
+            {{ tagDetail.creatorId }} ({{ userNameMap.get(tagDetail.creatorId) || '无' }})
           </span>
-          <span v-else>{{ t('common.none.title') }}</span>
+          <span v-else>无</span>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('content.tag.field.description')">
-          {{ tagDetail.description || t('common.none.title') }}
+        <el-descriptions-item label="描述">
+          {{ tagDetail.description || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">
+        <el-descriptions-item label="创建时间">
           {{ formatDate(tagDetail.createdAt) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">
+        <el-descriptions-item label="更新时间">
           {{ formatDate(tagDetail.updateAt) }}
         </el-descriptions-item>
       </el-descriptions>

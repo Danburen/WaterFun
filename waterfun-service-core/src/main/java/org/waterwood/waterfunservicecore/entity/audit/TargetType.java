@@ -29,7 +29,7 @@ public enum TargetType {
                     FileExtension.WEBP
             )
     ),
-    POST_CONTENT(5, Set.of(FileExtension.TXT, FileExtension.MD)),;
+    ;
 
     private final short code;
     private final Set<FileExtension> allowedExts;
@@ -40,11 +40,12 @@ public enum TargetType {
     }
 
     public static TargetType fromCode(int code) {
-        return switch (code) {
-            case 1 -> USER_AVATAR;
-            case 2 -> POST_COVERAGE_IMAGE;
-            default -> UNKNOWN;
-        };
+        for(int i = 0; i < values().length; i++) {
+            if(values()[i].code == code) {
+                return values()[i];
+            }
+        }
+        return UNKNOWN;
     }
 
     public String toLowerCase() {

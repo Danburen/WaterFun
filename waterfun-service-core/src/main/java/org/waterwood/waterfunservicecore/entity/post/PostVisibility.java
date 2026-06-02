@@ -14,11 +14,11 @@ public enum PostVisibility {
     }
 
     public static PostVisibility fromCode(short code) {
-        return switch (code) {
-            case 0 -> PUBLIC;
-            case 1 -> PRIVATE;
-            case 2 -> FANS_ONLY;
-            default -> throw new IllegalArgumentException("Invalid PostVisibility code: " + code);
-        };
+        for (PostVisibility postVisibility : PostVisibility.values()) {
+            if (postVisibility.code == code) {
+                return postVisibility;
+            }
+        }
+        throw new IllegalArgumentException("Unknown PostVisibility code: " + code);
     }
 }

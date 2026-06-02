@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { OptionResItem } from "@waterfun/web-core/src/types";
-import { useI18n } from "vue-i18n";
+
 import { addRole, getRole, updateRole } from "~/api/role";
 import RoleForm from "./RoleForm.vue";
 import type { RoleFormExpose, RoleFormModel } from "../types";
@@ -26,7 +26,7 @@ const emit = defineEmits<{
   success: [];
 }>();
 
-const { t } = useI18n();
+
 const roleFormRef = ref<RoleFormExpose>();
 const submitting = ref(false);
 
@@ -71,7 +71,7 @@ watch(
       await loadEditData();
     } catch (e) {
       console.error(e);
-      ElMessage.error(t("role.error.fetch"));
+      ElMessage.error('获取角色信息失败');
       visible.value = false;
     }
   }
@@ -95,17 +95,17 @@ const handleSave = async () => {
 
     if (props.mode === "create") {
       await addRole(payload);
-      ElMessage.success(t("role.success.create"));
+      ElMessage.success('角色创建成功');
     } else if (props.roleId != null) {
       await updateRole(props.roleId, payload);
-      ElMessage.success(t("role.success.update"));
+      ElMessage.success('角色更新成功');
     }
 
     visible.value = false;
     emit("success");
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.save"));
+    ElMessage.error('保存角色失败');
   } finally {
     submitting.value = false;
   }
@@ -120,7 +120,7 @@ const handleClosed = () => {
 <template>
   <el-dialog
     v-model="visible"
-    :title="mode === 'create' ? t('role.create') : t('role.edit')"
+    :title="mode === 'create' ? '创建角色' : '编辑角色'"
     width="640"
     destroy-on-close
     @closed="handleClosed"
@@ -133,14 +133,14 @@ const handleClosed = () => {
     />
     <template #footer>
       <el-button @click="visible = false">
-        {{ t('common.action.cancel') }}
+        取消
       </el-button>
       <el-button
         type="primary"
         :loading="submitting"
         @click="handleSave"
       >
-        {{ t('common.action.save') }}
+        保存
       </el-button>
     </template>
   </el-dialog>

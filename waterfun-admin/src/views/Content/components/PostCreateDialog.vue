@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { OptionResItem } from "@waterfun/web-core/src/types";
 import type { FormInstance, FormRules } from "element-plus";
-import { useI18n } from "vue-i18n";
 import { getCategoryOptions } from "~/api/category";
 import {
   createPost,
@@ -35,7 +34,6 @@ const emit = defineEmits<{
   success: [];
 }>();
 
-const { t } = useI18n();
 const formRef = ref<FormInstance>();
 const submitting = ref(false);
 const loadingOptions = ref(false);
@@ -59,28 +57,28 @@ const formModel = ref<CreatePostRequest>({
 });
 
 const statusOptions: { label: string; value: PostStatus }[] = [
-  { label: "content.post.status.draft", value: "DRAFT" },
-  { label: "content.post.status.pending", value: "PENDING" },
-  { label: "content.post.status.published", value: "PUBLISHED" },
-  { label: "content.post.status.rejected", value: "REJECTED" },
-  { label: "content.post.status.archived", value: "ARCHIVED" },
+  { label: "草稿", value: "DRAFT" },
+  { label: "待审核", value: "PENDING" },
+  { label: "已发布", value: "PUBLISHED" },
+  { label: "已拒绝", value: "REJECTED" },
+  { label: "已归档", value: "ARCHIVED" },
 ];
 
 const visibilityOptions: { label: string; value: PostVisibility }[] = [
-  { label: "content.post.visibility.public", value: "PUBLIC" },
-  { label: "content.post.visibility.private", value: "PRIVATE" },
-  { label: "content.post.visibility.fansOnly", value: "FANS_ONLY" },
+  { label: "公开", value: "PUBLIC" },
+  { label: "私密", value: "PRIVATE" },
+  { label: "粉丝可见", value: "FANS_ONLY" },
 ];
 
 const rules: FormRules<CreatePostRequest> = {
-  title: [{ required: true, message: t("content.post.input.title"), trigger: "blur" }],
-  content: [{ required: true, message: t("content.post.input.content"), trigger: "blur" }],
-  authorId: [{ required: true, message: t("content.post.input.authorId"), trigger: "change" }],
-  categoryId: [{ required: true, message: t("content.post.input.categoryId"), trigger: "change" }],
+  title: [{ required: true, message: '请输入标题', trigger: "blur" }],
+  content: [{ required: true, message: '请输入内容', trigger: "blur" }],
+  authorId: [{ required: true, message: '请选择作者', trigger: "change" }],
+  categoryId: [{ required: true, message: '请选择分类', trigger: "change" }],
 };
 
 const dialogTitle = computed(() =>
-  props.mode === "edit" ? t("content.post.edit") : t("content.post.create")
+  props.mode === "edit" ? '编辑文章' : '新增文章'
 );
 
 const visible = computed({
@@ -114,7 +112,7 @@ const loadOptions = async () => {
     userOptions.value = userRes.data || [];
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   } finally {
     loadingOptions.value = false;
   }
@@ -143,7 +141,7 @@ const loadDetail = async () => {
     fillFormFromDetail(res.data);
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   }
 };
 
@@ -174,20 +172,20 @@ const handleSave = async () => {
     if (props.mode === "edit" && props.postId) {
       await putPost(props.postId, payload);
       await replacePostTags(props.postId, { tagIds: formModel.value.tagIds || [] });
-      ElMessage.success(t("content.post.success.update"));
+      ElMessage.success('文章更新成功');
     } else {
       await createPost({
         ...(payload as CreatePostRequest),
         tagIds: formModel.value.tagIds?.length ? formModel.value.tagIds : undefined,
       });
-      ElMessage.success(t("content.post.success.create"));
+      ElMessage.success('文章创建成功');
     }
 
     visible.value = false;
     emit("success");
   } catch (e) {
     console.error(e);
-    ElMessage.error(props.mode === "edit" ? t("content.post.error.save") : t("content.post.error.create"));
+    ElMessage.error(props.mode === "edit" ? '文章保存失败' : '文章创建失败');
   } finally {
     submitting.value = false;
   }
@@ -197,53 +195,53 @@ const handleSave = async () => {
 <template>
   <el-dialog v-model="visible" :title="dialogTitle" width="760" destroy-on-close @closed="resetForm">
     <el-form ref="formRef" v-loading="loadingOptions" :model="formModel" :rules="rules" label-width="110px" status-icon>
-      <el-form-item prop="title" :label="t('content.post.field.title')">
-        <el-input v-model="formModel.title" :placeholder="t('content.post.input.title')"/>
+      <el-form-item prop="title" label="标题">
+        <el-input v-model="formModel.title" placeholder="请输入标题"/>
       </el-form-item>
-      <el-form-item prop="subtitle" :label="t('content.post.field.subtitle')">
-        <el-input v-model="formModel.subtitle" :placeholder="t('content.post.input.subtitle')"/>
+      <el-form-item prop="subtitle" label="副标题">
+        <el-input v-model="formModel.subtitle" placeholder="请输入副标题"/>
       </el-form-item>
-      <el-form-item prop="content" :label="t('content.post.field.content')">
-        <el-input v-model="formModel.content" type="textarea" :rows="6" :placeholder="t('content.post.input.content')"/>
+      <el-form-item prop="content" label="内容">
+        <el-input v-model="formModel.content" type="textarea" :rows="6" placeholder="请输入内容"/>
       </el-form-item>
-      <el-form-item prop="summary" :label="t('content.post.field.summary')">
-        <el-input v-model="formModel.summary" type="textarea" :rows="3" :placeholder="t('content.post.input.summary')"/>
+      <el-form-item prop="summary" label="摘要">
+        <el-input v-model="formModel.summary" type="textarea" :rows="3" placeholder="请输入摘要"/>
       </el-form-item>
-      <el-form-item prop="coverImg" :label="t('content.post.field.coverImg')">
-        <el-input v-model="formModel.coverImg" :placeholder="t('content.post.input.coverImg')"/>
+      <el-form-item prop="coverImg" label="封面图">
+        <el-input v-model="formModel.coverImg" placeholder="请输入封面图URL"/>
       </el-form-item>
-      <el-form-item prop="slug" :label="t('content.post.field.slug')">
-        <el-input v-model="formModel.slug" :placeholder="t('content.post.input.slug')"/>
+      <el-form-item prop="slug" label="唯一标识符">
+        <el-input v-model="formModel.slug" placeholder="请输入唯一标识符"/>
       </el-form-item>
-      <el-form-item prop="status" :label="t('content.post.field.status')">
+      <el-form-item prop="status" label="状态">
         <el-select v-model="formModel.status" style="width: 220px">
-          <el-option v-for="item in statusOptions" :key="item.value" :label="t(item.label)" :value="item.value"/>
+          <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item prop="visibility" :label="t('content.post.field.visibility')">
+      <el-form-item prop="visibility" label="可见性">
         <el-select v-model="formModel.visibility" style="width: 220px">
-          <el-option v-for="item in visibilityOptions" :key="item.value" :label="t(item.label)" :value="item.value"/>
+          <el-option v-for="item in visibilityOptions" :key="item.value" :label="item.label" :value="item.value"/>
         </el-select>
       </el-form-item>
-      <el-form-item prop="authorId" :label="t('content.post.field.authorId')">
+      <el-form-item prop="authorId" label="作者ID">
         <el-select v-model="formModel.authorId" style="width: 300px" filterable>
           <el-option v-for="item in userOptions" :key="item.id" :label="`${item.id} (${item.name}${item.code ? ` / ${item.code}` : ''})`" :value="item.id" :disabled="item.disabled || false"/>
         </el-select>
       </el-form-item>
-      <el-form-item prop="categoryId" :label="t('content.post.field.categoryId')">
+      <el-form-item prop="categoryId" label="分类ID">
         <el-select v-model="formModel.categoryId" style="width: 300px" filterable>
           <el-option v-for="item in categoryOptions" :key="item.id" :label="`${item.id} (${item.name})`" :value="item.id" :disabled="item.disabled || false"/>
         </el-select>
       </el-form-item>
-      <el-form-item prop="tagIds" :label="t('content.post.field.tagIds')">
+      <el-form-item prop="tagIds" label="标签">
         <el-select v-model="formModel.tagIds" multiple style="width: 100%" filterable>
           <el-option v-for="item in tagOptions" :key="item.id" :label="`${item.id} (${item.name})`" :value="item.id" :disabled="item.disabled || false"/>
         </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('common.action.save') }}</el-button>
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" :loading="submitting" @click="handleSave">保存</el-button>
     </template>
   </el-dialog>
 </template>

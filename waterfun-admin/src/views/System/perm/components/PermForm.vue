@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { OptionResItem } from "@waterfun/web-core/src/types";
 import type { FormInstance, FormRules } from "element-plus";
-import { useI18n } from "vue-i18n";
 import type { PermissionType } from "~/api/permission";
 import type { PermFormExpose, PermFormModel } from "../types";
 
@@ -23,7 +22,6 @@ const emit = defineEmits<{
   "update:modelValue": [value: PermFormModel];
 }>();
 
-const { t } = useI18n();
 const formRef = ref<FormInstance>();
 
 const localModel = computed({
@@ -32,22 +30,22 @@ const localModel = computed({
 });
 
 const permTypeOptions: { label: string; value: PermissionType }[] = [
-  { label: "permission.type.menu", value: "MENU" },
-  { label: "permission.type.button", value: "BUTTON" },
-  { label: "permission.type.api", value: "API" },
-  { label: "permission.type.data", value: "DATA" },
-  { label: "permission.type.other", value: "OTHER" },
+  { label: "菜单", value: "MENU" },
+  { label: "按钮", value: "BUTTON" },
+  { label: "接口", value: "API" },
+  { label: "数据", value: "DATA" },
+  { label: "其他", value: "OTHER" },
 ];
 
 const rules: FormRules<PermFormModel> = {
   name: [
-    { required: true, message: t("permission.validate.name"), trigger: "blur" },
-    { min: 2, max: 50, message: t("permission.validate.nameLength"), trigger: "blur" },
+    { required: true, message: '请输入权限名称', trigger: "blur" },
+    { min: 2, max: 50, message: '权限名称长度需在 2-50 个字符', trigger: "blur" },
   ],
-  code: [{ min: 2, max: 50, message: t("permission.validate.codeLength"), trigger: "blur" }],
+  code: [{ min: 2, max: 50, message: '权限编码长度需在 2-50 个字符', trigger: "blur" }],
   resource: [
-    { required: true, message: t("permission.validate.resource"), trigger: "blur" },
-    { max: 255, message: t("permission.validate.resourceLength"), trigger: "blur" },
+    { required: true, message: '请输入资源标识', trigger: "blur" },
+    { max: 255, message: '资源标识长度不能超过 255 个字符', trigger: "blur" },
   ],
 };
 
@@ -77,29 +75,29 @@ defineExpose<PermFormExpose>({
   >
     <el-form-item
       prop="name"
-      :label="t('permission.name')"
+      label="权限名称"
     >
       <el-input
         v-model="localModel.name"
         :readonly="readonly"
-        :placeholder="t('permission.input.name')"
+        placeholder="请输入权限名称"
       />
     </el-form-item>
 
     <el-form-item
       prop="code"
-      :label="t('permission.code')"
+      label="权限编码"
     >
       <el-input
         v-model="localModel.code"
         :readonly="readonly"
-        :placeholder="t('permission.input.code')"
+        placeholder="请输入权限编码"
       />
     </el-form-item>
 
     <el-form-item
       prop="type"
-      :label="t('permission.type.title')"
+      label="权限类型"
     >
       <el-select
         v-model="localModel.type"
@@ -109,7 +107,7 @@ defineExpose<PermFormExpose>({
         <el-option
           v-for="item in permTypeOptions"
           :key="item.value"
-          :label="t(item.label)"
+          :label="item.label"
           :value="item.value"
         />
       </el-select>
@@ -117,24 +115,24 @@ defineExpose<PermFormExpose>({
 
     <el-form-item
       prop="resource"
-      :label="t('permission.resource')"
+      label="资源标识"
     >
       <el-input
         v-model="localModel.resource"
         :readonly="readonly"
-        :placeholder="t('permission.input.resource')"
+        placeholder="请输入资源标识"
       />
     </el-form-item>
 
     <el-form-item
       prop="parentId"
-      :label="t('permission.parentId')"
+      label="父级权限ID"
     >
       <el-select
         v-model="localModel.parentId"
         clearable
         :disabled="readonly"
-        :placeholder="t('permission.input.parentId')"
+        placeholder="请选择父级权限"
         style="width: 100%"
       >
         <el-option
@@ -149,7 +147,7 @@ defineExpose<PermFormExpose>({
 
     <el-form-item
       prop="orderWeight"
-      :label="t('permission.weight')"
+      label="排序权重"
     >
       <el-input-number
         v-model="localModel.orderWeight"
@@ -161,20 +159,20 @@ defineExpose<PermFormExpose>({
 
     <el-form-item
       prop="description"
-      :label="t('permission.description')"
+      label="权限描述"
     >
       <el-input
         v-model="localModel.description"
         type="textarea"
         :readonly="readonly"
         :rows="4"
-        :placeholder="t('permission.input.description')"
+        placeholder="请输入权限描述"
       />
     </el-form-item>
 
     <el-form-item
       prop="isSystem"
-      :label="t('permission.isSystem')"
+      label="系统权限"
     >
       <el-switch
         v-model="localModel.isSystem"

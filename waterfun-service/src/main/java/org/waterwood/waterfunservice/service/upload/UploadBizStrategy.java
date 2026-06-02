@@ -4,7 +4,7 @@ import org.waterwood.waterfunservice.api.BizType;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
-import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
+import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
 
 import java.util.List;
 import java.util.Set;

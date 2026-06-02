@@ -55,7 +55,7 @@ const bcStore = useBreadcrumbs();
             v-for="item in bcStore.breadcrumbs.value"
             :to="item.to"
           >
-            {{ $t(item.locale) }}
+            {{ item.locale }}
           </el-breadcrumb-item>
         </el-breadcrumb>
       </div>

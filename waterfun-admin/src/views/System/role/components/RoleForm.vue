@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {OptionResItem} from "@waterfun/web-core/src/types";
-import {useI18n} from "vue-i18n";
+
 import type {FormInstance, FormRules} from "element-plus";
 import type {RoleFormExpose, RoleFormModel} from "../types";
 
@@ -19,7 +19,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: RoleFormModel];
 }>();
 
-const {t} = useI18n();
+
 const formRef = ref<FormInstance>();
 
 const localModel = computed({
@@ -29,12 +29,12 @@ const localModel = computed({
 
 const rules: FormRules<RoleFormModel> = {
   name: [
-    {required: true, message: t("role.validate.name"), trigger: "blur"},
-    {min: 2, max: 64, message: t("role.validate.nameLength"), trigger: "blur"},
+    {required: true, message: '请输入角色名称', trigger: "blur"},
+    {min: 2, max: 64, message: '角色名称长度需在 2-64 个字符', trigger: "blur"},
   ],
   code: [
-    {required: false, message: t("role.validate.code"), trigger: "blur"},
-    {min: 2, max: 64, message: t("role.validate.codeLength"), trigger: "blur"},
+    {required: false, message: '请输入角色编码', trigger: "blur"},
+    {min: 2, max: 64, message: '角色编码长度需在 2-64 个字符', trigger: "blur"},
   ],
 };
 
@@ -64,33 +64,33 @@ defineExpose<RoleFormExpose>({
   >
     <el-form-item
       prop="name"
-      :label="t('role.name')"
+      label="角色名称"
     >
       <el-input
         v-model="localModel.name"
         :readonly="readonly "
-        :placeholder="t('role.input.name')"
+        placeholder="请输入角色名称"
       />
     </el-form-item>
     <el-form-item
       prop="code"
-      :label="t('role.code')"
+      label="角色编码"
     >
       <el-input
         v-model="localModel.code"
         :readonly="readonly || localModel.isSystem"
-        :placeholder="t('role.input.code')"
+        placeholder="请输入角色编码"
       />
     </el-form-item>
     <el-form-item
       prop="parentId"
-      :label="t('role.parentId')"
+      label="父级角色ID"
     >
       <el-select
         v-model="localModel.parentId"
         clearable
         :disabled="readonly"
-        :placeholder="t('role.input.parentId')"
+        placeholder="请选择父级角色"
         style="width: 100%"
       >
         <el-option
@@ -104,7 +104,7 @@ defineExpose<RoleFormExpose>({
     </el-form-item>
     <el-form-item
       prop="orderWeight"
-      :label="t('role.weight')"
+      label="排序权重"
     >
       <el-input-number
         v-model="localModel.orderWeight"
@@ -116,19 +116,19 @@ defineExpose<RoleFormExpose>({
     </el-form-item>
     <el-form-item
       prop="description"
-      :label="t('role.description')"
+      label="角色描述"
     >
       <el-input
         v-model="localModel.description"
         type="textarea"
         :readonly="readonly"
         :rows="4"
-        :placeholder="t('role.input.description')"
+        placeholder="请输入角色描述"
       />
     </el-form-item>
     <el-form-item
       prop="isSystem"
-      :label="t('role.isSystem')"
+      label="系统角色"
     >
       <el-switch
         v-model="localModel.isSystem"

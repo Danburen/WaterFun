@@ -23,8 +23,4 @@ export const useUserAccountStore = defineStore('userAccount', ()=>{
         updateUserAccount,
         fetchAccountInfoAndUpdate,
     }
-}, {
-  persist: process.client ? {
-        storage: sessionStorage
-  } : false
 });

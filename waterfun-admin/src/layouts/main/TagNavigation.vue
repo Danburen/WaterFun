@@ -174,7 +174,7 @@ watch(()=> props.modelValue,
         @dragend="handleDrop"
         @drop="handleDrop"
       >
-        {{ $t(tag.locale) }}
+        {{ tag.locale }}
       </el-tag>
       <div
         v-if="dragPlaceholderIndex === sortedTags.length && index === sortedTags.length - 1"

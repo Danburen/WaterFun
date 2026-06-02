@@ -3,6 +3,7 @@ import { ElMessage } from "element-plus";
 import { translate } from "~/utils/translator";
 import {getErrorMessage} from "~/utils/errorMessage";
 import {useAuthStore} from "~/stores/authStore";
+import {useUserInfoStore} from "~/stores/userInfoStore";
 import type {ApiRes} from "@waterfun/web-core/src/types";
 
 declare module 'axios' {
@@ -66,6 +67,17 @@ service.interceptors.request.use(
 )
 
 // response interceptors
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+const onRefreshed = (token: string) => {
+    refreshSubscribers.map(cb => cb(token));
+};
+
+const addRefreshSubscriber = (cb: (token: string) => void) => {
+    refreshSubscribers.push(cb);
+};
+
 service.interceptors.response.use(
     response => {
         if (response.status !== 200) {
@@ -88,9 +100,64 @@ service.interceptors.response.use(
                 console.error(error.response.data.message); 
             }
             switch (status) {
-                case 401:
-                    // window.location.href = '/login'
-                    return Promise.reject(error.response.data)
+                case 401: {
+                    const authStore = useAuthStore();
+                    const originalRequest = error.config;
+                    
+                    if (!isRefreshing) {
+                        isRefreshing = true;
+                        
+                        // use fetch to refresh access token to avoid infinit axios looping
+                        const csrfTokenForFetch = getCsrfToken();
+                        const fetchOptions: RequestInit = {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: {
+                                'Accept': 'application/json, text/plain, */*',
+                            }
+                        };
+                        if (csrfTokenForFetch) {
+                            (fetchOptions.headers as Record<string, string>)['X-XSRF-TOKEN'] = csrfTokenForFetch;
+                        }
+
+                        fetch(`${import.meta.env.VITE_API_BASE}/auth/refresh`, fetchOptions)
+                            .then(res => {
+                                if (!res.ok) {
+                                  throw new Error("refresh failed");
+                                }
+                                return res.json();
+                            })
+                            .then(resData => {
+                                const newAccess = resData.data.accessToken;
+                                const newExp = resData.data.exp;
+                                authStore.setToken(newAccess, newExp);
+                                
+                                // Auto sync user info and avatar on successful refresh
+                                useUserInfoStore().fetchAndUpdateUserInfo().catch(console.error);
+
+                                onRefreshed(newAccess);
+                                refreshSubscribers = [];
+                            })
+                            .catch(err => {
+                                // refresh failed
+                                console.error('Token refresh failed', err);
+                                authStore.removeToken();
+                                refreshSubscribers = [];
+                                window.location.href = '/login';
+                            })
+                            .finally(() => {
+                                isRefreshing = false;
+                            });
+                    }
+                    
+                    // Put original request onto queue and wait for the refresh to complete
+                    return new Promise((resolve) => {
+                        addRefreshSubscriber((newToken: string) => {
+                            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+                            resolve(service(originalRequest));
+                        });
+                    });
+                }
             }
             if(showError) {
                 ElMessage({

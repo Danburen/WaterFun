@@ -8,7 +8,7 @@ interface UserInfo {
   nickname: string;
   avatar: CloudResourceUrlResp;
   accountStatus: string;
-  createAt: string;
+  createdAt: string;
   passwordHash: boolean;
 }
 
@@ -22,7 +22,7 @@ export const useUserInfoStore = defineStore('userInfoStore', () => {
         expireAt: 0,
     },
     accountStatus: '',
-    createAt: '',
+    createdAt: '',
     passwordHash: false,
   });
 
@@ -31,18 +31,21 @@ export const useUserInfoStore = defineStore('userInfoStore', () => {
   };
 
   const clearUserInfo = () => {
-    userInfo.value = { username: '', uid: '', nickname: '', avatar: { url: '', expireAt: 0 }, accountStatus: '', createAt: '', passwordHash: false };
+    userInfo.value = { username: '', uid: '', nickname: '', avatar: { url: '', expireAt: 0 }, accountStatus: '', createdAt: '', passwordHash: false };
   };
 
   const fetchAndUpdateUserInfo = async() =>{
     const userInfoRes = await getUserInfo();
-      updateUserInfo({
+    updateUserInfo({
         ...userInfoRes.data
     });
     if(userInfoRes.data.avatar){
+        const { useUserProfileStore } = await import('./userProfileStore');
+        const expireParam = userInfoRes.data.avatar.expireAt;
+        const expireTime = typeof expireParam === 'string' ? new Date(expireParam).getTime() : expireParam;
         useUserProfileStore().updateAvatar(
             userInfoRes.data.avatar.url, 
-            userInfoRes.data.avatar.expireAt
+            expireTime
         );
     }
   }
@@ -50,6 +53,6 @@ export const useUserInfoStore = defineStore('userInfoStore', () => {
   return { userInfo, updateUserInfo, clearUserInfo, fetchAndUpdateUserInfo };
 }, {
   persist: process.client ? {
-        storage: sessionStorage
+        storage: localStorage
   } : false
 });

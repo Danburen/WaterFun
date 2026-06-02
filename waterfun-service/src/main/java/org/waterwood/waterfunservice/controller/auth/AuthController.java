@@ -13,6 +13,7 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
+import org.waterwood.api.TokenPair;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
@@ -115,7 +116,7 @@ public class AuthController {
         String codeKey = dto.getChannel() == VerifyChannel.SMS ? "SMS_CODE_KEY" : "EMAIL_CODE_KEY";
         User user = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
         return ApiResponse.success(
-                authService.BuildLoginResponse(response, user, body.getDeviceFp())
+                authService.BuildLoginResponse(response, user, dto.getDeviceFp())
         );
     }
 
@@ -134,7 +135,14 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ApiResponse<LoginClientData> refresh(@Valid @NotNull String deviceFp, HttpServletRequest request, HttpServletResponse response) {
-        return authService.refreshAccessToken();
+        TokenPair tokenPair = authService.refreshAccessToken(
+                CookieUtil.getCookieValue(request.getCookies(),"REFRESH_TOKEN"),
+                deviceFp
+        );
+        CookieUtil.setTokenCookie(response, tokenPair);
+        ResponseUtil.setNoCacheSecurityHeaders(response);
+        return ApiResponse.success(new LoginClientData(
+                tokenPair.accessToken(), tokenPair.accessExp()
+        ));
     }
-
 }

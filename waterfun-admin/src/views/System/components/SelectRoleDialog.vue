@@ -5,7 +5,7 @@ import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
 import { getRoleAllIds, listRoles, type RoleResp } from "~/api/role";
 import type { PageOptions } from "~/types";
-import { useI18n } from "vue-i18n";
+
 import { ElMessage } from "element-plus";
 
 const props = withDefaults(
@@ -23,7 +23,7 @@ const emit = defineEmits<{
   confirm: [ids: number[]];
 }>();
 
-const { t } = useI18n();
+
 
 const visible = computed({
   get: () => props.modelValue,
@@ -55,7 +55,7 @@ const fetchRoleOptions = async () => {
     roleOptions.value = res.data || [];
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.fetch"));
+    ElMessage.error('获取角色信息失败');
   }
 };
 
@@ -73,7 +73,7 @@ const fetchData = async () => {
     pageOpts.value.total = res.data.page.totalElements || 0;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.fetch"));
+    ElMessage.error('获取角色信息失败');
   } finally {
     loading.value = false;
   }
@@ -113,7 +113,7 @@ watch(
 <template>
   <el-dialog
     v-model="visible"
-    :title="t('role.select')"
+    title="选择角色"
     width="1200"
     destroy-on-close
   >
@@ -124,23 +124,23 @@ watch(
           :model="searchForm"
           class="search-form"
         >
-          <el-form-item :label="t('role.name')">
+          <el-form-item label="角色名称">
             <el-input
               v-model="searchForm.name"
-              :placeholder="t('role.input.name')"
+              placeholder="请输入角色名称"
             />
           </el-form-item>
-          <el-form-item :label="t('role.code')">
+          <el-form-item label="角色编码">
             <el-input
               v-model="searchForm.code"
-              :placeholder="t('role.input.code')"
+              placeholder="请输入角色编码"
             />
           </el-form-item>
-          <el-form-item :label="t('role.parentId')">
+          <el-form-item label="父级角色ID">
             <el-select
               v-model="searchForm.parentId"
               clearable
-              :placeholder="t('role.input.parentId')"
+              placeholder="请选择父级角色"
               style="width: 180px"
             >
               <el-option
@@ -157,10 +157,10 @@ watch(
               type="primary"
               @click="handleSearch"
             >
-              {{ t('common.query.title') }}
+              查询
             </el-button>
             <el-button @click="handleReset">
-              {{ t('common.reset.title') }}
+              重置
             </el-button>
           </el-form-item>
         </el-form>
@@ -196,26 +196,26 @@ watch(
           />
           <el-table-column
             prop="name"
-            :label="t('role.name')"
+            label="角色名称"
             min-width="180"
           />
           <el-table-column
             prop="code"
-            :label="t('role.code')"
+            label="角色编码"
             min-width="180"
           />
           <el-table-column
             prop="parentId"
-            :label="t('role.parentId')"
+            label="父级角色ID"
             width="120"
           >
             <template #default="{ row }">
-              <span>{{ row.parentId ?? t('common.none.title') }}</span>
+              <span>{{ row.parentId ?? '无' }}</span>
             </template>
           </el-table-column>
           <el-table-column
             prop="createdAt"
-            :label="t('common.time.create')"
+            label="创建时间"
             min-width="170"
           >
             <template #default="{ row }">
@@ -235,14 +235,14 @@ watch(
 
     <template #footer>
       <el-button @click="visible = false">
-        {{ t('common.action.cancel') }}
+        取消
       </el-button>
       <el-button
         type="primary"
         :disabled="selectedIds.length === 0"
         @click="handleConfirm"
       >
-        {{ t('common.action.save') }}
+        保存
       </el-button>
     </template>
   </el-dialog>

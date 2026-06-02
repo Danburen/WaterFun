@@ -26,3 +26,7 @@ deploy
 .gradle
 .vscode
 /sqls/
+
+# java
+*.jar
+*.class

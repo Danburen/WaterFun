@@ -3,6 +3,7 @@ package org.waterwood.waterfunadminservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,7 +26,10 @@ import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationT
 import org.waterwood.waterfunadminservice.infrastructure.mapper.AuditTaskMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.AuditTaskResourceMapper;
 import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
+import org.waterwood.waterfunservicecore.api.moderation.AuditPayload;
+import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
+import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
@@ -36,9 +40,11 @@ import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.notfound.AuditTaskNotFoundException;
 import org.waterwood.waterfunservicecore.exception.notfound.AuditTaskResourceNotFoundException;
 import org.waterwood.waterfunservicecore.exception.reference.AuditTaskReferenceInvalidException;
+import org.waterwood.waterfunservicecore.exception.reference.AuditTaskResourceReferenceInvalid;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
@@ -61,6 +67,8 @@ public class ModerationServiceImpl implements ModerationService {
     private final RabbitTemplate rabbitTemplate;
     private final AuditTaskResourceMapper auditTaskResourceMapper;
     private final ResourceRepository resourceRepository;
+    private final UserRepository userRepository;
+    private final MessageSource messageSource;
 
     @Override
     public Page<AuditTask> listTasks(Specification<AuditTask> spec, Pageable pageable) {
@@ -85,18 +93,22 @@ public class ModerationServiceImpl implements ModerationService {
         if (!auditTaskRepository.existsById(taskId)) {
             throw new AuditTaskReferenceInvalidException(taskId);
         }
-        List<AuditResource> auditResources = auditTaskResourceRepository.findAllByTask_IdOrderBySortNoAsc(taskId);
+        List<AuditResource> auditResources = auditTaskResourceRepository
+                .findAllByTaskId(taskId);
         return auditResources.stream().map(this::toModerationResourceRes).toList();
     }
 
     @Override
     public Page<ModerationResourceRes> listResourcesWithPayload(Specification<AuditResource> spec, Pageable pageable) {
-        return auditTaskResourceRepository.findAll(spec, pageable).map(this::toModerationResourceRes);
+        return auditTaskResourceRepository
+                .findAll(spec, pageable)
+                .map(this::toModerationResourceRes);
     }
 
     @Override
-    public ModerationResourceRes getTaskResource(Long resourceId) {
-        AuditResource auditResource = auditTaskResourceRepository.findById(resourceId)
+    public ModerationResourceRes getTaskResource(Long taskId, String resourceUuid) {
+        AuditResource auditResource = auditTaskResourceRepository
+                .findByTaskIdAndResourceUuid(taskId, resourceUuid)
                 .orElseThrow(AuditTaskResourceNotFoundException::new);
         return toModerationResourceRes(auditResource);
     }
@@ -122,33 +134,50 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Override
     public BatchResult rejectAll(BatchModerateRejectRequest req) {
-        AtomicInteger success = new AtomicInteger();
+        int success = 0;
         if(CollectionUtil.isNotEmpty(req.getAuditTaskIds())){
-            List<AuditTask> availableTasks = auditTaskRepository.findAllByIdInAndStatus(
+            List<Long> availableTaskIds = auditTaskRepository.findAllByIdInAndStatus(
                     req.getAuditTaskIds(), AuditStatus.PENDING
+            ).stream().map(AuditTask::getId).toList();
+            User u = userRepository.getReferenceById(UserCtxHolder.getUserUid());
+            auditTaskResourceRepository.updateStatusAndRejectTypeAndAuditorAndAuditAtByTaskIdIn(
+                    AuditStatus.REJECTED,
+                    AuditRejectType.CASCADE,
+                    u,
+                    Instant.now(),
+                    availableTaskIds
             );
-            User auditor = userCoreService.getUserByUid(UserCtxHolder.getUserUid());
-            availableTasks.forEach(t -> {
-                t.setStatus(AuditStatus.REJECTED);
-                t.setAuditor(auditor);
-                t.setRejectType(req.getRejectType());
-                t.setRejectReason(req.getRejectReason());
-                success.getAndIncrement();
-            });
-            auditTaskRepository.saveAll(availableTasks);
+            success = auditTaskRepository.updateStatusAndRejectTypeAndRejectReasonAndAuditorAndAuditAtByIdInAndStatus(
+                    AuditStatus.REJECTED,
+                    req.getRejectType(),
+                    req.getRejectReason(),
+                    u,
+                    Instant.now(),
+                    availableTaskIds,
+                    AuditStatus.PENDING
+            );
         }
-        return BatchResult.ofNullable(req.getAuditTaskIds(), success.get());
+        return BatchResult.ofNullable(req.getAuditTaskIds(), success);
     }
 
     @Override
-    public void approve(Long id) {
+    public List<ModerationResourceRes> approve(Long id) {
         AuditTask task = auditTaskRepository.findById(id)
                 .orElseThrow(AuditTaskNotFoundException::new);
-        User auditor = userCoreService.getUser(UserCtxHolder.getUserUid());
-        task.setAuditor(auditor);
+        task.setAuditor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
         task.setStatus(AuditStatus.APPROVED);
+        List<AuditResource> auditResources = auditTaskResourceRepository.findAllByTaskId(id);
+        List<AuditResource> blocked = auditResources.stream()
+                .filter(auditResource ->
+                        auditResource.getStatus().equals(AuditStatus.REJECTED) ||
+                                auditResource.getStatus().equals(AuditStatus.SUSPECT))
+                .toList();
+        if(!blocked.isEmpty()) {
+            return blocked.stream().map(this::toModerationResourceRes).collect(Collectors.toList());
+        }
         auditTaskRepository.save(task);
         sendMessage(task);
+        return List.of();
     }
 
     @Override
@@ -166,9 +195,10 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Transactional
     @Override
-    public void approveResource(Long resourceId) {
-        AuditResource auditResource = auditTaskResourceRepository.findByIdAndStatus(resourceId, AuditStatus.PENDING)
-                .orElseThrow(() -> new AuditTaskReferenceInvalidException(resourceId));
+    public void approveResource(Long taskId, String resourceUuid) {
+        AuditResource auditResource = auditTaskResourceRepository
+                .findByTaskIdAndResourceUuidAndStatus(taskId, resourceUuid, AuditStatus.PENDING)
+                .orElseThrow(() -> new AuditTaskResourceReferenceInvalid(resourceUuid));
         User auditor = userCoreService.getUser(UserCtxHolder.getUserUid());
         auditResource.setStatus(AuditStatus.APPROVED);
         auditResource.setAuditor(auditor);
@@ -181,9 +211,10 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Transactional
     @Override
-    public void rejectResource(Long resourceId, ModerateRejectRequest req) {
-        AuditResource auditResource = auditTaskResourceRepository.findByIdAndStatus(resourceId, AuditStatus.PENDING)
-                .orElseThrow(() -> new AuditTaskReferenceInvalidException(resourceId));
+    public void rejectResource(Long taskId, String resourceUuid, ModerateRejectRequest req) {
+        AuditResource auditResource = auditTaskResourceRepository
+                .findByTaskIdAndResourceUuidAndStatus(taskId, resourceUuid, AuditStatus.PENDING)
+                .orElseThrow(() -> new AuditTaskResourceReferenceInvalid(resourceUuid));
         User auditor = userCoreService.getUser(UserCtxHolder.getUserUid());
         auditResource.setStatus(AuditStatus.REJECTED);
         auditResource.setAuditor(auditor);
@@ -194,20 +225,33 @@ public class ModerationServiceImpl implements ModerationService {
         aggregateTaskStatus(auditResource.getTask(), auditResource);
     }
 
+    @Override
+    public ModerateTaskResponse getTask(Long id) {
+        return auditTaskRepository.findById(id)
+                .map(task -> {
+                    ModerateTaskResponse resp = auditTaskMapper.toModerateTaskResponse(task);
+                    List<AuditResource> auditResources = auditTaskResourceRepository
+                            .findAllByTaskId(task.getId());
+                    resp.setPayload(buildPayload(task, auditResources));
+                    return resp;
+                })
+                .orElseThrow(AuditTaskNotFoundException::new);
+    }
+
     private void aggregateTaskStatus(AuditTask task, AuditResource lastUpdated) {
         long rejectedCount = auditTaskResourceRepository.countByTask_IdAndStatus(task.getId(), AuditStatus.REJECTED);
         long pendingCount = auditTaskResourceRepository.countByTask_IdAndStatus(task.getId(), AuditStatus.PENDING);
         AuditStatus prev = task.getStatus();
-        if (rejectedCount > 0) {
-            task.setStatus(AuditStatus.REJECTED);
-            task.setRejectType(lastUpdated.getRejectType());
-            task.setRejectReason(lastUpdated.getRejectReason());
-        } else if (pendingCount == 0) {
-            task.setStatus(AuditStatus.APPROVED);
-            task.setRejectType(null);
-            task.setRejectReason(null);
-        } else {
-            task.setStatus(AuditStatus.PENDING);
+        if(task.getContent() == null){ // single resource
+            if (rejectedCount > 0) {
+                task.setStatus(AuditStatus.REJECTED);
+                task.setRejectType(lastUpdated.getRejectType());
+                task.setRejectReason(lastUpdated.getRejectReason());
+            } else if (pendingCount == 0) {
+                task.setStatus(AuditStatus.APPROVED);
+                task.setRejectType(null);
+                task.setRejectReason(null);
+            }
         }
         task.setAuditor(lastUpdated.getAuditor());
         task.setAuditAt(Instant.now());
@@ -222,7 +266,8 @@ public class ModerationServiceImpl implements ModerationService {
         if (CollectionUtil.isEmpty(taskIds)) {
             return Collections.emptyMap();
         }
-        List<AuditResource> auditResources = auditTaskResourceRepository.findAllByTask_IdInOrderBySortNoAsc(taskIds);
+        List<AuditResource> auditResources = auditTaskResourceRepository
+                .findAllByTaskIdIn(taskIds);
         Map<Long, List<AuditResource>> grouped = new HashMap<>();
         auditResources.forEach(resource -> {
             Long taskId = resource.getTask().getId();
@@ -236,17 +281,31 @@ public class ModerationServiceImpl implements ModerationService {
         if(task.getContent() == null){
             renderedContent = "";
         } else {
-            Set<String> resourceUuidsInContent = StringUtil.extractResUrls(task.getContent());
-            List<String> cosKeys = resourceRepository.findByUuidInAndStatus(resourceUuidsInContent, ResourceStatus.ACTIVE)
-                    .stream().map(Resource::getResourceKey).toList();
-            Map<String, String> uuidCosKeyMap = resourceUuidsInContent.stream()
-                    .collect(Collectors.toMap(k -> k, k -> k));
-            renderedContent = StringUtil.replaceResPlaceholders(task.getContent(), uuidCosKeyMap);
+            List<String> resourceUuidsInContent = StringUtil.extraResPlaceholders(task.getContent()).stream().toList();
+            Map<String, String> uuidCosKeyMap = resourceRepository
+                    .findByUuidInAndStatus(resourceUuidsInContent, ResourceStatus.ACTIVE)
+                    .stream()
+                    .collect(Collectors.toMap(
+                            Resource::getUuid,      // key: UUID
+                            Resource::getResourceKey // value: COS Key
+                    ));
+            Map<String, CloudResPresignedUrlResp> resUuidPresignedUrlMap = cloudFileService.batchGetReadPublicUrlCached(
+                    CloudFSRoot.UPLOADS,
+                    uuidCosKeyMap,
+                    TargetType.POST
+            );
+            renderedContent = StringUtil.replaceResPlaceholders(
+                    task.getContent(),
+                        resUuidPresignedUrlMap.entrySet().stream()
+                    .filter(e -> e.getValue() != null && e.getValue().getUrl() != null)
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            e -> e.getValue().getUrl()
+                    )));
         }
         if(CollectionUtil.isEmpty(auditResources)) {
             return new ModerationTaskPayloadRes(
                     ModerationTaskPayloadRes.PayloadType.PLAIN_TEXT,
-                    null,
                     Collections.emptyList(),
                     renderedContent,
                     task.getContentFormat(),
@@ -258,7 +317,6 @@ public class ModerationServiceImpl implements ModerationService {
             ModerationResourceRes single = toModerationResourceRes(auditResources.getFirst());
             return new ModerationTaskPayloadRes(
                     ModerationTaskPayloadRes.PayloadType.SINGLE_RESOURCE,
-                    single,
                     List.of(single),
                     renderedContent,
                     task.getContentFormat(),
@@ -266,16 +324,41 @@ public class ModerationServiceImpl implements ModerationService {
             );
         }
 
-        List<ModerationResourceRes> items = auditResources.stream().map(this::toModerationResourceRes).toList();
+        List<ModerationResourceRes> items = auditResources.stream()
+                .map(this::toModerationResourceRes).toList();
         return new ModerationTaskPayloadRes(
                 ModerationTaskPayloadRes.PayloadType.RICH_TEXT,
-                null,
                 items,
                 renderedContent,
                 task.getContentFormat(),
-                null
+                getPayload(task.getPayload(), task.getTargetType())
+
         );
     }
+
+    private AuditPayload getPayload(String json, TargetType targetType) {
+        return switch (targetType) {
+            case POST -> {
+                PostAuditPayload payload = JsonUtil.fromJson(json, PostAuditPayload.class);
+                Resource coverageRes = resourceRepository.findByUuidAndStatusNot(
+                        payload.getCoverageResUuid(), ResourceStatus.DELETED
+                ).orElse(null);
+                if(coverageRes != null) {
+                    payload.setCoverResPresignedUrl(cloudFileService.getReadUrlCached(
+                                    getCloudFSRootByTargetType(targetType),
+                                    coverageRes.getResourceKey(),
+                                    payload.getCoverageResUuid(),
+                                    targetType
+                    ));
+                }else {
+                    payload.setCoverResPresignedUrl(null);
+                }
+                yield payload;
+            }
+            default -> null;
+        };
+    }
+
 
     private ModerationResourceRes toModerationResourceRes(AuditResource auditResource) {
         CloudResPresignedUrlResp urlResp = null;
@@ -283,13 +366,15 @@ public class ModerationServiceImpl implements ModerationService {
             urlResp = cloudFileService.getReadUrlCached(
                     getCloudFSRootByTargetType(auditResource.getTask().getTargetType()),
                     auditResource.getResource().getResourceKey(),
-                    "audit-res-" + auditResource.getId(),
+                    auditResource.getResource().getUuid(),
                     auditResource.getTask().getTargetType()
             );
         } catch (Exception e) {
-            log.debug("Failed generating preview url for resource {}, key={}, err={}", auditResource.getId(), auditResource.getResource().getResourceKey(), e.getMessage());
+            log.debug("Failed generating preview url for resource {}, key={}, err={}",
+                    auditResource.getId(), auditResource.getResource().getResourceKey(), e.getMessage());
         }
-        ModerationResourceRes result = auditTaskResourceMapper.toModerationResourceRes(auditResource);
+        ModerationResourceRes result = auditTaskResourceMapper
+                .toModerationResourceRes(auditResource);
         Resource res = auditResource.getResource();
         result.setPresignedUrl(urlResp);
         result.setFileProbeResult(new FileProbeResult(
@@ -299,7 +384,6 @@ public class ModerationServiceImpl implements ModerationService {
         ));
         return result;
     }
-
 
     private void sendMessage(AuditTask task){
         try{

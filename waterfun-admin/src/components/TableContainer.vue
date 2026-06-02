@@ -1,15 +1,12 @@
 
-
 <script setup lang="ts">
 import { computed } from 'vue';
-import {useI18n} from "vue-i18n";
 
 
-const { t } = useI18n();
+
 // Props
 const props = withDefaults(defineProps<{
   title: string;
-  titleI18n?: boolean;
   showAddBtn?: boolean;
   showRemoveBtn?: boolean;
   disableDelete?: boolean;
@@ -20,7 +17,6 @@ const props = withDefaults(defineProps<{
   currentPage?: number;
   pageSizes?: number[];
 }>(), {
-  titleI18n: true,
   showTitle: true,
   showAddBtn: false,
   showPagination: true,
@@ -59,7 +55,6 @@ const localCurrentPage = computed({
 <template>
   <CardContainer
     :title="title"
-    :title-i18n="titleI18n"
     :show-title="showTitle"
   >
     <div class="operation-bar">
@@ -69,7 +64,7 @@ const localCurrentPage = computed({
         size="small"
         @click="$emit('add')"
       >
-        {{ t('common.action.create') }}
+        新增
       </el-button>
       <el-button
         v-if="showRemoveBtn"
@@ -78,7 +73,7 @@ const localCurrentPage = computed({
         size="small"
         @click="$emit('remove')"
       >
-        {{ t('common.action.delete') }}
+        删除
       </el-button>
       <slot name="action-buttons" />
     </div>

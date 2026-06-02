@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
 import type { OptionResItem } from "@waterfun/web-core/src/types";
-import { useI18n } from "vue-i18n";
+
 import { useRoute, useRouter } from "vue-router";
 import {
   getRole,
@@ -13,7 +13,7 @@ import {
 import { ElMessage } from "element-plus";
 import RoleEditDialog from "./components/RoleEditDialog.vue";
 
-const { t } = useI18n();
+
 const route = useRoute();
 const router = useRouter();
 
@@ -34,13 +34,13 @@ const fetchRoleOptions = async () => {
     roleOptions.value = res.data;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.fetch"));
+    ElMessage.error('获取角色信息失败');
   }
 };
 
 const fetchRoleDetail = async () => {
   if (Number.isNaN(roleId.value)) {
-    ElMessage.error(t("role.error.invalidId"));
+    ElMessage.error('无效的角色 ID');
     router.back();
     return;
   }
@@ -51,7 +51,7 @@ const fetchRoleDetail = async () => {
     roleDetail.value = res.data;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.fetch"));
+    ElMessage.error('获取角色信息失败');
   } finally {
     loading.value = false;
   }
@@ -74,7 +74,7 @@ const fetchAssignedPermissions = async () => {
     assignedPermissionOptions.value = all;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.fetchPermissions"));
+    ElMessage.error('获取角色权限失败');
   }
 };
 
@@ -95,7 +95,7 @@ const fetchRoleUsersPreview = async () => {
     assignedUserOptions.value = all;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("role.error.fetchUsers"));
+    ElMessage.error('获取角色用户失败');
   }
 };
 
@@ -146,47 +146,47 @@ onMounted(async () => {
           text
           @click="router.back()"
         >
-          {{ t("common.action.back") }}
+          返回
         </el-button>
         <el-button
           type="primary"
           plain
           @click="gotoAssignPermPage"
         >
-          {{ t("permission.assign") }}
+          分配权限
         </el-button>
         <el-button
           type="primary"
           plain
           @click="gotoAssignUserPage"
         >
-          {{ t("user.assign") }}
+          分配用户
         </el-button>
         <el-button
           type="primary"
           plain
           @click="openEditDialog"
         >
-          {{ t("common.action.edit") }}
+          编辑
         </el-button>
       </template>
 
       <el-descriptions
         v-if="roleDetail"
-        :title="t('role.basicInfo')"
+        title="基础信息"
         :column="2"
         border
       >
         <el-descriptions-item label="ID">
           {{ roleDetail.id }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('role.name')">
+        <el-descriptions-item label="角色名称">
           {{ roleDetail.name }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('role.code')">
-          {{ roleDetail.code || t('common.none.title') }}
+        <el-descriptions-item label="角色编码">
+          {{ roleDetail.code || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('role.parentId')">
+        <el-descriptions-item label="父级角色ID">
           <el-link
             v-if="roleDetail.parentId != null"
             type="primary"
@@ -195,26 +195,26 @@ onMounted(async () => {
           >
             {{ roleDetail.parentId }}
           </el-link>
-          <span v-else>{{ t('common.none.title') }}</span>
+          <span v-else>无</span>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('role.weight')">
-          {{ roleDetail.orderWeight ?? t('common.none.title') }}
+        <el-descriptions-item label="排序权重">
+          {{ roleDetail.orderWeight ?? '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('role.isSystem')">
+        <el-descriptions-item label="系统角色">
           <el-tag
             size="small"
             :type="roleDetail.isSystem ? 'warning' : 'info'"
           >
-            {{ roleDetail.isSystem ? t('common.boolean.yes') : t('common.boolean.no') }}
+            {{ roleDetail.isSystem ? '是' : '否' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('role.description')">
-          {{ roleDetail.description || t('common.none.title') }}
+        <el-descriptions-item label="角色描述">
+          {{ roleDetail.description || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">
+        <el-descriptions-item label="创建时间">
           {{ formatISOData(roleDetail.createdAt) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">
+        <el-descriptions-item label="更新时间">
           {{ formatISOData(roleDetail.updatedAt) }}
         </el-descriptions-item>
       </el-descriptions>
@@ -226,7 +226,7 @@ onMounted(async () => {
     >
       <el-collapse v-model="collapseActive">
         <el-collapse-item
-          :title="t('role.assignedPermissions')"
+          title="已分配权限"
           name="permissions"
         >
           <el-row :gutter="10">
@@ -251,12 +251,12 @@ onMounted(async () => {
               v-if="assignedPermissionOptions.length === 0"
               :span="24"
             >
-              {{ t('common.none.description') }}
+              暂无数据
             </el-col>
           </el-row>
         </el-collapse-item>
         <el-collapse-item
-          :title="t('role.assignedUsers')"
+          title="已分配用户"
           name="users"
         >
           <el-row :gutter="10">
@@ -281,7 +281,7 @@ onMounted(async () => {
               v-if="assignedUserOptions.length === 0"
               :span="24"
             >
-              {{ t('common.none.description') }}
+              暂无数据
             </el-col>
           </el-row>
         </el-collapse-item>

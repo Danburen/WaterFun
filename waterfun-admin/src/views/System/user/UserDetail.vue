@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
-import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { getUserDetail, type AccountStatus, type UserDetailDto } from "~/api/user";
 import { ElMessage } from "element-plus";
 import UserEditDialog from "./components/UserEditDialog.vue";
 
-const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
@@ -23,7 +21,7 @@ const statusTypeMap: Record<AccountStatus, "success" | "warning" | "danger" | "i
   DELETED: "info",
 };
 
-const statusLabel = (status: AccountStatus) => t(`user.statusMap.${status.toLowerCase()}`);
+const statusLabel = (status: AccountStatus) => status.toLowerCase();
 
 const isValidUid = computed(() => /^\d+$/.test(uid.value));
 
@@ -56,7 +54,7 @@ const handleEditSuccess = () => {
 
 const fetchDetail = async () => {
   if (!isValidUid.value) {
-    ElMessage.error(t("user.error.invalidId"));
+    ElMessage.error('无效的用户UID');
     router.back();
     return;
   }
@@ -67,7 +65,7 @@ const fetchDetail = async () => {
     detail.value = res.data;
   } catch (error) {
     console.error(error);
-    ElMessage.error(t("user.error.fetchDetail"));
+    ElMessage.error('获取用户详情失败');
   } finally {
     loading.value = false;
   }
@@ -80,53 +78,53 @@ onMounted(async () => {
 
 <template>
   <div v-loading="loading">
-    <CardContainer title="user.detail">
+    <CardContainer title="用户详情">
       <template #header-right>
         <el-button
           text
           @click="router.back()"
         >
-          {{ t("common.action.back") }}
+          返回
         </el-button>
         <el-button
           type="primary"
           plain
           @click="gotoAssignRolePage"
         >
-          {{ t("role.assign") }}
+          分配角色
         </el-button>
         <el-button
           type="primary"
           plain
           @click="gotoAssignPermPage"
         >
-          {{ t("permission.assign") }}
+          分配权限
         </el-button>
         <el-button
           type="primary"
           plain
           @click="gotoEdit"
         >
-          {{ t("common.action.edit") }}
+          编辑
         </el-button>
       </template>
 
       <el-descriptions
         v-if="detail"
-        :title="t('user.basicInfo')"
+        title="基本信息"
         :column="2"
         border
       >
-        <el-descriptions-item :label="t('user.uid')">
+        <el-descriptions-item label="用户ID">
           {{ detail.info.uid }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('user.username')">
+        <el-descriptions-item label="用户名">
           {{ detail.info.username }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('user.nickname')">
-          {{ detail.info.nickname || t('common.none.title') }}
+        <el-descriptions-item label="昵称">
+          {{ detail.info.nickname || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('user.status')">
+        <el-descriptions-item label="用户状态">
           <el-tag
             size="small"
             :type="statusTypeMap[detail.info.accountStatus]"
@@ -134,70 +132,70 @@ onMounted(async () => {
             {{ statusLabel(detail.info.accountStatus) }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.create')">
+        <el-descriptions-item label="创建时间">
           {{ formatISOData(detail.info.createdAt) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('common.time.update')">
+        <el-descriptions-item label="更新时间">
           {{ formatISOData(detail.info.updatedAt) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('user.lastActiveAt')">
+        <el-descriptions-item label="最后活跃">
           {{ formatISOData(detail.info.lastActiveAt) }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('user.avatar')">
+        <el-descriptions-item label="头像">
           <el-image
             v-if="detail.info.avatarUrl"
             :src="detail.info.avatarUrl"
             style="width: 48px; height: 48px; border-radius: 50%"
             fit="cover"
           />
-          <span v-else>{{ t('common.none.title') }}</span>
+          <span v-else>无</span>
         </el-descriptions-item>
       </el-descriptions>
 
       <el-descriptions
         v-if="detail"
-        :title="t('user.profileInfo')"
+        title="档案信息"
         :column="2"
         border
         class="section-gap"
       >
-        <el-descriptions-item :label="t('user.bio')">
-          {{ detail.profile.bio || t('common.none.title') }}
+        <el-descriptions-item label="简介">
+          {{ detail.profile.bio || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('user.gender')">
-          {{ detail.profile.gender || t('common.none.title') }}
+        <el-descriptions-item label="性别">
+          {{ detail.profile.gender || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('user.birthDate')">
-          {{ detail.profile.birthDate || t('common.none.title') }}
+        <el-descriptions-item label="生日">
+          {{ detail.profile.birthDate || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('user.residence')">
-          {{ detail.profile.residence || t('common.none.title') }}
+        <el-descriptions-item label="居住地">
+          {{ detail.profile.residence || '无' }}
         </el-descriptions-item>
       </el-descriptions>
 
       <el-descriptions
         v-if="detail"
-        :title="t('user.contactInfo')"
+        title="联系方式"
         :column="2"
         border
         class="section-gap"
       >
-        <el-descriptions-item :label="t('user.email')">
-          {{ detail.maskedData.emailMasked || t('common.none.title') }}
+        <el-descriptions-item label="邮箱">
+          {{ detail.maskedData.emailMasked || '无' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="t('user.phone')">
-          {{ detail.maskedData.phoneMasked || t('common.none.title') }}
+        <el-descriptions-item label="手机号">
+          {{ detail.maskedData.phoneMasked || '无' }}
         </el-descriptions-item>
       </el-descriptions>
 
       <CardContainer
         v-if="detail"
         class="section-gap"
-        title="user.authInfo"
+        title="认证信息"
       >
         <el-collapse v-model="collapseActive">
           <el-collapse-item
-            :title="t('role.title')"
+            title="角色管理"
             name="roles"
           >
             <el-row :gutter="10">
@@ -222,12 +220,12 @@ onMounted(async () => {
                 v-if="detail.roles.length === 0"
                 :span="24"
               >
-                {{ t('common.none.description') }}
+                暂无数据
               </el-col>
             </el-row>
           </el-collapse-item>
           <el-collapse-item
-            :title="t('permission.title')"
+            title="权限管理"
             name="permissions"
           >
             <el-row :gutter="10">
@@ -252,7 +250,7 @@ onMounted(async () => {
                 v-if="detail.permissions.length === 0"
                 :span="24"
               >
-                {{ t('common.none.description') }}
+                暂无数据
               </el-col>
             </el-row>
           </el-collapse-item>

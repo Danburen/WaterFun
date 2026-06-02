@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
@@ -21,28 +20,29 @@ import java.time.Instant;
 @Entity
 @Table(name = "audit_task_resource")
 @NamedEntityGraph(
-        name = "AuditResource.withAuditTask",
-        attributeNodes = @NamedAttributeNode("task")
+        name = "AuditResource.withAll",
+        attributeNodes = {
+                @NamedAttributeNode("task"),
+                @NamedAttributeNode("resource")
+        }
 )
 public class AuditResource {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+
+    @EmbeddedId
+    private AuditResourceId id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "resource_uuid", nullable = false, referencedColumnName = "uuid"
+        ,insertable = false,updatable = false)
+    private Resource resource;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "task_id", nullable = false)
+    @JoinColumn(name = "task_id", nullable = false,
+        insertable = false, updatable = false)
     private AuditTask task;
-
-    @Size(max = 64)
-    @Column(name = "placeholder", length = 64)
-    private String placeholder;
-
-    @ColumnDefault("'0'")
-    @Column(name = "sort_no", columnDefinition = "int UNSIGNED not null")
-    private Long sortNo = 0L;
 
     @ColumnDefault("'1'")
     @Column(name = "status", columnDefinition = "tinyint UNSIGNED not null")
@@ -63,6 +63,9 @@ public class AuditResource {
     @Column(name = "reject_reason")
     private String rejectReason;
 
+    @Size(max = 255)
+    @Column(name = "suspect_reason")
+    private String suspect_reason;
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "created_at", nullable = false)
@@ -72,10 +75,4 @@ public class AuditResource {
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "resource_id", nullable = false)
-    private Resource resource;
-
 }

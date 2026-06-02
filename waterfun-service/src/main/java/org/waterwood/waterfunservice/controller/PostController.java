@@ -10,7 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
-import org.waterwood.waterfunservice.api.request.PutUserPostReq;
+import org.waterwood.waterfunservice.api.ContentPreviewReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservicecore.entity.post.Post;
@@ -75,12 +75,6 @@ public class PostController {
         return ApiResponse.success();
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<Void> editPost(@PathVariable Long id, @Valid @RequestBody PutUserPostReq req){
-        postService.updatePost(id, req);
-        return ApiResponse.success();
-    }
-
     @PostMapping("/draft")
     public ApiResponse<Long> draftNewPost(){
         return ApiResponse.success(postService.draftNew());
@@ -92,18 +86,18 @@ public class PostController {
     }
 
     @PostMapping("/{id}/publish")
-    public ApiResponse<Void> publishPost(@PathVariable Long id, PostSaveReq req){
+    public ApiResponse<Void> publishPost(@PathVariable Long id, @Valid @RequestBody PostSaveReq req){
         postService.publish(id, req);
         return ApiResponse.success();
     }
 
     @GetMapping("/{id}/content/preview")
-    public ApiResponse<String> previewContent(@PathVariable Long id, String content){
-        return ApiResponse.success(postService.contentPreview(id, content));
+    public ApiResponse<String> previewContent(@PathVariable Long id,@Valid  @RequestBody ContentPreviewReq req){
+        return ApiResponse.success(postService.contentPreview(id, req.getContent()));
     }
 
     @PostMapping("/{id}/temp-save")
-    public ApiResponse<Void> tempSavePost(@PathVariable Long id, PostSaveReq req){
+    public ApiResponse<Void> tempSavePost(@PathVariable Long id, @Valid @RequestBody PostSaveReq req){
         postService.save(id, req);
         return ApiResponse.success();
     }

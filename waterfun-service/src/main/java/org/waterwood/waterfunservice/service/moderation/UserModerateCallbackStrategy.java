@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import org.waterwood.common.CloudFSRoot;
-import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
 import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
@@ -43,6 +42,7 @@ public class UserModerateCallbackStrategy implements ModerationCallbackStrategy 
     private final CloudFileService cloudFileService;
     private final RedisHelper redisHelper;
     private final ResourceRepository resourceRepository;
+    private final ModerationConsumeHandler moderationConsumeHandler;
 
     @Override
     public Set<TargetType> getTargetTypes() {
@@ -54,22 +54,18 @@ public class UserModerateCallbackStrategy implements ModerationCallbackStrategy 
     public void handle(ModerationConsumerMessage msg) {
         InboxSystem is = new InboxSystem();
         Long bizId = Long.parseLong(msg.getTargetId());
-        Locale locale = Locale.of(msg.getUserLocale());
         switch (msg.getTargetType()){
-            case USER_AVATAR: handleUserAvatarModeration(msg, is, bizId, locale); break;
+            case USER_AVATAR: handleUserAvatarModeration(msg, bizId); break;
         }
-        is.setNoticeType(NoticeType.BUSINESS);
-        is.setTitle(messageSource.getMessage("notification.audit.title", null, locale));
-        is.setUser(userRepository.getReferenceById(bizId));
+        moderationConsumeHandler.handleModeration(msg, bizId);
         inboxSystemRepository.save(is);
     }
 
-    private void handleUserAvatarModeration(ModerationConsumerMessage msg, InboxSystem is, Long userUid, Locale locale) {
+    private void handleUserAvatarModeration(ModerationConsumerMessage msg, Long userUid) {
         AuditResource res = auditTaskResourceRepository.findByTaskId(msg.getId()).orElseThrow(
-                () -> new AuditTaskResourceReferenceInvalid(msg.getId())
+                () -> new IllegalArgumentException("AuditResource not found for task id: " + msg.getId())
         );
         if(msg.getStatus() == AuditStatus.APPROVED){
-            is.setContent(messageSource.getMessage("notification.audit.avatar.approve", null, locale));
             String dbAvatarResourceUuid = userCoreService.getUserAvatar(userUid);
             if(dbAvatarResourceUuid != null){
                 resourceRepository.findByUuidAndStatus(dbAvatarResourceUuid, ResourceStatus.ACTIVE)
@@ -91,22 +87,7 @@ public class UserModerateCallbackStrategy implements ModerationCallbackStrategy 
             );
             redisHelper.del(redisKey);
         } else if(msg.getStatus() == AuditStatus.REJECTED){
-            String fullMsg = getRejectText(msg.getRejectType(), locale) + " " + (StringUtil.isBlank(msg.getRejectReason()) ? "" : msg.getRejectReason());
-            is.setContent(messageSource.getMessage("notification.audit.avatar.reject", new Object[]{fullMsg}, locale));
             cloudFileService.removeFile(CloudFSRoot.USER, res.getResource().getResourceKey());
         }
-    }
-
-    private String getRejectText(AuditRejectType type, Locale locale){
-        String rejectTemplateText = switch (type) {
-            case VIOLATION_OF_GUIDELINES -> "reject.reason.violation_of_guidelines";
-            case INAPPROPRIATE_CONTENT -> "reject.reason.inappropriate_content";
-            case ADVERTISEMENT -> "reject.reason.advertisement";
-            case VIOLENCE -> "reject.reason.violence";
-            case SENSITIVE -> "reject.reason.sensitive";
-            case OTHER -> "reject.reason.other";
-        };
-
-        return messageSource.getMessage(rejectTemplateText, null, locale);
     }
 }

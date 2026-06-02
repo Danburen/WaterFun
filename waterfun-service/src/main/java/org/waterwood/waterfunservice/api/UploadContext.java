@@ -2,7 +2,7 @@ package org.waterwood.waterfunservice.api;
 
 import lombok.*;
 import org.waterwood.utils.StringUtil;
-import org.waterwood.waterfunservicecore.utils.BizUploadPayload;
+import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
 
 import java.io.Serializable;
 

@@ -1,13 +1,16 @@
 package org.waterwood.waterfunadminservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
+import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRejectRequest;
@@ -32,6 +35,7 @@ import java.util.List;
 public class ModerationController {
 
     private final ModerationService moderationService;
+    private final MessageSource messageSource;
 
     @GetMapping("/list")
     public ApiResponse<Page<ModerateTaskResponse>> list(@RequestParam(required = false) TargetType taskType,
@@ -64,25 +68,32 @@ public class ModerationController {
         return ApiResponse.success(moderationService.listResourcesWithPayload(spec, pageable));
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<ModerateTaskResponse> getTask(@PathVariable Long id){
+        return ApiResponse.success(
+                moderationService.getTask(id)
+        );
+    }
+
     @GetMapping("/{id}/resources")
     public ApiResponse<List<ModerationResourceRes>> listResourcesByTask(@PathVariable Long id) {
         return ApiResponse.success(moderationService.listTaskResources(id));
     }
 
-    @GetMapping("/resources/{resourceId}")
-    public ApiResponse<ModerationResourceRes> getResource(@PathVariable Long resourceId) {
-        return ApiResponse.success(moderationService.getTaskResource(resourceId));
+    @GetMapping("/{taskId}/resources/{resourceUuid}")
+    public ApiResponse<ModerationResourceRes> getResource(@PathVariable Long taskId, @PathVariable String resourceUuid) {
+        return ApiResponse.success(moderationService.getTaskResource(taskId, resourceUuid));
     }
 
-    @PostMapping("/resources/{resourceId}/approve")
-    public ApiResponse<Void> approveResource(@PathVariable Long resourceId) {
-        moderationService.approveResource(resourceId);
+    @PostMapping("/{taskId}/resources/{resourceUuid}/approve")
+    public ApiResponse<Void> approveResource(@PathVariable Long taskId, @PathVariable String resourceUuid) {
+        moderationService.approveResource(taskId, resourceUuid);
         return ApiResponse.success();
     }
 
-    @PostMapping("/resources/{resourceId}/reject")
-    public ApiResponse<Void> rejectResource(@PathVariable Long resourceId, @RequestBody @Valid ModerateRejectRequest req) {
-        moderationService.rejectResource(resourceId, req);
+    @PostMapping("/{taskId}/resources/{resourceUuid}/reject")
+    public ApiResponse<Void> rejectResource(@PathVariable Long taskId, @PathVariable String resourceUuid, @RequestBody @Valid ModerateRejectRequest req) {
+        moderationService.rejectResource(taskId, resourceUuid, req);
         return ApiResponse.success();
     }
 
@@ -100,10 +111,24 @@ public class ModerationController {
         );
     }
 
+    @Operation(
+            summary = "审核通过任务",
+            description = "将任务下所有待审资源标记为通过。若存在已被标记为可疑或驳回的资源，则任务不通过，并返回这些可疑资源列表。"
+    )
     @PostMapping("/{id}/approve")
-    public ApiResponse<BatchResult> approve(@PathVariable Long id){
-        moderationService.approve(id);
-        return ApiResponse.success();
+    public ApiResponse<List<ModerationResourceRes>> approve(@PathVariable Long id){
+        List<ModerationResourceRes> res = moderationService.approve(id);
+        return res.isEmpty() ?
+                ApiResponse.success() :
+                ApiResponse.reject(
+                        BaseResponseCode.AUDIT_TASK_RESOURCE_REJECT_OR_SUSPECT.getCode(),
+                        messageSource.getMessage(
+                                BaseResponseCode.AUDIT_TASK_RESOURCE_REJECT_OR_SUSPECT.getCode(),
+                                null,
+                                null
+                        ),
+                        res
+                );
     }
 
     @PostMapping("/{id}/reject")

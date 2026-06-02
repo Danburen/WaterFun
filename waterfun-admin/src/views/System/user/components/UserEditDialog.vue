@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
 import {
   createUser,
   getUserDetail,
@@ -28,7 +27,6 @@ const emit = defineEmits<{
   success: [];
 }>();
 
-const { t } = useI18n();
 const loading = ref(false);
 const submitting = ref(false);
 
@@ -58,7 +56,7 @@ const createRules = {
       validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
         const phone = (value || "").trim();
         if (createForm.userType === 0 && !phone) {
-          callback(new Error(t("user.input.phone")));
+          callback(new Error('请输入手机号'));
           return;
         }
         callback();
@@ -66,14 +64,14 @@ const createRules = {
       trigger: "blur",
     },
   ],
-  username: [{ required: true, message: t("user.input.username"), trigger: "blur" }],
+  username: [{ required: true, message: '请输入用户名', trigger: "blur" }],
   password: [
     {
       validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
         const password = (value || "").trim();
         const isOptionalType = createForm.userType === 1 || createForm.userType === 3;
         if (!isOptionalType && !password) {
-          callback(new Error(t("user.input.password")));
+          callback(new Error('请输入密码'));
           return;
         }
         callback();
@@ -81,7 +79,7 @@ const createRules = {
       trigger: "blur",
     },
   ],
-  userType: [{ required: true, message: t("user.input.type"), trigger: "change" }],
+  userType: [{ required: true, message: '请选择用户类型', trigger: "change" }],
 };
 
 const userInfoForm = reactive<{
@@ -120,8 +118,10 @@ const datumInitial = reactive({
   phone: "",
 });
 
-const statusLabel = (status: AccountStatus) => t(`user.statusMap.${status.toLowerCase()}`);
-const genderLabel = (gender: Gender) => t(`user.genderMap.${gender.toLowerCase()}`);
+const statusLabel = (status: AccountStatus) =>
+  ({ ACTIVE: '正常', SUSPENDED: '已停用', DEACTIVATED: '已注销', DELETED: '已删除' })[status];
+const genderLabel = (gender: Gender) =>
+  ({ MALE: '男', FEMALE: '女', OTHER: '其他', UNKNOWN: '未知' })[gender];
 const isValidUid = computed(() => props.uid != null && /^\d+$/.test(props.uid));
 
 const resetForms = () => {
@@ -197,7 +197,7 @@ watch(
       return;
     }
     if (!isValidUid.value) {
-      ElMessage.error(t("user.error.invalidId"));
+      ElMessage.error('无效的用户UID');
       visible.value = false;
       return;
     }
@@ -205,7 +205,7 @@ watch(
       await loadUserData();
     } catch (e) {
       console.error(e);
-      ElMessage.error(t("user.error.fetchDetail"));
+      ElMessage.error('获取用户详情失败');
       visible.value = false;
     }
   }
@@ -223,12 +223,12 @@ const handleSave = async () => {
         password: createForm.password?.trim() || undefined,
         userType: createForm.userType,
       });
-      ElMessage.success(t("user.success.create"));
+      ElMessage.success('用户创建成功');
       visible.value = false;
       emit("success");
     } catch (e) {
       console.error(e);
-      ElMessage.error(t("user.error.create"));
+      ElMessage.error('创建用户失败');
     } finally {
       submitting.value = false;
     }
@@ -263,12 +263,12 @@ const handleSave = async () => {
             : undefined,
       }),
     ]);
-    ElMessage.success(t("user.success.updateInfo"));
+    ElMessage.success('基本信息更新成功');
     visible.value = false;
     emit("success");
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("user.error.saveInfo"));
+    ElMessage.error('保存基本信息失败');
   } finally {
     submitting.value = false;
   }
@@ -282,7 +282,7 @@ const handleClosed = () => {
 <template>
   <el-dialog
     v-model="visible"
-    :title="isCreateMode ? t('user.create') : t('user.edit')"
+    :title="isCreateMode ? '创建用户' : '编辑用户'"
     width="760"
     destroy-on-close
     @closed="handleClosed"
@@ -296,36 +296,36 @@ const handleClosed = () => {
         class="form-block"
       >
         <el-form-item
-          :label="t('user.phone')"
+          label="手机号"
           prop="phone"
         >
           <el-input
             v-model="createForm.phone"
-            :placeholder="t('user.input.phone')"
+            placeholder="请输入手机号"
           />
         </el-form-item>
         <el-form-item
-          :label="t('user.username')"
+          label="用户名"
           prop="username"
         >
           <el-input
             v-model="createForm.username"
-            :placeholder="t('user.input.username')"
+            placeholder="请输入用户名"
           />
         </el-form-item>
         <el-form-item
-          :label="t('auth.password')"
+          label="密码"
           prop="password"
         >
           <el-input
             v-model="createForm.password"
             type="password"
             show-password
-            :placeholder="t('user.input.password')"
+            placeholder="请输入密码"
           />
         </el-form-item>
         <el-form-item
-          :label="t('user.type')"
+          label="用户类型"
           prop="userType"
         >
           <el-select
@@ -333,23 +333,23 @@ const handleClosed = () => {
             style="width: 100%"
           >
             <el-option
-              :label="t('user.typeMap.normal')"
+              label="普通用户"
               :value="0"
             />
             <el-option
-              :label="t('user.typeMap.tester')"
+              label="测试用户"
               :value="1"
             />
             <el-option
-              :label="t('user.typeMap.admin')"
+              label="管理员"
               :value="2"
             />
             <el-option
-              :label="t('user.typeMap.system')"
+              label="系统用户"
               :value="3"
             />
             <el-option
-              :label="t('user.typeMap.superAdmin')"
+              label="超管"
               :value="4"
             />
           </el-select>
@@ -366,53 +366,53 @@ const handleClosed = () => {
         label-width="120px"
         class="form-block"
       >
-        <el-form-item :label="t('user.username')">
+        <el-form-item label="用户名">
           <el-input
             v-model="userInfoForm.username"
             disabled
           />
         </el-form-item>
-        <el-form-item :label="t('user.type')">
+        <el-form-item label="用户类型">
           <el-select
             v-model="userInfoForm.userType"
             disabled
             style="width: 100%"
           >
             <el-option
-              :label="t('user.typeMap.normal')"
+              label="普通用户"
               :value="0"
             />
             <el-option
-              :label="t('user.typeMap.tester')"
+              label="测试用户"
               :value="1"
             />
             <el-option
-              :label="t('user.typeMap.admin')"
+              label="管理员"
               :value="2"
             />
             <el-option
-              :label="t('user.typeMap.system')"
+              label="系统用户"
               :value="3"
             />
             <el-option
-              :label="t('user.typeMap.superAdmin')"
+              label="超管"
               :value="4"
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('user.nickname')">
+        <el-form-item label="昵称">
           <el-input
             v-model="userInfoForm.nickname"
-            :placeholder="t('user.input.nickname')"
+            placeholder="请输入昵称"
           />
         </el-form-item>
-        <el-form-item :label="t('user.avatar')">
+        <el-form-item label="头像">
           <el-input
             v-model="userInfoForm.avatarUrl"
-            :placeholder="t('user.input.avatar')"
+            placeholder="请输入头像URL"
           />
         </el-form-item>
-        <el-form-item :label="t('user.status')">
+        <el-form-item label="用户状态">
           <el-select
             v-model="userInfoForm.accountStatus"
             style="width: 100%"
@@ -444,15 +444,15 @@ const handleClosed = () => {
         label-width="120px"
         class="form-block"
       >
-        <el-form-item :label="t('user.bio')">
+        <el-form-item label="简介">
           <el-input
             v-model="userProfileForm.bio"
             type="textarea"
             :rows="3"
-            :placeholder="t('user.input.bio')"
+            placeholder="请输入个人简介"
           />
         </el-form-item>
-        <el-form-item :label="t('user.gender')">
+        <el-form-item label="性别">
           <el-select
             v-model="userProfileForm.gender"
             style="width: 100%"
@@ -475,19 +475,19 @@ const handleClosed = () => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('user.birthDate')">
+        <el-form-item label="生日">
           <el-date-picker
             v-model="userProfileForm.birthDate"
             type="date"
             value-format="YYYY-MM-DD"
-            :placeholder="t('user.input.birthDate')"
+            placeholder="请选择生日"
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item :label="t('user.residence')">
+        <el-form-item label="居住地">
           <el-input
             v-model="userProfileForm.residence"
-            :placeholder="t('user.input.residence')"
+            placeholder="请输入居住地"
           />
         </el-form-item>
       </el-form>
@@ -499,16 +499,16 @@ const handleClosed = () => {
         label-width="120px"
         class="form-block"
       >
-        <el-form-item :label="t('user.email')">
+        <el-form-item label="邮箱">
           <el-input
             v-model="userDatumForm.email"
-            :placeholder="t('user.input.email')"
+            placeholder="请输入邮箱"
           />
         </el-form-item>
-        <el-form-item :label="t('user.phone')">
+        <el-form-item label="手机号">
           <el-input
             v-model="userDatumForm.phone"
-            :placeholder="t('user.input.phone')"
+            placeholder="请输入手机号"
           />
         </el-form-item>
       </el-form>
@@ -516,14 +516,14 @@ const handleClosed = () => {
 
     <template #footer>
       <el-button @click="visible = false">
-        {{ t('common.action.cancel') }}
+        取消
       </el-button>
       <el-button
         type="primary"
         :loading="submitting"
         @click="handleSave"
       >
-        {{ t('common.action.save') }}
+        保存
       </el-button>
     </template>
   </el-dialog>

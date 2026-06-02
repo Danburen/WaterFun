@@ -15,6 +15,10 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "post_resource")
+@NamedEntityGraph(
+        name = "postResource.resourceUuid",
+        attributeNodes = @NamedAttributeNode("resourceUuid")
+)
 public class PostResource {
     @EmbeddedId
     private PostResourceId id;
@@ -26,7 +30,8 @@ public class PostResource {
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "resource_uuid", nullable = false, referencedColumnName = "uuid", insertable = false, updatable = false)
+    @JoinColumn(name = "resource_uuid", nullable = false, referencedColumnName = "uuid",
+            insertable = false, updatable = false)
     private Resource resourceUuid;
 
     @NotNull

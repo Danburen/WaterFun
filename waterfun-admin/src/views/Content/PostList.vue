@@ -2,7 +2,6 @@
 import type { OptionResItem } from "@waterfun/web-core/src/types/api/response";
 import { formatDate } from "@waterfun/web-core/src/timer";
 import { ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { getCategoryOptions } from "~/api/category";
 import SearchContainer from "~/components/SearchContainer.vue";
@@ -19,7 +18,6 @@ import type { PageOptions } from "~/types/api";
 import PostCreateDialog from "~/views/Content/components/PostCreateDialog.vue";
 import { ElMessage } from "element-plus";
 
-const { t } = useI18n();
 const router = useRouter();
 
 const loading = ref(false);
@@ -53,11 +51,11 @@ const pageOpts = ref<PageOptions>({
 });
 
 const postStatusOptions: { label: string; value: PostStatus }[] = [
-  { label: "content.post.status.draft", value: "DRAFT" },
-  { label: "content.post.status.pending", value: "PENDING" },
-  { label: "content.post.status.published", value: "PUBLISHED" },
-  { label: "content.post.status.rejected", value: "REJECTED" },
-  { label: "content.post.status.archived", value: "ARCHIVED" },
+  { label: "草稿", value: "DRAFT" },
+  { label: "待审核", value: "PENDING" },
+  { label: "已发布", value: "PUBLISHED" },
+  { label: "已拒绝", value: "REJECTED" },
+  { label: "已归档", value: "ARCHIVED" },
 ];
 
 const loadOptions = async () => {
@@ -68,7 +66,7 @@ const loadOptions = async () => {
     userOptions.value = userRes.data || [];
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   } finally {
     loadingOptions.value = false;
   }
@@ -90,7 +88,7 @@ const fetchData = async () => {
     pageOpts.value.total = res.data.page?.totalElements || 0;
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   } finally {
     loading.value = false;
   }
@@ -142,16 +140,16 @@ const handleSelectionChange = (rows: PostResp[]) => {
 const handleDelete = async (id?: string | number) => {
   if (!id) return;
   try {
-    await ElMessageBox.confirm(t("content.post.confirm.delete"), t("common.action.delete"), {
+    await ElMessageBox.confirm('确定删除该文章吗？', '删除', {
       type: "warning",
     });
     await deletePostById(id);
-    ElMessage.success(t("content.post.success.delete"));
+    ElMessage.success('文章删除成功');
     fetchData();
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("content.post.error.delete"));
+      ElMessage.error('文章删除失败');
     }
   }
 };
@@ -161,8 +159,8 @@ const handleBatchDelete = async () => {
 
   try {
     await ElMessageBox.confirm(
-      t("content.post.confirm.batchDelete", { count: selectedPostIds.value.length }),
-      t("common.action.delete"),
+      `确定删除选中的 ${selectedPostIds.value.length} 篇文章吗？`,
+      '删除',
       { type: "warning" }
     );
 
@@ -170,11 +168,11 @@ const handleBatchDelete = async () => {
     const result = res.data;
 
     if (result.success === result.requested) {
-      ElMessage.success(t("content.post.success.delete"));
+      ElMessage.success('文章删除成功');
     } else if (result.success === 0) {
-      ElMessage.error(t("content.post.error.delete"));
+      ElMessage.error('文章删除失败');
     } else {
-      ElMessage.warning(`${t("content.post.success.delete")} ${result.success}/${result.requested}`);
+      ElMessage.warning(`${'文章删除成功'} ${result.success}/${result.requested}`);
     }
 
     selectedPostIds.value = [];
@@ -182,7 +180,7 @@ const handleBatchDelete = async () => {
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("content.post.error.delete"));
+      ElMessage.error('文章删除失败');
     }
   }
 };
@@ -201,13 +199,13 @@ onMounted(() => {
         class="search-form"
         :model="searchForm"
       >
-        <el-form-item :label="t('content.post.field.title')">
+        <el-form-item label="标题">
           <el-input
             v-model="searchForm.title"
-            :placeholder="t('content.post.input.title')"
+            placeholder="请输入标题"
           />
         </el-form-item>
-        <el-form-item :label="t('content.post.field.status')">
+        <el-form-item label="状态">
           <el-select
             v-model="searchForm.status"
             clearable
@@ -216,18 +214,18 @@ onMounted(() => {
             <el-option
               v-for="item in postStatusOptions"
               :key="item.value"
-              :label="t(item.label)"
+              :label="item.label"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('content.post.field.categoryId')">
+        <el-form-item label="分类ID">
           <el-select
             v-model="searchForm.categoryId"
             clearable
             filterable
             :loading="loadingOptions"
-            :placeholder="t('content.post.input.categoryId')"
+            placeholder="请选择分类"
             style="width: 220px"
           >
             <el-option
@@ -239,13 +237,13 @@ onMounted(() => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('content.post.field.authorId')">
+        <el-form-item label="作者ID">
           <el-select
             v-model="searchForm.authorId"
             clearable
             filterable
             :loading="loadingOptions"
-            :placeholder="t('content.post.input.authorId')"
+            placeholder="请选择作者"
             style="width: 220px"
           >
             <el-option
@@ -257,10 +255,10 @@ onMounted(() => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('content.post.field.slug')">
+        <el-form-item label="唯一标识符">
           <el-input
             v-model="searchForm.slug"
-            :placeholder="t('content.post.input.slug')"
+            placeholder="请输入唯一标识符"
           />
         </el-form-item>
         <el-form-item>
@@ -268,10 +266,10 @@ onMounted(() => {
             type="primary"
             @click="handleSearch"
           >
-            {{ t('common.query.title') }}
+            查询
           </el-button>
           <el-button @click="handleReset">
-            {{ t('common.reset.title') }}
+            重置
           </el-button>
         </el-form-item>
       </el-form>
@@ -280,7 +278,7 @@ onMounted(() => {
     <TableContainer
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
-      title="content.post.title"
+      title="文章管理"
       show-add-btn
       :show-remove-btn="true"
       :disable-delete="selectedPostIds.length === 0"
@@ -309,7 +307,7 @@ onMounted(() => {
         />
         <el-table-column
           prop="title"
-          :label="t('content.post.field.title')"
+          label="标题"
           min-width="180"
           show-overflow-tooltip
         >
@@ -325,40 +323,40 @@ onMounted(() => {
         </el-table-column>
         <el-table-column
           prop="status"
-          :label="t('content.post.field.status')"
+          label="状态"
           width="130"
         >
           <template #default="{ row }">
-            {{ row.status ? t(`content.post.status.${row.status.toLowerCase()}`) : t('common.none.title') }}
+            {{ ({ draft: '草稿', pending: '待审核', published: '已发布', rejected: '已拒绝', archived: '已归档' })[row.status?.toLowerCase()] || '无' }}
           </template>
         </el-table-column>
         <el-table-column
           prop="categoryId"
-          :label="t('content.post.field.categoryId')"
+          label="分类ID"
           width="110"
         />
         <el-table-column
           prop="authorId"
-          :label="t('content.post.field.authorId')"
+          label="作者ID"
           width="110"
         />
         <el-table-column
           prop="slug"
-          :label="t('content.post.field.slug')"
+          label="唯一标识符"
           min-width="150"
           show-overflow-tooltip
         />
         <el-table-column
           prop="createdAt"
-          :label="t('common.time.create')"
+          label="创建时间"
           min-width="170"
         >
           <template #default="{ row }">
-            {{ formatDate(row.createdAt) || t('common.none.title') }}
+            {{ formatDate(row.createdAt) || '无' }}
           </template>
         </el-table-column>
         <el-table-column
-          :label="t('common.operation.title')"
+          label="操作"
           width="180"
           fixed="right"
         >
@@ -368,14 +366,14 @@ onMounted(() => {
               type="primary"
               @click="handleEdit(row.id)"
             >
-              {{ t('common.action.edit') }}
+              编辑
             </el-button>
             <el-button
               size="small"
               type="danger"
               @click="handleDelete(row.id)"
             >
-              {{ t('common.action.delete') }}
+              删除
             </el-button>
           </template>
         </el-table-column>

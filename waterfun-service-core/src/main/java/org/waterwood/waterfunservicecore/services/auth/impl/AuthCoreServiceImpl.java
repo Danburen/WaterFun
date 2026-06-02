@@ -14,6 +14,7 @@ import org.waterwood.common.TokenResult;
 import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPayload;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
+import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.auth.AuthCoreService;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSenderFactory;
@@ -31,11 +32,8 @@ public class AuthCoreServiceImpl implements AuthCoreService {
     public LoginClientData BuildLoginResponse(HttpServletResponse response, User user, String dfp) {
         TokenPair tokenPair = createNewTokens(user.getUid(), dfp);
         CookieUtil.setTokenCookie(response,tokenPair);
-        response.setContentType("application/json");
-        response.setHeader("Pragma", "No-cache");
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.setHeader("X-Content-Type-Options", "nosniff");response.setHeader("X-Frame-Options", "DENY");
-        return  new LoginClientData(tokenPair.accessToken(),tokenPair.accessExp());
+        ResponseUtil.setNoCacheSecurityHeaders(response);
+        return new LoginClientData(tokenPair.accessToken(),tokenPair.accessExp());
     }
 
     @Override
@@ -49,22 +47,22 @@ public class AuthCoreServiceImpl implements AuthCoreService {
     }
 
     /**
-     * Return the api response ofPending refresh access tokenValue operation.
-     * <p>for future extension or refactor , we temporarily use api response instead ofPending OpResult</p>
+     * Return the refresh token
      *
      * @param refreshToken refresh tokenValue
-     * @return ServiceResult type Token result that contains tokenValue and expirations.
+     * @return Token result that contains tokenValue and expirations.
      */
     @Override
-    public TokenResult refreshAccessToken(String refreshToken, String dfp) {
+    public TokenPair refreshAccessToken(String refreshToken, String dfp) {
         StringUtil.isBlankThen(refreshToken, () -> {
             throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
         });// Missing refresh token
         long userUid = UserCtxHolder.getUserUid();
         RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
-        String deviceId = payload.deviceId();
-        return userRepository.findById(userUid).map(_ ->
-                        tokenService.genAndCacheRefToken(userUid, deviceId))
+        TokenResult RT = userRepository.findById(userUid).map(_ ->
+                        tokenService.genAndCacheRefToken(userUid, payload.deviceId()))
                 .orElseThrow(() -> new AuthException(AuthCode.USER_NOT_FOUND));
+        TokenResult AT = tokenService.genCacheNewAccTokenRevokeOlds(userUid, payload.deviceId());
+        return TokenPair.of(AT, RT);
     }
 }

@@ -24,7 +24,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.PostReposito
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PostTagRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
-import org.waterwood.waterfunservicecore.utils.ContentIdGenerator;
+import org.waterwood.waterfunservicecore.infrastructure.utils.ContentIdGenerator;
 
 import java.util.HashSet;
 import java.util.List;

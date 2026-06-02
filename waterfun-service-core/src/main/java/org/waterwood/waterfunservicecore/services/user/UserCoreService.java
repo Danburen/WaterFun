@@ -106,5 +106,6 @@ public interface UserCoreService {
     /**
      * Whether a user is admin
      */
-    boolean isCurrentUserAdmin();
+    boolean isUserAdmin(Long userUid);
+
 }

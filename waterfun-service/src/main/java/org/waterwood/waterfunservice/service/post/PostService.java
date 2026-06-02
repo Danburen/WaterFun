@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.waterfunservice.api.UploadContext;
-import org.waterwood.waterfunservice.api.request.PutUserPostReq;
 import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.post.*;
@@ -62,13 +61,6 @@ public interface PostService {
      * @return long value of generated new post id
      */
     Long draftNew();
-
-    /**
-     * Update a post must at DRAFT status by user self
-     * @param id target post id
-     * @param req request body
-     */
-    void updatePost(Long id, PutUserPostReq req);
 
     /**
      * User publish self post

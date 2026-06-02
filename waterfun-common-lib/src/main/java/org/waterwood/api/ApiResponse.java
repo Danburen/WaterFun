@@ -12,24 +12,33 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ApiResponse<T>{
+    Boolean success;
     String code;
     String message;
     T data;
 
-    public static ApiResponse<Void> response(BaseResponseCode baseResponseCode){
-        return new ApiResponse<>(baseResponseCode.getCode(),null,null);
+    public static <T> ApiResponse<T> success() {
+        return new ApiResponse<>(true, "success", "ok", null);
     }
 
-    public static ApiResponse<Void> response(BaseResponseCode baseResponseCode, String message){
-        return new ApiResponse<>(baseResponseCode.getCode(),message,null);
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(true, "success", "ok", data);
     }
 
-    public static <T> ApiResponse<T> success(){
-        return new ApiResponse<>("success", "http.success",null);
+    public static <T> ApiResponse<T> success(T data, String message) {
+        return new ApiResponse<>(true, "success", message, data);
     }
 
-    public static <T> ApiResponse<T> success(T data){
-        return new ApiResponse<>("success", null,data);
+    public static <T> ApiResponse<T> reject(String code, String message, T data) {
+        return new ApiResponse<>(false, code, message, data);
+    }
+
+    public static <T> ApiResponse<T> error(BaseResponseCode baseResponseCode) {
+        return new ApiResponse<>(false, "error", baseResponseCode.getCode(), null);
+    }
+
+    public static <T> ApiResponse<T> error(String code, String message) {
+        return new ApiResponse<>(false, code, message, null);
     }
 
 }

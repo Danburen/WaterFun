@@ -81,14 +81,14 @@ const handleMenuClick = (routeName:string) => {
           <el-icon class="menu-icon">
             <IconComponent :icon="route.meta.icon" />
           </el-icon>
-          <span>{{ $t(`nav.${route.meta.locale}`) }}</span>
+          <span>{{ route.meta.locale }}</span>
         </template>
         <el-menu-item
           v-for="child in route.children.filter(child => !child.meta.isDetail)"  
           :index="child.name as string" 
           @click="handleMenuClick(child.name as string)"
         >
-          <span>{{ $t(`nav.${child.meta.locale}`) }}</span>
+          <span>{{ child.meta.locale }}</span>
         </el-menu-item>
       </el-sub-menu>
       <el-menu-item 
@@ -99,7 +99,7 @@ const handleMenuClick = (routeName:string) => {
         <el-icon class="menu-icon">
           <IconComponent :icon="route.meta.icon" />
         </el-icon>
-        <span>{{ $t(`nav.${route.meta.locale}`) }}</span>
+        <span>{{ route.meta.locale }}</span>
       </el-menu-item>
     </template>
   </el-menu>

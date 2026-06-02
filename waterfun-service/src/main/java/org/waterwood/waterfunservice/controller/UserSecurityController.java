@@ -50,15 +50,4 @@ public class UserSecurityController {
         if(result) CookieUtil.cleanTokenCookie(response);
         return ApiResponse.success();
     }
-
-    @Operation(summary = "刷新access token")
-    @PostMapping("/refresh-access-token")
-    public ApiResponse<LoginClientData> refreshAccessToken(@Valid @NotBlank(message = "{auth.device_fingerprint.required}") String dfp, HttpServletRequest request) {
-        TokenResult res = authCoreService.refreshAccessToken(
-                CookieUtil.getCookieValue(request.getCookies(),"REFRESH_TOKEN"),
-                dfp
-        );
-        LoginClientData data = new LoginClientData(res.tokenValue(),res.expire());
-        return ApiResponse.success(data);
-    }
 }

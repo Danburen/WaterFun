@@ -21,7 +21,7 @@ import org.waterwood.waterfunservice.service.account.AccountService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.user.UserDatumCoreService;
-import org.waterwood.waterfunservicecore.utils.CookieKeyGetter;
+import org.waterwood.waterfunservicecore.infrastructure.utils.CookieKeyGetter;
 
 @Slf4j
 @RestController

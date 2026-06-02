@@ -13,10 +13,11 @@ public enum VisibleStatus {
     }
 
     public static VisibleStatus fromCode(short code) {
-       return switch (code) {
-           case 1 -> SHOW;
-           case 2 -> HIDE;
-           default -> throw new IllegalArgumentException("Unknown visible status code: " + code);
-       };
+      for (VisibleStatus visibleStatus : values()) {
+            if (visibleStatus.code == code) {
+                return visibleStatus;
+            }
+      }
+      throw new IllegalArgumentException("Unknown visible status code: " + code);
     }
 }

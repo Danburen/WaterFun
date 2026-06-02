@@ -13,7 +13,8 @@ import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface AuditTaskResourceMapper {
-    @Mapping(source = "auditor.uid", target = "auditorId")
     @Mapping(source = "task.id", target = "taskId")
+    @Mapping(source = "auditor.uid", target = "auditorId")
+    @Mapping(source = "resource.uuid", target = "resourceUuid")
     ModerationResourceRes toModerationResourceRes(AuditResource auditResource);
 }

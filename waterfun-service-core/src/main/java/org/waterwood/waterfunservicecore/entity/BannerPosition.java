@@ -13,10 +13,11 @@ public enum BannerPosition {
     }
 
     public static BannerPosition fromCode(short code) {
-        return switch (code) {
-            case 1 -> HOME;
-            case 2 -> SIDE;
-            default -> throw new IllegalArgumentException("Invalid BannerPosition: " + code);
-        };
+      for (BannerPosition position : BannerPosition.values()) {
+          if (position.code == code) {
+              return position;
+          }
+      }
+      throw new IllegalArgumentException("Invalid BannerPosition: " + code);
     }
 }

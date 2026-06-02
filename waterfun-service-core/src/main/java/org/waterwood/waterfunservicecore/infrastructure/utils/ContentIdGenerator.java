@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.utils;
+package org.waterwood.waterfunservicecore.infrastructure.utils;
 
 import org.waterwood.utils.codec.Snowflake;
 

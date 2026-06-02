@@ -9,6 +9,7 @@ public enum AuditRejectType {
     ADVERTISEMENT(3),
     VIOLENCE(4),
     SENSITIVE(5),
+    CASCADE(6),
     OTHER(99);
     private final short code;
     AuditRejectType(int code) {

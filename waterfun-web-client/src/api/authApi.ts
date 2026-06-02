@@ -98,3 +98,7 @@ export const logout = (deviceFp: string): PromiseResBody<void> => {
 export const getCsrfToken = (): PromiseResBody<void> => {
     return request.get('/auth/csrf-token');
 }
+
+export const refreshAccessToken = (deviceFp?: string): PromiseResBody<AccessTokenResponse> => {
+    return request.post('/auth/refresh', null, { params: { deviceFp } });
+}

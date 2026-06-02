@@ -1,5 +1,7 @@
 package org.waterwood.api;
 
+import org.waterwood.common.TokenResult;
+
 /**
  * A recorder contains the pair of AccessToken and RefreshToken with their expirations
  * @param accessToken Access Token
@@ -10,4 +12,7 @@ package org.waterwood.api;
  * @version 1.0
  */
 public record TokenPair(String accessToken, long accessExp, String refreshToken,long refreshExp) {
+    public static TokenPair of(TokenResult at, TokenResult rt) {
+        return new TokenPair(at.tokenValue(), at.expire(), rt.tokenValue(), rt.expire());
+    }
 }

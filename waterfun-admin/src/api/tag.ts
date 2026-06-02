@@ -2,6 +2,8 @@ import type { OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
+export type TagOptionVO = OptionResItem<number>;
+
 export interface Instant {
   seconds: number;
   nanos: number;

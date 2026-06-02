@@ -4,8 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
-@Component
-public class ResponseUtil {
+public final class ResponseUtil {
     public static void setCookieAndNoCache(HttpServletResponse response, String cookieName, String cookieValue, int maxAge) {
         Cookie cookie = new Cookie(cookieName, cookieValue);
         cookie.setHttpOnly(true);
@@ -16,6 +15,14 @@ public class ResponseUtil {
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setDateHeader("Expires", 0);
+    }
+
+    public static HttpServletResponse setNoCacheSecurityHeaders(HttpServletResponse response) {
+        response.setContentType("application/json");
+        response.setHeader("Pragma", "No-cache");
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("X-Content-Type-Options", "nosniff");response.setHeader("X-Frame-Options", "DENY");
+        return response;
     }
 
 

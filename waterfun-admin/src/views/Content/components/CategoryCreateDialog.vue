@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormInstance, FormRules } from "element-plus";
-import { useI18n } from "vue-i18n";
+
 import type { OptionResItem } from "@waterfun/web-core/src/types";
 import { createCategory, getCategory, getCategoryOptions, putCategory, type CreateCategoryRequest } from "~/api/category";
 import { ElMessage } from "element-plus";
@@ -22,7 +22,7 @@ const emit = defineEmits<{
   success: [];
 }>();
 
-const { t } = useI18n();
+
 const formRef = ref<FormInstance>();
 const submitting = ref(false);
 const loadingOptions = ref(false);
@@ -39,7 +39,7 @@ const formModel = ref<CreateCategoryRequest>({
 
 const rules: FormRules<CreateCategoryRequest> = {
   name: [
-    { required: true, message: t("content.category.input.name"), trigger: "blur" },
+    { required: true, message: '请输入分类名', trigger: "blur" },
     { max: 50, message: "Max 50", trigger: "blur" },
   ],
   slug: [{ max: 50, message: "Max 50", trigger: "blur" }],
@@ -47,7 +47,7 @@ const rules: FormRules<CreateCategoryRequest> = {
 };
 
 const dialogTitle = computed(() =>
-  props.mode === "edit" ? t("content.category.edit") : t("content.category.create")
+  props.mode === "edit" ? '编辑分类' : '新增分类'
 );
 
 const visible = computed({
@@ -62,7 +62,7 @@ const loadOptions = async () => {
     categoryOptions.value = res.data || [];
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   } finally {
     loadingOptions.value = false;
   }
@@ -82,7 +82,7 @@ const loadDetail = async () => {
     };
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("error.fetch"));
+    ElMessage.error('获取数据失败');
   }
 };
 
@@ -125,17 +125,17 @@ const handleSave = async () => {
 
     if (props.mode === "edit" && props.categoryId) {
       await putCategory(props.categoryId, payload);
-      ElMessage.success(t("content.category.success.update"));
+      ElMessage.success('分类更新成功');
     } else {
       await createCategory(payload);
-      ElMessage.success(t("content.category.success.create"));
+      ElMessage.success('分类创建成功');
     }
 
     visible.value = false;
     emit("success");
   } catch (e) {
     console.error(e);
-    ElMessage.error(props.mode === "edit" ? t("content.category.error.save") : t("content.category.error.create"));
+    ElMessage.error(props.mode === "edit" ? '分类保存失败' : '分类创建失败');
   } finally {
     submitting.value = false;
   }
@@ -145,30 +145,30 @@ const handleSave = async () => {
 <template>
   <el-dialog v-model="visible" :title="dialogTitle" width="620" destroy-on-close @closed="resetForm">
     <el-form ref="formRef" v-loading="loadingOptions" :model="formModel" :rules="rules" label-width="110px" status-icon>
-      <el-form-item prop="name" :label="t('content.category.field.name')">
-        <el-input v-model="formModel.name" :placeholder="t('content.category.input.name')"/>
+      <el-form-item prop="name" label="分类名">
+        <el-input v-model="formModel.name" placeholder="请输入分类名"/>
       </el-form-item>
-      <el-form-item prop="slug" :label="t('content.category.field.slug')">
-        <el-input v-model="formModel.slug" :placeholder="t('content.category.input.slug')"/>
+      <el-form-item prop="slug" label="唯一标识符">
+        <el-input v-model="formModel.slug" placeholder="请输入唯一标识符"/>
       </el-form-item>
-      <el-form-item prop="parentId" :label="t('content.category.field.parentId')">
+      <el-form-item prop="parentId" label="父级ID">
         <el-select v-model="formModel.parentId" clearable filterable style="width: 280px">
           <el-option v-for="item in categoryOptions" :key="item.id" :label="`${item.id} (${item.name})`" :value="item.id" :disabled="item.disabled || false"/>
         </el-select>
       </el-form-item>
-      <el-form-item prop="sortOrder" :label="t('content.category.field.sortOrder')">
+      <el-form-item prop="sortOrder" label="排序">
         <el-input-number v-model="formModel.sortOrder" :min="0" :max="99999"/>
       </el-form-item>
-      <el-form-item prop="isActive" :label="t('content.category.field.isActive')">
+      <el-form-item prop="isActive" label="是否启用">
         <el-switch v-model="formModel.isActive"/>
       </el-form-item>
-      <el-form-item prop="description" :label="t('content.category.field.description')">
+      <el-form-item prop="description" label="描述">
         <el-input v-model="formModel.description" type="textarea" :rows="4"/>
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="visible = false">{{ t('common.action.cancel') }}</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSave">{{ t('common.action.save') }}</el-button>
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" :loading="submitting" @click="handleSave">保存</el-button>
     </template>
   </el-dialog>
 </template>

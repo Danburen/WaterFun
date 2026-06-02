@@ -113,7 +113,7 @@ public class TagServiceImpl implements TagService {
         if (!tagsToCreate.isEmpty()) {
             int createdCount = tagRepository.countByCreatorUid(userUid);
             if(createdCount > userMaxTagCreateCount) {
-                if(userCoreService.isCurrentUserAdmin()){
+                if(userCoreService.isUserAdmin(userUid)){
                     // Admin can bypass the quota limit, but we still want to log it for audit
                     log.warn("Admin user {} is creating tags beyond the quota limit. Current count: {}, Attempting to create: {}, Quota limit: {}",
                             userUid, createdCount, tagsToCreate.size(), userMaxTagCreateCount);

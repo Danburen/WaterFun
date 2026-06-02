@@ -53,6 +53,7 @@ public enum BaseResponseCode implements ResponseCode {
     AUDIT_TASK_NOT_FOUND_ARGS("audit.task.not_found.args"),
     AUDIT_TASK_RESOURCE_NOT_FOUND("audit.task.resource_not_found"),
     AUDIT_TASK_RESOURCE_NOT_FOUND_ARGS("audit.task.resource_not_found.args"),
+    AUDIT_TASK_RESOURCE_REJECT_OR_SUSPECT("audit_task_resource_reject_or_suspect"),
 
     // Role & Permissions
     ROLE_NOT_FOUND("role.not_found"),

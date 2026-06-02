@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { OptionResItem } from "@waterfun/web-core/src/types";
-import { useI18n } from "vue-i18n";
+
 import { addPermission, getPermission, updatePermission, type PermissionType } from "~/api/permission";
 import PermForm from "./PermForm.vue";
 import { ElMessage } from "element-plus";
@@ -26,7 +26,7 @@ const emit = defineEmits<{
   success: [];
 }>();
 
-const { t } = useI18n();
+
 const permFormRef = ref<PermFormExpose>();
 const submitting = ref(false);
 
@@ -75,7 +75,7 @@ watch(
 	  await loadEditData();
 	} catch (e) {
 	  console.error(e);
-	  ElMessage.error(t("permission.error.fetch"));
+	  ElMessage.error('获取权限信息失败');
 	  visible.value = false;
 	}
   }
@@ -102,7 +102,7 @@ const handleSave = async () => {
   try {
 	if (props.mode === "create") {
 	  await addPermission({ ...payload, name: payload.name, resource: payload.resource });
-	  ElMessage.success(t("permission.success.create"));
+	  ElMessage.success('权限创建成功');
 	} else if (props.permissionId != null) {
 	  await updatePermission(props.permissionId, {
 		...payload,
@@ -110,13 +110,13 @@ const handleSave = async () => {
 		name: payload.name,
 		resource: payload.resource,
 	  });
-	  ElMessage.success(t("permission.success.update"));
+	  ElMessage.success('权限更新成功');
 	}
 	visible.value = false;
 	emit("success");
   } catch (e) {
 	console.error(e);
-	ElMessage.error(t("permission.error.save"));
+	ElMessage.error('保存权限失败');
   } finally {
 	submitting.value = false;
   }
@@ -131,7 +131,7 @@ const handleClosed = () => {
 <template>
   <el-dialog
     v-model="visible"
-    :title="mode === 'create' ? t('permission.create') : t('permission.edit')"
+    :title="mode === 'create' ? '创建权限' : '编辑权限'"
     width="680"
     destroy-on-close
     @closed="handleClosed"
@@ -144,14 +144,14 @@ const handleClosed = () => {
     />
     <template #footer>
       <el-button @click="visible = false">
-        {{ t('common.action.cancel') }}
+        取消
       </el-button>
       <el-button
         type="primary"
         :loading="submitting"
         @click="handleSave"
       >
-        {{ t('common.action.save') }}
+        保存
       </el-button>
     </template>
   </el-dialog>

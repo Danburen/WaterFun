@@ -24,6 +24,7 @@ public class PutUserPostReq {
     @Size(max = 64)
     private String subtitle;
     private String content;
+    private String coverageResourceUuid;
     @Size(max = 500)
     private String summary;
     private PostVisibility visibility;

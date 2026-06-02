@@ -1,37 +1,38 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
-import { ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
+import { ElMessageBox, ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
+import { User, Clock, Files } from "@element-plus/icons-vue";
 import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
 import {
-  approveModerationResource,
-  listModerationResources,
-  rejectModerationResource,
-  type AuditStatus,
+  listModerations,
+  approveModerationById,
+  rejectModerationById,
+  approveModerations,
+  rejectModerations,
+  type ModerateTaskResp,
+  type TargetType,
   type ModerateRejectType,
-  type ModerationResourceResp,
+  type AuditStatus,
 } from "~/api/moderation";
+import { useDictStore } from "~/stores/dictStore";
 import type { PageOptions } from "~/types/api";
-import { ElMessage } from "element-plus";
 
-const { t } = useI18n();
 const router = useRouter();
+const dictStore = useDictStore();
 
 const loading = ref(false);
-const cardData = ref<ModerationResourceResp[]>([]);
+const taskData = ref<ModerateTaskResp[]>([]);
 
 const searchForm = ref<{
-  taskId: string;
-  status: AuditStatus | "";
-  auditorId: string;
-  auditAtRange: [Date, Date] | null;
+  taskType: TargetType | "";
+  submitterId: string;
+  submitAtRange: [Date, Date] | null;
 }>({
-  taskId: "",
-  status: "PENDING",
-  auditorId: "",
-  auditAtRange: null,
+  taskType: "",
+  submitterId: "",
+  submitAtRange: null,
 });
 
 const pageOpts = ref<PageOptions>({
@@ -40,24 +41,30 @@ const pageOpts = ref<PageOptions>({
   total: 0,
 });
 
-const statusOptions: Array<{ label: string; value: AuditStatus }> = [
-  { label: "moderation.status.pending", value: "PENDING" },
-  { label: "moderation.status.approved", value: "APPROVED" },
-  { label: "moderation.status.rejected", value: "REJECTED" },
+const selectedIds = ref<number[]>([]);
+
+const targetTypeOptions: Array<{ label: string; value: TargetType }> = [
+  { label: "帖子", value: "POST" },
+  { label: "用户头像", value: "USER_AVATAR" },
+  { label: "帖子封面图", value: "POST_COVERAGE_IMAGE" },
+  { label: "帖子内容图", value: "POST_CONTENT_IMAGE" },
+  { label: "帖子内容", value: "POST_CONTENT" },
+  { label: "未知", value: "UNKNOWN" },
 ];
 
 const rejectTypeOptions: Array<{ label: string; value: ModerateRejectType }> = [
-  { label: "moderation.rejectType.violation_of_guidelines", value: "VIOLATION_OF_GUIDELINES" },
-  { label: "moderation.rejectType.inappropriate_content", value: "INAPPROPRIATE_CONTENT" },
-  { label: "moderation.rejectType.advertisement", value: "ADVERTISEMENT" },
-  { label: "moderation.rejectType.violence", value: "VIOLENCE" },
-  { label: "moderation.rejectType.sensitive", value: "SENSITIVE" },
-  { label: "moderation.rejectType.other", value: "OTHER" },
+  { label: "违反社区准则", value: "VIOLATION_OF_GUIDELINES" },
+  { label: "不当内容", value: "INAPPROPRIATE_CONTENT" },
+  { label: "广告", value: "ADVERTISEMENT" },
+  { label: "暴力内容", value: "VIOLENCE" },
+  { label: "敏感内容", value: "SENSITIVE" },
+  { label: "其他", value: "OTHER" },
 ];
 
 const rejectDialogVisible = ref(false);
+const rejectBatchMode = ref(false);
 const rejectSubmitting = ref(false);
-const currentRejectResourceId = ref<string>("");
+const currentRejectTaskId = ref<number | null>(null);
 const rejectForm = ref<{ rejectType: ModerateRejectType; rejectReason: string }>({
   rejectType: "OTHER",
   rejectReason: "",
@@ -73,22 +80,10 @@ const getInstantIso = (value?: { seconds?: number; nanos?: number } | string | n
   return new Date(ms).toISOString();
 };
 
-const formatFileSize = (size?: number | string): string => {
-  const parsed = Number(size);
-  if (!parsed || Number.isNaN(parsed) || parsed < 0) return t("common.none.title");
-  if (parsed < 1024) return `${parsed} B`;
-  if (parsed < 1024 * 1024) return `${(parsed / 1024).toFixed(2)} KB`;
-  return `${(parsed / (1024 * 1024)).toFixed(2)} MB`;
-};
-
-const previewUrl = (item: ModerationResourceResp): string => {
-  return item.presignedUrl?.url || "";
-};
-
 const pageTotal = (payload: Record<string, unknown>): number => {
+  if (payload.page && typeof (payload.page as Record<string, unknown>).totalElements === "number")
+    return (payload.page as Record<string, unknown>).totalElements as number;
   if (typeof payload.totalElements === "number") return payload.totalElements;
-  if (typeof payload.total === "number") return payload.total;
-  if (payload.page && typeof payload.page.totalElements === "number") return payload.page.totalElements;
   return 0;
 };
 
@@ -99,26 +94,67 @@ const statusTagType = (status?: AuditStatus): "warning" | "success" | "danger" |
   return "info";
 };
 
+const parsePostMeta = (meta?: Record<string, unknown>): { title?: string; summary?: string } | null => {
+  if (!meta) return null;
+  return meta as { title?: string; summary?: string };
+};
+
+const getPostTitle = (task: ModerateTaskResp): string => {
+  const payload = task.payload;
+  if (!payload) return "审核任务 #" + (task.id ?? "?");
+  const meta = parsePostMeta(payload.meta);
+  if (meta?.title) return meta.title;
+  if (payload.type === "RICH_TEXT" || payload.type === "PLAIN_TEXT") {
+    if (payload.content) return payload.content.substring(0, 60);
+    return "[内容审核]";
+  }
+  if (payload.type === "SINGLE_RESOURCE") {
+    return "[资源审核] " + (payload.singleResource?.resourceUuid?.substring(0, 16) ?? "");
+  }
+  return "审核任务 #" + (task.id ?? "?");
+};
+
+const getContentPreview = (task: ModerateTaskResp): string => {
+  const payload = task.payload;
+  if (!payload) return "";
+  if (payload.type === "RICH_TEXT" || payload.type === "PLAIN_TEXT") {
+    const meta = parsePostMeta(payload.meta);
+    if (meta?.summary) return meta.summary;
+    if (payload.content) return payload.content.substring(0, 120);
+    return "";
+  }
+  return "";
+};
+
+const getResourceCount = (task: ModerateTaskResp): number => {
+  return task.payload?.resources?.length ?? 0;
+};
+
 const fetchData = async () => {
   loading.value = true;
   try {
-    const [start, end] = searchForm.value.auditAtRange || [];
-    const res = await listModerationResources({
+    const [start, end] = searchForm.value.submitAtRange || [];
+    const res = await listModerations({
       page: (pageOpts.value.currentPage || 1) - 1,
       size: pageOpts.value.pageSize,
-      resourceType: "IMAGE",
-      taskId: searchForm.value.taskId || undefined,
-      status: searchForm.value.status || undefined,
-      auditorId: searchForm.value.auditorId || undefined,
-      auditAtStart: start ? start.toISOString() : undefined,
-      auditAtEnd: end ? end.toISOString() : undefined,
+      taskType: searchForm.value.taskType || undefined,
+      submitterId: searchForm.value.submitterId ? Number(searchForm.value.submitterId) : undefined,
+      submitAtStart: start ? start.toISOString() : undefined,
+      submitAtEnd: end ? end.toISOString() : undefined,
     });
 
-    cardData.value = res.data.content || [];
+    taskData.value = res.data.content || [];
+    taskData.value.sort((a, b) => {
+      const aStatus = (a as any)._computedStatus || "";
+      const bStatus = (b as any)._computedStatus || "";
+      const aPending = a.payload?.type ? 0 : 1;
+      const bPending = b.payload?.type ? 0 : 1;
+      return aPending - bPending;
+    });
     pageOpts.value.total = pageTotal(res.data as unknown as Record<string, unknown>);
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("moderation.error.fetch"));
+    ElMessage.error("获取审核任务失败");
   } finally {
     loading.value = false;
   }
@@ -132,118 +168,166 @@ const handleSearch = () => {
 const handleReset = () => {
   pageOpts.value.currentPage = 1;
   searchForm.value = {
-    taskId: "",
-    status: "PENDING",
-    auditorId: "",
-    auditAtRange: null,
+    taskType: "",
+    submitterId: "",
+    submitAtRange: null,
   };
   fetchData();
 };
 
-const gotoDetail = (id?: string) => {
-  if (!id) return;
-  router.push({ name: "moderationResourceDetail", params: { resourceId: id } });
+const toggleSelection = (id: number, checked: boolean) => {
+  if (checked) {
+    selectedIds.value.push(id);
+  } else {
+    selectedIds.value = selectedIds.value.filter(i => i !== id);
+  }
 };
 
-const handleApproveResource = async (resourceId?: string) => {
-  if (!resourceId) return;
+const gotoDetail = (task: ModerateTaskResp) => {
+  if (!task.id) return;
+  router.push({
+    name: "moderationTaskDetail",
+    params: { taskId: task.id },
+  });
+};
+
+const handleApproveTask = async (taskId?: number) => {
+  if (!taskId) return;
   try {
-    await ElMessageBox.confirm(t("moderation.confirm.approveResource"), t("moderation.action.approve"), {
-      type: "warning",
-    });
-    await approveModerationResource(resourceId);
-    ElMessage.success(t("moderation.success.approve"));
+    await ElMessageBox.confirm("确定通过该审核任务吗？", "通过", { type: "warning" });
+    await approveModerationById(taskId);
+    ElMessage.success("审核通过成功");
     await fetchData();
   } catch (e) {
     if (e !== "cancel") {
       console.error(e);
-      ElMessage.error(t("moderation.error.approve"));
+      ElMessage.error("审核通过失败");
     }
   }
 };
 
-const openRejectDialog = (resourceId?: string) => {
-  if (!resourceId) return;
-  currentRejectResourceId.value = resourceId;
+const handleBatchApprove = async () => {
+  if (selectedIds.value.length === 0) {
+    ElMessage.warning("请先选择要审核的任务");
+    return;
+  }
+  try {
+    await ElMessageBox.confirm(
+      `确定批量通过 ${selectedIds.value.length} 个审核任务吗？`,
+      "批量通过",
+      { type: "warning" }
+    );
+    await approveModerations({ auditTaskIds: selectedIds.value });
+    ElMessage.success("批量审核通过成功");
+    selectedIds.value = [];
+    await fetchData();
+  } catch (e) {
+    if (e !== "cancel") {
+      console.error(e);
+      ElMessage.error("批量审核通过失败");
+    }
+  }
+};
+
+const openRejectDialog = (taskId?: number) => {
+  rejectBatchMode.value = false;
+  currentRejectTaskId.value = taskId ?? null;
+  rejectForm.value = { rejectType: "OTHER", rejectReason: "" };
+  rejectDialogVisible.value = true;
+};
+
+const openBatchRejectDialog = () => {
+  if (selectedIds.value.length === 0) {
+    ElMessage.warning("请先选择要驳回的任务");
+    return;
+  }
+  rejectBatchMode.value = true;
+  currentRejectTaskId.value = null;
   rejectForm.value = { rejectType: "OTHER", rejectReason: "" };
   rejectDialogVisible.value = true;
 };
 
 const submitReject = async () => {
-  if (!currentRejectResourceId.value) return;
   rejectSubmitting.value = true;
   try {
-    await rejectModerationResource(currentRejectResourceId.value, {
-      rejectType: rejectForm.value.rejectType,
-      rejectReason: rejectForm.value.rejectReason || undefined,
-    });
-    ElMessage.success(t("moderation.success.reject"));
+    if (rejectBatchMode.value) {
+      const res = await rejectModerations({
+        auditTaskIds: selectedIds.value,
+        rejectType: rejectForm.value.rejectType,
+        rejectReason: rejectForm.value.rejectReason || undefined,
+      });
+      if (res.data) {
+        ElMessage.success(`批量驳回成功: ${res.data.success}, 失败: ${res.data.failed}`);
+      } else {
+        ElMessage.success("批量驳回成功");
+      }
+      selectedIds.value = [];
+    } else {
+      if (!currentRejectTaskId.value) return;
+      await rejectModerationById(currentRejectTaskId.value, {
+        rejectType: rejectForm.value.rejectType,
+        rejectReason: rejectForm.value.rejectReason || undefined,
+      });
+      ElMessage.success("审核驳回成功");
+    }
     rejectDialogVisible.value = false;
     await fetchData();
   } catch (e) {
     console.error(e);
-    ElMessage.error(t("moderation.error.reject"));
+    ElMessage.error("审核驳回失败");
   } finally {
     rejectSubmitting.value = false;
   }
 };
 
-onMounted(fetchData);
+const targetTypeLabel = (type?: TargetType): string => {
+  if (!type) return "未知";
+  const map: Record<string, string> = {
+    POST: "帖子",
+    USER_AVATAR: "用户头像",
+    POST_COVERAGE_IMAGE: "帖子封面图",
+    POST_CONTENT_IMAGE: "帖子内容图",
+    POST_CONTENT: "帖子内容",
+    UNKNOWN: "未知",
+  };
+  return map[type] || type;
+};
+
+onMounted(async () => {
+  dictStore.ensureLoaded();
+  fetchData();
+});
 </script>
 
 <template>
   <div class="list-layout">
     <SearchContainer>
-      <el-form
-        inline
-        class="search-form"
-        :model="searchForm"
-      >
-        <el-form-item :label="t('moderation.field.taskId')">
-          <el-input
-            v-model="searchForm.taskId"
-            :placeholder="t('moderation.input.taskId')"
-          />
-        </el-form-item>
-        <el-form-item :label="t('moderation.field.status')">
-          <el-select
-            v-model="searchForm.status"
-            clearable
-            style="width: 160px"
-          >
+      <el-form inline class="search-form" :model="searchForm">
+        <el-form-item label="任务类型">
+          <el-select v-model="searchForm.taskType" clearable style="width: 160px">
             <el-option
-              v-for="item in statusOptions"
+              v-for="item in targetTypeOptions"
               :key="item.value"
-              :label="t(item.label)"
+              :label="item.label"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('moderation.field.auditorId')">
-          <el-input
-            v-model="searchForm.auditorId"
-            :placeholder="t('moderation.input.auditorId')"
-          />
+        <el-form-item label="提交人ID">
+          <el-input v-model="searchForm.submitterId" placeholder="请输入提交人ID" />
         </el-form-item>
-        <el-form-item :label="t('moderation.field.auditAt')">
+        <el-form-item label="提交时间">
           <el-date-picker
-            v-model="searchForm.auditAtRange"
+            v-model="searchForm.submitAtRange"
             type="datetimerange"
             range-separator="~"
-            :start-placeholder="t('moderation.input.startTime')"
-            :end-placeholder="t('moderation.input.endTime')"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
           />
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleSearch"
-          >
-            {{ t('common.query.title') }}
-          </el-button>
-          <el-button @click="handleReset">
-            {{ t('common.reset.title') }}
-          </el-button>
+          <el-button type="primary" @click="handleSearch">查询</el-button>
+          <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
     </SearchContainer>
@@ -251,89 +335,99 @@ onMounted(fetchData);
     <TableContainer
       v-model:page-size="pageOpts.pageSize"
       v-model:current-page="pageOpts.currentPage"
-      title="moderation.workbench"
+      title="审核工作台"
       :show-add-btn="false"
       :show-remove-btn="false"
       :total="pageOpts.total"
       @change="fetchData"
     >
-      <div
-        v-loading="loading"
-        class="resource-grid-wrap"
-      >
-        <div
-          v-if="cardData.length === 0"
-          class="empty-box"
-        >
-          <el-empty :description="t('common.none.description')" />
+      <template #action-buttons>
+        <el-button type="success" size="small" :disabled="selectedIds.length === 0" @click="handleBatchApprove">
+          批量通过
+        </el-button>
+        <el-button type="warning" size="small" :disabled="selectedIds.length === 0" @click="openBatchRejectDialog">
+          批量驳回
+        </el-button>
+      </template>
+
+      <div v-loading="loading" class="task-grid-wrap">
+        <div v-if="taskData.length === 0" class="empty-box">
+          <el-empty description="暂无数据" />
         </div>
 
-        <div
-          v-else
-          class="resource-list"
-        >
+        <div v-else class="task-list">
           <el-card
-            v-for="item in cardData"
-            :key="item.id"
-            class="resource-card-horizontal"
+            v-for="task in taskData"
+            :key="task.id"
+            class="task-card"
             shadow="hover"
-            @click="gotoDetail(item.id)"
           >
-            <div class="image-box-small">
-              <img
-                v-if="previewUrl(item)"
-                :src="previewUrl(item)"
-                :alt="item.placeholder || String(item.id || '')"
-                class="preview-image"
-              >
-              <div
-                v-else
-                class="image-empty"
-              >
-                {{ t('common.none.title') }}
-              </div>
-              <div class="hover-mask">
-                {{ t('detail') }}
-              </div>
-            </div>
+            <div class="task-card-inner">
+              <el-checkbox
+                v-if="task.id"
+                :model-value="selectedIds.includes(task.id!)"
+                @change="(val: boolean) => toggleSelection(task.id!, val)"
+                @click.stop
+                class="card-checkbox"
+              />
 
-            <div class="card-main-horizontal">
-              <div class="title-row">
-                <span class="resource-id">#{{ item.id || t('common.none.title') }}</span>
-                <el-tag :type="statusTagType(item.status)">
-                  {{ t(`moderation.status.${(item.status || 'pending').toLowerCase()}`) }}
-                </el-tag>
+              <div class="card-body" @click="gotoDetail(task)">
+                <div class="card-header">
+                  <div class="title-area">
+                    <span class="task-id-badge">#{{ task.id }}</span>
+                    <span class="post-title">{{ getPostTitle(task) }}</span>
+                  </div>
+                  <div class="header-tags">
+                    <el-tag size="small" :type="statusTagType('PENDING')" v-if="!task.id">待审核</el-tag>
+                    <el-tag size="small" type="info">{{ targetTypeLabel(task.targetType) }}</el-tag>
+                  </div>
+                </div>
+
+                <div v-if="getContentPreview(task)" class="content-preview">
+                  {{ getContentPreview(task) }}
+                </div>
+
+                <div class="card-meta">
+                  <span class="meta-item">
+                    <el-icon><User /></el-icon>
+                    提交人 #{{ task.submitterId || "?" }}
+                  </span>
+                  <span class="meta-divider">|</span>
+                  <span class="meta-item">
+                    <el-icon><Clock /></el-icon>
+                    {{ formatISOData(getInstantIso(task.submitAt)) || "未知" }}
+                  </span>
+                  <span v-if="getResourceCount(task) > 0" class="meta-divider">|</span>
+                  <span v-if="getResourceCount(task) > 0" class="meta-item">
+                    <el-icon><Files /></el-icon>
+                    {{ getResourceCount(task) }} 个资源
+                  </span>
+                  <span v-if="task.targetId" class="meta-divider">|</span>
+                  <span v-if="task.targetId" class="meta-item">
+                    目标ID: {{ task.targetId }}
+                  </span>
+                </div>
               </div>
 
-              <div class="meta-row">
-                <span>{{ t('moderation.field.taskId') }}: {{ item.taskId || t('common.none.title') }}</span>
-              </div>
-              <div class="meta-row">
-                <span>{{ t('moderation.field.mimeType') }}: {{ item.fileProbeResult?.mimeType || t('common.none.title') }}</span>
-              </div>
-              <div class="meta-row">
-                <span>{{ t('moderation.field.fileSize') }}: {{ formatFileSize(item.fileProbeResult?.size) }}</span>
-              </div>
-              <div class="meta-row">
-                <span>{{ t('moderation.field.auditAt') }}: {{ formatISOData(getInstantIso(item.auditAt)) || t('common.none.title') }}</span>
-              </div>
-
-              <div class="action-row-horizontal">
+              <div class="card-actions">
+                <el-button size="small" type="primary" plain @click.stop="gotoDetail(task)">
+                  详情
+                </el-button>
                 <el-button
                   size="small"
                   type="success"
-                  :disabled="!item.id"
-                  @click.stop="handleApproveResource(item.id)"
+                  :disabled="!task.id"
+                  @click.stop="handleApproveTask(task.id)"
                 >
-                  {{ t('moderation.action.approve') }}
+                  通过
                 </el-button>
                 <el-button
                   size="small"
                   type="warning"
-                  :disabled="!item.id"
-                  @click.stop="openRejectDialog(item.id)"
+                  :disabled="!task.id"
+                  @click.stop="openRejectDialog(task.id)"
                 >
-                  {{ t('moderation.action.reject') }}
+                  驳回
                 </el-button>
               </div>
             </div>
@@ -342,46 +436,30 @@ onMounted(fetchData);
       </div>
     </TableContainer>
 
-    <el-dialog
-      v-model="rejectDialogVisible"
-      :title="t('moderation.dialog.rejectTitle')"
-      width="520"
-    >
+    <el-dialog v-model="rejectDialogVisible" title="驳回审核任务" width="520">
       <el-form label-width="100px">
-        <el-form-item :label="t('moderation.field.rejectType')">
-          <el-select
-            v-model="rejectForm.rejectType"
-            style="width: 100%"
-          >
+        <el-form-item label="驳回类型">
+          <el-select v-model="rejectForm.rejectType" style="width: 100%">
             <el-option
               v-for="item in rejectTypeOptions"
               :key="item.value"
-              :label="t(item.label)"
+              :label="item.label"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="t('moderation.field.rejectReason')">
+        <el-form-item label="驳回原因">
           <el-input
             v-model="rejectForm.rejectReason"
             type="textarea"
             :rows="4"
-            :placeholder="t('moderation.input.rejectReason')"
+            placeholder="请输入驳回原因（可选）"
           />
         </el-form-item>
       </el-form>
-
       <template #footer>
-        <el-button @click="rejectDialogVisible = false">
-          {{ t('common.action.cancel') }}
-        </el-button>
-        <el-button
-          type="primary"
-          :loading="rejectSubmitting"
-          @click="submitReject"
-        >
-          {{ t('common.action.save') }}
-        </el-button>
+        <el-button @click="rejectDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="rejectSubmitting" @click="submitReject">保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -394,109 +472,124 @@ onMounted(fetchData);
   gap: 12px;
 }
 
-.resource-grid-wrap {
+.task-grid-wrap {
   min-height: 520px;
 }
 
-.resource-list {
+.task-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.task-card {
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.task-card-inner {
+  display: flex;
+  align-items: flex-start;
   gap: 12px;
 }
 
-.resource-card-horizontal {
-  cursor: pointer;
-  border-radius: 8px;
+.task-card :deep(.el-card__body) {
+  padding: 16px;
 }
 
-.resource-card-horizontal :deep(.el-card__body) {
-  display: flex;
-  padding: 12px;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.image-box-small {
-  position: relative;
-  width: 140px;
-  height: 140px;
+.card-checkbox {
+  padding-top: 4px;
   flex-shrink: 0;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #f5f7fa;
 }
 
-.preview-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.2s ease;
-}
-
-.resource-card-horizontal:hover .preview-image {
-  transform: scale(1.04);
-}
-
-.image-empty {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #909399;
-}
-
-.hover-mask {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.38);
-  color: #fff;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  font-size: 13px;
-}
-
-.resource-card-horizontal:hover .hover-mask {
-  opacity: 1;
-}
-
-.card-main-horizontal {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+.card-body {
+  flex: 1;
   min-width: 0;
+  cursor: pointer;
 }
 
-.title-row {
+.card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 8px;
 }
 
-.resource-id {
-  color: #303133;
-  font-weight: 600;
-  font-size: 15px;
+.title-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
 }
 
-.meta-row {
+.task-id-badge {
+  font-size: 12px;
+  color: #909399;
+  background: #f0f2f5;
+  padding: 0 8px;
+  border-radius: 4px;
+  line-height: 22px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.post-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #303133;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-tags {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.content-preview {
   font-size: 13px;
   color: #606266;
-  line-height: 1.8;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  background: #f5f7fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   word-break: break-all;
 }
 
-.action-row-horizontal {
+.card-meta {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  align-self: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 13px;
+  color: #909399;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.meta-divider {
+  color: #dcdfe6;
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-top: 2px;
 }
 
 .empty-box {
