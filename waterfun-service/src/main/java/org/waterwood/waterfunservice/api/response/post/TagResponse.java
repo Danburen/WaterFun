@@ -21,5 +21,4 @@ public class TagResponse implements Serializable {
     private String description;
     private Long usageCount;
     private Instant createdAt;
-    private Instant updateAt;
 }

@@ -1,5 +1,6 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +27,14 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSp
         WHERE p.id IN :postIds
     """)
     List<Object[]> findCategoryByPostIds(List<Long> postIds);
+
+    List<Category> findAllByIsDeleted(Boolean isDeleted);
+
+    @EntityGraph("withParent")
+    @Query("""
+        SELECT c FROM Category c
+        WHERE c.isDeleted = false
+        ORDER BY c.usageCount DESC
+       """)
+    List<Category> findAllByIsDeletedWithParentOrderByUsageCountDesc();
 }

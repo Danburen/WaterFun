@@ -150,7 +150,7 @@ public class UserCoreServiceImpl implements UserCoreService {
 
     @Override
     public int updateAvatarResourceUuid(Long userUid, String uuid) {
-        return userRepository.updateAvatarResourceUuidByUid(
+        return userRepository.updateAvatarResourceByUid(
                 uuid == null ? null : resourceRepository.getReferenceByUuid(uuid),
                 userUid
         );

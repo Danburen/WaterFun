@@ -35,4 +35,17 @@ public interface AuditTaskResourceRepository extends JpaRepository<AuditResource
             @Param("auditor") User auditor,
             @Param("auditAt") Instant auditAt,
             @Param("taskIds") Collection<Long> taskIds);
+
+    @Query("UPDATE AuditResource a SET a.status = :status, a.rejectType = :type, a.auditor = :auditor, a.auditAt = :auditAt " +
+            "WHERE a.task.id = :taskId AND a.status = :oldStatus")
+    @Modifying
+    void updateStatusAndRejectTypeAndAuditorAndAuditAtByTaskIdAndStatus(
+            @Param("status") AuditStatus status,
+            @Param("type") AuditRejectType type,
+            @Param("auditor") User auditor,
+            @Param("auditAt") Instant auditAt,
+            @Param("taskId") Long taskId,
+            @Param("oldStatus") AuditStatus oldStatus);
+
+    List<AuditResource> findByTaskIdIn(List<Long> attr0);
 }

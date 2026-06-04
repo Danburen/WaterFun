@@ -1,12 +1,8 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence.user;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import jakarta.persistence.NamedAttributeNode;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
-import org.springframework.lang.NonNull;
-import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
@@ -35,10 +31,24 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
     int deleteUserByUidIn(Collection<Long> uids);
 
 
-    @Query("SELECT u.avatarResourceUuid.uuid FROM User u WHERE u.uid = :uid")
+    @Query("SELECT u.avatarResource.uuid FROM User u JOIN u.avatarResource WHERE u.uid = :uid")
     String getUserAvatarByUid(@Param("uid") Long uid);
 
-    @Query("update User u set u.avatarResourceUuid = :avatarResourceUuid where u.uid = :uid")
+    @Query("SELECT u.avatarResource FROM User u WHERE u.uid IN :uid")
+    List<Resource> findUserAvatarByUidIn(@Param("uid") List<Long> uid);
+
+
+    @Query("update User u set u.avatarResource = :avatarResourceUuid where u.uid = :uid")
     @Modifying
-    int updateAvatarResourceUuidByUid(Resource avatarResourceUuid, Long uid);
+    int updateAvatarResourceByUid(Resource avatarResourceUuid, Long uid);
+
+    @Query("update User u set u.avatarResource.uuid = :resourceUuid where u.uid = :uid")
+    @Modifying
+    int updateAvatarResourceUuidByUid(@Param("resourceUuid") String resourceUuid, Long uid);
+
+    @Query("SELECT u.avatarResource.resourceKey FROM User u JOIN u.avatarResource WHERE u.uid in :uids")
+    List<String> findUserAvatarResourceKeyUuidByUidIn(@Param("uids") Collection<Long> uids);
+
+    @EntityGraph(attributePaths = "avatarResource")
+    List<User> findAllByUidIn(List<Long> attr0);
 }

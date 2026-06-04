@@ -2,7 +2,7 @@
 import { formatDate } from "@waterfun/web-core/src/timer";
 import SearchContainer from "~/components/SearchContainer.vue";
 import TableContainer from "~/components/TableContainer.vue";
-import { listBanners, getBannerCoverageUpload, type BannerPosition, type BannerResp, type BannerStatus } from "~/api/banner";
+import { listBanners, type BannerPosition, type BannerResp, type BannerStatus } from "~/api/banner";
 import type { PageOptions } from "~/types/api";
 import BannerCreateDialog from "~/views/Content/components/BannerCreateDialog.vue";
 import { ElMessage } from "element-plus";
@@ -62,27 +62,6 @@ const fetchData = async () => {
     loading.value = false;
   }
 };
-
-const uploaderVisible = ref(false);
-const uploading = ref(false);
-const selectedFile = ref<File | null>(null);
-const uploadSuffix = ref("");
-const uploadedResourceKey = ref("");
-const uploadedUploadToken = ref("");
-
-watch(
-  () => createDialogVisible.value,
-  (open) => {
-    if (!open) {
-      // clear transient upload state when dialog closed
-      uploadedResourceKey.value = "";
-      uploadedUploadToken.value = "";
-      selectedFile.value = null;
-      uploadSuffix.value = "";
-      uploaderVisible.value = false;
-    }
-  }
-);
 
 const handleSearch = () => {
   pageOpts.value.currentPage = 1;
@@ -317,8 +296,6 @@ onMounted(() => {
       v-model="createDialogVisible"
       :mode="dialogMode"
       :banner-id="currentBannerId"
-      :initial-resource-key="uploadedResourceKey"
-      :initial-upload-token="uploadedUploadToken"
       @success="handleCreateSuccess"
     />
   </div>

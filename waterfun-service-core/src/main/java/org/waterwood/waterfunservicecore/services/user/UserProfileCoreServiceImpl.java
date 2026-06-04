@@ -68,10 +68,10 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     @Override
     public @Nullable CloudResPresignedUrlResp getUserAvatar(long userUid) {
         User u = userCoreService.getUser(userUid);
-        if(u.getAvatarResourceUuid() == null){
+        if(u.getAvatarResource() == null){
             return null;
         }
-        return resourceRepository.getByUuid(u.getAvatarResourceUuid().getUuid()).map(
+        return resourceRepository.getByUuid(u.getAvatarResource().getUuid()).map(
                 res -> cloudFileService.getReadUrlCached(
                         CloudFSRoot.USER,
                         res.getResourceKey(),
@@ -85,12 +85,12 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     public Map<Long, CloudResPresignedUrlResp> listUserAvatars(List<Long> userUids) {
         List<User> users = userRepository.findAllVisibleUsersByIds(userUids);
         List<String> paths = users.stream().map(
-                u -> u.getAvatarResourceUuid().getUuid()
+                u -> u.getAvatarResource().getUuid()
         ).toList();
         Map<Long, String> userIdCosPathMap = users.stream().collect(
                 Collectors.toMap(
                         User::getUid,
-                        u -> u.getAvatarResourceUuid().getUuid()
+                        u -> u.getAvatarResource().getUuid()
                 )
         );
         return cloudFileService.batchGetReadPublicUrlCached(

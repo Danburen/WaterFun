@@ -3,6 +3,7 @@ package org.waterwood.waterfunservice.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunservice.api.request.content.CreateCategoryRequest;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservice.api.request.content.UpdateCategoryRequest;
@@ -28,9 +29,12 @@ public class CategoryController {
 
     @GetMapping
     public ApiResponse<List<CategoryResponse>> getCategories(){
-        return ApiResponse.success(categoryMapper.toResponseList(
-                categoryService.getCategories()
-        ));
+        return ApiResponse.success(categoryService.getCategories());
+    }
+
+    @GetMapping("/options")
+    public ApiResponse<List<OptionVO<Long>>> getCategoryOptions(){
+        return ApiResponse.success(categoryService.getCategoryOptions());
     }
 
     @GetMapping("/{id}")

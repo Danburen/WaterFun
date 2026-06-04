@@ -1,19 +1,19 @@
-package org.waterwood.waterfunservice.api.request;
+package org.waterwood.waterfunservice.api;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.waterfunservice.api.BizType;
+import org.waterwood.waterfunservicecore.services.sys.upload.UploadPolicy;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadPolicyReq {
+public class UserUploadPolicyReq implements UploadPolicy {
     @NotNull
-    private BizType bizType;
+    private UserBizType bizType;
     private String bizId;
     @NotEmpty
     @Size(min = 1, max = 9)

@@ -1,5 +1,7 @@
 package org.waterwood.waterfunservice.service.post;
 
+import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunservice.api.response.post.CategoryResponse;
 import org.waterwood.waterfunservicecore.entity.post.Category;
 
 import java.util.List;
@@ -17,9 +19,16 @@ public interface CategoryService {
 
     /**
      * Get all categories
+     *
      * @return {@link List} ofPending {@link Category}
      */
-    List<Category> getCategories();
+    List<CategoryResponse> getCategories();
+
+    /**
+     * List all {@link OptionVO} of categories
+     * @return list of optionVOs
+     */
+    List<OptionVO<Long>> getCategoryOptions();
 
     /**
      * Get a category by id

@@ -9,6 +9,4 @@ public class CreateTagRequest {
     @NotBlank
     @Size(max = 50)
     String name;
-    @Size(max = 50)
-    String description;
 }

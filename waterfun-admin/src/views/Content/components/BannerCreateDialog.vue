@@ -48,7 +48,7 @@ const formModel = ref<{
   status: BannerStatus;
   startAt: Date | null;
   endAt: Date | null;
-  resourceKey: string;
+  imageUuid: string;
 }>(
   {
     title: "",
@@ -59,14 +59,15 @@ const formModel = ref<{
     status: "SHOW",
     startAt: null,
     endAt: null,
-    resourceKey: "",
+    imageUuid: "",
   }
 );
 
 const uploadToken = ref("");
+const resourceKey = ref("");
 const coveragePreviewUrl = ref("");
 
-const hasImage = computed(() => !!(coveragePreviewUrl.value || formModel.value.resourceKey));
+const hasImage = computed(() => !!(coveragePreviewUrl.value || formModel.value.imageUuid));
 
 const rules: FormRules = {
   title: [{ required: true, message: '请输入标题', trigger: "blur" }],
@@ -125,8 +126,9 @@ const resetForm = () => {
     status: "SHOW",
     startAt: null,
     endAt: null,
-    resourceKey: "",
+    imageUuid: "",
   };
+  resourceKey.value = "";
   uploadToken.value = "";
   coveragePreviewUrl.value = "";
   uploaderVisible.value = false;
@@ -146,7 +148,7 @@ const loadDetail = async () => {
       status: res.data.status || "SHOW",
       startAt: toDate(res.data.startAt),
       endAt: toDate(res.data.endAt),
-      resourceKey: "",
+      imageUuid: "",
     };
     if (res.data.coverageUrl?.url) {
       coveragePreviewUrl.value = res.data.coverageUrl.url;
@@ -163,7 +165,8 @@ watch(
     if (open) {
       loadDetail();
       if (props.mode === "create" && props.initialResourceKey) {
-        formModel.value.resourceKey = props.initialResourceKey;
+        formModel.value.imageUuid = props.initialResourceKey;
+        resourceKey.value = props.initialResourceKey;
         uploadToken.value = props.initialUploadToken || "";
       }
     }
@@ -175,7 +178,7 @@ const handleSave = async () => {
   if (!valid) return;
 
   if (!hasImage.value) {
-    ElMessage.error('请先获取上传凭证');
+    ElMessage.error('请先上传图片');
     return;
   }
 
@@ -194,8 +197,11 @@ const handleSave = async () => {
         status: formModel.value.status,
         startAt,
         endAt,
-        resourceKey: formModel.value.resourceKey || undefined,
       };
+      if (formModel.value.imageUuid) {
+        payload.imageUuid = formModel.value.imageUuid;
+        payload.resourceKey = resourceKey.value || undefined;
+      }
       await updateBanner(props.bannerId, payload);
       ElMessage.success('轮播图更新成功');
     } else {
@@ -208,10 +214,7 @@ const handleSave = async () => {
         status: formModel.value.status,
         startAt,
         endAt,
-        putCallback: {
-          key: formModel.value.resourceKey,
-          token: uploadToken.value,
-        },
+        imageUuid: formModel.value.imageUuid,
       };
       await createBanner(payload);
       ElMessage.success('轮播图创建成功');
@@ -237,13 +240,20 @@ const handleSave = async () => {
       <el-form-item prop="subtitle" label="副标题">
         <el-input v-model="formModel.subtitle" placeholder="请输入副标题"/>
       </el-form-item>
-      <el-form-item prop="resourceKey" label="轮播图图片">
+      <el-form-item prop="imageUuid" label="轮播图图片">
         <div class="banner-coverage">
           <img v-if="coveragePreviewUrl" class="banner-coverage-img" :src="coveragePreviewUrl" alt="" @click="uploaderVisible = true"/>
           <el-button v-else type="primary" plain @click="uploaderVisible = true">选择</el-button>
           <el-button v-if="coveragePreviewUrl" @click="uploaderVisible = true">更换</el-button>
         </div>
-        <SingleImageUploader v-model:visible="uploaderVisible" v-model:resourceKey="formModel.resourceKey" v-model:uploadToken="uploadToken" v-model:previewUrl="coveragePreviewUrl" :get-upload-policy="getBannerCoverageUpload"/>
+        <SingleImageUploader
+          v-model:visible="uploaderVisible"
+          v-model:resourceKey="resourceKey"
+          v-model:uploadToken="uploadToken"
+          v-model:previewUrl="coveragePreviewUrl"
+          :get-upload-policy="getBannerCoverageUpload"
+          @submitted="(payload) => { formModel.imageUuid = payload.key }"
+        />
       </el-form-item>
       <el-form-item prop="linkUrl" label="跳转链接">
         <el-input v-model="formModel.linkUrl" placeholder="请输入跳转链接"/>

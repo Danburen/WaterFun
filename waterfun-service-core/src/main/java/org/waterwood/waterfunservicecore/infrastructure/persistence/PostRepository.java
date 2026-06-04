@@ -13,6 +13,7 @@ import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.common.jpa.SlugUniquenessChecker;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     int deleteByIdIn(List<Long> attr0);
 
     Optional<Post> findByIdAndVisibilityAndIsDeleted(Long id, PostVisibility visibility, Boolean isDeleted);
-    @Query("SELECT p.id FROM Post p")
+    @Query("SELECT p.id FROM Post p WHERE p.isDeleted = false")
     Page<Long> findAllIds(Specification<Post> spec, Pageable pageable);
 
     Optional<Post> findByIdAndAuthorUidAndIsDeleted(Long id, Long id1, boolean attr0);
@@ -34,4 +35,6 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     Optional<Post> findByIdAndIsDeleted(@NotNull Long id, Boolean isDeleted);
 
     Optional<Post> findByIdAndIsDeletedAndStatus(@NotNull Long id, Boolean isDeleted, PostStatus status);
+
+    List<Post> findAllByIdInAndIsDeletedAndStatus(List<Long> ids, Boolean isDeleted, PostStatus status);
 }

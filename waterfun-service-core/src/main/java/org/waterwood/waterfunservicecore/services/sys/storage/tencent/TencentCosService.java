@@ -2,6 +2,7 @@ package org.waterwood.waterfunservicecore.services.sys.storage.tencent;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.http.HttpMethodName;
+import com.qcloud.cos.model.DeleteObjectsRequest;
 import com.qcloud.cos.model.GeneratePresignedUrlRequest;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.KeyConstants;
+import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.FileProbeResult;
 import org.waterwood.common.io.ResourceType;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
@@ -174,6 +176,17 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
+    public void removeFiles(CloudFSRoot cloudFSRoot, List<String> keys) {
+        List<DeleteObjectsRequest.KeyVersion> keyList = new ArrayList<>(keys.size());
+        for (String key : keys) {
+            keyList.add(new DeleteObjectsRequest.KeyVersion(buildCosKey(cloudFSRoot, key)));
+        }
+        DeleteObjectsRequest request = new DeleteObjectsRequest(bucketName);
+        request.setKeys(keyList);
+        cosClient.deleteObjects(request);
+    }
+
+    @Override
     public String getCachedRedisKey(Serializable bizId, TargetType resType, CloudResOperationType operationType) {
         return RedisKeyBuilder.buildKey(
                 CloudKeyBuilder.fs(),
@@ -183,20 +196,39 @@ public class TencentCosService implements CloudFileService {
         );
     }
 
+
     @Override
-    public FileProbeResult detectAndAssertCloudFile(CloudFSRoot root, String KeyPath, CloudFileType cloudFileType) {
+    public List<String> batchGetCachedRedisKey(List<Serializable> bizIds, TargetType resType, CloudResOperationType operationType) {
+        return bizIds.stream().map(bizId -> getCachedRedisKey(bizId, resType, operationType)).collect(Collectors.toList());
+    }
+
+    @Override
+    public FileProbeResult detectAndAssertCloudFile(CloudFSRoot root, String KeyPath, ResourceType... allowResTypes) {
         String suffix = PathUtil.getSuffix(KeyPath);
         String fullPath = buildCosKey(root, KeyPath);
-        if(!cloudFileType.matchSuffix(suffix)){
-            throw new FileTypeNotAllowException(suffix, cloudFileType.getAllowFileExtensions());
+        boolean isAllow = true;
+        for(ResourceType type : allowResTypes){
+            if(! type.isAllowed(suffix)){
+                isAllow = false;
+                break;
+            }
         }
-        new FileProbeResult();
+        if(! isAllow){
+            this.removeFile(root, KeyPath); // remove unsupported file
+            throw new FileTypeNotAllowException(
+                    suffix,
+                    Arrays.toString(Arrays.stream(allowResTypes).map(ResourceType::getAllowExtensions).toArray())
+            );
+        }
         FileProbeResult meta;
         meta = cloudFileTypeDetector.detectByMagicNumber(fullPath);
         ContentType contentType = ContentType.getByMimeType(meta.getMimeType());
 //        log.info(contentType.getMimeType());
-        if(! cloudFileType.matchContentType(contentType.getMimeType())){
-            throw new FileTypeNotAllowException(contentType.getMimeType(), cloudFileType.name());
+        List<String> allowMimeTypes = Arrays.stream(allowResTypes)
+                .flatMap(t -> t.getAllowMimeTypes().stream())
+                .toList();
+        if(! allowMimeTypes.contains(contentType.getMimeType())){
+            throw new FileTypeNotAllowException(contentType.getMimeType(), allowMimeTypes);
         }
         return meta;
     }
@@ -232,7 +264,7 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public void CreateAndSetUpUploadRes(Resource res, String uuidPlain, String path, Long userUid) {
+    public void createAndSetUpUploadRes(Resource res, String uuidPlain, String path, Long userUid) {
         if(res == null){
             res = new Resource();
         }
@@ -243,7 +275,7 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public Resource CreateAndSetUpUploadRes(String uuidPlain, String path, Long userUid) {
+    public Resource createAndSetUpUploadRes(String uuidPlain, String path, Long userUid) {
         Resource res = new Resource();
         res.setUuid(uuidPlain);
         res.setResourceKey(path);
@@ -253,12 +285,14 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public void setAndValidResourceForCallback(@NotNull Resource res, CloudFSRoot root, ResourceStatus resourceStatus, ResourceType resourceType) {
+    public void setAndValidResourceForCallback(@NotNull Resource res, CloudFSRoot root, ResourceStatus resourceStatus, ResourceType... resourceType) {
         if(res.getUploaderId() == null || ! res.getUploaderId().equals(UserCtxHolder.getUserUid())){
             throw new ForbiddenException();
         }
-        FileProbeResult probeResult = detectAndAssertCloudFile(root, res.getResourceKey(), CloudFileType.IMAGE);
-        res.setResourceType(resourceType);
+
+        FileProbeResult probeResult = detectAndAssertCloudFile(root, res.getResourceKey(), resourceType);
+        ResourceType resType = FileExtension.typeOfMime(probeResult.getMimeType());
+        res.setResourceType(resType);
         res.setSizeBytes(probeResult.getSize());
         res.setMimeType(probeResult.getMimeType());
         res.setFileMeta(probeResult.getMeta().toJson());

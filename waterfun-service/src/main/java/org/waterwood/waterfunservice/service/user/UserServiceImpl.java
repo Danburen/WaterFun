@@ -53,8 +53,8 @@ public class UserServiceImpl implements UserService{
         );
         return new UserPublicProfileResp(
                         up.getGender(),
-                        uc.getLevel(),
-                        uc.getExp(),
+                        u.getLevel(),
+                        u.getExp(),
                         uc.getFollowerCnt(),
                         uc.getFollowingCnt(),
                         uc.getPostCnt(),
@@ -72,9 +72,11 @@ public class UserServiceImpl implements UserService{
                 u.getUid(),
                 u.getUsername(),
                 u.getNickname(),
-                uc.getLevel(),
+                u.getLevel(),
+                u.getExp(),
                 uc.getVisible()
         ) : new UserPublicCardResp(
+                null,
                 null,
                 null,
                 null,
@@ -90,7 +92,8 @@ public class UserServiceImpl implements UserService{
                         uf.getFollower().getUid(),
                         uf.getUser().getUsername(),
                         uf.getFollower().getUsername(),
-                        uf.getCounter().getLevel(),
+                        uf.getUser().getLevel(),
+                        uf.getUser().getExp(),
                         uf.getCounter().getVisible()
                 ): new UserPublicCardResp());
     }
@@ -102,7 +105,8 @@ public class UserServiceImpl implements UserService{
                         uf.getFollower().getUid(),
                         uf.getUser().getUsername(),
                         uf.getFollower().getUsername(),
-                        uf.getCounter().getLevel(),
+                        uf.getUser().getLevel(),
+                        uf.getUser().getExp(),
                         uf.getCounter().getVisible()
                 )
         );

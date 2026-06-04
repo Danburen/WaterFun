@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
+import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunservice.api.response.post.CategoryResponse;
 import org.waterwood.waterfunservicecore.entity.post.Category;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.utils.generator.IdentifierGenerator;
@@ -41,9 +43,41 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getCategories() {
-        Long userUid = UserCtxHolder.getUserUid();
-        return categoryRepository.findAllByCreatorUid(userUid);
+    public List<CategoryResponse> getCategories() {
+        List<Category> categories = categoryRepository.findAllByIsDeletedWithParentOrderByUsageCountDesc();
+        return categories.stream()
+                .map(
+                        c -> {
+                            CategoryResponse cr = categoryMapper.toResponse(c);
+                            if(c.getParent() != null && !c.getParent().getIsDeleted()) {
+                                Category parent = c.getParent();
+                                cr.setParent(
+                                        OptionVO.of(
+                                                parent.getId(),
+                                                parent.getName(),
+                                                parent.getSlug(),
+                                                parent.getIsActive()
+                                        )
+                                );
+                            } else {
+                                cr.setParent(null);
+                            }
+                            return cr;
+                        }
+                ).toList();
+    }
+
+    @Override
+    public List<OptionVO<Long>> getCategoryOptions() {
+        List<Category> categories = categoryRepository.findAllByIsDeletedWithParentOrderByUsageCountDesc();
+        return categories.stream()
+                .filter(c -> c.getIsActive() && !c.getIsDeleted())
+                .map(c -> OptionVO.<Long>builder()
+                        .id(c.getId())
+                        .name(c.getName())
+                        .code(c.getSlug())
+                        .build()
+                ).toList();
     }
 
     @Override

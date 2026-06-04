@@ -19,6 +19,7 @@ public class NotFoundException extends BizException {
 
     public NotFoundException(BaseResponseCode responseCode) {
         super(responseCode);
+        super.setHttpStatusCode(404);
     }
 
     public NotFoundException(BaseResponseCode baseResponseCode, Serializable id) {

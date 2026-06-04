@@ -31,4 +31,9 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     Optional<Resource> getByUuid(String uuid);
 
     Optional<Resource> findByUuidAndStatusNot(String uuid, ResourceStatus status);
+
+    @Query("SELECT r.resourceKey FROM Resource r WHERE r.uuid in :uuids")
+    List<String> findResourceResourceKeyByUuidIn(Collection<String> uuids);
+
+    List<Resource> findByUuidIn(List<String> attr0);
 }

@@ -18,10 +18,11 @@ import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.ResourceType;
 import org.waterwood.utils.StringUtil;
-import org.waterwood.waterfunservice.api.BizType;
-import org.waterwood.waterfunservice.api.UploadContext;
-import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
+import org.waterwood.waterfunservice.api.UserBizType;
+import org.waterwood.waterfunservice.api.UserUploadContext;
+import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
+import org.waterwood.waterfunservice.api.response.UserBrief;
 import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservice.infrastructure.mapper.PostMapper;
 import org.waterwood.waterfunservice.service.post.TagService;
@@ -47,10 +48,10 @@ import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
-import org.waterwood.waterfunservicecore.exception.io.IllegalUploadCountException;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservice.service.post.PostService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.infrastructure.validation.UploadValidator;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 import org.waterwood.utils.generator.IdentifierGenerator;
@@ -119,10 +120,18 @@ public class PostServiceImpl implements PostService {
                 spec,
                 pageable,
                 postMapper::toPostCardResponseDto,
-                (res, post, postTagMap, postCategoryMap, postCoverageImgMap) -> {
-                    res.setTags(postTagMap.getOrDefault(post.getId(), Collections.emptyList()));
-                    res.setCategory(postCategoryMap.get(post.getId()));
-                    res.setCoverImage(postCoverageImgMap.get(post.getId()));
+                (res,
+                 post,
+                 postTagMap,
+                 postCategoryMap,
+                 postCoverageImgMap,
+                 postUserBriefMap
+                ) -> {
+                    Long postId = post.getId();
+                    res.setTags(postTagMap.getOrDefault(postId, Collections.emptyList()));
+                    res.setCategory(postCategoryMap.get(postId));
+                    res.setCoverImage(postCoverageImgMap.get(postId));
+                    res.setUserBrief(postUserBriefMap.get(postId));
                 }
         );
     }
@@ -133,10 +142,17 @@ public class PostServiceImpl implements PostService {
                 spec,
                 pageable,
                 postMapper::toPostAuthorCardResp,
-                (res, post, postTagMap, postCategoryMap, postCoverageImgMap) -> {
-                    res.setTags(postTagMap.getOrDefault(post.getId(), Collections.emptyList()));
-                    res.setCategory(postCategoryMap.get(post.getId()));
-                    res.setCoverImage(postCoverageImgMap.get(post.getId()));
+                (res,
+                 post,
+                 postTagMap,
+                 postCategoryMap,
+                 postCoverageImgMap,
+                 postUserBriefMap
+                ) -> {
+                    Long postId = post.getId();
+                    res.setTags(postTagMap.getOrDefault(postId, Collections.emptyList()));
+                    res.setCategory(postCategoryMap.get(postId));
+                    res.setCoverImage(postCoverageImgMap.get(postId));
                 }
         );
     }
@@ -428,29 +444,19 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     @Override
-    public List<PresignedResp> handlePostCoverageImageUpload(UploadPolicyReq request) {
+    public List<PresignedResp> handlePostCoverageImageUpload(UserUploadPolicyReq request) {
         Long bizId = Long.parseLong(request.getBizId());
-        if(request.getExts().size() != 1){
-            throw new IllegalUploadCountException(1);
-        }
-
-        FileExtension ext = FileExtension.fromExt(request.getExts().getFirst());
-        if(! TargetType.POST_COVERAGE_IMAGE.isAllowed(ext)){
-            throw new UnsupportedOperationException("File type not allowed: " + ext.getExt());
-        }
-
+        FileExtension ext =  UploadValidator.validateSingleFileUpload(request, TargetType.POST_COVERAGE_IMAGE);
         Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
                 bizId, UserCtxHolder.getUserUid(),false
         ).orElseThrow(PostNotFoundException::new);
 
-
         UUID resourceUUID = UUID.randomUUID();
-        BizUploadPayload payload = UploadContext.<Long>builder()
-                .bizId(bizId)
-                .bizType(request.getBizType())
-                .resourceUuid(resourceUUID.toString().replace("-", ""))
-                .build()
-                .toPayload();
+        BizUploadPayload payload = BizUploadPayload.of(
+                bizId,
+                request.getBizType().getCode(),
+                resourceUUID
+        );
         String cosPath = CosKeyPathGenerator.of(resourceUUID, ext);
 
         Resource res = new Resource();
@@ -476,11 +482,11 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     @Override
-    public List<PresignedResp> handlePostContentImageUpload(UploadPolicyReq request) {
+    public List<PresignedResp> handlePostContentImageUpload(UserUploadPolicyReq request) {
         Long bizId = Long.parseLong(request.getBizId());
         Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
                 bizId, UserCtxHolder.getUserUid(),false
-        ).orElseThrow(() -> new NotFoundException("Post: " + bizId));
+        ).orElseThrow(PostNotFoundException::new);
 
         List<PresignedResp> results = new ArrayList<>();
         List<UploadItem> validItems = new ArrayList<>();
@@ -505,7 +511,7 @@ public class PostServiceImpl implements PostService {
         if(! validItems.isEmpty()){
             List<Resource> resources = validItems.stream()
                     .map(item -> {
-                        return cloudFileService.CreateAndSetUpUploadRes(item.uuidPlain, item.path, UserCtxHolder.getUserUid());
+                        return cloudFileService.createAndSetUpUploadRes(item.uuidPlain, item.path, UserCtxHolder.getUserUid());
                     })
                     .toList();
             List<PostResource> postResources = resources.stream()
@@ -524,7 +530,7 @@ public class PostServiceImpl implements PostService {
             List<BizUploadPayload> payloads = validItems.stream()
                     .map(item -> BizUploadPayload.of(
                             bizId,
-                            BizType.POST_CONTENT_IMAGE.name(),
+                            UserBizType.POST_CONTENT_IMAGE.name(),
                             item.uuid()
                     ))
                     .toList();
@@ -545,9 +551,9 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     @Override
-    public void handlePostImageUploadCallback(CloudPutCallbackReq request, UploadContext<Long> ctx) {
-        Assert.isTrue(ctx.getBizType() == BizType.POST_COVERAGE_IMAGE
-                        || ctx.getBizType() == BizType.POST_CONTENT_IMAGE,
+    public void handlePostImageUploadCallback(CloudPutCallbackReq request, UserUploadContext<Long> ctx) {
+        Assert.isTrue(ctx.getBizType() == UserBizType.POST_COVERAGE_IMAGE
+                        || ctx.getBizType() == UserBizType.POST_CONTENT_IMAGE,
                 "Invalid biz type: " + ctx.getBizType()
         );
 
@@ -575,7 +581,7 @@ public class PostServiceImpl implements PostService {
                 }
         ).orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid));
 
-        if(ctx.getBizType() == BizType.POST_COVERAGE_IMAGE){
+        if(ctx.getBizType() == UserBizType.POST_COVERAGE_IMAGE){
             AuditTask task = auditTaskRepository
                     .findByTargetIdAndTargetTypeAndStatus(
                             String.valueOf(ctx.getBizId()), TargetType.POST, AuditStatus.PENDING)
@@ -646,7 +652,7 @@ public class PostServiceImpl implements PostService {
                 .map(arr -> (OptionVO<Integer>) arr[1])
                 .findFirst()
                 .orElse(null);
-        Resource coverageImgRes = post.getCoverageResourceUuid();
+        Resource coverageImgRes = post.getCoverageResource();
         CloudResPresignedUrlResp coverImg = null;
         if(coverageImgRes != null) {
             coverImg = cloudFileService.getReadUrlCached(
@@ -679,7 +685,7 @@ public class PostServiceImpl implements PostService {
         Page<Long> postPageIds = postRepository.findAllIds(spec, pageable);
         List<Long> postIds = postPageIds.getContent();
         List<Post> posts = postRepository.findAllById(postIds);
-
+        // Post & Category Map
         Map<Long, List<OptionVO<Integer>>> postTagMap = tagRepository.findTagsByPostIds(postIds).stream()
                 .collect(Collectors.groupingBy(
                         arr -> (long) arr[0],
@@ -693,21 +699,49 @@ public class PostServiceImpl implements PostService {
                         (a, b) -> a
                 ));
 
+        Map<Long, User> userUidUserMap = userRepository.findAllByUidIn(
+                postIds
+        ).stream().collect(Collectors.toMap(User::getUid, u -> u));
+        // Post coverage resource presigned url map
         Map<Long, String> postIdCoverImgKeyMap = new HashMap<>();
         for(int i = 0; i < postIds.size(); i++){
-            postIdCoverImgKeyMap.put(postIds.get(i), posts.get(i).getCoverageResourceUuid().getResourceKey());
+            Post post = posts.get(i);
+            postIdCoverImgKeyMap.put(post.getId(), post.getCoverageResource().getResourceKey());
         }
-
         Map<Long, CloudResPresignedUrlResp> postCoverageImgMap = cloudFileService.batchGetReadPublicUrlCached(
                 CloudFSRoot.UPLOADS,
                 postIdCoverImgKeyMap,
                 TargetType.POST_COVERAGE_IMAGE
         );
-
+        // Get user avatar resource presigned url key map
+        Map<Long, String> userUidAvatarKeyMap = new HashMap<>();
+        userUidUserMap.forEach((uid, user) -> {
+            if(user.getAvatarResource() != null){
+                userUidAvatarKeyMap.put(uid, user.getAvatarResource().getResourceKey());
+            }
+        });
+        Map<Long, CloudResPresignedUrlResp> userUidPresignedUrlMap = cloudFileService.batchGetReadPublicUrlCached(
+                CloudFSRoot.USER,
+                userUidAvatarKeyMap,
+                TargetType.USER_AVATAR
+        );
+        // Post UserBrief Map
+        Map<Long, UserBrief> postUserBriefMap = userUidPresignedUrlMap.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                e -> {
+                    User u = userUidUserMap.get(e.getKey());
+                    return new UserBrief(
+                            u.getNickname() == null ? u.getUsername() : u.getNickname(),
+                            e.getValue(),
+                            u.getLevel(),
+                            u.getUserType()
+                    );
+                }
+        ));
         return new PageImpl<>(
                 posts.stream().map(post -> {
                     T res = mapper.apply(post);
-                    applier.apply(res, post, postTagMap, postCategoryMap, postCoverageImgMap);
+                    applier.apply(res, post, postTagMap, postCategoryMap, postCoverageImgMap, postUserBriefMap);
                     return res;
                 }).toList(),
                 pageable,
@@ -722,7 +756,8 @@ public class PostServiceImpl implements PostService {
                 Post post,
                 Map<Long, List<OptionVO<Integer>>> postTagMap,
                 Map<Long, OptionVO<Integer>> postCategoryMap,
-                Map<Long, CloudResPresignedUrlResp> postCoverageImgMap
+                Map<Long, CloudResPresignedUrlResp> postCoverageImgMap,
+                Map<Long, UserBrief> postUserBriefMap
         );
     }
 

@@ -8,6 +8,7 @@ export type TargetType =
   | "POST"
   | "POST_COVERAGE_IMAGE"
   | "POST_CONTENT_IMAGE"
+  | "BANNER_IMAGE"
   | "POST_CONTENT";
 
 export type ModerateRejectType =
@@ -16,9 +17,10 @@ export type ModerateRejectType =
   | "ADVERTISEMENT"
   | "VIOLENCE"
   | "SENSITIVE"
+  | "CASCADE"
   | "OTHER";
 
-export type AuditStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type AuditStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPECT";
 
 export type ResourceType = "UNKNOWN" | "IMAGE" | "VIDEO" | "AUDIO" | "TEXT" | "DOCUMENT" | "ARCHIVE" | "EXECUTABLE" | "OTHER";
 

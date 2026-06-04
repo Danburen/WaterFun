@@ -5,21 +5,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.Assert;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.ResourceType;
 import org.waterwood.utils.StringUtil;
-import org.waterwood.waterfunservice.api.BizType;
-import org.waterwood.waterfunservice.api.UploadContext;
-import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
+import org.waterwood.waterfunservice.api.UserUploadContext;
+import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
+import org.waterwood.waterfunservicecore.entity.resource.AuditResourceId;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
+import org.waterwood.waterfunservicecore.exception.ForbiddenException;
 import org.waterwood.waterfunservicecore.exception.io.IllegalUploadCountException;
 import org.waterwood.waterfunservicecore.exception.io.UnsupportedFileExtension;
 import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
@@ -47,7 +47,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final ResourceRepository resourceRepository;
     @Transactional
     @Override
-    public List<PresignedResp> handleUserAvatarUpload(UploadPolicyReq request) {
+    public List<PresignedResp> handleUserAvatarUpload(UserUploadPolicyReq request) {
         Long userUid = UserCtxHolder.getUserUid();
         if(request.getExts().size() != 1){
             throw new IllegalUploadCountException(1);
@@ -58,14 +58,14 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
 
         UUID resourceUUID = UUID.randomUUID();
-        BizUploadPayload payload = UploadContext.<Long>builder()
+        BizUploadPayload payload = UserUploadContext.<Long>builder()
                 .bizId(userUid)
                 .bizType(request.getBizType())
                 .resourceUuid(resourceUUID.toString().replace("-", ""))
                 .build()
                 .toPayload();
         String cosPath = CosKeyPathGenerator.ofUser(userUid, resourceUUID, ext);
-        resourceRepository.save(cloudFileService.CreateAndSetUpUploadRes(
+        resourceRepository.save(cloudFileService.createAndSetUpUploadRes(
                 StringUtil.noDashUUIDString(resourceUUID),
                 cosPath,
                 UserCtxHolder.getUserUid()
@@ -80,15 +80,15 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Transactional
     @Override
-    public void uploadAvatarCallback(CloudPutCallbackReq req, UploadContext<Long> ctx) {
-        Assert.isTrue(ctx.getBizType() == BizType.AVATAR,
-                "Invalid payload for avatar upload callback: " + ctx.getBizType());
+    public void uploadAvatarCallback(CloudPutCallbackReq req, UserUploadContext<Long> ctx) {
         String resourceUuid = ctx.getResourceUuid();
+        Long bizId = UserCtxHolder.getUserUid();
+        if(! bizId.equals(ctx.getBizId())) throw new ForbiddenException();
         AuditTask task = auditTaskRepository
-                .findByTargetIdAndTargetTypeAndStatus(String.valueOf(resourceUuid), TargetType.USER_AVATAR,AuditStatus.PENDING)
+                .findByTargetIdAndTargetTypeAndStatus(bizId.toString(), TargetType.USER_AVATAR,AuditStatus.PENDING)
                 .orElseGet(() -> {
                     AuditTask newTask = new AuditTask();
-                    newTask.setTargetId(UserCtxHolder.getUserUid().toString());
+                    newTask.setTargetId(bizId.toString());
                     newTask.setSubmitAt(Instant.now());
                     newTask.setTargetType(TargetType.USER_AVATAR);
                     newTask.setSubmitter(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
@@ -124,6 +124,10 @@ public class UserProfileServiceImpl implements UserProfileService {
         res = resourceRepository.findByUuidAndStatus(resourceUuid, ResourceStatus.UPLOAD_PENDING)
                 .orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid));
         auditRes.setResource(res);
+        AuditResourceId id = new AuditResourceId();
+        id.setResourceUuid(resourceUuid);
+        id.setTaskId(task.getId());
+        auditRes.setId(id);
 
         cloudFileService.setAndValidResourceForCallback(
                 res,

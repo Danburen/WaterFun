@@ -12,6 +12,11 @@ import java.util.Set;
 public interface RedisHelperHolder {
 
     void del(String key);
+    /**
+     * batch del by keys
+     * @param redisKeys redis keys
+     */
+    void del(List<String> redisKeys);
 
     <T> void set(String key, T value, Duration expire);
 

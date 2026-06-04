@@ -1,8 +1,8 @@
-package org.waterwood.waterfunservicecore.infrastructure.validation;
+package org.waterwood.waterfunservicecore.infrastructure.validation.anno;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import org.waterwood.waterfunservicecore.infrastructure.validation.validator.PostStateValidator;
+import org.waterwood.waterfunservicecore.infrastructure.validation.anno.validator.PostStateValidator;
 
 import java.lang.annotation.*;
 

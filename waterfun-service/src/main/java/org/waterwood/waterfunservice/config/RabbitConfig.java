@@ -19,6 +19,8 @@ public class RabbitConfig {
     @Bean
     public Queue moderationNotificationQueue() {
         return QueueBuilder.durable(RabbitConstants.QUEUE_MODERATION_NOTIFICATION)
+                .quorum()
+                .withArgument("x-delivery-limit", 3)
                 .withArgument("x-dead-letter-exchange", "")
                 .withArgument("x-dead-letter-routing-key", RabbitConstants.QUEUE_MODERATION_NOTIFICATION + ".dlq")
                 .build();
@@ -31,9 +33,19 @@ public class RabbitConfig {
                 .to(moderationExchange())
                 .with(RabbitConstants.ROUTE_MODERATION_RESULT);
     }
+
+    @Bean
+    public Binding moderationBatchBinding() {
+        return BindingBuilder
+                .bind(moderationNotificationQueue())
+                .to(moderationExchange())
+                .with(RabbitConstants.ROUTE_MODERATION_BATCH_RESULT);
+    }
     @Bean
     public Queue moderationDlq() {
-        return new Queue(RabbitConstants.QUEUE_MODERATION_NOTIFICATION + ".dlq");
+        return QueueBuilder.durable(RabbitConstants.QUEUE_MODERATION_NOTIFICATION + ".dlq")
+                .quorum()
+                .build();
     }
 
     @Bean

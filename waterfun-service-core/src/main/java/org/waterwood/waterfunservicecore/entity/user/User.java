@@ -19,8 +19,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "user", schema = "waterfun")
 @NamedEntityGraph(
-        name = "User.withAvatarResource",
-        attributeNodes = @NamedAttributeNode("avatarResourceUuid")
+        name = "user.withAvatarResource",
+        attributeNodes = @NamedAttributeNode("avatarResource")
 )
 public class User {
     @Id
@@ -57,14 +57,22 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "avatar_resource_uuid", referencedColumnName = "uuid")
-    private Resource avatarResourceUuid;
+    private Resource avatarResource;
 
     @Column(name = "last_active_at")
     private Instant lastActiveAt;
 
     @ColumnDefault("'0'")
     @Column(name = "user_type", columnDefinition = "tinyint UNSIGNED")
-    private Short userType = 0;
+    private UserType userType = UserType.COMMON;
+
+    @ColumnDefault("'1'")
+    @Column(name = "level", columnDefinition = "tinyint UNSIGNED")
+    private Short level = 1;
+
+    @ColumnDefault("'0'")
+    @Column(name = "exp", columnDefinition = "int UNSIGNED")
+    private Long exp = 0L;
 
     @Override
     public final boolean equals(Object o) {

@@ -1,6 +1,7 @@
 package org.waterwood.waterfunservice.infrastructure.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.waterwood.waterfunservice.api.response.post.CategoryResponse;
@@ -14,8 +15,8 @@ import java.util.List;
         componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CategoryMapper {
+    @Mapping(target = "parent", ignore = true)
     CategoryResponse toResponse(Category category);
-    List<CategoryResponse> toResponseList(List<Category> categoryList);
 
     Category toEntity(CreateCategoryRequest body);
 

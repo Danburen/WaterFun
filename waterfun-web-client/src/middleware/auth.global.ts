@@ -2,7 +2,7 @@ import { useAuthStore } from "~/stores/authStore";
 import { navigateTo } from "nuxt/app";
 
 export default defineNuxtRouteMiddleware((to, from) => {
-  const whiteList = ['/login', '/register', '/']
+   const whiteList = ['/login', '/register', '/', '/post']
    const inWhiteList = whiteList.some(p =>
     typeof p === 'string' ? p === to.path : (p as RegExp).test(to.path)
   )

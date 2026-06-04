@@ -25,6 +25,7 @@ import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationR
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationTaskPayloadRes;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.AuditTaskMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.AuditTaskResourceMapper;
+import org.waterwood.waterfunservicecore.api.message.ModerationBatchMessage;
 import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
 import org.waterwood.waterfunservicecore.api.moderation.AuditPayload;
 import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
@@ -115,26 +116,38 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Override
     public BatchResult approveAll(BatchModerateRequest req) {
-        AtomicInteger success = new AtomicInteger();
+        int success = 0;
+        List<AuditTask> tasks = new ArrayList<>();
         if(CollectionUtil.isNotEmpty(req.getAuditTaskIds())){
-            List<AuditTask> availableTasks = auditTaskRepository.findAllByIdInAndStatus(
+            List<Long> availableTaskIds = auditTaskRepository.findAllByIdInAndStatus(
                     req.getAuditTaskIds(), AuditStatus.PENDING
+            ).stream().map(AuditTask::getId).toList();
+            User u = userRepository.getReferenceById(UserCtxHolder.getUserUid());
+            auditTaskResourceRepository.updateStatusAndRejectTypeAndAuditorAndAuditAtByTaskIdIn(
+                    AuditStatus.APPROVED,
+                    AuditRejectType.CASCADE,
+                    u,
+                    Instant.now(),
+                    availableTaskIds
             );
-            User auditor = userCoreService.getUserByUid(UserCtxHolder.getUserUid());
-            availableTasks.forEach(t -> {
-                t.setStatus(AuditStatus.APPROVED);
-                t.setAuditor(auditor);
-                success.getAndIncrement();
-            });
-
-            auditTaskRepository.saveAll(availableTasks);
+            tasks = auditTaskRepository.updateStatusAndAuditorAndAuditAtByIdInAndStatus(
+                    AuditStatus.APPROVED,
+                    u,
+                    Instant.now(),
+                    availableTaskIds,
+                    AuditStatus.PENDING
+            );
         }
-        return BatchResult.ofNullable(req.getAuditTaskIds(), success.get());
+        if(!tasks.isEmpty()){
+            sendMessages(tasks);
+        }
+        return BatchResult.ofNullable(req.getAuditTaskIds(), success);
     }
 
     @Override
     public BatchResult rejectAll(BatchModerateRejectRequest req) {
         int success = 0;
+        List<AuditTask> tasks = new ArrayList<>();
         if(CollectionUtil.isNotEmpty(req.getAuditTaskIds())){
             List<Long> availableTaskIds = auditTaskRepository.findAllByIdInAndStatus(
                     req.getAuditTaskIds(), AuditStatus.PENDING
@@ -147,7 +160,7 @@ public class ModerationServiceImpl implements ModerationService {
                     Instant.now(),
                     availableTaskIds
             );
-            success = auditTaskRepository.updateStatusAndRejectTypeAndRejectReasonAndAuditorAndAuditAtByIdInAndStatus(
+             tasks = auditTaskRepository.updateStatusAndRejectTypeAndRejectReasonAndAuditorAndAuditAtByIdInAndStatus(
                     AuditStatus.REJECTED,
                     req.getRejectType(),
                     req.getRejectReason(),
@@ -156,13 +169,17 @@ public class ModerationServiceImpl implements ModerationService {
                     availableTaskIds,
                     AuditStatus.PENDING
             );
+            success = tasks.size();
+        }
+        if(!tasks.isEmpty()){
+            sendMessages(tasks);
         }
         return BatchResult.ofNullable(req.getAuditTaskIds(), success);
     }
 
     @Override
     public List<ModerationResourceRes> approve(Long id) {
-        AuditTask task = auditTaskRepository.findById(id)
+        AuditTask task = auditTaskRepository.findByIdAndStatus(id, AuditStatus.PENDING)
                 .orElseThrow(AuditTaskNotFoundException::new);
         task.setAuditor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
         task.setStatus(AuditStatus.APPROVED);
@@ -182,9 +199,17 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Override
     public void reject(Long id, ModerateRejectRequest req) {
-        AuditTask task = auditTaskRepository.findById(id)
+        AuditTask task = auditTaskRepository.findByIdAndStatus(id, AuditStatus.PENDING)
                 .orElseThrow(AuditTaskNotFoundException::new);
-        User auditor = userCoreService.getUser(UserCtxHolder.getUserUid());
+        User auditor = userRepository.getReferenceById(UserCtxHolder.getUserUid());
+        auditTaskResourceRepository.updateStatusAndRejectTypeAndAuditorAndAuditAtByTaskIdAndStatus(
+                AuditStatus.REJECTED,
+                AuditRejectType.CASCADE,
+                auditor,
+                Instant.now(),
+                task.getId(),
+                AuditStatus.PENDING
+        );
         task.setStatus(AuditStatus.REJECTED);
         task.setAuditor(auditor);
         task.setRejectType(req.getRejectType());
@@ -395,6 +420,35 @@ public class ModerationServiceImpl implements ModerationService {
             );
         }catch (Exception e){
             log.info("Failed to send moderation result message for task UID: {}, error: {}", task.getId(), e.getMessage());
+        }
+    }
+
+    private void sendMessages(List<AuditTask> tasks) {
+        if (CollectionUtil.isEmpty(tasks)) return;
+
+        try {
+            List<ModerationConsumerMessage> messages = tasks.stream()
+                    .map(auditTaskMapper::toModerationConsumerMessage)
+                    .toList();
+
+            if (messages.size() == 1) {
+                rabbitTemplate.convertAndSend(
+                        RabbitConstants.MODERATION_EXCHANGE,
+                        RabbitConstants.ROUTE_MODERATION_RESULT,
+                        messages.getFirst()
+                );
+                return;
+            }
+
+            rabbitTemplate.convertAndSend(
+                    RabbitConstants.MODERATION_EXCHANGE,
+                    RabbitConstants.ROUTE_MODERATION_BATCH_RESULT,
+                    new ModerationBatchMessage(messages)
+            );
+
+        } catch (Exception e) {
+            log.error("Failed to send moderation result messages, task count: {}, error: {}",
+                    tasks.size(), e.getMessage(), e);
         }
     }
 

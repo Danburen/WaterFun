@@ -13,8 +13,8 @@ import java.time.Instant;
 @AllArgsConstructor
 public class UserPublicProfileResp implements Serializable {
     private Gender gender;
-    private Byte level;
-    private Integer exp;
+    private Short level;
+    private Long exp;
     private Integer followerCount;
     private Integer followingCount;
     private Integer postCount;

@@ -23,7 +23,7 @@ import java.util.List;
 @Table(name = "post")
 @NamedEntityGraph(
         name = "Post.withCoverageResource",
-        attributeNodes = @NamedAttributeNode("coverageResourceUuid")
+        attributeNodes = @NamedAttributeNode("coverageResource")
 )
 public class Post {
     @Id
@@ -51,7 +51,7 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coverage_resource_uuid", referencedColumnName = "uuid")
-    private Resource coverageResourceUuid;
+    private Resource coverageResource;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

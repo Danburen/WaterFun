@@ -131,7 +131,6 @@ const handleSave = async () => {
     }
 
     await callbackAvatarUpload({
-      key,
       token: token || '',
     });
 

@@ -1,12 +1,14 @@
 package org.waterwood.waterfunservicecore.entity.post;
 
 import jakarta.persistence.*;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.*;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
@@ -15,6 +17,10 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "category")
+@NamedEntityGraph(
+        name = "withParent",
+        attributeNodes = @NamedAttributeNode("parent")
+)
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,19 +50,19 @@ public class Category {
 
     @ColumnDefault("0")
     @Column(name = "sort_order")
-    private Integer sortOrder;
+    private Integer sortOrder = 0;
 
     @ColumnDefault("1")
     @Column(name = "is_active")
-    private Boolean isActive;
+    private Boolean isActive = true;
 
     @UpdateTimestamp
     @Column(name = "update_at", nullable = false)
-    private Instant updateAt;
+    private Instant updateAt = Instant.now();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -66,5 +72,9 @@ public class Category {
     @ColumnDefault("0")
     @Column(name = "is_deleted")
     private Boolean isDeleted =  false;
+
+    @ColumnDefault("'0'")
+    @Column(name = "usage_count", columnDefinition = "int UNSIGNED")
+    private Long usageCount = 0L;
 
 }

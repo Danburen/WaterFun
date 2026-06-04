@@ -1,5 +1,6 @@
 package org.waterwood.waterfunadminservice.api.request.content;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,25 +22,20 @@ import java.time.Instant;
 public class PutBannerRequest implements Serializable {
     @Size(max = 64)
     private String resourceKey;
-
     @Size(max = 64)
     private String title;
-
     @Size(max = 128)
     private String subtitle;
 
     @Size(max = 255)
     @URL
     private String linkUrl;
-
     private BannerPosition position;
-
     private Integer sortNo;
-
     private VisibleStatus status;
-
     private Instant startAt;
-
     private Instant endAt;
+    @NotBlank
+    private String imageUuid;
 }
 

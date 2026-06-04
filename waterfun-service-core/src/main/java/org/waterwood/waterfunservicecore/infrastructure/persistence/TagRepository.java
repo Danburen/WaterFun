@@ -1,5 +1,7 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -9,6 +11,7 @@ import org.waterwood.common.jpa.SlugUniquenessChecker;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificationExecutor<Tag>, SlugUniquenessChecker {
@@ -34,4 +37,15 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
   List<Tag> findAllByNameIn(Set<String> newTagNames);
 
   int countByCreatorUid(Long userUid);
+
+  Optional<Tag> findByName(String name);
+
+  Page<Tag> findAllByIsDeleted(boolean attr0, Pageable attr1);
+
+  @Query("""
+    SELECT t FROM Tag t
+    WHERE t.isDeleted = false
+    AND (t.name LIKE :keyword% OR t.slug LIKE :keyword%)
+    """)
+  List<Tag> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

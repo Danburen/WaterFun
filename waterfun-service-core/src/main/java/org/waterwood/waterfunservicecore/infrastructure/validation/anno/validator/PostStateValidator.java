@@ -1,8 +1,8 @@
-package org.waterwood.waterfunservicecore.infrastructure.validation.validator;
+package org.waterwood.waterfunservicecore.infrastructure.validation.anno.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.waterwood.waterfunservicecore.infrastructure.validation.PostState;
+import org.waterwood.waterfunservicecore.infrastructure.validation.anno.PostState;
 
 public class PostStateValidator implements ConstraintValidator<PostState, String> {
     @Override

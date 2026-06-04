@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunservice.api.response.UserBrief;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 
@@ -21,6 +22,8 @@ public class PostCardResp {
     private String title;
     private String subtitle;
     private String summary;
+
+    private UserBrief userBrief;
 
     private CloudResPresignedUrlResp coverImage;
     private OptionVO<Integer> category;

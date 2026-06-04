@@ -4,7 +4,8 @@
     "community": "Community",
     "wiki": "Wiki",
     "resource": "Resource",
-    "blog": "Blog"
+    "blog": "Blog",
+    "post": "Posts"
   },
   "search": "Search"
 }

@@ -13,7 +13,8 @@ public class UserPublicCardResp implements Serializable {
     private Long userUid;
     private String username;
     private String nickname;
-    private Byte level;
+    private Short level;
+    private Long exp;
     private Short visible;
 
     public UserPublicCardResp(short visible) {

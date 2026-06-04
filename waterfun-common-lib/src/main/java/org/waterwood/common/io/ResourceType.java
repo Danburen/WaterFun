@@ -3,6 +3,7 @@ package org.waterwood.common.io;
 import lombok.Getter;
 
 import java.io.File;
+import java.util.List;
 
 @Getter
 public enum ResourceType {
@@ -22,19 +23,27 @@ public enum ResourceType {
     }
 
     public static ResourceType fromCode(Short value) {
-        if(value == null) {
-            return UNKNOWN;
+        for (ResourceType type : ResourceType.values()) {
+            if (type.value == value) {
+                return type;
+            }
         }
-        return switch (value) {
-            case 1 -> IMAGE;
-            case 2 -> VIDEO;
-            case 3 -> AUDIO;
-            case 4 -> OTHER;
-            default -> UNKNOWN;
-        };
+        throw new IllegalArgumentException();
     }
 
     public boolean isAllowed(FileExtension ext) {
-        return FileExtension.isAllowed(ext.getExt(), this);
+        return isAllowed(ext.getExt());
+    }
+
+    public boolean isAllowed(String ext) {
+        return FileExtension.isAllowed(ext, this);
+    }
+
+    public List<String> getAllowExtensions() {
+        return FileExtension.getAllowExtensions(this);
+    }
+
+    public List<String> getAllowMimeTypes() {
+        return FileExtension.getAllowMimeTypes(this);
     }
 }

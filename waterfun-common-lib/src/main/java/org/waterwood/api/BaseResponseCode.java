@@ -92,9 +92,12 @@ public enum BaseResponseCode implements ResponseCode {
     POST_CATEGORY_NOT_FOUND_ARGS("post.category.not_found.args"),
     POST_TAG_NOT_FOUND("post.tag.not_found"),
     POST_TAG_NOT_FOUND_ARGS("post.tag.not_found.args"),
+    POST_TAG_CONFLICT("post.tag.conflict"),
 
     RESOURCE_NOT_FOUND("resource_not_found"),
     RESOURCE_NOT_FOUND_ARGS("resource_not_found.args"),
+    RESOURCE_UNAVAILABLE("resource_unavailable"),
+    RESOURCE_UNAVAILABLE_ARGS("resource_unavailable.args"),
 
     INVALID_VERIFY_SCENE("verify.invalid.scene"),
     CHANNEL_NOT_SUPPORT("error.channel.not.supported" ),
@@ -120,7 +123,9 @@ public enum BaseResponseCode implements ResponseCode {
     UNSUPPORTED_ID_TYPE("system.unsupported_id_type"),
     ILLEGAL_UPLOAD_FILE_EXTENSION("system.illegal_upload_file_extension"),
     ILLEGAL_UPLOAD_FILE_ARGUMENTS("system.illegal_upload_file_arguments"),
-    INVALID_REFERENCE("system.invalid_reference"),;
+    INVALID_REFERENCE("system.invalid_reference"),
+    BIZ_TYPE_NOT_ALLOW_ARGS("system.biz_type_not_allow_args"),
+    BANNER_NOT_FOUND("system.banner.not_found"), ;
     private final String code;
     // private final String defaultMessage;
 

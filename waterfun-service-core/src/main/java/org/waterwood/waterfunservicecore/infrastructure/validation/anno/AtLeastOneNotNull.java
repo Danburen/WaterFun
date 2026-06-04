@@ -1,8 +1,8 @@
-package org.waterwood.waterfunservicecore.infrastructure.validation;
+package org.waterwood.waterfunservicecore.infrastructure.validation.anno;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import org.waterwood.waterfunservicecore.infrastructure.validation.validator.AtLeastOneNotNullValidator;
+import org.waterwood.waterfunservicecore.infrastructure.validation.anno.validator.AtLeastOneNotNullValidator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

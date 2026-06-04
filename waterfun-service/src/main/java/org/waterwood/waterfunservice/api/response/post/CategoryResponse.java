@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunservicecore.entity.post.Category;
 
 import java.io.Serializable;
@@ -27,11 +28,10 @@ public class CategoryResponse implements Serializable {
     @NotEmpty
     String slug;
     String description;
-    Long parentId;
+    OptionVO<Long> parent;
     Integer sortOrder;
     Boolean isActive;
-    @NotNull
-    Instant updateAt;
+    Long usageCount;
     @NotNull
     Instant createdAt;
 }

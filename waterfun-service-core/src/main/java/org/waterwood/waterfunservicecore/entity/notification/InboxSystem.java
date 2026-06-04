@@ -70,6 +70,7 @@ public class InboxSystem {
     private TargetType targetType;
 
     @Column(name = "target_id")
-    private Long targetId;
+    @Size(max = 64)
+    private String targetId;
 
 }

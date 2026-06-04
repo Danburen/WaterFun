@@ -1,6 +1,9 @@
 package org.waterwood.utils;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public final class CollectionUtil {
     public static <T>  boolean isEmpty(Collection<T> collection){
@@ -23,5 +26,9 @@ public final class CollectionUtil {
         }
 
         return collection1.size() == collection2.size();
+    }
+
+    public static <T extends Serializable> List<Serializable> serialize(List<T> ids) {
+        return new ArrayList<Serializable>(ids);
     }
 }

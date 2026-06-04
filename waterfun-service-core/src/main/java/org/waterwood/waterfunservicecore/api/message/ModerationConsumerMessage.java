@@ -16,6 +16,9 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModerationConsumerMessage implements Serializable {
+    /**
+     * Task id
+     */
     private Long id;
     private String targetId;
     private TargetType targetType;
@@ -25,4 +28,7 @@ public class ModerationConsumerMessage implements Serializable {
     private Instant auditAt;
     private String rejectReason;
     private AuditRejectType rejectType;
+
+    @Builder.Default
+    private Instant sendTime = Instant.now();
 }

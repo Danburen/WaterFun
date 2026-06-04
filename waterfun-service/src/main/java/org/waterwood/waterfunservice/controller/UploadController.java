@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
-import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
+import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
 import org.waterwood.waterfunservice.service.upload.UploadStrategyFactory;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
@@ -23,7 +23,7 @@ public class UploadController {
 
     @RateLimit(key = "avatarUpload", permits = 5)
     @PostMapping("/policy")
-    public ApiResponse<List<PresignedResp>> getUploadPolity(@RequestBody @Valid UploadPolicyReq request) {
+    public ApiResponse<List<PresignedResp>> getUploadPolity(@RequestBody @Valid UserUploadPolicyReq request) {
         return ApiResponse.success(uploadStrategyFactory.getStrategy(request.getBizType()).handle(request));
     }
 

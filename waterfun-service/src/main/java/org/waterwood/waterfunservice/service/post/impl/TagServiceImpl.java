@@ -3,14 +3,22 @@ package org.waterwood.waterfunservice.service.post.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.utils.CollectionUtil;
+import org.waterwood.waterfunservice.api.request.content.CreateTagRequest;
+import org.waterwood.waterfunservice.infrastructure.mapper.TagMapper;
 import org.waterwood.waterfunservice.service.user.UserService;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.TagLimitExceededException;
+import org.waterwood.waterfunservicecore.exception.conflict.TagConflictException;
 import org.waterwood.waterfunservicecore.exception.notfound.TagNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;
 import org.waterwood.waterfunservice.service.post.TagService;
@@ -34,24 +42,30 @@ public class TagServiceImpl implements TagService {
     private final UserCoreService userCoreService;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final TagMapper tagMapper;
 
     @Value("${user.quota.tags:50}")
     private int userMaxTagCreateCount = 50;
 
     @Override
-    public void createTag(Tag tag) {
-        // Generate slug && check
-        String slug = slugGenerator.generateSlug(tag.getName().toLowerCase(), tagRepository);
-        tag.setSlug(slug);
-        User u = userCoreService.getUserByUid(UserCtxHolder.getUserUid());
-        tag.setCreator(u);
-
-        if(tag.getUsageCount() == null) tag.setUsageCount(0L);
+    public void createTag(CreateTagRequest req) {
+        tagRepository.findByName(req.getName()).ifPresent(_ -> {
+            throw new TagConflictException();
+        });
+        int createdCount = tagRepository.countByCreatorUid(UserCtxHolder.getUserUid());
+        if(createdCount > userMaxTagCreateCount ) {
+            throw new TagLimitExceededException();
+        }
+        Tag tag = new Tag();
+        tag.setName(req.getName());
+        tag.setSlug(slugGenerator.generateSlug(
+                req.getName(), tagRepository
+        ));
         tagRepository.save(tag);
     }
 
     @Override
-    public List<Tag> getTags() {
+    public List<Tag> getSelfTags() {
         return tagRepository.findAllByCreatorUid(UserCtxHolder.getUserUid());
     }
 
@@ -83,7 +97,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Set<Tag> getTags(Iterable<Long> tagIds, boolean strict) {
+    public Set<Tag> getSelfTags(Iterable<Long> tagIds, boolean strict) {
         return new HashSet<>(tagRepository.findAllById(tagIds));
     }
 
@@ -118,11 +132,35 @@ public class TagServiceImpl implements TagService {
                     log.warn("Admin user {} is creating tags beyond the quota limit. Current count: {}, Attempting to create: {}, Quota limit: {}",
                             userUid, createdCount, tagsToCreate.size(), userMaxTagCreateCount);
                 } else {
-                    throw new BizException(BaseResponseCode.USER_TAG_QUOTA_EXCEEDED);
+                    throw new TagLimitExceededException();
                 }
             };
             return tagRepository.saveAll(tagsToCreate);
         }
         return List.of();
+    }
+
+    @Override
+    public Page<Tag> getHotTags(Pageable pageable) {
+        int size = Math.min(pageable.getPageSize(), 50);
+        Pageable fixedSort = PageRequest.of(
+                pageable.getPageNumber(),
+                size,
+                Sort.by(Sort.Direction.DESC, "usageCount")
+        );;
+        Page<Tag> tags = tagRepository
+                .findAllByIsDeleted(false, fixedSort);
+        return tags;
+    }
+
+    @Override
+    public List<Tag> searchTags(String keyword, int limit) {
+        limit = Math.max(limit, 20);
+        Pageable pageable = PageRequest.of(
+                0,
+                limit,
+                Sort.by(Sort.Direction.DESC, "usageCount")
+        );
+        return tagRepository.searchByKeyword(keyword, pageable);
     }
 }

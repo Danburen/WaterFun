@@ -1,10 +1,10 @@
-package org.waterwood.waterfunservicecore.infrastructure.validation.validator;
+package org.waterwood.waterfunservicecore.infrastructure.validation.anno.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.waterwood.waterfunservicecore.infrastructure.validation.AtLeastOneNotNull;
+import org.waterwood.waterfunservicecore.infrastructure.validation.anno.AtLeastOneNotNull;
 
 public class AtLeastOneNotNullValidator implements ConstraintValidator<AtLeastOneNotNull, Object> {
     private String[] fields;

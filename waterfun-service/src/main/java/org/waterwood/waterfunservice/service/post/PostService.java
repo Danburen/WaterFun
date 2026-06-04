@@ -3,8 +3,8 @@ package org.waterwood.waterfunservice.service.post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.waterwood.waterfunservice.api.UploadContext;
-import org.waterwood.waterfunservice.api.request.UploadPolicyReq;
+import org.waterwood.waterfunservice.api.UserUploadContext;
+import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
@@ -75,21 +75,21 @@ public interface PostService {
      * @param request upload policy request body
      * @return List of presigned resp usually only one element
      */
-    List<PresignedResp> handlePostCoverageImageUpload(UploadPolicyReq request);
+    List<PresignedResp> handlePostCoverageImageUpload(UserUploadPolicyReq request);
 
     /**
      * Hande post content images upload
      * @param request upload policy request body
      * @return List of presigned resp
      */
-    List<PresignedResp> handlePostContentImageUpload(UploadPolicyReq request);
+    List<PresignedResp> handlePostContentImageUpload(UserUploadPolicyReq request);
 
     /**
      * Handle post content image upload callback
      * @param request request body
      * @param ctx business upload context resolved from stored payload
      */
-    void handlePostImageUploadCallback(CloudPutCallbackReq request, UploadContext<Long> ctx);
+    void handlePostImageUploadCallback(CloudPutCallbackReq request, UserUploadContext<Long> ctx);
 
     /**
      * Temporarily save the post content, which is in DRAFT status.

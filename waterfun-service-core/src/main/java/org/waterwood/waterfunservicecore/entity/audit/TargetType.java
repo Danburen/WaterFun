@@ -29,7 +29,13 @@ public enum TargetType {
                     FileExtension.WEBP
             )
     ),
-    ;
+    BANNER_IMAGE(5,
+            Set.of(FileExtension.JPG,
+                    FileExtension.JPEG,
+                    FileExtension.PNG,
+                    FileExtension.WEBP
+            )
+    );
 
     private final short code;
     private final Set<FileExtension> allowedExts;

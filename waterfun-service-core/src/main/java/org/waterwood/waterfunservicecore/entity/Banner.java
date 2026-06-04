@@ -6,6 +6,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.waterwood.waterfunservicecore.entity.resource.Resource;
 
 import java.time.Instant;
 
@@ -18,11 +21,6 @@ public class Banner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
-    @Size(max = 64)
-    @NotNull
-    @Column(name = "resource_key", nullable = false, length = 64)
-    private String resourceKey;
 
     @Size(max = 64)
     @NotNull
@@ -64,5 +62,10 @@ public class Banner {
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "resource_uuid", referencedColumnName = "uuid")
+    private Resource resource;
 
 }

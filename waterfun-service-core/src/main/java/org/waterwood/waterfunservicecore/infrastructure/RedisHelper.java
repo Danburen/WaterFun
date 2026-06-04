@@ -27,6 +27,14 @@ public class RedisHelper implements RedisHelperHolder {
         redisTemplate.delete(key);
     }
 
+    @Override
+    public void del(List<String> redisKeys) {
+        if (redisKeys == null || redisKeys.isEmpty()) {
+            return;
+        }
+        redisTemplate.delete(redisKeys);
+    }
+
     public <T> void set(String key, T value, Duration expire) {
         redisTemplate.opsForValue().set(key, JsonUtil.toJson(value), expire);
     }

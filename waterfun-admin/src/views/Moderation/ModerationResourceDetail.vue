@@ -35,6 +35,7 @@ const rejectTypeOptions: Array<{ label: string; value: ModerateRejectType }> = [
   { label: "广告", value: "ADVERTISEMENT" },
   { label: "暴力内容", value: "VIOLENCE" },
   { label: "敏感内容", value: "SENSITIVE" },
+  { label: "级联驳回", value: "CASCADE" },
   { label: "其他", value: "OTHER" },
 ];
 
@@ -60,6 +61,7 @@ const statusLabel = (status?: string): string => {
   if (status === "PENDING") return "待审核";
   if (status === "APPROVED") return "已通过";
   if (status === "REJECTED") return "已驳回";
+  if (status === "SUSPECT") return "可疑";
   return status || "未知";
 };
 
@@ -69,6 +71,7 @@ const rejectTypeLabel = (type?: string): string => {
   if (type === "ADVERTISEMENT") return "广告";
   if (type === "VIOLENCE") return "暴力内容";
   if (type === "SENSITIVE") return "敏感内容";
+  if (type === "CASCADE") return "级联驳回";
   if (type === "OTHER") return "其他";
   return type || "无";
 };
@@ -77,6 +80,7 @@ const statusTagType = (status?: AuditStatus): "warning" | "success" | "danger" |
   if (status === "PENDING") return "warning";
   if (status === "APPROVED") return "success";
   if (status === "REJECTED") return "danger";
+  if (status === "SUSPECT") return "info";
   return "info";
 };
 

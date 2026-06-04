@@ -10,7 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CloudPutCallbackReq {
     @NotBlank
-    private String key;
-    @NotBlank
     private String token;
 }

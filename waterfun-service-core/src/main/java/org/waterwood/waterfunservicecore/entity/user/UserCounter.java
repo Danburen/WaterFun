@@ -26,14 +26,6 @@ public class UserCounter {
     @JoinColumn(name = "user_uid", nullable = false)
     private User user;
 
-    @ColumnDefault("1")
-    @Column(name = "level")
-    private Byte level = 0;
-
-    @ColumnDefault("0")
-    @Column(name = "exp")
-    private Integer exp = 0;
-
     @ColumnDefault("0")
     @Column(name = "follower_cnt")
     private Integer followerCnt = 0;

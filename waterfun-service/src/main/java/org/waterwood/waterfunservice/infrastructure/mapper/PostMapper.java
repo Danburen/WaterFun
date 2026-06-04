@@ -1,6 +1,5 @@
 package org.waterwood.waterfunservice.infrastructure.mapper;
 
-import org.hibernate.boot.internal.Target;
 import org.mapstruct.*;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
 import org.waterwood.waterfunservice.api.response.post.*;
@@ -25,7 +24,7 @@ public interface PostMapper {
     Post partialUpdate(PostSaveReq postSaveReq, @MappingTarget Post post);
 
 
-    @Mapping(target = "coverageResourceUuid", ignore = true)
+    @Mapping(target = "coverageResource", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Post partialUpdate(PutUserPostReq putUserPostReq, @MappingTarget Post post);
 

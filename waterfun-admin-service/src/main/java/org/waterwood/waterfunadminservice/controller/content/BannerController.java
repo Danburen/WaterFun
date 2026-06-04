@@ -54,11 +54,6 @@ public class BannerController {
         return ApiResponse.success();
     }
 
-    @GetMapping("/coverage/upload")
-    public ApiResponse<PresignedResp> getCoverageUpload(@RequestParam String suffix) {
-        return ApiResponse.success(bannerService.getCoverageUploadPolicy(suffix));
-    }
-
     @PutMapping("/{id}")
     public ApiResponse<Void> update(@PathVariable Long id, @RequestBody @Valid PutBannerRequest req) {
         bannerService.update(id, req);

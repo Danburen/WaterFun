@@ -5,7 +5,7 @@ import request from "~/utils/axiosRequest";
 
 export type BannerPosition = "HOME" | "SIDE";
 export type BannerStatus = "SHOW" | "HIDE";
-import type { OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
+
 export interface Instant {
   seconds: number;
   nanos: number;
@@ -35,11 +35,6 @@ export interface ListBannerParams {
   status?: BannerStatus;
 }
 
-export interface CloudPutCallbackReq {
-  key: string;
-  token: string;
-}
-
 export interface CreateBannerRequest {
   title: string;
   subtitle?: string;
@@ -49,7 +44,7 @@ export interface CreateBannerRequest {
   status?: BannerStatus;
   startAt?: Instant;
   endAt?: Instant;
-  putCallback: CloudPutCallbackReq;
+  imageUuid: string;
 }
 
 export interface UpdateBannerRequest {
@@ -62,6 +57,7 @@ export interface UpdateBannerRequest {
   status?: BannerStatus;
   startAt?: Instant;
   endAt?: Instant;
+  imageUuid?: string;
 }
 
 export interface CoverageUploadResp {

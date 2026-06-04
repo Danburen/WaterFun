@@ -48,6 +48,7 @@ const targetTypeOptions: Array<{ label: string; value: TargetType }> = [
   { label: "用户头像", value: "USER_AVATAR" },
   { label: "帖子封面图", value: "POST_COVERAGE_IMAGE" },
   { label: "帖子内容图", value: "POST_CONTENT_IMAGE" },
+  { label: "轮播图", value: "BANNER_IMAGE" },
   { label: "帖子内容", value: "POST_CONTENT" },
   { label: "未知", value: "UNKNOWN" },
 ];
@@ -58,6 +59,7 @@ const rejectTypeOptions: Array<{ label: string; value: ModerateRejectType }> = [
   { label: "广告", value: "ADVERTISEMENT" },
   { label: "暴力内容", value: "VIOLENCE" },
   { label: "敏感内容", value: "SENSITIVE" },
+  { label: "级联驳回", value: "CASCADE" },
   { label: "其他", value: "OTHER" },
 ];
 
@@ -91,6 +93,7 @@ const statusTagType = (status?: AuditStatus): "warning" | "success" | "danger" |
   if (status === "PENDING") return "warning";
   if (status === "APPROVED") return "success";
   if (status === "REJECTED") return "danger";
+  if (status === "SUSPECT") return "info";
   return "info";
 };
 
@@ -287,6 +290,7 @@ const targetTypeLabel = (type?: TargetType): string => {
     USER_AVATAR: "用户头像",
     POST_COVERAGE_IMAGE: "帖子封面图",
     POST_CONTENT_IMAGE: "帖子内容图",
+    BANNER_IMAGE: "轮播图",
     POST_CONTENT: "帖子内容",
     UNKNOWN: "未知",
   };

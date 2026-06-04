@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AuditTaskRepository extends JpaRepository<AuditTask, Long>, JpaSpecificationExecutor<AuditTask> {
-    Optional<AuditTask> findByTargetIdAndStatus(String targetId, AuditStatus status);
 
     List<AuditTask> findAllByIdInAndStatus(Collection<Long> ids, AuditStatus status);
 
@@ -26,7 +25,7 @@ public interface AuditTaskRepository extends JpaRepository<AuditTask, Long>, Jpa
     @Query("UPDATE AuditTask a SET a.status = :status, a.rejectType = :type, a.rejectReason = :reason, a.auditor = :auditor," +
             "a.auditAt = :auditAt WHERE a.id IN :ids AND a.status = :oldStatus")
     @Modifying
-    int updateStatusAndRejectTypeAndRejectReasonAndAuditorAndAuditAtByIdInAndStatus(
+    List<AuditTask> updateStatusAndRejectTypeAndRejectReasonAndAuditorAndAuditAtByIdInAndStatus(
             @Param("status") AuditStatus status,
             @Param("type") AuditRejectType rejectType,
             @Param("reason") String reason,
@@ -35,4 +34,17 @@ public interface AuditTaskRepository extends JpaRepository<AuditTask, Long>, Jpa
             @Param("ids") Collection<Long> ids,
             @Param("oldStatus") AuditStatus oldStatus
     );
+
+    @Query("UPDATE AuditTask a SET a.status = :status, a.auditor = :auditor," +
+            "a.auditAt = :auditAt WHERE a.id IN :ids AND a.status = :oldStatus")
+    @Modifying
+    List<AuditTask> updateStatusAndAuditorAndAuditAtByIdInAndStatus(
+            @Param("status") AuditStatus status,
+            @Param("auditor") User auditor,
+            @Param("auditAt") Instant auditAt,
+            @Param("ids") Collection<Long> ids,
+            @Param("oldStatus") AuditStatus oldStatus
+    );
+
+    Optional<AuditTask> findByIdAndStatus(Long id, AuditStatus status);
 }

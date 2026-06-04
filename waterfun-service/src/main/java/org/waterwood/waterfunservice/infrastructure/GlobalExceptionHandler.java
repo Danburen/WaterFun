@@ -160,29 +160,37 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageNotReadableException ex){
+    public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageNotReadableException ex) {
         Throwable cause = ex.getCause();
-        if(cause instanceof InvalidFormatException ife){
-            // ensure enum type cause IFE. If not, ignore
-            if(ife.getTargetType() != null && ife.getTargetType().isEnum()){
-                String field = ife.getPath().get(0).getFieldName();
-                String value = ife.getValue().toString();
-                List<String> availableValues = Arrays.stream(ife.getTargetType().getEnumConstants())
-                        .map(Object::toString)
-                        .toList();
-                String msg = msgSrc.getMessage(
-                        "validation.enum.not_support",
-                        new Object[]{field, value, availableValues},
-                        "Invalid value for field {0}, value {1} is not one ofPending {2}",
-                        LOCALE
-                );
-                ErrorResponse res = new ErrorResponse(BaseResponseCode.VALIDATION_ERROR.getCode(), msg);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
-            }
-        }
-        throw ex;
-    }
 
+        if (cause instanceof InvalidFormatException ife
+                && ife.getTargetType() != null
+                && ife.getTargetType().isEnum()) {
+            String field = ife.getPath().isEmpty() ? "unknown" : ife.getPath().get(0).getFieldName();
+            String value = ife.getValue() != null ? ife.getValue().toString() : "null";
+            List<String> availableValues = Arrays.stream(ife.getTargetType().getEnumConstants())
+                    .map(Object::toString)
+                    .toList();
+
+            String msg = msgSrc.getMessage(
+                    "validation.enum.not_support",
+                    new Object[]{field, value, availableValues},
+                    "Invalid value for field " + field + ", value " + value + " is not one of " + availableValues,
+                    LOCALE
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(BaseResponseCode.VALIDATION_ERROR.getCode(), msg));
+        }
+
+        log.warn("Malformed request body: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(
+                        BaseResponseCode.VALIDATION_ERROR.getCode(),
+                        msgSrc.getMessage("validation.malformed", null, "Request body format error", LOCALE),
+                        null,
+                        new Date()
+                ));
+    }
     /**
      * Handle auth exception
      * @param ex auth exception

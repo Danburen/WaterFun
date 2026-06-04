@@ -63,7 +63,6 @@ export const updateUserProfile = (data: Partial<UserProfileDto>): PromiseResBody
 }
 
 export const getAvatarUploadPolicy = (suffix: string): PromiseResBody<PresignedResp[]> => {
-    // 自动将后缀处理成大写并不带点，以符合通用的 exts 格式要求
     const ext = suffix.startsWith('.') ? suffix.slice(1) : suffix;
     return getUploadPolicy({
         bizType: 'AVATAR',
@@ -74,7 +73,7 @@ export const getAvatarUploadPolicy = (suffix: string): PromiseResBody<PresignedR
 // 导出通用的上传API，防止如果原来的业务组件里正在用它产生冲突
 export const uploadFileToCos = genericUploadFileToCos;
 
-export const callbackAvatarUpload = (data: { key: string; token: string }): PromiseResBody<null> => {
+export const callbackAvatarUpload = (data: { token: string }): PromiseResBody<null> => {
     return uploadCallback(data);
 }
 
