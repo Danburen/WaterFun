@@ -7,18 +7,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.waterfunadminservice.api.request.audit.DeleteAuditLogRequest;
+import org.waterwood.waterfunadminservice.api.request.security.BanIpRequest;
+import org.waterwood.waterfunadminservice.api.request.security.UnbanIpRequest;
 import org.waterwood.waterfunadminservice.api.response.AuditLogResponse;
 import org.waterwood.waterfunadminservice.api.response.IpBanResponse;
-import org.waterwood.waterfunadminservice.api.response.SiteStatisticResponse;
 import org.waterwood.waterfunadminservice.service.AuditLogService;
 import org.waterwood.waterfunadminservice.service.IpBanService;
-import org.waterwood.waterfunadminservice.service.StatisticService;
 import org.waterwood.waterfunservicecore.entity.AuditLog;
 import org.waterwood.waterfunservicecore.entity.AuditLogActionType;
 import org.waterwood.waterfunservicecore.entity.AuditLogStatusType;
@@ -27,7 +25,6 @@ import org.waterwood.waterfunservicecore.entity.spec.AuditLogSpec;
 import org.waterwood.waterfunservicecore.entity.spec.IpBanSpec;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/admin/security")
@@ -35,7 +32,6 @@ import java.time.LocalDate;
 public class SecurityController {
     private final IpBanService ipBanService;
     private final AuditLogService auditLogService;
-    private final StatisticService statisticService;
 
     @GetMapping("/list")
     public ApiResponse<Page<IpBanResponse>> listBanResponses(
@@ -55,6 +51,28 @@ public class SecurityController {
         return ApiResponse.success(
             ipBanService.listIpBanResponse(spec, pageable)
         );
+    }
+
+    @GetMapping("/ban/{id}")
+    public ApiResponse<IpBanResponse> getIpBan(@PathVariable Long id) {
+        return ApiResponse.success(ipBanService.getIpBan(id));
+    }
+
+    @PostMapping("/ban")
+    public ApiResponse<IpBanResponse> banIp(@RequestBody @Valid BanIpRequest req) {
+        return ApiResponse.success(ipBanService.banIp(req.getIp(), req.getReason(), req.getExpiresAt()));
+    }
+
+    @PostMapping("/unban")
+    public ApiResponse<Void> unbanIp(@RequestBody @Valid UnbanIpRequest req) {
+        ipBanService.unbanIp(req.getIp());
+        return ApiResponse.success();
+    }
+
+    @DeleteMapping("/ban/{id}")
+    public ApiResponse<Void> deleteIpBan(@PathVariable Long id) {
+        ipBanService.deleteIpBan(id);
+        return ApiResponse.success();
     }
 
     @GetMapping("/audit-log/list")
@@ -90,24 +108,5 @@ public class SecurityController {
     public ApiResponse<Void> deleteAuditLog(@PathVariable Long id) {
         auditLogService.deleteAuditLog(id);
         return ApiResponse.success();
-    }
-
-    @GetMapping("/statistic/list")
-    public ApiResponse<Page<SiteStatisticResponse>> listStatistics(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ApiResponse.success(statisticService.listStatistics(startDate, endDate, pageable));
-    }
-
-    @GetMapping("/statistic/latest")
-    public ApiResponse<SiteStatisticResponse> getLatestStatistic() {
-        return ApiResponse.success(statisticService.getLatestStatistic());
-    }
-
-    @GetMapping("/statistic/{date}")
-    public ApiResponse<SiteStatisticResponse> getStatistic(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ApiResponse.success(statisticService.getStatistic(date));
     }
 }

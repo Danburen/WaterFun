@@ -46,6 +46,9 @@ public class AuditLogServiceImpl implements AuditLogService {
         return BatchResult.ofNullable(ids, removed);
     }
 
+    /**
+     * Map AuditLog entity to AuditLogResponse DTO.
+     */
     private AuditLogResponse toResponse(AuditLog log) {
         AuditLogResponse resp = new AuditLogResponse();
         resp.setId(log.getId());

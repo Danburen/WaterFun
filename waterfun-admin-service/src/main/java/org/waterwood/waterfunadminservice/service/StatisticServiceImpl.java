@@ -39,6 +39,9 @@ public class StatisticServiceImpl implements StatisticService {
                 .orElseThrow(() -> new NotFoundException("No statistics found")));
     }
 
+    /**
+     * Map SiteStatistic entity to SiteStatisticResponse DTO.
+     */
     private SiteStatisticResponse toResponse(SiteStatistic stat) {
         SiteStatisticResponse resp = new SiteStatisticResponse();
         resp.setStatDate(stat.getId());
