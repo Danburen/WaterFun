@@ -8,28 +8,28 @@ import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
 import org.waterwood.waterfunservicecore.entity.user.UserRole;
+import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserCoreMapper;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
-import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 import org.waterwood.waterfunservicecore.services.user.UserPermissionCoreService;
 import org.waterwood.waterfunservicecore.services.user.UserProfileCoreService;
 import org.waterwood.waterfunservicecore.services.user.UserRoleCoreService;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
 public class UserServiceImpl implements UserService {
-    private final UserCoreService userCoreService;
     private final UserCoreMapper userCoreMapper;
     private final UserProfileCoreService userProfileCoreService;
     private final UserRoleCoreService userRoleCoreService;
     private final UserPermissionCoreService userPermissionCoreService;
+    private final UserRepository userRepository;
 
     @Override
     public AdminUserInfoResponse getCurrentAdminUserInfo() {
-        User u = userCoreService.getUserByUid(UserCtxHolder.getUserUid());
+        User u = userRepository.findById(UserCtxHolder.getUserUid())
+                .orElseThrow(() -> new UserNotFoundException(UserCtxHolder.getUserUid()));
         UserInfoResponse plainRes = userCoreMapper.toUserInfoResponse(u);
         AdminUserInfoResponse res = new AdminUserInfoResponse();
         res.setUid(plainRes.getUid());

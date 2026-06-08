@@ -1,25 +1,20 @@
-import type { OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
+import type { ISOString, OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type CategoryOptionVO = OptionResItem<number>;
-
-export interface Instant {
-  seconds: number;
-  nanos: number;
-}
 
 export interface CategoryResp {
   id: number;
   name: string;
   slug?: string;
   description?: string;
-  parentId?: number;
+  parentId?: string;
   sortOrder?: number;
   isActive?: boolean;
   creatorId?: string;
-  updateAt?: Instant | string | null;
-  createdAt?: Instant | string | null;
+  updateAt?: ISOString;
+  createdAt?: ISOString;
 }
 
 export interface ListCategoryParams {
@@ -27,7 +22,7 @@ export interface ListCategoryParams {
   size?: number;
   name?: string;
   slug?: string;
-  parentId?: number;
+  parentId?: string;
   creatorId?: string;
 }
 
@@ -35,7 +30,7 @@ export interface UpdateCategoryRequest {
   name?: string;
   slug?: string;
   description?: string;
-  parentId?: number;
+  parentId?: string;
   sortOrder?: number;
   isActive?: boolean;
 }
@@ -44,7 +39,7 @@ export interface CreateCategoryRequest {
   name: string;
   slug?: string;
   description?: string;
-  parentId?: number;
+  parentId?: string;
   sortOrder?: number;
   isActive?: boolean;
 }

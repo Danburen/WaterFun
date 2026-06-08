@@ -2,7 +2,6 @@ import type {
   ISOString,
   OptionResItem,
   PromiseResBody,
-  ResBody,
 } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
@@ -108,28 +107,28 @@ export interface DeletePermsRequest {
 export const listPermissions = (
   params: ListPermissionParams = {}
 ): PromiseResBody<Page<PermissionResp>> => {
-  return request.get<ResBody<Page<PermissionResp>>>("/permission/list", { params });
+  return request.get<Page<PermissionResp>>("/permission/list", { params });
 };
 
 export const getPermission = (id: number): PromiseResBody<PermissionResp> => {
-  return request.get<ResBody<PermissionResp>>(`/permission/${id}`);
+  return request.get<PermissionResp>(`/permission/${id}`);
 };
 
 export const addPermission = (data: CreatePermRequest): PromiseResBody<null> => {
-  return request.post<ResBody<null>>("/permission", data);
+  return request.post<null>("/permission", data);
 };
 
 export const updatePermission = (id: number, data: UpdatePermRequest): PromiseResBody<null> => {
-  return request.put<ResBody<null>>(`/permission/${id}`, data);
+  return request.put<null>(`/permission/${id}`, data);
 };
 
 export const deletePermission = (id: number): PromiseResBody<null> => {
-  return request.delete<ResBody<null>>(`/permission/${id}`);
+  return request.delete<null>(`/permission/${id}`);
 };
 
 export const deletePerms = (permIds: number[]): PromiseResBody<BatchResult> => {
   const data: DeletePermsRequest = { permIds };
-  return request.delete<ResBody<BatchResult>>("/permission", { data });
+  return request.delete<BatchResult>("/permission", { data });
 };
 
 export const getPermUsers = (
@@ -140,7 +139,7 @@ export const getPermUsers = (
   username?: string,
   nickname?: string
 ): PromiseResBody<Page<AssignedUserRes>> => {
-  return request.get<ResBody<Page<AssignedUserRes>>>(`/permission/${id}/users`, {
+  return request.get<Page<AssignedUserRes>>(`/permission/${id}/users`, {
     params: { page, size, userUid, username, nickname },
   });
 };
@@ -149,23 +148,23 @@ export const assignPermToUsers = (
   id: number,
   data: AssignPermToUsersReq
 ): PromiseResBody<BatchResult> => {
-  return request.post<ResBody<BatchResult>>(`/permission/${id}/users`, data);
+  return request.post<BatchResult>(`/permission/${id}/users`, data);
 };
 
 export const putPermUsers = (
   id: number,
   data: AssignPermToUsersReq
 ): PromiseResBody<BatchResult> => {
-  return request.put<ResBody<BatchResult>>(`/permission/${id}/users`, data);
+  return request.put<BatchResult>(`/permission/${id}/users`, data);
 };
 
 export const deletePermUsers = (
   id: number,
   data: RemovePermUsersReq
 ): PromiseResBody<BatchResult> => {
-  return request.delete<ResBody<BatchResult>>(`/permission/${id}/users`, { data });
+  return request.delete<BatchResult>(`/permission/${id}/users`, { data });
 };
 
 export const getPermOptions = (): PromiseResBody<OptionResItem<number>[]> => {
-  return request.get<ResBody<OptionResItem<number>[]>>("/permission/options");
+  return request.get<OptionResItem<number>[]>("/permission/options");
 };

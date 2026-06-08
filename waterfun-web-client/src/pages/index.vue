@@ -4,6 +4,7 @@ import { useAuthStore } from '~/stores/authStore'
 import { useUserInfoStore } from '~/stores/userInfoStore'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
+import BannerCarousel from '~/components/BannerCarousel.vue'
 //@ts-ignore
 import { View, Star, ChatDotSquare, ArrowRight, Edit, User, Bell, Link as IconLink } from '@element-plus/icons-vue'
 
@@ -14,9 +15,9 @@ const { posts, pagination, loading, categories } = storeToRefs(postStore)
 const { userInfo } = storeToRefs(userInfoStore)
 const router = useRouter()
 
-const selectedCategoryId = ref<number | undefined>(undefined)
+const selectedCategoryId = ref<string | undefined>(undefined)
 
-const selectCategory = (id: number | undefined) => {
+const selectCategory = (id: string | undefined) => {
   selectedCategoryId.value = id
   postStore.fetchPostList({ categoryId: id, page: 0, size: 12 })
 }
@@ -28,7 +29,7 @@ const currentPage = computed({
   }
 })
 
-const goToDetail = (id: number) => router.push(`/post/${id}`)
+const goToDetail = (id: string) => router.push(`/post/${id}`)
 const goToCreate = () => router.push('/post/create')
 
 onMounted(async () => {
@@ -39,6 +40,7 @@ onMounted(async () => {
 <template>
   <div>
     <HeaderNavMenu />
+    <BannerCarousel />
     <div style="max-width:1280px;margin:0 auto;padding:24px">
       <el-row :gutter="24">
         <el-col :xs="24" :md="17">
@@ -74,7 +76,7 @@ onMounted(async () => {
                 >
                   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
                     <span style="font-size:14px;font-weight:600;color:#1e293b">{{ post.category?.name || '未分类' }}</span>
-                    <span style="font-size:12px;color:#94a3b8">{{ post.publishedAt ? new Date(post.publishedAt.seconds * 1000).toLocaleDateString() : '' }}</span>
+                    <span style="font-size:12px;color:#94a3b8">{{ post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : '' }}</span>
                     <el-tag v-for="tag in post.tags" :key="tag.id" size="small" type="primary" effect="plain" style="margin-left:4px">{{ tag.name }}</el-tag>
                   </div>
                   <h3 style="font-size:16px;font-weight:600;color:#1e293b;line-height:1.5;margin:0 0 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ post.title }}</h3>

@@ -33,7 +33,7 @@ const userOptions = ref<OptionResItem<string>[]>([]);
 const searchForm = ref<{
   title: string;
   status: PostStatus | "";
-  categoryId: number | null;
+  categoryId: string | null;
   authorId: string | null;
   slug: string;
 }>({

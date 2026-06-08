@@ -243,6 +243,16 @@ export const routes: RouteRecordRaw[] = [
                         name: 'contentBannerList',
                         meta: { locale: '横幅管理' },
                         component: () => import('@/views/Content/BannerList.vue')
+                    },
+                    {
+                        path: 'banner/:id',
+                        name: 'contentBannerDetail',
+                        component: () => import('@/views/Content/BannerDetail.vue'),
+                        props: true,
+                        meta: {
+                            locale: '横幅详情',
+                            isDetail: true,
+                        }
                     }
                 ]
             }

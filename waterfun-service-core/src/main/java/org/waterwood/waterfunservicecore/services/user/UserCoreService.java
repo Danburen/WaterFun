@@ -6,27 +6,12 @@ import org.waterwood.api.enums.PermissionType;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
 import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
-import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 
 import java.time.Instant;
 import java.util.Set;
 
 public interface UserCoreService {
-    User getUserByUsername(String username);
-
-    /**
-     * Get user by id
-     * @param uid user id
-     * @throws BizException if user not found
-     * @return userinfo response dto ofPending {@link UserInfoResponse}
-     */
-    User getUserByUid(long uid);
-
-    User addUser(User user);
-
-    User update(User user);
 
     /**
      * Get user permissions

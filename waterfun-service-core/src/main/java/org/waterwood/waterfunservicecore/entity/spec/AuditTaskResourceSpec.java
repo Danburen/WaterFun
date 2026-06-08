@@ -1,0 +1,49 @@
+package org.waterwood.waterfunservicecore.entity.spec;
+
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
+import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
+import org.waterwood.common.io.ResourceType;
+import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+public final class AuditTaskResourceSpec {
+    private AuditTaskResourceSpec() {
+    }
+
+    public static Specification<AuditResource> of(
+            Long taskId,
+            AuditStatus status,
+            ResourceType resourceType,
+            Long auditorId,
+            Instant auditAtStart,
+            Instant auditAtEnd
+    ) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (taskId != null) {
+                predicates.add(cb.equal(root.get("task").get("id"), taskId));
+            }
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            if (resourceType != null) {
+                predicates.add(cb.equal(root.get("resource").get("resourceType"), resourceType));
+            }
+            if (auditorId != null) {
+                predicates.add(cb.equal(root.get("auditor").get("uid"), auditorId));
+            }
+            if (auditAtStart != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("auditAt"), auditAtStart));
+            }
+            if (auditAtEnd != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("auditAt"), auditAtEnd));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+}
+

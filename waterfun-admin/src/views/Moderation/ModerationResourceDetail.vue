@@ -19,7 +19,7 @@ const router = useRouter();
 const loading = ref(false);
 const detail = ref<ModerationResourceRes | null>(null);
 
-const taskId = computed(() => Number(route.params.taskId));
+const taskId = computed(() => String(route.params.taskId));
 const resourceUuid = computed(() => String(route.params.resourceUuid || ""));
 
 const rejectDialogVisible = ref(false);
@@ -39,14 +39,9 @@ const rejectTypeOptions: Array<{ label: string; value: ModerateRejectType }> = [
   { label: "其他", value: "OTHER" },
 ];
 
-const getInstantIso = (value?: { seconds?: number; nanos?: number } | string | null): string => {
+const getInstantIso = (value?: string | null): string => {
   if (!value) return "";
-  if (typeof value === "string") return value;
-  const seconds = Number(value.seconds || 0);
-  const nanos = Number(value.nanos || 0);
-  if (!seconds && !nanos) return "";
-  const ms = seconds * 1000 + Math.floor(nanos / 1_000_000);
-  return new Date(ms).toISOString();
+  return value;
 };
 
 const formatFileSize = (size?: number | string): string => {

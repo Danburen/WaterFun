@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.waterwood.waterfunservicecore.entity.post.PostStatus;
+import org.waterwood.waterfunservicecore.entity.post.PostType;
 import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * DTO for {@link org.waterwood.waterfunservicecore.entity.post.Post}
@@ -26,12 +28,14 @@ public class PutPostReq implements Serializable {
     private String content;
     @Size(max = 500)
     private String summary;
-    @Size(max = 255)
-    private String coverImg;
+    private String coverageUuid;
     private PostStatus status = PostStatus.DRAFT;
     private PostVisibility visibility = PostVisibility.PUBLIC;
     private Long authorId;
     @Size(max = 200)
     private String slug;
     private Long categoryId;
+    private List<Long> tagIds;
+    private PostType type;
+    private Boolean isPinned;
 }

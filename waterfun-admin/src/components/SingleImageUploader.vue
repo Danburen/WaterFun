@@ -48,10 +48,10 @@
 
 <script lang="ts" setup>
 import { ElMessage } from 'element-plus'
+import { uploadCallback } from '~/api/resource'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 export type PresignedUploadResp = {
-    key: string
     url: string
     method: HttpMethod
     token: string
@@ -67,7 +67,7 @@ const props = withDefaults(
         uploadToken?: string
         previewUrl?: string
         getUploadPolicy: (suffix: string) => Promise<{ data: PresignedUploadResp }> | Promise<PresignedUploadResp>
-        onUploaded?: (payload: { key: string; token: string; previewUrl: string }) => void | Promise<void>
+        onUploaded?: (payload: { token: string; previewUrl: string }) => void | Promise<void>
     }>(),
     {
         title: '上传图片',
@@ -84,7 +84,7 @@ const emit = defineEmits<{
     'update:resourceKey': [value: string]
     'update:uploadToken': [value: string]
     'update:previewUrl': [value: string]
-    submitted: [payload: { key: string; token: string; previewUrl: string }]
+    submitted: [payload: { token: string; previewUrl: string }]
 }>()
 
 const fileInputRef = ref<HTMLInputElement | null>(null)
@@ -191,11 +191,12 @@ const handleConfirm = async () => {
         const suffix = selectedFile.value.name.split('.').pop()?.toLowerCase() || ''
         const policy = await normalizePolicy(suffix)
         await uploadToPresignedUrl(policy, selectedFile.value)
+        await uploadCallback({ token: policy.token })
 
-        emit('update:resourceKey', policy.key)
+        emit('update:resourceKey', policy.token)
         emit('update:uploadToken', policy.token)
 
-        // 只有上传成功后才把 objectURL 同步给父层，用于“按钮替换成 img”展示。
+        // 只有上传成功后才把 objectURL 同步给父层，用于"按钮替换成 img"展示。
         if (ownedPendingObjectUrl) {
             if (lastEmittedObjectUrl && lastEmittedObjectUrl !== ownedPendingObjectUrl) {
                 URL.revokeObjectURL(lastEmittedObjectUrl)
@@ -205,7 +206,7 @@ const handleConfirm = async () => {
             emit('update:previewUrl', lastEmittedObjectUrl)
         }
 
-        const payload = { key: policy.key, token: policy.token, previewUrl: lastEmittedObjectUrl || localPreviewUrl.value }
+        const payload = { token: policy.token, previewUrl: lastEmittedObjectUrl || localPreviewUrl.value }
         emit('submitted', payload)
         await props.onUploaded?.(payload)
 

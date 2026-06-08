@@ -44,6 +44,10 @@ public enum BaseResponseCode implements ResponseCode {
     USER_NOT_FOUND("user.not_found"),
     USER_NOT_FOUND_ARGS("user.not_found.args"),
     USER_TAG_QUOTA_EXCEEDED("user.tag_quota_exceeded"),
+    USER_ASSOCIATION_DATA_NOT_FOUND("user.association.data.not_found"),
+    USER_ASSOCIATION_DATA_NOT_FOUND_ARGS("user.association.data.not_found.args"),
+    USER_COLLECT_EXCEED_LIMIT("user.collect_exceed_limit"),
+    USER_FOLLOW_SELF_NOT_ALLOW("user.follow_self_not_allow"),
 
     EMAIL_INVALID("email.verify.invalid"),
     EMAIL_NOT_FOUND("email.not.found"),
@@ -93,6 +97,10 @@ public enum BaseResponseCode implements ResponseCode {
     POST_TAG_NOT_FOUND("post.tag.not_found"),
     POST_TAG_NOT_FOUND_ARGS("post.tag.not_found.args"),
     POST_TAG_CONFLICT("post.tag.conflict"),
+    COMMENT_NOT_FOUND("comment.not_found"),
+    COMMENT_NOT_FOUND_ARGS("comment.not_found.args"),
+    COMMENT_ALREADY_DELETED_OR_NOT_FOUND("comment.already_deleted_or_not_found"),
+    COMMENT_POST_MISMATCH("comment.post_mismatch"),
 
     RESOURCE_NOT_FOUND("resource_not_found"),
     RESOURCE_NOT_FOUND_ARGS("resource_not_found.args"),

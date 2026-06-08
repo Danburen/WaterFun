@@ -1,6 +1,7 @@
 package org.waterwood.waterfunservicecore.infrastructure.utils;
 
 import lombok.*;
+import org.waterwood.api.Mappable;
 import org.waterwood.waterfunservicecore.api.BizType;
 import org.waterwood.waterfunservicecore.services.sys.upload.UploadContext;
 
@@ -13,7 +14,7 @@ import java.util.function.Supplier;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BizUploadPayload {
+public class BizUploadPayload implements Mappable<String> {
     private String resourceUuid;
     private String bizType;
     private String bizId;
@@ -28,6 +29,7 @@ public class BizUploadPayload {
         );
     }
 
+    @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<>();
         if(resourceUuid != null) {

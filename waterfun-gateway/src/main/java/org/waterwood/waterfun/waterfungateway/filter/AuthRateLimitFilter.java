@@ -1,12 +1,10 @@
 package org.waterwood.waterfun.waterfungateway.filter;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -15,14 +13,13 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
+import org.waterwood.waterfun.waterfungateway.util.CounterWindow;
+import org.waterwood.waterfun.waterfungateway.util.RateLimitResponseBuilder;
+import org.waterwood.waterfun.waterfungateway.util.RateLimitUtils;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -67,7 +64,7 @@ public class AuthRateLimitFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
-        String key = buildKey(request, path);
+        String key = RateLimitUtils.getClientIp(request) + ":" + path;
         long nowEpochSecond = Instant.now().getEpochSecond();
 
         CounterWindow counter = Objects.requireNonNull(
@@ -79,44 +76,23 @@ public class AuthRateLimitFilter implements GlobalFilter, Ordered {
         long safeWindow = Math.max(1, windowSeconds);
 
         synchronized (counter) {
-            if (nowEpochSecond - counter.windowStartEpochSecond >= safeWindow) {
-                counter.windowStartEpochSecond = nowEpochSecond;
-                counter.counter.set(0);
+            if (nowEpochSecond - counter.getWindowStartEpochSecond() >= safeWindow) {
+                counter.setWindowStartEpochSecond(nowEpochSecond);
+                counter.getCounter().set(0);
             }
-            currentCount = counter.counter.incrementAndGet();
-            retryAfter = Math.max(1, safeWindow - (nowEpochSecond - counter.windowStartEpochSecond));
+            currentCount = counter.getCounter().incrementAndGet();
+            retryAfter = Math.max(1, safeWindow - (nowEpochSecond - counter.getWindowStartEpochSecond()));
         }
 
         if (currentCount > requestLimit) {
-            return buildTooManyRequestsResponse(exchange, retryAfter);
+            return RateLimitResponseBuilder.buildTooManyRequests(exchange, retryAfter);
         }
 
         return chain.filter(exchange);
     }
 
-    private Mono<Void> buildTooManyRequestsResponse(ServerWebExchange exchange, long retryAfter) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
-        response.getHeaders().add("Retry-After", String.valueOf(retryAfter));
-        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-
-        String body = "{\"code\":429,\"message\":\"Too many requests\"}";
-        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-        DataBuffer buffer = response.bufferFactory().wrap(bytes);
-
-        return response.writeWith(Mono.just(buffer));
-    }
-
     private boolean isLimitedPath(String path) {
         return pathPatterns.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
-    }
-
-    private String buildKey(ServerHttpRequest request, String path) {
-        String remoteAddr = "unknown";
-        if (request.getRemoteAddress() != null) {
-            remoteAddr = request.getRemoteAddress().getAddress().getHostAddress();
-        }
-        return remoteAddr + ":" + path;
     }
 
     @Override
@@ -124,12 +100,5 @@ public class AuthRateLimitFilter implements GlobalFilter, Ordered {
         return Ordered.HIGHEST_PRECEDENCE + 10;
     }
 
-    private static class CounterWindow {
-        private final AtomicInteger counter = new AtomicInteger(0);
-        private long windowStartEpochSecond;
 
-        private CounterWindow(long windowStartEpochSecond) {
-            this.windowStartEpochSecond = windowStartEpochSecond;
-        }
-    }
 }

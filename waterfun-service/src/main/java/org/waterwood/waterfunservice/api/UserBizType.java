@@ -2,6 +2,7 @@ package org.waterwood.waterfunservice.api;
 
 import lombok.Getter;
 import org.waterwood.waterfunservicecore.api.BizType;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 
 @Getter
 public enum UserBizType implements BizType {

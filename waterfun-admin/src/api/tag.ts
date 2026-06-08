@@ -1,23 +1,18 @@
-import type { OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
+import type { ISOString, OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type TagOptionVO = OptionResItem<number>;
-
-export interface Instant {
-  seconds: number;
-  nanos: number;
-}
 
 export interface TagResp {
   id: number;
   name: string;
   slug?: string;
   description?: string;
-  usageCount?: number;
+  usageCount?: string;
   creatorId?: string;
-  createdAt?: Instant | string | null;
-  updateAt?: Instant | string | null;
+  createdAt?: ISOString;
+  updateAt?: ISOString;
 }
 
 export interface ListTagParams {

@@ -114,7 +114,6 @@ public class TencentCosService implements CloudFileService {
                     Duration.ofSeconds(uploadTokenExpires)
             );
             return new PresignedResp(
-                    path,
                     url.toString(),
                     HttpMethod.PUT,
                     payload.getResourceUuid()
@@ -160,7 +159,6 @@ public class TencentCosService implements CloudFileService {
             );
 
             results.add(new PresignedResp(
-                    path,
                     url.toString(),
                     HttpMethod.PUT,
                     payload.getResourceUuid()

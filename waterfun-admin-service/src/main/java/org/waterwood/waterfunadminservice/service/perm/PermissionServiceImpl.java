@@ -51,7 +51,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Page<Permission> listPermissions(Specification<Permission> spec, Pageable pageable) {
-        log.info("Listing permissions with spec: {} and pageable: {}", spec, pageable);
+        log.info("Listing permissions with of: {} and pageable: {}", spec, pageable);
         return permissionRepo.findAll(spec, pageable);
     }
 

@@ -5,6 +5,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { Bell, Message, Search } from '@element-plus/icons-vue'
 import { useAuth } from "~/composables/useAuth"
 import { useUserInfoStore } from "~/stores/userInfoStore"
+import logoSrc from '~/assets/logo.svg'
 import { useUserProfileStore } from "~/stores/userProfileStore"
 
 const { isLoggedIn, logout } = useAuth()
@@ -21,8 +22,6 @@ const userName = computed(() => userInfoStore.userInfo.username || '未登录')
 const navItems = [
   { key: 'home', path: '/' },
   { key: 'post', path: '/post' },
-  { key: 'community', path: '/community' },
-  { key: 'playground', path: '/playground' },
   { key: 'about', path: '/about' },
 ]
 
@@ -66,7 +65,7 @@ onMounted(async () => {
   <header class="header">
     <div class="header-inner">
       <NuxtLink to="/" class="logo">
-        <div class="logo-icon">WF</div>
+        <img :src="logoSrc" alt="WaterFun" class="logo-img">
         <span class="logo-text">WaterFun</span>
       </NuxtLink>
       <nav class="nav">
@@ -141,18 +140,10 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 
-.logo-icon {
-  width: 36px;
+.logo-img {
+  width: 32px;
   height: 36px;
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+  object-fit: contain;
 }
 
 .logo-text {

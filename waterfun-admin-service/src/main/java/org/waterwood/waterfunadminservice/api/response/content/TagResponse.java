@@ -15,7 +15,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TagResponse implements Serializable {
-    private Integer id;
+    private Long id;
     private String name;
     private String slug;
     private String description;

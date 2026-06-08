@@ -4,10 +4,9 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
+import org.waterwood.waterfunservicecore.entity.post.PostAuthorUidTitleDO;
 import org.waterwood.waterfunservicecore.entity.post.PostStatus;
 import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.post.Post;
@@ -21,6 +20,9 @@ public interface PostRepository extends JpaRepository<Post, Long>,
         JpaSpecificationExecutor<Post>,
         SlugUniquenessChecker {
     boolean existsBySlug(String slug);
+    @EntityGraph(attributePaths = { "author"})
+    @Query("SELECT p FROM Post p WHERE p.id IN :ids ORDER BY p.createdAt DESC")
+    List<Post> findAllByIdInAndOrderBYCreatedAtDesc(@Param("ids") Collection<Long> ids);
 
     int deleteByIdIn(List<Long> attr0);
 
@@ -37,4 +39,33 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     Optional<Post> findByIdAndIsDeletedAndStatus(@NotNull Long id, Boolean isDeleted, PostStatus status);
 
     List<Post> findAllByIdInAndIsDeletedAndStatus(List<Long> ids, Boolean isDeleted, PostStatus status);
+    @Modifying
+    @Query("UPDATE Post p SET p.commentCount = p.commentCount + :count WHERE p.id = :postId")
+    void increaseCommentCountById(@Param("postId") Long id, @Param("count") int count);
+
+    @Modifying
+    @Query("UPDATE Post p SET p.commentCount = GREATEST(p.commentCount - :count, 0) WHERE p.id = :postId")
+    void decreaseCommentCountById(@Param("postId") Long id, @Param("count") int count);
+
+    @Modifying
+    @Query("UPDATE Post p SET p.likeCount = p.likeCount + :count WHERE p.id = :postId")
+    void increaseLikeCount(@Param("postId") Long postId, @Param("count") int count);
+
+    @Modifying
+    @Query("UPDATE Post p SET p.likeCount = GREATEST(p.likeCount - :count, 0) WHERE p.id = :postId")
+    void decreaseLikeCount(@Param("postId") Long postId, @Param("count") int count);
+
+    @Modifying
+    @Query("UPDATE Post p SET p.collectCount = p.collectCount + : count WHERE p.id = :postID")
+    void increaseCollectCount(@Param("postId") Long postId, @Param("count") int count);
+
+    @Modifying
+    @Query("UPDATE Post p SET p.collectCount = GREATEST(p.collectCount - :count, 0) WHERE p.id = :postId")
+    void decreaseCollectCount(@Param("postId") Long postId, @Param("count") int count);
+
+    Long findAuthorUidById(@NotNull Long id);
+
+    @Query("SELECT new org.waterwood.waterfunservicecore.entity.post.PostAuthorUidTitleDO(p.author.uid, p.title, p.coverageResource.id) " +
+            "FROM Post p WHERE p.id = :id")
+    Optional<PostAuthorUidTitleDO> findPostAuthorIdTitleDOById(@Param("id") Long id);
 }

@@ -18,6 +18,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.waterwood.utils.StringUtil;
+import org.waterwood.waterfun.waterfungateway.util.RateLimitUtils;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -40,6 +41,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     public @NonNull Mono<Void> filter(@NonNull ServerWebExchange exchange,@NonNull GatewayFilterChain chain) {
         String acceptLang = exchange.getRequest().getHeaders().getFirst(HttpHeaders.ACCEPT_LANGUAGE);
         String normalizedLang = normalizeLanguage(acceptLang);
+        String clientIp = RateLimitUtils.getClientIp(exchange.getRequest());
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .filter(auth -> auth instanceof JwtAuthenticationToken)
@@ -67,6 +69,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
                         exchange.mutate().request(
                                 exchange.getRequest().mutate()
                                         .header("X-User-Lang", normalizedLang)
+                                        .header("X-Real-Client-Ip", clientIp)
                                         .build()
                         ).build()
                 )

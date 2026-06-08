@@ -35,7 +35,6 @@ public class PutBannerRequest implements Serializable {
     private VisibleStatus status;
     private Instant startAt;
     private Instant endAt;
-    @NotBlank
     private String imageUuid;
 }
 

@@ -16,7 +16,7 @@ import org.waterwood.waterfunservicecore.infrastructure.RedisHelper;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserCoreMapper;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserProfileCoreMapper;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepo;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
@@ -28,14 +28,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserProfileCoreServiceImpl implements UserProfileCoreService {
-    private final UserProfileRepo upRepo;
+    private final UserProfileRepository upRepo;
     private final UserRepository userRepository;
     private final UserProfileCoreMapper userProfileCoreMapper;
     private final CloudFileService cloudFileService;
     private final UserCoreMapper userCoreMapper;
     private final UserCoreService userCoreService;
     private final RedisHelper redisHelper;
-    private final UserProfileRepo userProfileRepo;
+    private final UserProfileRepository userProfileRepository;
     private final ResourceRepository resourceRepository;
 
     @Override
@@ -60,7 +60,7 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
 
     @Override
     public UserProfile getUserProfile(Long userUid) {
-        return upRepo.findUserProfileByUserUid(userUid).orElseThrow(
+        return upRepo.findByUserUid(userUid).orElseThrow(
                 ()-> new BizException(BaseResponseCode.USER_NOT_FOUND)
         );
     }
@@ -83,7 +83,7 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
 
     @Override
     public Map<Long, CloudResPresignedUrlResp> listUserAvatars(List<Long> userUids) {
-        List<User> users = userRepository.findAllVisibleUsersByIds(userUids);
+        List<User> users = userRepository.findAllVisibleUsersByIn(userUids);
         List<String> paths = users.stream().map(
                 u -> u.getAvatarResource().getUuid()
         ).toList();
@@ -102,6 +102,6 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
 
     @Override
     public UserProfile update(UserProfile p) {
-        return userProfileRepo.save(p);
+        return userProfileRepository.save(p);
     }
 }

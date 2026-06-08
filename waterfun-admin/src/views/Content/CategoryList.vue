@@ -28,7 +28,7 @@ const userOptions = ref<OptionResItem<string>[]>([]);
 const searchForm = ref<{
   name: string;
   slug: string;
-  parentId: number | null;
+  parentId: string | null;
   creatorId: string | null;
 }>({
   name: "",
@@ -100,13 +100,13 @@ const handleAdd = () => {
   createDialogVisible.value = true;
 };
 
-const handleEdit = (id: number) => {
+const handleEdit = (id: number | string) => {
   dialogMode.value = "edit";
-  currentCategoryId.value = id;
+  currentCategoryId.value = Number(id);
   createDialogVisible.value = true;
 };
 
-const gotoDetail = (id: number) => {
+const gotoDetail = (id: number | string) => {
   router.push({ name: "contentCategoryDetail", params: { id } });
 };
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.waterwood.waterfunservicecore.entity.post.PostStatus;
+import org.waterwood.waterfunservicecore.entity.post.PostType;
 import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 
@@ -37,4 +38,6 @@ public class PostResponse implements Serializable {
     private Instant publishedAt;
     private Instant createdAt;
     private Instant updatedAt;
+    private PostType type = PostType.COMMON;
+    private Boolean isPinned = false;
 }

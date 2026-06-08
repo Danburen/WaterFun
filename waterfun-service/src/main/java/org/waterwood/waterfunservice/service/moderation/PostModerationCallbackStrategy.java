@@ -177,7 +177,7 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
     }
 
     private void handlePostApprovedBatch(List<Post> posts) {
-        // collect all new tag names by postId
+        // collection all new tag names by postId
         Map<Long, Set<String>> authorToTagNames = new HashMap<>();
         posts.forEach(p -> {
             if (CollectionUtil.isNotEmpty(p.getEditedNewTags())) {
@@ -191,7 +191,7 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
                 });
             }
         });
-        // batch create new tags and collect all new tags by name
+        // batch create new tags and collection all new tags by name
         Map<String, Tag> allNewTags = new ConcurrentHashMap<>();
         authorToTagNames.forEach((authorUid, tagNames) -> {
             try {

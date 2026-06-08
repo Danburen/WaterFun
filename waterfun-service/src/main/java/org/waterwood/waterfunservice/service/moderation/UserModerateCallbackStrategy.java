@@ -18,7 +18,7 @@ import org.waterwood.waterfunservicecore.infrastructure.RedisHelper;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.notification.InboxSystemRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.notification.InboxRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudResOperationType;
@@ -35,7 +35,7 @@ public class UserModerateCallbackStrategy implements ModerationCallbackStrategy 
 
     private final MessageSource messageSource;
     private final UserCoreService userCoreService;
-    private final InboxSystemRepository inboxSystemRepository;
+    private final InboxRepository inboxRepository;
     private final AuditTaskRepository auditTaskRepository;
     private final AuditTaskResourceRepository auditTaskResourceRepository;
     private final UserRepository userRepository;

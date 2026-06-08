@@ -1,15 +1,15 @@
 package org.waterwood.waterfunservice.infrastructure.mapper;
 
 import org.mapstruct.*;
-import org.waterwood.waterfunservice.api.response.SystemNotificationRes;
-import org.waterwood.waterfunservicecore.entity.notification.InboxSystem;
+import org.waterwood.waterfunservice.api.response.InboxNotificationRes;
+import org.waterwood.waterfunservicecore.entity.notification.Inbox;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface InboxSystemMapper {
-    InboxSystem toEntity(SystemNotificationRes systemNotificationRes);
+    Inbox toEntity(InboxNotificationRes inboxNotificationRes);
 
-    SystemNotificationRes toDto(InboxSystem inboxSystem);
+    InboxNotificationRes toDto(Inbox inbox);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    InboxSystem partialUpdate(SystemNotificationRes systemNotificationRes, @MappingTarget InboxSystem inboxSystem);
+    Inbox partialUpdate(InboxNotificationRes inboxNotificationRes, @MappingTarget Inbox inbox);
 }

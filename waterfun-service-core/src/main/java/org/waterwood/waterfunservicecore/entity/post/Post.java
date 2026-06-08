@@ -157,4 +157,12 @@ public class Post {
     @Column(name = "version", columnDefinition = "int UNSIGNED")
     private Long version = 1L;
 
+    @ColumnDefault("'0'")
+    @Column(name = "type", columnDefinition = "tinyint UNSIGNED")
+    private PostType type = PostType.COMMON;
+
+    @ColumnDefault("0")
+    @Column(name = "is_pinned")
+    private Boolean isPinned = false;
+
 }

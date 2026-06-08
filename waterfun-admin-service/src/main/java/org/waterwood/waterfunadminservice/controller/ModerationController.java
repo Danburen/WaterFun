@@ -23,8 +23,8 @@ import org.waterwood.common.io.ResourceType;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.AuditTaskResourceSpec;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.AuditTaskSpec;
+import org.waterwood.waterfunservicecore.entity.spec.AuditTaskResourceSpec;
+import org.waterwood.waterfunservicecore.entity.spec.AuditTaskSpec;
 
 import java.time.Instant;
 import java.util.List;

@@ -19,7 +19,7 @@ import org.waterwood.waterfunadminservice.infrastructure.mapper.PostMapper;
 import org.waterwood.waterfunadminservice.service.content.PostService;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.PostSpec;
+import org.waterwood.waterfunservicecore.entity.spec.PostSpec;
 
 import java.util.List;
 

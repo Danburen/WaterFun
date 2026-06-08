@@ -23,7 +23,7 @@ const roleOptions = ref<OptionResItem[]>([]);
 const roleDetail = ref<RoleResp | null>(null);
 
 const editDialogVisible = ref(false);
-type SimpleOption = { id: number; name: string };
+type SimpleOption = { id: string; name: string };
 const assignedPermissionOptions = ref<SimpleOption[]>([]);
 const assignedUserOptions = ref<SimpleOption[]>([]);
 const collapseActive = ref(["permissions", "users"]);
@@ -66,7 +66,7 @@ const fetchAssignedPermissions = async () => {
     while (page < totalPages) {
       const res = await listRolePerms(roleId.value, { page, size: 100 });
       (res.data.content || []).forEach((item) => {
-        all.push({ id: item.id, name: `${item.name} (${item.code || item.id})` });
+        all.push({ id: String(item.id), name: `${item.name} (${item.code || item.id})` });
       });
       totalPages = res.data.page.totalPages || 0;
       page += 1;
@@ -242,7 +242,7 @@ onMounted(async () => {
               <el-link
                 type="primary"
                 :underline="false"
-                @click="gotoPermissionDetail(item.id)"
+                @click="gotoPermissionDetail(Number(item.id))"
               >
                 {{ item.name }}
               </el-link>

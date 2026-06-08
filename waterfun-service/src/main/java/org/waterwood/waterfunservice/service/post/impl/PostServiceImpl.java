@@ -2,6 +2,7 @@ package org.waterwood.waterfunservice.service.post.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,7 +23,8 @@ import org.waterwood.waterfunservice.api.UserBizType;
 import org.waterwood.waterfunservice.api.UserUploadContext;
 import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
-import org.waterwood.waterfunservice.api.response.UserBrief;
+import org.waterwood.waterfunservice.service.NotificationService;
+import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservice.infrastructure.mapper.PostMapper;
 import org.waterwood.waterfunservice.service.post.TagService;
@@ -34,13 +36,17 @@ import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.post.*;
 import org.waterwood.waterfunservicecore.entity.resource.*;
+import org.waterwood.waterfunservicecore.entity.user.*;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
+import org.waterwood.waterfunservicecore.exception.UserCollectExceedLimitException;
 import org.waterwood.waterfunservicecore.exception.notfound.PostNotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.UserAssociationDataNotFoundException;
 import org.waterwood.waterfunservicecore.exception.reference.CategoryReferenceInvalidException;
 import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.*;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerator;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
@@ -48,11 +54,11 @@ import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
-import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservice.service.post.PostService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.infrastructure.validation.UploadValidator;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
+import org.waterwood.waterfunservicecore.services.user.UserBriefService;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
@@ -81,12 +87,19 @@ public class PostServiceImpl implements PostService {
     private final AuditTaskResourceRepository auditTaskResourceRepository;
     private final TagService tagService;
     private final PostResourceRepository postResourceRepository;
+    private final UserBriefService userBriefService;
+    private final UserCounterRepository userCounterRepository;
+    private final UserLikeRepository userLikeRepository;
+    private final UserCollectRepository userCollectRepository;
+    private final NotificationService notificationService;
+
+    @Value("${user.quota.collect:10000}")
+    private Long userCollectExceedLimit;
 
     @Override
     public void add(Post post, Set<Long> tagIds) {
         List<Tag> tags = tagRepository.findAllById(tagIds);
-        User u = userCoreService.getUserByUid(UserCtxHolder.getUserUid());
-        post.setAuthor(u);
+        post.setAuthor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
         post.setSlug(identifierGenerator.generateSlug(post.getTitle(), postRepository));
         post.setTags(tags);
         postRepository.save(post);
@@ -101,7 +114,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void deletePost(Long id) {
         Post p = postRepository.getReferenceById(id);
-        if(p.getAuthor() == userCoreService.getUserByUid(UserCtxHolder.getUserUid())){
+        if(p.getAuthor() == userRepository.getReferenceById(UserCtxHolder.getUserUid())) {
             postRepository.deleteById(id);
         }else{
             throw new BizException(BaseResponseCode.FORBIDDEN);
@@ -110,8 +123,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post getPostById(Long id) {
-        return postRepository.findById(id)
-                .orElseThrow(()-> new BizException(BaseResponseCode.NOT_FOUND));
+        return postRepository.findById(id).orElseThrow(PostNotFoundException::new);
     }
 
     @Override
@@ -444,6 +456,77 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     @Override
+    public void like(Long postId) {
+        Long userUid = UserCtxHolder.getUserUid();
+        PostAuthorUidTitleDO pdo = postRepository.findPostAuthorIdTitleDOById(
+                postId
+        ).orElse(null);
+        userLikeRepository.findById(new UserLikeId(userUid, postId))
+                .ifPresentOrElse(
+                        like -> {
+                            userCounterRepository.decreaseUserLikeCount(userUid, 1);
+                            postRepository.decreaseLikeCount(postId, 1);
+                            userLikeRepository.delete(like);
+                        },
+                        () -> {
+                            UserLike newLike = new UserLike();
+                            newLike.setId(new UserLikeId(userUid, postId));
+                            userLikeRepository.save(newLike);
+                            userCounterRepository.increaseUserLikeCount(userUid, 1);
+                            postRepository.increaseLikeCount(postId, 1);
+                            if(pdo != null) {
+                                notificationService.onPostLike(
+                                        pdo.getAuthorUid(),
+                                        userUid,
+                                        postId,
+                                        pdo.getTitle(),
+                                        pdo.getCoverageResourceUuid()
+                                );
+                            }
+                        }
+                );
+    }
+
+    @Override
+    public void collection(Long postId) {
+        Long userUid = UserCtxHolder.getUserUid();
+        UserCounter uc = userCounterRepository.findByUserUid(userUid)
+                .orElseThrow(UserAssociationDataNotFoundException::new);
+        PostAuthorUidTitleDO pdo = postRepository.findPostAuthorIdTitleDOById(
+                postId
+        ).orElse(null);
+        userCollectRepository.findById(new UserCollectId(userUid, postId))
+                .ifPresentOrElse(
+                        collection -> {
+                            userCounterRepository.decreaseUserLikeCount(userUid, 1);
+                            postRepository.decreaseCollectCount(postId, 1);
+                            userCollectRepository.delete(collection);
+                        },
+                        () -> {
+                            if (uc.getCollectCnt() >= userCollectExceedLimit) {
+                                throw new UserCollectExceedLimitException();
+                            }
+                            UserCollect newCollection = new UserCollect();
+                            newCollection.setId(new UserCollectId(userUid, postId));
+                            userCollectRepository.save(newCollection);
+                            userCounterRepository.increaseUserLikeCount(userUid, 1);
+                            postRepository.increaseCollectCount(postId, 1);
+                            if(pdo != null) {
+                                notificationService.onPostCollect(
+                                        pdo.getAuthorUid(),
+                                        userUid,
+                                        postId,
+                                        pdo.getTitle(),
+                                        pdo.getCoverageResourceUuid()
+                                );
+                            }
+                        }
+                );
+
+    }
+
+    @Transactional
+    @Override
     public List<PresignedResp> handlePostCoverageImageUpload(UserUploadPolicyReq request) {
         Long bizId = Long.parseLong(request.getBizId());
         FileExtension ext =  UploadValidator.validateSingleFileUpload(request, TargetType.POST_COVERAGE_IMAGE);
@@ -645,10 +728,10 @@ public class PostServiceImpl implements PostService {
             DetailApplier<T> applier
     ) {
         T res = mapper.apply(post);
-        List<OptionVO<Integer>> tags = tagRepository.findTagsByPostIds(List.of(post.getId())).stream()
+        List<OptionVO<Integer>> tags = tagRepository.findTagsByPostIdIn(List.of(post.getId())).stream()
                 .map(arr -> (OptionVO<Integer>) arr[1])
                 .toList();
-        OptionVO<Integer> category = categoryRepository.findCategoryByPostIds(List.of(post.getId())).stream()
+        OptionVO<Integer> category = categoryRepository.findCategoryByPostIdIn(List.of(post.getId())).stream()
                 .map(arr -> (OptionVO<Integer>) arr[1])
                 .findFirst()
                 .orElse(null);
@@ -684,60 +767,39 @@ public class PostServiceImpl implements PostService {
     ) {
         Page<Long> postPageIds = postRepository.findAllIds(spec, pageable);
         List<Long> postIds = postPageIds.getContent();
-        List<Post> posts = postRepository.findAllById(postIds);
+        List<Post> posts = postRepository.findAllByIdInAndOrderBYCreatedAtDesc(postIds);
         // Post & Category Map
-        Map<Long, List<OptionVO<Integer>>> postTagMap = tagRepository.findTagsByPostIds(postIds).stream()
+        Map<Long, List<OptionVO<Integer>>> postTagMap = tagRepository.findTagsByPostIdIn(postIds).stream()
                 .collect(Collectors.groupingBy(
                         arr -> (long) arr[0],
                         Collectors.mapping(arr -> (OptionVO<Integer>) arr[1], Collectors.toList())
                 ));
 
-        Map<Long, OptionVO<Integer>> postCategoryMap = categoryRepository.findCategoryByPostIds(postIds).stream()
+        Map<Long, OptionVO<Integer>> postCategoryMap = categoryRepository.findCategoryByPostIdIn(postIds).stream()
                 .collect(Collectors.toMap(
                         arr -> (long) arr[0],
                         arr -> (OptionVO<Integer>) arr[1],
                         (a, b) -> a
                 ));
 
-        Map<Long, User> userUidUserMap = userRepository.findAllByUidIn(
-                postIds
-        ).stream().collect(Collectors.toMap(User::getUid, u -> u));
         // Post coverage resource presigned url map
-        Map<Long, String> postIdCoverImgKeyMap = new HashMap<>();
-        for(int i = 0; i < postIds.size(); i++){
-            Post post = posts.get(i);
-            postIdCoverImgKeyMap.put(post.getId(), post.getCoverageResource().getResourceKey());
-        }
+        Map<Long, String> postIdCoverImgKeyMap = posts.stream()
+                .filter(post -> post.getCoverageResource() != null)
+                .collect(Collectors.toMap(
+                        Post::getId,
+                        post -> post.getCoverageResource().getResourceKey()
+                ));
         Map<Long, CloudResPresignedUrlResp> postCoverageImgMap = cloudFileService.batchGetReadPublicUrlCached(
                 CloudFSRoot.UPLOADS,
                 postIdCoverImgKeyMap,
                 TargetType.POST_COVERAGE_IMAGE
         );
-        // Get user avatar resource presigned url key map
-        Map<Long, String> userUidAvatarKeyMap = new HashMap<>();
-        userUidUserMap.forEach((uid, user) -> {
-            if(user.getAvatarResource() != null){
-                userUidAvatarKeyMap.put(uid, user.getAvatarResource().getResourceKey());
-            }
-        });
-        Map<Long, CloudResPresignedUrlResp> userUidPresignedUrlMap = cloudFileService.batchGetReadPublicUrlCached(
-                CloudFSRoot.USER,
-                userUidAvatarKeyMap,
-                TargetType.USER_AVATAR
-        );
         // Post UserBrief Map
-        Map<Long, UserBrief> postUserBriefMap = userUidPresignedUrlMap.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                e -> {
-                    User u = userUidUserMap.get(e.getKey());
-                    return new UserBrief(
-                            u.getNickname() == null ? u.getUsername() : u.getNickname(),
-                            e.getValue(),
-                            u.getLevel(),
-                            u.getUserType()
-                    );
-                }
-        ));
+        List<Long> userUids = posts.stream()
+                .map(p -> p.getAuthor().getUid())
+                .distinct()
+                .toList();
+        Map<Long, UserBrief> postUserBriefMap = userBriefService.queryForMapUserIdBriefMap(userUids);
         return new PageImpl<>(
                 posts.stream().map(post -> {
                     T res = mapper.apply(post);

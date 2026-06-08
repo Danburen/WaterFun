@@ -27,30 +27,27 @@ public class UserCounter {
     private User user;
 
     @ColumnDefault("0")
-    @Column(name = "follower_cnt")
-    private Integer followerCnt = 0;
+    @Column(name = "follower_cnt", columnDefinition = "int UNSIGNED")
+    private Long followerCnt = 0L;
 
     @ColumnDefault("0")
-    @Column(name = "following_cnt")
-    private Integer followingCnt = 0;
+    @Column(name = "following_cnt", columnDefinition = "int UNSIGNED")
+    private Long followingCnt = 0L;
 
     @ColumnDefault("0")
-    @Column(name = "like_cnt")
-    private Integer likeCnt = 0;
+    @Column(name = "like_cnt", columnDefinition = "int UNSIGNED")
+    private Long likeCnt = 0L;
 
     @ColumnDefault("0")
-    @Column(name = "post_cnt")
-    private Integer postCnt = 0;
+    @Column(name = "post_cnt", columnDefinition = "int UNSIGNED")
+    private Long postCnt = 0L;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "updated_at")
     private Instant updatedAt = Instant.now();
 
-    @ColumnDefault("'1'")
-    @Column(name = "visible", columnDefinition = "tinyint UNSIGNED")
-    private Short visible = 1;
+    @ColumnDefault("'0'")
+    @Column(name = "collect_cnt", columnDefinition = "int UNSIGNED")
+    private Long collectCnt = 0L;
 
-    public boolean isVisible() {
-        return visible == 1;
-    }
 }

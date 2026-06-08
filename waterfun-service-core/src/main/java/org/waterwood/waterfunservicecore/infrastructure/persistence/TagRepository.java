@@ -32,7 +32,7 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
     FROM Post p JOIN p.tags t
     WHERE p.id IN :postIds
 """)
-  List<Object[]> findTagsByPostIds(List<Long> postIds);
+  List<Object[]> findTagsByPostIdIn(List<Long> postIds);
 
   List<Tag> findAllByNameIn(Set<String> newTagNames);
 
@@ -48,4 +48,6 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
     AND (t.name LIKE :keyword% OR t.slug LIKE :keyword%)
     """)
   List<Tag> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    List<Tag> findAllByIdInAndIsDeleted(Collection<Long> ids, Boolean isDeleted);
 }

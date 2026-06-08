@@ -16,6 +16,7 @@ import org.waterwood.waterfunadminservice.infrastructure.mapper.CategoryMapper;
 import org.waterwood.waterfunservicecore.entity.post.Category;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CategoryRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
@@ -28,12 +29,13 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
     private final IdentifierGenerator identifierGenerator;
     private final UserCoreService userCoreService;
+    private final UserRepository userRepository;
 
     @Override
     public void create(CreateCategoryRequest req) {
         Category category = categoryMapper.toEntity(req);
         category.setSlug(identifierGenerator.fromSlug(req.getSlug(), req.getName(), categoryRepository));
-        category.setCreator(userCoreService.getUserByUid(UserCtxHolder.getUserUid()));
+        category.setCreator(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
         if (req.getParentId() != null) {
             category.setParent(getById(req.getParentId()));
         }

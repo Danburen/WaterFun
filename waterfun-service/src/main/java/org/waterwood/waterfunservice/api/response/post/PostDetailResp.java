@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.post.Post;
+import org.waterwood.waterfunservicecore.entity.post.PostType;
 
 import java.time.Instant;
 import java.util.List;
@@ -35,4 +36,7 @@ public class PostDetailResp {
     private String slug;
     private Instant publishedAt;
     private Instant updatedAt;
+    private PostType type;
+    private Boolean isPinned = false;
+
 }

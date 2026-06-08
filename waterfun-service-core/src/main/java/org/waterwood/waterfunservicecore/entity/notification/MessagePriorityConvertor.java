@@ -4,14 +4,14 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class MessagePriorityConvertor implements AttributeConverter<MessagePriority, Short> {
+public class MessagePriorityConvertor implements AttributeConverter<NoticePriority, Short> {
     @Override
-    public Short convertToDatabaseColumn(MessagePriority attribute) {
+    public Short convertToDatabaseColumn(NoticePriority attribute) {
         return attribute == null ? 3 : attribute.getValue();
     }
 
     @Override
-    public MessagePriority convertToEntityAttribute(Short dbData) {
-        return MessagePriority.fromCode(dbData);
+    public NoticePriority convertToEntityAttribute(Short dbData) {
+        return NoticePriority.fromCode(dbData);
     }
 }

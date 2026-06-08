@@ -1,10 +1,10 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence.user;
 
-import jakarta.persistence.NamedAttributeNode;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.user.User;
+import org.waterwood.waterfunservicecore.entity.user.UserBriefDO;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,11 +20,9 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
     List<User> getUsersByUid(Long id);
 
     Optional<User> findUserByUid(Long uid);
-    @Query(
-            "select u from User u join UserCounter c " +
-                    "where u.uid in :userUids and c.visible = 1"
+    @Query("SELECT u FROM User u JOIN UserCounter c WHERE u.uid IN :userUids"
     )
-    List<User> findAllVisibleUsersByIds(@Param("userUids") List<Long> userUids);
+    List<User> findAllVisibleUsersByIn(@Param("userUids") List<Long> userUids);
 
     boolean deleteUserByUid(Long uid);
 
@@ -51,4 +49,22 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
 
     @EntityGraph(attributePaths = "avatarResource")
     List<User> findAllByUidIn(List<Long> attr0);
+
+
+    @Query("""
+        SELECT new org.waterwood.waterfunservicecore.entity.user.UserBriefDO(
+            u.uid, u.username, u.nickname, u.avatarResource.uuid,u.level, u.userType
+        ) FROM User u
+        LEFT JOIN u.avatarResource r
+        WHERE u.uid IN :uids
+    """)
+    List<UserBriefDO> findBriefDOsByUidIn(@Param("uids") List<Long> uids);
+    @Query("""
+        SELECT new org.waterwood.waterfunservicecore.entity.user.UserBriefDO(
+            u.uid, u.username, u.nickname, u.avatarResource.uuid,u.level, u.userType
+        ) FROM User u
+        LEFT JOIN u.avatarResource r
+        WHERE u.uid = :uid
+    """)
+    UserBriefDO findBriefDOsByUid(@Param("uid") Long uid);
 }

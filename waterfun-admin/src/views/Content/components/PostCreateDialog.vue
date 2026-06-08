@@ -51,7 +51,7 @@ const formModel = ref<CreatePostRequest>({
   status: "DRAFT",
   visibility: "PUBLIC",
   authorId: "",
-  categoryId: 0,
+  categoryId: "",
   slug: "",
   tagIds: [],
 });
@@ -96,7 +96,7 @@ const resetForm = () => {
     status: "DRAFT",
     visibility: "PUBLIC",
     authorId: "",
-    categoryId: 0,
+    categoryId: "",
     slug: "",
     tagIds: [],
   };
@@ -128,7 +128,7 @@ const fillFormFromDetail = (data: PostResp) => {
     status: data.status || "DRAFT",
     visibility: data.visibility || "PUBLIC",
     authorId: data.authorId || "",
-    categoryId: data.categoryId || 0,
+    categoryId: data.categoryId || "",
     slug: data.slug || "",
     tagIds: data.tagIds || [],
   };

@@ -1,6 +1,5 @@
 <template>
   <div class="profile-page">
-    <!-- 顶部导航菜单 -->
     <HeaderNavMenu />
     <!-- 主要内容区域 -->
     <div class="profile-layout">
@@ -26,7 +25,6 @@ definePageMeta({
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import UserCenterSideBar from '~/components/UserCenterSideBar.vue';
-import HeaderNavMenu from '~/components/HeaderNavMenu.vue';
 import { useUserInfoStore } from "~/stores/userInfoStore";
 import { useUserProfileStore } from "~/stores/userProfileStore";
 import { ElMessage } from 'element-plus';

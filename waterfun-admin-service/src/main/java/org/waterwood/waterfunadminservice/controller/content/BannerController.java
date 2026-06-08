@@ -13,11 +13,10 @@ import org.waterwood.waterfunadminservice.api.request.content.PutBannerRequest;
 import org.waterwood.waterfunadminservice.api.response.content.BannerResponse;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.BannerMapper;
 import org.waterwood.waterfunadminservice.service.content.BannerService;
-import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.Banner;
 import org.waterwood.waterfunservicecore.entity.BannerPosition;
 import org.waterwood.waterfunservicecore.entity.VisibleStatus;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.BannerSpec;
+import org.waterwood.waterfunservicecore.entity.spec.BannerSpec;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 
 import java.time.Instant;
@@ -37,10 +36,10 @@ public class BannerController {
                                                   @RequestParam(required = false) VisibleStatus status,
                                                   @RequestParam(required = false) Instant startAt,
                                                   @RequestParam(required = false) Instant endAt,
+                                                  @RequestParam(required = false) Boolean isDeleted,
                                                   @PageableDefault Pageable pageable) {
-        Specification<Banner> spec = BannerSpec.of(title, subtitle, position, status, startAt, endAt);
-        Page<Banner> banners = bannerService.list(spec, pageable);
-        return ApiResponse.success(banners.map(bannerMapper::toResponse));
+        Specification<Banner> spec = BannerSpec.of(title, subtitle, position, status, startAt, endAt, isDeleted);
+        return ApiResponse.success(bannerService.list(spec, pageable));
     }
 
     @GetMapping("/{id}")
@@ -57,6 +56,12 @@ public class BannerController {
     @PutMapping("/{id}")
     public ApiResponse<Void> update(@PathVariable Long id, @RequestBody @Valid PutBannerRequest req) {
         bannerService.update(id, req);
+        return ApiResponse.success();
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> delete(@PathVariable Long id) {
+        bannerService.delete(id);
         return ApiResponse.success();
     }
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.waterwood.waterfunadminservice.service.content.AdminBizType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
 import org.waterwood.waterfunservicecore.services.sys.upload.UploadContext;
 
@@ -13,12 +14,12 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminUploadContext <T extends Serializable> implements UploadContext<T, AdminUploadBizType> {
+public class AdminUploadContext <T extends Serializable> implements UploadContext<T, AdminBizType> {
     private String resourceUuid;
     private T bizId;
     @Builder.Default
     private String cosKey = null;
-    private AdminUploadBizType bizType;
+    private AdminBizType bizType;
 
     public BizUploadPayload toPayload() {
         BizUploadPayload payload = new BizUploadPayload();

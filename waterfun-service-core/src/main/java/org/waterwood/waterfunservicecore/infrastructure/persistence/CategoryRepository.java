@@ -26,7 +26,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSp
         FROM Post p JOIN p.category c
         WHERE p.id IN :postIds
     """)
-    List<Object[]> findCategoryByPostIds(List<Long> postIds);
+    List<Object[]> findCategoryByPostIdIn(List<Long> postIds);
 
     List<Category> findAllByIsDeleted(Boolean isDeleted);
 

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.URL;
 import org.waterwood.waterfunservicecore.entity.post.PostStatus;
+import org.waterwood.waterfunservicecore.entity.post.PostType;
 import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 
@@ -30,9 +31,7 @@ public class CreatePostRequest implements Serializable {
     private String content;
     @Size(max = 500)
     private String summary;
-    @Size(max = 255)
-    @URL
-    private String coverImg;
+    private String coverageUuid;
     @NotNull
     private PostStatus status;
     @NotNull
@@ -43,4 +42,6 @@ public class CreatePostRequest implements Serializable {
     private Long categoryId;
     private String slug;
     private List<Long> tagIds;
+    private PostType type = PostType.COMMON;
+    private Boolean isPinned = false;
 }

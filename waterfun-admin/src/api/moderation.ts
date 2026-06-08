@@ -1,4 +1,4 @@
-import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
+import type { ISOString, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
@@ -44,27 +44,22 @@ export interface FileMeta {
 }
 
 export interface FileProbeResult {
-  size?: number;
+  size?: string;
   mimeType?: string;
   meta?: FileMeta;
 }
 
-export interface InstantLike {
-  seconds?: number;
-  nanos?: number;
-}
-
 export interface CloudResPresignedUrlResp {
   url?: string;
-  expireAt?: InstantLike | string | null;
+  expireAt?: ISOString;
 }
 
 export interface ModerationResourceRes {
-  taskId?: number;
+  taskId?: string;
   resourceUuid?: string;
   status?: AuditStatus;
-  auditAt?: InstantLike | string | null;
-  auditorId?: number;
+  auditAt?: ISOString;
+  auditorId?: string;
   rejectType?: ModerateRejectType;
   rejectReason?: string;
   fileProbeResult?: FileProbeResult | null;
@@ -80,12 +75,12 @@ export interface ModerationTaskPayloadRes {
 }
 
 export interface ModerateTaskResp {
-  id?: number;
+  id?: string;
   targetType?: TargetType;
   targetId?: string;
   payload?: ModerationTaskPayloadRes;
-  submitterId?: number;
-  submitAt?: InstantLike | string | null;
+  submitterId?: string;
+  submitAt?: ISOString;
 }
 
 export interface BatchResult {
@@ -99,7 +94,7 @@ export interface ListModerationParams {
   page?: number;
   size?: number;
   taskType?: TargetType;
-  submitterId?: number;
+  submitterId?: string;
   submitAtStart?: string;
   submitAtEnd?: string;
 }
@@ -107,20 +102,20 @@ export interface ListModerationParams {
 export interface ListModerationResourceParams {
   page?: number;
   size?: number;
-  taskId?: number;
+  taskId?: string;
   status?: AuditStatus;
   resourceType?: ResourceType;
-  auditorId?: number;
+  auditorId?: string;
   auditAtStart?: string;
   auditAtEnd?: string;
 }
 
 export interface BatchModerateRequest {
-  auditTaskIds: number[];
+  auditTaskIds: string[];
 }
 
 export interface BatchModerateRejectRequest {
-  auditTaskIds: number[];
+  auditTaskIds: string[];
   rejectType: ModerateRejectType;
   rejectReason?: string;
 }
@@ -130,7 +125,7 @@ export interface ModerateRejectRequest {
   rejectReason?: string;
 }
 
-export const getModerationTaskById = (id: number): PromiseResBody<ModerateTaskResp> => {
+export const getModerationTaskById = (id: string): PromiseResBody<ModerateTaskResp> => {
   return request.get<ModerateTaskResp>(`/moderations/${id}`);
 };
 
@@ -138,11 +133,11 @@ export const listModerations = (params: ListModerationParams): PromiseResBody<Pa
   return request.get<Page<ModerateTaskResp>>("/moderations/list", { params });
 };
 
-export const approveModerationById = (id: number): PromiseResBody<BatchResult> => {
+export const approveModerationById = (id: string): PromiseResBody<BatchResult> => {
   return request.post<BatchResult>(`/moderations/${id}/approve`);
 };
 
-export const rejectModerationById = (id: number, data: ModerateRejectRequest): PromiseResBody<BatchResult> => {
+export const rejectModerationById = (id: string, data: ModerateRejectRequest): PromiseResBody<BatchResult> => {
   return request.post<BatchResult>(`/moderations/${id}/reject`, data);
 };
 
@@ -154,7 +149,7 @@ export const rejectModerations = (data: BatchModerateRejectRequest): PromiseResB
   return request.post<BatchResult>("/moderations/reject", data);
 };
 
-export const listResourcesByTask = (id: number): PromiseResBody<ModerationResourceRes[]> => {
+export const listResourcesByTask = (id: string): PromiseResBody<ModerationResourceRes[]> => {
   return request.get<ModerationResourceRes[]>(`/moderations/${id}/resources`);
 };
 
@@ -164,16 +159,16 @@ export const listModerationResources = (
   return request.get<Page<ModerationResourceRes>>("/moderations/resources/list", { params });
 };
 
-export const getModerationResource = (taskId: number, resourceUuid: string): PromiseResBody<ModerationResourceRes> => {
+export const getModerationResource = (taskId: string, resourceUuid: string): PromiseResBody<ModerationResourceRes> => {
   return request.get<ModerationResourceRes>(`/moderations/${taskId}/resources/${resourceUuid}`);
 };
 
-export const approveModerationResource = (taskId: number, resourceUuid: string): PromiseResBody<void> => {
+export const approveModerationResource = (taskId: string, resourceUuid: string): PromiseResBody<void> => {
   return request.post<void>(`/moderations/${taskId}/resources/${resourceUuid}/approve`);
 };
 
 export const rejectModerationResource = (
-  taskId: number,
+  taskId: string,
   resourceUuid: string,
   data: ModerateRejectRequest
 ): PromiseResBody<void> => {

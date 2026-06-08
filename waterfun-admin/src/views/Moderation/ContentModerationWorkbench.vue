@@ -41,7 +41,7 @@ const pageOpts = ref<PageOptions>({
   total: 0,
 });
 
-const selectedIds = ref<number[]>([]);
+const selectedIds = ref<string[]>([]);
 
 const targetTypeOptions: Array<{ label: string; value: TargetType }> = [
   { label: "帖子", value: "POST" },
@@ -66,20 +66,15 @@ const rejectTypeOptions: Array<{ label: string; value: ModerateRejectType }> = [
 const rejectDialogVisible = ref(false);
 const rejectBatchMode = ref(false);
 const rejectSubmitting = ref(false);
-const currentRejectTaskId = ref<number | null>(null);
+const currentRejectTaskId = ref<string | null>(null);
 const rejectForm = ref<{ rejectType: ModerateRejectType; rejectReason: string }>({
   rejectType: "OTHER",
   rejectReason: "",
 });
 
-const getInstantIso = (value?: { seconds?: number; nanos?: number } | string | null): string => {
+const getInstantIso = (value?: string | null): string => {
   if (!value) return "";
-  if (typeof value === "string") return value;
-  const seconds = Number(value.seconds || 0);
-  const nanos = Number(value.nanos || 0);
-  if (!seconds && !nanos) return "";
-  const ms = seconds * 1000 + Math.floor(nanos / 1_000_000);
-  return new Date(ms).toISOString();
+  return value;
 };
 
 const pageTotal = (payload: Record<string, unknown>): number => {
@@ -112,7 +107,7 @@ const getPostTitle = (task: ModerateTaskResp): string => {
     return "[内容审核]";
   }
   if (payload.type === "SINGLE_RESOURCE") {
-    return "[资源审核] " + (payload.singleResource?.resourceUuid?.substring(0, 16) ?? "");
+    return "[资源审核] " + ((payload.resources?.[0] as any)?.resourceUuid?.substring(0, 16) ?? "");
   }
   return "审核任务 #" + (task.id ?? "?");
 };
@@ -141,7 +136,7 @@ const fetchData = async () => {
       page: (pageOpts.value.currentPage || 1) - 1,
       size: pageOpts.value.pageSize,
       taskType: searchForm.value.taskType || undefined,
-      submitterId: searchForm.value.submitterId ? Number(searchForm.value.submitterId) : undefined,
+      submitterId: searchForm.value.submitterId || undefined,
       submitAtStart: start ? start.toISOString() : undefined,
       submitAtEnd: end ? end.toISOString() : undefined,
     });
@@ -178,7 +173,7 @@ const handleReset = () => {
   fetchData();
 };
 
-const toggleSelection = (id: number, checked: boolean) => {
+const toggleSelection = (id: string, checked: boolean) => {
   if (checked) {
     selectedIds.value.push(id);
   } else {
@@ -194,7 +189,7 @@ const gotoDetail = (task: ModerateTaskResp) => {
   });
 };
 
-const handleApproveTask = async (taskId?: number) => {
+const handleApproveTask = async (taskId?: string) => {
   if (!taskId) return;
   try {
     await ElMessageBox.confirm("确定通过该审核任务吗？", "通过", { type: "warning" });
@@ -232,7 +227,7 @@ const handleBatchApprove = async () => {
   }
 };
 
-const openRejectDialog = (taskId?: number) => {
+const openRejectDialog = (taskId?: string) => {
   rejectBatchMode.value = false;
   currentRejectTaskId.value = taskId ?? null;
   rejectForm.value = { rejectType: "OTHER", rejectReason: "" };
@@ -369,8 +364,8 @@ onMounted(async () => {
             <div class="task-card-inner">
               <el-checkbox
                 v-if="task.id"
-                :model-value="selectedIds.includes(task.id!)"
-                @change="(val: boolean) => toggleSelection(task.id!, val)"
+                :model-value="selectedIds.includes(task.id)"
+                @change="(val: boolean) => toggleSelection(task.id, val)"
                 @click.stop
                 class="card-checkbox"
               />

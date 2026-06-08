@@ -9,7 +9,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: boolean;
     mode?: "create" | "edit";
-    categoryId?: number;
+    categoryId?: number | string;
   }>(),
   {
     mode: "create",
@@ -71,12 +71,12 @@ const loadOptions = async () => {
 const loadDetail = async () => {
   if (props.mode !== "edit" || !props.categoryId) return;
   try {
-    const res = await getCategory(props.categoryId);
+    const res = await getCategory(Number(props.categoryId));
     formModel.value = {
       name: res.data.name || "",
       slug: res.data.slug || "",
       description: res.data.description || "",
-      parentId: res.data.parentId,
+      parentId: res.data.parentId != null ? String(res.data.parentId) : undefined,
       sortOrder: res.data.sortOrder || 0,
       isActive: res.data.isActive !== false,
     };
@@ -123,8 +123,8 @@ const handleSave = async () => {
       isActive: formModel.value.isActive,
     };
 
-    if (props.mode === "edit" && props.categoryId) {
-      await putCategory(props.categoryId, payload);
+    if (props.mode === "edit" && props.categoryId != null && props.categoryId !== "") {
+      await putCategory(Number(props.categoryId), payload);
       ElMessage.success('分类更新成功');
     } else {
       await createCategory(payload);

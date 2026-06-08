@@ -29,6 +29,7 @@ import org.waterwood.waterfunservicecore.api.resp.AccountResp;
 import org.waterwood.waterfunservicecore.entity.Permission;
 import org.waterwood.waterfunservicecore.entity.Role;
 import org.waterwood.waterfunservicecore.entity.user.*;
+import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.*;
@@ -61,7 +62,6 @@ public class UserAdminServiceImpl implements UserAdminService {
     private final UserCoreService userCoreService;
     private final UserProfileCoreService userProfileCoreService;
     private final UserDatumCoreService userDatumCoreService;
-    private final UserCounterCoreService userCounterCoreService;
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
     private final UserCounterMapper userCounterMapper;
@@ -71,7 +71,7 @@ public class UserAdminServiceImpl implements UserAdminService {
     private final EncryptedKeyService encryptedKeyService;
     private final UserDatumRepo userDatumRepo;
     private final UidGenerator uidGenerator;
-    private final UserProfileRepo userProfileRepo;
+    private final UserProfileRepository userProfileRepository;
     private final UserCounterRepository userCounterRepository;
     private final UserFollowerRepository userFollowerRepository;
 
@@ -96,7 +96,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         User u = userRepository.findById(uid).orElseThrow(
                 ()-> new UserAdminException(BaseResponseCode.USER_NOT_FOUND)
         );
-        if(u.getUserType() == 4){
+        if(u.getUserType() == UserType.ADMIN){
             throw new BizException(BaseResponseCode.CAN_NOT_DELETE_SUPER_ADMIN_USER);
         }
         userRepository.deleteUserByUid(uid);
@@ -252,12 +252,23 @@ public class UserAdminServiceImpl implements UserAdminService {
         });
     }
 
+    @Transactional
     @Override
     public UserAdminDetail getUserDetail(long uid) {
-        User u = userCoreService.getUser(uid);
-        UserProfile p = userProfileCoreService.getUserProfile(uid);
+        User u = userRepository.findById(uid).orElseThrow(
+                UserNotFoundException::new
+        );
+        UserProfile p = userProfileRepository.findByUserUid(uid).orElseGet(() -> {;
+            UserProfile up = new UserProfile();
+            up.setUser(u);
+            return userProfileRepository.save(up);
+        });
         AccountResp acc = userDatumCoreService.getAccountInfo(uid);
-        UserCounter c = userCounterCoreService.getUserCounter(uid);
+        UserCounter c = userCounterRepository.findByUserUid(uid).orElseGet(() -> {
+            UserCounter uc = new UserCounter();
+            uc.setUser(u);
+            return userCounterRepository.save(uc);
+        });
         Set<UserRole> urs = userRoleCoreService.getUserRoles(uid);
         Set<UserPermission> ups = userPermissionCoreService.getUserPermission(uid);
 
@@ -273,9 +284,11 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     public void updateUserInfo(long uid, UserInfoAUpdateReq body) {
-        User u = userCoreService.getUserByUid(uid);
+        User u = userRepository.findById(uid).orElseThrow(
+                () -> new UserNotFoundException(uid)
+        );
         u = userAdminMapper.toEntity(body, u);
-        userCoreService.update(u);
+        userRepository.save(u);
     }
 
     @Override
@@ -320,7 +333,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         user.setUsername(username);
         user.setUid(uidGenerator.generateUid());
         user.setAccountStatus(AccountStatus.ACTIVE);
-        user.setUserType(req.getUserType() != null ? req.getUserType() : (short) 0);
+        user.setUserType(req.getUserType() != null ? UserType.fromValue(req.getUserType()) : UserType.COMMON);
         if(StringUtil.isNotBlank( req.getPassword())) user.setPasswordHash(encoder.encode(pwd));
 
         UserDatum ud = new UserDatum();

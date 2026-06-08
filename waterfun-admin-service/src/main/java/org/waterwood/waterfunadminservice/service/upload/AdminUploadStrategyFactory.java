@@ -3,7 +3,6 @@ package org.waterwood.waterfunadminservice.service.upload;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import org.waterwood.waterfunadminservice.api.AdminUploadBizType;
 import org.waterwood.waterfunadminservice.api.request.AdminUploadPolicyReq;
 import org.waterwood.waterfunservicecore.api.BizType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;

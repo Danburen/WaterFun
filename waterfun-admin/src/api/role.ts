@@ -1,4 +1,4 @@
-import type { ISOString, OptionResItem, PromiseResBody, ResBody } from "@waterfun/web-core/src/types/api/response";
+import type { ISOString, OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
 import request from "../utils/axiosRequest";
 
@@ -141,57 +141,57 @@ export const listRoles = (
     name?: string,
     code?: string,
     parentId?: number
-): Promise<ResBody<Page<RoleResp>>> => {
-    return request.get<ResBody<Page<RoleResp>>>("/role/list", {
+): PromiseResBody<Page<RoleResp>> => {
+    return request.get<Page<RoleResp>>("/role/list", {
         params: { page, size, name, code, parentId }
     });
 };
 
-export const getRole = (id: number): Promise<ResBody<RoleResp>> => {
-    return request.get<ResBody<RoleResp>>(`/role/${id}`);
+export const getRole = (id: number): PromiseResBody<RoleResp> => {
+    return request.get<RoleResp>(`/role/${id}`);
 };
 
-export const addRole = (data: CreateRoleRequest): Promise<ResBody<null>> => {
-    return request.post<ResBody<null>>("/role", data);
+export const addRole = (data: CreateRoleRequest): PromiseResBody<null> => {
+    return request.post<null>("/role", data);
 };
 
-export const updateRole = (id: number, data: UpdateRoleRequest): Promise<ResBody<null>> => {
-    return request.put<ResBody<null>>(`/role/${id}`, data);
+export const updateRole = (id: number, data: UpdateRoleRequest): PromiseResBody<null> => {
+    return request.put<null>(`/role/${id}`, data);
 };
 
-export const deleteRole = (id: number): Promise<ResBody<null>> => {
-    return request.delete<ResBody<null>>(`/role/${id}`);
+export const deleteRole = (id: number): PromiseResBody<null> => {
+    return request.delete<null>(`/role/${id}`);
 };
 
-export const deleteRoles = (roleIds: number[]): Promise<ResBody<BatchResult>> => {
+export const deleteRoles = (roleIds: number[]): PromiseResBody<BatchResult> => {
     const data: DeleteRolesRequest = { roleIds };
-    return request.delete<ResBody<BatchResult>>("/role", { data });
+    return request.delete<BatchResult>("/role", { data });
 };
 
-export const assignPermissions = (id: number, data: AssignRolePermReq): Promise<ResBody<BatchResult | null>> => {
-    return request.post<ResBody<BatchResult | null>>(`/role/${id}/permissions`, data);
+export const assignPermissions = (id: number, data: AssignRolePermReq): PromiseResBody<BatchResult | null> => {
+    return request.post<BatchResult | null>(`/role/${id}/permissions`, data);
 };
 
-export const updatePermissions = (id: number, data: UpdateRolePermReq): Promise<ResBody<BatchResult | null>> => {
-    return request.put<ResBody<BatchResult | null>>(`/role/${id}/permissions`, data);
+export const updatePermissions = (id: number, data: UpdateRolePermReq): PromiseResBody<BatchResult | null> => {
+    return request.put<BatchResult | null>(`/role/${id}/permissions`, data);
 };
 
 export const listRolePerms = (
     id: number,
     params: ListRolePermsParams = {}
 ): PromiseResBody<Page<AssignedPermissionRes>> => {
-    return request.get<ResBody<Page<AssignedPermissionRes>>>(`/role/${id}/permissions`, { params });
+    return request.get<Page<AssignedPermissionRes>>(`/role/${id}/permissions`, { params });
 };
 
-export const deleteRolePerms = (id: number, data: DeleteRolePermsReq): Promise<ResBody<BatchResult | null>> => {
-    return request.delete<ResBody<BatchResult | null>>(`/role/${id}/permissions`, { data });
+export const deleteRolePerms = (id: number, data: DeleteRolePermsReq): PromiseResBody<BatchResult | null> => {
+    return request.delete<BatchResult | null>(`/role/${id}/permissions`, { data });
 };
 
 export const listRoleUsers = (
     id: number,
     params: ListRoleUsersParams = {}
 ): PromiseResBody<Page<AssignedUserRes>> => {
-    return request.get<ResBody<Page<AssignedUserRes>>>(`/role/${id}/users`, {
+    return request.get<Page<AssignedUserRes>>(`/role/${id}/users`, {
         params,
     });
 };
@@ -207,18 +207,18 @@ export const getRoleUsers = (
     return listRoleUsers(id, { page, size, userUid, username, nickname });
 };
 
-export const putUserRoles = (id: number, data: AssignUserToRoleReq): Promise<ResBody<BatchResult | null>> => {
-    return request.put<ResBody<BatchResult | null>>(`/role/${id}/users`, data);
+export const putUserRoles = (id: number, data: AssignUserToRoleReq): PromiseResBody<BatchResult | null> => {
+    return request.put<BatchResult | null>(`/role/${id}/users`, data);
 };
 
-export const deleteUserRoles = (id: number, data: RemoveRoleUsersReq): Promise<ResBody<BatchResult | null>> => {
-    return request.delete<ResBody<BatchResult | null>>(`/role/${id}/users`, { data });
+export const deleteUserRoles = (id: number, data: RemoveRoleUsersReq): PromiseResBody<BatchResult | null> => {
+    return request.delete<BatchResult | null>(`/role/${id}/users`, { data });
 };
 
 export const assignUserRoles = (id: number, data: AssignUserToRoleReq): PromiseResBody<BatchResult | null> => {
-    return request.post<ResBody<BatchResult | null>>(`/role/${id}/users`, data);
+    return request.post<BatchResult | null>(`/role/${id}/users`, data);
 };
 
 export const getRoleAllIds = (): PromiseResBody<OptionResItem<number>[]> => {
-    return request.get<ResBody<OptionResItem<number>[]>>(`/role/options`);
+    return request.get<OptionResItem<number>[]>(`/role/options`);
 }

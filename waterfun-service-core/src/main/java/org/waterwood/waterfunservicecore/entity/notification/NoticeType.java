@@ -4,13 +4,23 @@ import lombok.Getter;
 
 @Getter
 public enum NoticeType {
-    BUSINESS(1),
-    ACCOUNT_SECURITY(2),
-    PENALTY(3),;
+    GENERAL(0, NoticeGroup.MISC, NoticePriority.MEDIUM),
+    LIKE(1, NoticeGroup.INTERACTION, NoticePriority.MEDIUM),
+    REPLY(2, NoticeGroup.REPLY, NoticePriority.HIGH),
+    MENTION(3, NoticeGroup.MENTION, NoticePriority.EMERGENCY),
+    NEW_FOLLOWER(4, NoticeGroup.INTERACTION, NoticePriority.MEDIUM),
+    COLLECT(5, NoticeGroup.INTERACTION, NoticePriority.MEDIUM),
+    PROMOTION(9, NoticeGroup.SYSTEM, NoticePriority.LOW),
+    SYSTEM(10, NoticeGroup.SYSTEM, NoticePriority.MEDIUM),;
 
+
+    private final NoticeGroup group;
+    private final NoticePriority priority;
     private final short code;
-    NoticeType(final int code) {
+    NoticeType(final int code, final NoticeGroup group, final NoticePriority priority) {
         this.code = (short) code;
+        this.group = group;
+        this.priority = priority;
     }
 
     public static NoticeType fromCode(final short code) {
@@ -19,6 +29,14 @@ public enum NoticeType {
                 return noticeType;
             }
         }
-        return BUSINESS;
+        throw new IllegalArgumentException("No NoticeType found for code " + code);
+    }
+
+    public boolean isSendImmediately() {
+        return this.priority == NoticePriority.HIGH;
+    }
+
+    public boolean isAggregatable() {
+        return this.group == NoticeGroup.INTERACTION || this.group == NoticeGroup.SYSTEM;
     }
 }

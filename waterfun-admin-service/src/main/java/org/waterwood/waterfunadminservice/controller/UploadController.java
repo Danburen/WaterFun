@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunadminservice.api.request.AdminUploadPolicyReq;
@@ -17,12 +18,13 @@ import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/admin/upload")
 @RequiredArgsConstructor
 public class UploadController {
     private final AdminUploadStrategyFactory factory;
     private final CloudFileService cloudFileService;
 
-    @RateLimit(key = "avatarUpload", permits = 5)
+    @RateLimit(key = "adminUpload", permits = 5)
     @PostMapping("/policy")
     public ApiResponse<List<PresignedResp>> getUploadPolity(@RequestBody @Valid AdminUploadPolicyReq request) {
         return ApiResponse.success(factory.getStrategy(request.getBizType()).handle(request));

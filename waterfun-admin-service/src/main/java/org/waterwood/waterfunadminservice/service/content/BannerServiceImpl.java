@@ -17,6 +17,7 @@ import org.waterwood.waterfunadminservice.api.request.content.PutBannerRequest;
 import org.waterwood.waterfunadminservice.api.response.content.BannerResponse;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.BannerMapper;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
+import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.Banner;
 import org.waterwood.waterfunservicecore.entity.BannerPosition;
@@ -38,8 +39,9 @@ import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerato
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,8 +52,25 @@ public class BannerServiceImpl implements BannerService {
     private final ResourceRepository resourceRepository;
 
     @Override
-    public Page<Banner> list(Specification<Banner> spec, Pageable pageable) {
-        return bannerRepository.findAll(spec, pageable);
+    public Page<BannerResponse> list(Specification<Banner> spec, Pageable pageable) {
+        Page<Banner> banners = bannerRepository.findAll(spec, pageable);
+        Map<Long, String> bannerIdResourceCosKeyMap =
+                banners.stream().collect(
+                        Collectors.toMap(
+                                Banner::getId,
+                                v-> v.getResource().getResourceKey()
+                        )
+                );
+        Map<Long, CloudResPresignedUrlResp> bannerIdPresignedUrlMap = cloudFileService.batchGetReadPublicUrlCached(
+                CloudFSRoot.SYSTEM,
+                bannerIdResourceCosKeyMap,
+                TargetType.BANNER_IMAGE
+        );
+        return banners.map(b -> {
+            BannerResponse br = bannerMapper.toResponse(b);
+            br.setCoverageUrl(bannerIdPresignedUrlMap.get(b.getId()));
+            return br;
+        });
     }
 
     @Override
@@ -73,9 +92,12 @@ public class BannerServiceImpl implements BannerService {
         if (banner.getStatus() == null) {
             banner.setStatus(VisibleStatus.SHOW);
         }
-        Instant now = Instant.now();
-        banner.setCreatedAt(now);
-        banner.setUpdatedAt(now);
+//        if(req.getStartAt() != null) {
+//            banner.setStartAt(req.getStartAt());
+//        }
+//        if(req.getEndAt() != null) {
+//            banner.setEndAt(req.getEndAt());
+//        }
         Resource imageRes = resourceRepository.findByUuidAndStatus(req.getImageUuid(), ResourceStatus.ORPHAN)
                 .orElseThrow(() -> new ResourceReferenceInvalidException(req.getImageUuid()));
         imageRes.setStatus(ResourceStatus.ACTIVE);
@@ -89,16 +111,18 @@ public class BannerServiceImpl implements BannerService {
     @Override
     public void update(Long id, PutBannerRequest req) {
         Banner banner = getById(id);
-        String newResUuid = req.getImageUuid();
-        Resource oldRes = banner.getResource();
+        if(req.getImageUuid() != null) {
+            String newResUuid = req.getImageUuid();
+            Resource oldRes = banner.getResource();
 
-        if(!newResUuid.equals(oldRes.getUuid())){
-            oldRes.setStatus(ResourceStatus.ORPHAN);
-            Resource newRes = resourceRepository.findByUuidAndStatus(newResUuid, ResourceStatus.ORPHAN)
-                    .orElseThrow(() -> new ResourceReferenceInvalidException(newResUuid));
-            banner.setResource(newRes);
-            newRes.setStatus(ResourceStatus.ACTIVE);
-            resourceRepository.save(newRes);
+            if(!newResUuid.equals(oldRes.getUuid())){
+                oldRes.setStatus(ResourceStatus.ORPHAN);
+                Resource newRes = resourceRepository.findByUuidAndStatus(newResUuid, ResourceStatus.ORPHAN)
+                        .orElseThrow(() -> new ResourceReferenceInvalidException(newResUuid));
+                banner.setResource(newRes);
+                newRes.setStatus(ResourceStatus.ACTIVE);
+                resourceRepository.save(newRes);
+            }
         }
         bannerMapper.partialUpdate(req, banner);
         banner.setUpdatedAt(Instant.now());
@@ -116,7 +140,7 @@ public class BannerServiceImpl implements BannerService {
             throw new ResourceUnavailableException(banner.getResource().getUuid());
         resp.setCoverageUrl(
                 cloudFileService.getReadUrlCached(
-                        CloudFSRoot.UPLOADS,
+                        CloudFSRoot.SYSTEM,
                         banner.getResource().getResourceKey(),
                         "banner-coverage-" + banner.getId(),
                         TargetType.POST_COVERAGE_IMAGE
@@ -149,7 +173,7 @@ public class BannerServiceImpl implements BannerService {
                 )
         );
         return List.of(cloudFileService.buildPutPolicyWithPayload(
-                CloudFSRoot.USER,
+                CloudFSRoot.SYSTEM,
                 cosPath,
                 payload)
         );
@@ -170,10 +194,17 @@ public class BannerServiceImpl implements BannerService {
         ).orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid));
         cloudFileService.setAndValidResourceForCallback(
                 res,
-                CloudFSRoot.UPLOADS,
+                CloudFSRoot.SYSTEM,
                 ResourceStatus.ORPHAN,
                 ResourceType.IMAGE
         );
         resourceRepository.save(res);
+    }
+
+    @Override
+    public void delete(Long id) {
+        Banner banner = getById(id);
+        banner.setIsDeleted(true);
+        bannerRepository.save(banner);
     }
 }

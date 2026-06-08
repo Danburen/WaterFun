@@ -68,4 +68,9 @@ public class Banner {
     @JoinColumn(name = "resource_uuid", referencedColumnName = "uuid")
     private Resource resource;
 
+    @NotNull
+    @ColumnDefault("0")
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
 }

@@ -17,6 +17,7 @@ import org.waterwood.waterfunadminservice.infrastructure.mapper.TagMapper;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.waterwood.waterfunservicecore.exception.notfound.TagNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
@@ -29,12 +30,13 @@ public class TagServiceImpl implements TagService {
     private final TagMapper tagMapper;
     private final IdentifierGenerator identifierGenerator;
     private final UserCoreService userCoreService;
+    private final UserRepository userRepository;
 
     @Override
     public void createTag(CreateTagRequest req) {
         Tag tag = tagMapper.toEntity(req);
         tag.setSlug(identifierGenerator.fromSlug(req.getSlug(), req.getName(), tagRepository));
-        tag.setCreator(userCoreService.getUserByUid(UserCtxHolder.getUserUid()));
+        tag.setCreator(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
         tagRepository.save(tag);
     }
 

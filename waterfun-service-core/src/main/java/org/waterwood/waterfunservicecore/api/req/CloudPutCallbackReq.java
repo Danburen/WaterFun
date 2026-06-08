@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Cloud put callback request body
+ * token is the same as resource uuid.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

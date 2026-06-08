@@ -17,7 +17,7 @@ import org.waterwood.waterfunadminservice.api.response.content.CategoryResponse;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.CategoryMapper;
 import org.waterwood.waterfunadminservice.service.content.CategoryService;
 import org.waterwood.waterfunservicecore.entity.post.Category;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.CategorySpec;
+import org.waterwood.waterfunservicecore.entity.spec.CategorySpec;
 
 import java.time.Instant;
 import java.util.List;

@@ -72,7 +72,7 @@ public class User {
 
     @ColumnDefault("'0'")
     @Column(name = "exp", columnDefinition = "int UNSIGNED")
-    private Long exp = 0L;
+    private Integer exp = 0;
 
     @Override
     public final boolean equals(Object o) {
@@ -99,8 +99,15 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserCounter userCounter;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserPreference userPreference;
+
     public OptionVO<Long> toOptionVO(){
         return OptionVO.of(this.uid, this.nickname, this.nickname, ! this.accountStatus.equals(AccountStatus.ACTIVE));
+    }
+
+    public String getDisplayName(){
+        return this.nickname != null ? this.nickname : this.username;
     }
 }
 

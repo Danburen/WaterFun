@@ -108,8 +108,8 @@ onMounted(async () => {
           {{ categoryDetail.slug || '无' }}
         </el-descriptions-item>
         <el-descriptions-item label="父级ID">
-          <span v-if="categoryDetail.parentId">
-            {{ categoryDetail.parentId }} ({{ categoryNameMap.get(categoryDetail.parentId) || '无' }})
+          <span v-if="categoryDetail.parentId != null">
+            {{ categoryDetail.parentId }} ({{ categoryNameMap.get(Number(categoryDetail.parentId)) || '无' }})
           </span>
           <span v-else>无</span>
         </el-descriptions-item>

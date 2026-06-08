@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.waterfunadminservice.api.AdminUploadBizType;
+import org.waterwood.waterfunadminservice.service.content.AdminBizType;
 import org.waterwood.waterfunservicecore.services.sys.upload.UploadPolicy;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AdminUploadPolicyReq implements UploadPolicy {
     @NotNull
-    private AdminUploadBizType BizType;
+    private AdminBizType bizType;
     @NotEmpty
     private String bizId;
     @NotEmpty

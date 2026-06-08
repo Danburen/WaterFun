@@ -1,18 +1,18 @@
-import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
-import type { CloudResPresignedUrlResp } from "@waterfun/web-core/src/types/api/response";
+import type { ISOString, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
+import { getUploadPolicy, type PresignedResp } from "~/api/resource";
 
 export type BannerPosition = "HOME" | "SIDE";
 export type BannerStatus = "SHOW" | "HIDE";
 
-export interface Instant {
-  seconds: number;
-  nanos: number;
+export interface CloudResPresignedUrlResp {
+  url: string;
+  expireAt?: string | null;
 }
 
 export interface BannerResp {
-  id: number;
+  id: string;
   coverageUrl?: CloudResPresignedUrlResp;
   title: string;
   subtitle?: string;
@@ -20,10 +20,10 @@ export interface BannerResp {
   position?: BannerPosition;
   sortNo?: number;
   status?: BannerStatus;
-  startAt?: Instant | string | null;
-  endAt?: Instant | string | null;
-  createdAt?: Instant | string | null;
-  updatedAt?: Instant | string | null;
+  startAt?: ISOString;
+  endAt?: ISOString;
+  createdAt?: ISOString;
+  updatedAt?: ISOString;
 }
 
 export interface ListBannerParams {
@@ -33,6 +33,9 @@ export interface ListBannerParams {
   subtitle?: string;
   position?: BannerPosition;
   status?: BannerStatus;
+  startAt?: string;
+  endAt?: string;
+  isDeleted?: boolean;
 }
 
 export interface CreateBannerRequest {
@@ -42,8 +45,8 @@ export interface CreateBannerRequest {
   position?: BannerPosition;
   sortNo?: number;
   status?: BannerStatus;
-  startAt?: Instant;
-  endAt?: Instant;
+  startAt?: string | null;
+  endAt?: string | null;
   imageUuid: string;
 }
 
@@ -55,34 +58,35 @@ export interface UpdateBannerRequest {
   position?: BannerPosition;
   sortNo?: number;
   status?: BannerStatus;
-  startAt?: Instant;
-  endAt?: Instant;
+  startAt?: string | null;
+  endAt?: string | null;
   imageUuid?: string;
-}
-
-export interface CoverageUploadResp {
-  key: string;
-  url: string;
-  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-  token: string;
 }
 
 export const listBanners = (params: ListBannerParams = {}): PromiseResBody<Page<BannerResp>> => {
   return request.get<Page<BannerResp>>("/content/banner/list", { params });
 };
 
-export const getBannerById = (id: number): PromiseResBody<BannerResp> => {
+export const getBannerById = (id: string): PromiseResBody<BannerResp> => {
   return request.get<BannerResp>(`/content/banner/${id}`);
 };
 
-export const createBanner = (data: CreateBannerRequest): PromiseResBody<string> => {
-  return request.post<string>("/content/banner", data);
+export const createBanner = (data: CreateBannerRequest): PromiseResBody<void> => {
+  return request.post<void>("/content/banner", data);
 };
 
-export const updateBanner = (id: number, data: UpdateBannerRequest): PromiseResBody<string> => {
-  return request.put<string>(`/content/banner/${id}`, data);
+export const updateBanner = (id: string, data: UpdateBannerRequest): PromiseResBody<void> => {
+  return request.put<void>(`/content/banner/${id}`, data);
 };
 
-export const getBannerCoverageUpload = (suffix: string): PromiseResBody<CoverageUploadResp> => {
-  return request.get<CoverageUploadResp>("/content/banner/coverage/upload", { params: { suffix } });
+export const deleteBanner = (id: string): PromiseResBody<void> => {
+  return request.delete<void>(`/content/banner/${id}`);
+};
+
+export const getBannerUploadPolicy = (exts: string[], bizId: string = "0"): PromiseResBody<PresignedResp[]> => {
+  return getUploadPolicy({
+    bizType: "BANNER_IMAGE",
+    bizId,
+    exts,
+  });
 };

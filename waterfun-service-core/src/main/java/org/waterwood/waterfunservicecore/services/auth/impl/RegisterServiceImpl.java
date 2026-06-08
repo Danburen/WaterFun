@@ -110,10 +110,13 @@ public class RegisterServiceImpl implements RegisterService {
         up.setUser(user);
         UserCounter uc = new UserCounter();
         uc.setUser(user);
+        UserPreference upp = new UserPreference();
+        upp.setUser(user);
 
         user.setUserCounter(uc);
         user.setUserProfile(up);
         user.setUserDatum(ud);
+        user.setUserPreference(upp);
         userRepo.save(user);
         return user;
     }

@@ -3,9 +3,9 @@ import type { LoginRequest, AccessTokenResponse } from "@waterfun/web-core/src/t
 import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 
 export const login = (data: LoginRequest): PromiseResBody<AccessTokenResponse> => {
-    return request.post('/auth/login-by-password', data);
+    return request.post<AccessTokenResponse>('/auth/login-by-password', data);
 }
 
-export const logout = (deviceFp: string): PromiseResBody<void> => {
-    return request.post('/auth/logout', deviceFp);
+export const logout = (deviceFp: string): PromiseResBody<null> => {
+    return request.post<null>('/auth/logout', deviceFp);
 }

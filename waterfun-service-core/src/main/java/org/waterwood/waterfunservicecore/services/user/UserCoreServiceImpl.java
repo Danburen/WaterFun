@@ -24,8 +24,8 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPer
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRoleRepo;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.UserPermSpec;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.UserSpec;
+import org.waterwood.waterfunservicecore.entity.spec.UserPermSpec;
+import org.waterwood.waterfunservicecore.entity.spec.UserSpec;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.time.Instant;
@@ -48,30 +48,6 @@ public class UserCoreServiceImpl implements UserCoreService {
     private final PermissionRepo permissionRepo;
     private final UserRoleCoreService userRoleCoreService;
     private final ResourceRepository resourceRepository;
-
-    @Override
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(
-                ()-> new BizException(BaseResponseCode.USER_NOT_FOUND)
-        );
-    }
-
-    @Override
-    public User getUserByUid(long uid) {
-        return  userRepository.findById(uid).orElseThrow(
-                ()-> new BizException(BaseResponseCode.USER_NOT_FOUND)
-        );
-    }
-
-    @Override
-    public User addUser(User user) {
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User update(User user){
-        return addUser(user);
-    }
 
     @Override
     public Set<Permission> getUserPermissions(long userUid) {

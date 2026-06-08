@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.waterwood.waterfunservicecore.entity.user.AccountStatus;
 import org.waterwood.waterfunservicecore.entity.user.User;
+import org.waterwood.waterfunservicecore.entity.user.UserType;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -19,7 +20,7 @@ public class UserInfoARes implements Serializable {
     private Long uid;
     private String username;
     private AccountStatus accountStatus;
-    private Short userType;
+    private UserType userType;
     private Instant statusChangedAt;
     private Instant updatedAt;
     private Instant createdAt;

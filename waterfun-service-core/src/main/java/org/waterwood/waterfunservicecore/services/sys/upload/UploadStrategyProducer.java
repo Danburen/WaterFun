@@ -17,7 +17,7 @@ public interface UploadStrategyProducer<T extends UploadPolicy> {
      * @return UploadBizStrategy
      */
     default UploadBizStrategy<T> getStrategy(BizType bizType) {
-        return doGetStrategy(bizType.getCode().toLowerCase());
+        return doGetStrategy(bizType.getCode());
     };
 
     /**
@@ -28,11 +28,11 @@ public interface UploadStrategyProducer<T extends UploadPolicy> {
      * @return UploadBizStrategy
      */
     default UploadBizStrategy<T> getStrategy(BizUploadPayload payload){
-        return doGetStrategy(payload.getBizType().toLowerCase());
+        return doGetStrategy(payload.getBizType());
     };
 
     private UploadBizStrategy<T> doGetStrategy(String code) {
-        UploadBizStrategy<T> strategy = getStrategies().get(code);
+        UploadBizStrategy<T> strategy = getStrategies().get(code.toLowerCase());
         if (strategy == null) {
             throw new BizTypeNotAllowException(code, getAvailableCodes());
         }

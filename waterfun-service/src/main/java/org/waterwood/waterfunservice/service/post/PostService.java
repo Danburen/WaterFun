@@ -112,4 +112,16 @@ public interface PostService {
 
     
     PostDraftResp getEditPostDraft(Long id);
+
+    /**
+     * User like a post
+     * @param id target post id
+     */
+    void like(Long id);
+
+    /**
+     * User collection a post
+     * @param id target post id
+     */
+    void collection(Long id);
 }

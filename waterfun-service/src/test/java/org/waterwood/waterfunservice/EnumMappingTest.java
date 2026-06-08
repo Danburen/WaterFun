@@ -17,11 +17,4 @@ public class EnumMappingTest {
         }
     }
 
-    @Test
-    public void testAllModerationTargetTypeHaveValidTargetType() {
-        for (ModerationTargetType mt : ModerationTargetType.values()) {
-            assertNotNull(mt.getTargetType());
-            assertDoesNotThrow(() -> TargetType.valueOf(mt.getTargetType().name()));
-        }
-    }
 }

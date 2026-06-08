@@ -17,7 +17,7 @@ import org.waterwood.waterfunadminservice.api.response.content.TagResponse;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.TagMapper;
 import org.waterwood.waterfunadminservice.service.content.TagService;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.utils.TagSpec;
+import org.waterwood.waterfunservicecore.entity.spec.TagSpec;
 
 import java.time.Instant;
 import java.util.List;

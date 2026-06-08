@@ -3,12 +3,11 @@ import type { FormInstance, FormRules } from "element-plus";
 import {
   createBanner,
   getBannerById,
-  getBannerCoverageUpload,
+  getBannerUploadPolicy,
   updateBanner,
   type BannerPosition,
   type BannerStatus,
   type CreateBannerRequest,
-  type Instant,
   type UpdateBannerRequest,
 } from "~/api/banner";
 import SingleImageUploader from "~/components/SingleImageUploader.vue";
@@ -18,13 +17,13 @@ const props = withDefaults(
   defineProps<{
     modelValue: boolean;
     mode?: "create" | "edit";
-    bannerId?: number;
+    bannerId?: string;
     initialResourceKey?: string;
     initialUploadToken?: string;
   }>(),
   {
     mode: "create",
-    bannerId: 0,
+    bannerId: "",
     initialResourceKey: "",
     initialUploadToken: "",
   }
@@ -94,26 +93,15 @@ const visible = computed({
   set: (value: boolean) => emit("update:modelValue", value),
 });
 
-const toDate = (value?: Instant | string | null): Date | null => {
+const toDate = (value?: string | null): Date | null => {
   if (!value) return null;
-  if (typeof value === "string") {
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  }
-  const seconds = Number(value.seconds || 0);
-  const nanos = Number(value.nanos || 0);
-  if (!seconds && !nanos) return null;
-  const ms = seconds * 1000 + Math.floor(nanos / 1_000_000);
-  return new Date(ms);
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-const toInstant = (value?: Date | null): Instant | undefined => {
+const toIsoString = (value?: Date | null): string | undefined => {
   if (!value) return undefined;
-  const ms = value.getTime();
-  return {
-    seconds: Math.floor(ms / 1000),
-    nanos: (ms % 1000) * 1_000_000,
-  };
+  return value.toISOString();
 };
 
 const resetForm = () => {
@@ -184,8 +172,8 @@ const handleSave = async () => {
 
   submitting.value = true;
   try {
-    const startAt = toInstant(formModel.value.startAt);
-    const endAt = toInstant(formModel.value.endAt);
+    const startAt = toIsoString(formModel.value.startAt);
+    const endAt = toIsoString(formModel.value.endAt);
 
     if (props.mode === "edit" && props.bannerId) {
       const payload: UpdateBannerRequest = {
@@ -251,8 +239,8 @@ const handleSave = async () => {
           v-model:resourceKey="resourceKey"
           v-model:uploadToken="uploadToken"
           v-model:previewUrl="coveragePreviewUrl"
-          :get-upload-policy="getBannerCoverageUpload"
-          @submitted="(payload) => { formModel.imageUuid = payload.key }"
+          :get-upload-policy="(suffix: string) => getBannerUploadPolicy([suffix]).then(r => ({ data: r.data[0] })) as any"
+          @submitted="(payload) => { formModel.imageUuid = payload.token }"
         />
       </el-form-item>
       <el-form-item prop="linkUrl" label="跳转链接">

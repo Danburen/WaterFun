@@ -15,7 +15,7 @@ const permOptions = ref<OptionResItem[]>([]);
 const permissionDetail = ref<PermissionResp | null>(null);
 
 const editDialogVisible = ref(false);
-type SimpleOption = { id: number; name: string };
+type SimpleOption = { id: string; name: string };
 const assignedUserOptions = ref<SimpleOption[]>([]);
 const collapseActive = ref(["users"]);
 

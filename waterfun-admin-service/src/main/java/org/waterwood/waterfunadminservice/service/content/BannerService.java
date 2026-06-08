@@ -15,7 +15,7 @@ import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import java.util.List;
 
 public interface BannerService {
-    Page<Banner> list(Specification<Banner> spec, Pageable pageable);
+    Page<BannerResponse> list(Specification<Banner> spec, Pageable pageable);
 
     Banner getById(Long id);
 
@@ -44,4 +44,10 @@ public interface BannerService {
      * @param ctx     payload suppose be parsed by {@link CloudFileService#parseToken(String)}
      */
     void handleBannerUploadCallback(CloudPutCallbackReq request, AdminUploadContext<Long> ctx);
+
+    /**
+     * Mark a banner deleted
+     * @param id target banner id
+     */
+    void delete(Long id);
 }

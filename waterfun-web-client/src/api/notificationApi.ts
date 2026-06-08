@@ -1,33 +1,28 @@
 import request from "../utils/axiosRequest";
 import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 
-export interface InstantDto {
-  seconds: number;
-  nanos: number;
-}
-
 export interface SystemNotificationRes {
-  id?: number;
+  id?: string;
   title: string;
   content: string;
-  createdAt: InstantDto;
+  createdAt: string;
   isRead?: boolean;
 }
 
 export interface CursorPageLong<T> {
   list: T[];
-  nextCursor: number | null;
+  nextCursor: string | null;
   hasNext: boolean;
 }
 
 export interface ListSystemNotificationParams {
-  cursor?: number;
+  cursor?: string;
   limit: number;
   unreadOnly?: boolean;
 }
 
 export interface BatchMarkReadReq {
-  ids: number[];
+  ids: string[];
 }
 
 export interface BatchResult {
@@ -47,7 +42,7 @@ export const getSystemNotificationUnreadCount = (): PromiseResBody<number> => {
   return request.get("/notifications/system/unreadCount");
 };
 
-export const markSystemNotificationReadById = (id: number): PromiseResBody<void> => {
+export const markSystemNotificationReadById = (id: string): PromiseResBody<void> => {
   return request.post(`/notifications/system/${id}/batchMarkRead`);
 };
 

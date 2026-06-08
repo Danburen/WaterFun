@@ -7,24 +7,18 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.waterwood.waterfunservicecore.entity.user.UserFollower;
+import org.waterwood.waterfunservicecore.entity.user.UserFollowerId;
 
-public interface UserFollowerRepository extends JpaRepository<UserFollower, Long> ,
+public interface UserFollowerRepository extends JpaRepository<UserFollower, UserFollowerId> ,
         JpaSpecificationExecutor<UserFollower> {
 
-    @Query("select distinct uf from UserFollower uf " +
-            "join fetch uf.follower u " +
-            "join fetch uf.counter  c " +
-            "join fetch uf.profile  p " +
-            "where uf.user.uid = :uid " +
-            "order by uf.createdAt desc")
-    Page<UserFollower> fetchFollowers(@Param("uid") Long uid, Pageable pageable);
-    @Query("select distinct uf from UserFollower uf " +
-            "join fetch uf.follower u " +
-            "join fetch uf.counter  c " +
-            "join fetch uf.profile  p " +
-            "where uf.follower.uid = :uid " +
-            "order by uf.createdAt desc")
-    Page<UserFollower> fetchFollowings(@Param("uid") Long uid, Pageable pageable);
+    @Query("SELECT uf.id.userUid FROM UserFollower uf " +
+            "WHERE uf.id.userUid = :uid " +
+            "ORDER BY uf.createdAt DESC ")
+    Page<Long> findByUserUid(@Param("uid") Long uid, Pageable pageable);
+    @Query("SELECT uf.id.userUid FROM UserFollower uf " +
+            "WHERE uf.id.followerUid = :uid " +
+            "ORDER BY uf.createdAt DESC ")
+    Page<Long> findByFollowerUid(long userUid, Pageable pageable);
 
-    void deleteByUserUid(Long userUid);
 }

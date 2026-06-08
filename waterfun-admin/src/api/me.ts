@@ -1,12 +1,9 @@
 import request from "../utils/axiosRequest"
-import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
+import type { ISOString, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 
 export interface AdminAvatarResponse {
     url: string;
-    expireAt?: {
-        seconds: number;
-        nanos: number;
-    };
+    expireAt?: ISOString;
 }
 
 export interface AdminUserInfoResponse {
@@ -15,10 +12,7 @@ export interface AdminUserInfoResponse {
     nickname: string;
     avatar?: AdminAvatarResponse;
     accountStatus: 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED';
-    createdAt?: {
-        seconds: number;
-        nanos: number;
-    };
+    createdAt?: ISOString;
     passwordHash: boolean;
     roles: string[];
     permissions: string[];
@@ -34,9 +28,9 @@ export interface UpdateUserProfileRequest {
 
 
 export const getCurrentUserInfo = (): PromiseResBody<AdminUserInfoResponse> => {
-    return request.post('/me/info');
+    return request.post<AdminUserInfoResponse>('/me/info');
 }
 
-export const updateCurrentUserProfile = (data: UpdateUserProfileRequest): PromiseResBody<void> => {
-    return request.put('/me/updateProfile', data);
+export const updateCurrentUserProfile = (data: UpdateUserProfileRequest): PromiseResBody<null> => {
+    return request.put<null>('/me/updateProfile', data);
 }

@@ -1,14 +1,9 @@
-import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
+import type { ISOString, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type PostStatus = "DRAFT" | "PENDING" | "PUBLISHED" | "REJECTED" | "ARCHIVED";
 export type PostVisibility = "PUBLIC" | "PRIVATE" | "FANS_ONLY";
-
-export interface Instant {
-  seconds: number;
-  nanos: number;
-}
 
 export interface PostResp {
   id: string;
@@ -19,17 +14,17 @@ export interface PostResp {
   coverImg?: string;
   status?: PostStatus;
   visibility?: PostVisibility;
-  categoryId: number;
+  categoryId?: string;
   authorId: string;
-  tagIds?: number[];
-  viewCount?: number;
-  likeCount?: number;
-  commentCount?: number;
-  collectCount?: number;
+  tagIds?: string[];
+  viewCount?: string;
+  likeCount?: string;
+  commentCount?: string;
+  collectCount?: string;
   slug?: string;
-  publishedAt?: Instant | string | null;
-  createdAt?: Instant | string | null;
-  updatedAt?: Instant | string | null;
+  publishedAt?: ISOString;
+  createdAt?: ISOString;
+  updatedAt?: ISOString;
 }
 
 export interface ListPostParams {
@@ -37,9 +32,9 @@ export interface ListPostParams {
   size?: number;
   title?: string;
   status?: PostStatus;
-  categoryId?: number;
+  categoryId?: string;
   authorId?: string;
-  tagIds?: number[];
+  tagIds?: string[];
   slug?: string;
 }
 
@@ -52,9 +47,9 @@ export interface CreatePostRequest {
   status: PostStatus;
   visibility: PostVisibility;
   authorId: string;
-  categoryId: number;
+  categoryId: string;
   slug?: string;
-  tagIds?: number[];
+  tagIds?: string[];
 }
 
 export interface UpdatePostRequest {
@@ -66,7 +61,7 @@ export interface UpdatePostRequest {
   status?: PostStatus;
   visibility?: PostVisibility;
   authorId?: string;
-  categoryId?: number;
+  categoryId?: string;
   slug?: string;
 }
 
@@ -75,7 +70,7 @@ export interface DeletePostRequest {
 }
 
 export interface AssignTagsRequest {
-  tagIds?: number[];
+  tagIds?: string[];
 }
 
 export interface BatchResult {

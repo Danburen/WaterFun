@@ -18,7 +18,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import HeaderNavMenu from "~/components/HeaderNavMenu.vue";
 import MessageCenterSidebar, { type MessageTabType } from "~/components/message-center/MessageCenterSidebar.vue";
 import SystemNotificationModule from "~/components/message-center/SystemNotificationModule.vue";
 import SubscribeMessageModule from "~/components/message-center/SubscribeMessageModule.vue";

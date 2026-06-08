@@ -135,8 +135,8 @@ onMounted(async () => {
           {{ postDetail.visibility ? (visibilityLabelMap[postDetail.visibility] || '无') : '无' }}
         </el-descriptions-item>
         <el-descriptions-item label="分类ID">
-          <span v-if="postDetail.categoryId">
-            {{ postDetail.categoryId }} ({{ categoryNameMap.get(postDetail.categoryId) || '无' }})
+          <span v-if="postDetail.categoryId != null">
+            {{ postDetail.categoryId }} ({{ categoryNameMap.get(Number(postDetail.categoryId)) || '无' }})
           </span>
           <span v-else>无</span>
         </el-descriptions-item>
@@ -153,7 +153,7 @@ onMounted(async () => {
               :key="tagId"
               size="small"
             >
-              {{ tagId }} ({{ tagNameMap.get(tagId) || '无' }})
+              {{ tagId }} ({{ tagNameMap.get(Number(tagId)) || '无' }})
             </el-tag>
             <span v-if="!postDetail.tagIds || postDetail.tagIds.length === 0">无</span>
           </el-space>

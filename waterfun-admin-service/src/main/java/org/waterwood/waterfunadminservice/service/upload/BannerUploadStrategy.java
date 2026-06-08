@@ -2,7 +2,6 @@ package org.waterwood.waterfunadminservice.service.upload;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.waterwood.waterfunadminservice.api.AdminUploadBizType;
 import org.waterwood.waterfunadminservice.api.AdminUploadContext;
 import org.waterwood.waterfunadminservice.api.request.AdminUploadPolicyReq;
 import org.waterwood.waterfunadminservice.service.content.AdminBizType;
@@ -24,7 +23,7 @@ public class BannerUploadStrategy implements UploadBizStrategy<AdminUploadPolicy
     @Override
     public Set<String> getTargetBizTypeCodes() {
         return Set.of(
-                AdminBizType.BANNER_COVERAGE.getCode()
+                AdminBizType.BANNER_IMAGE.getCode()
         );
     }
 
@@ -36,7 +35,7 @@ public class BannerUploadStrategy implements UploadBizStrategy<AdminUploadPolicy
     @Override
     public void handleCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
             bannerService.handleBannerUploadCallback(request, payload.toContext(
-                    AdminUploadBizType.class,
+                    AdminBizType.class,
                     Long.class,
                     AdminUploadContext::new
             ));

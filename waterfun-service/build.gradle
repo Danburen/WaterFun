@@ -51,7 +51,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     // https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations
     implementation("io.swagger.core.v3:swagger-annotations:2.2.41")
+    // Source: https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.3'
     implementation 'org.mapstruct:mapstruct:1.6.3'
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
     implementation 'com.ibm.icu:icu4j:78.1'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
