@@ -30,3 +30,4 @@ deploy
 # java
 *.jar
 *.class
+/waterfun-common-lib/build/
