@@ -18,6 +18,8 @@ import java.util.Optional;
 
 public interface AuditTaskRepository extends JpaRepository<AuditTask, Long>, JpaSpecificationExecutor<AuditTask> {
 
+    long countByStatus(AuditStatus status);
+
     List<AuditTask> findAllByIdInAndStatus(Collection<Long> ids, AuditStatus status);
 
     Optional<AuditTask> findByTargetIdAndTargetTypeAndStatus(String targetId, TargetType targetType, AuditStatus status);

@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.entity;
+package org.waterwood.waterfunservicecore.entity.audit;
 
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservicecore.entity;
+package org.waterwood.waterfunservicecore.entity.audit;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

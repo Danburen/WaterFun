@@ -46,11 +46,12 @@ public class CommentServiceImpl implements CommentService {
     public void create(CreateCommentReq req) {
         Comment parent = null;
         Comment comment = new Comment();
-        comment.setPost(postRepository.getReferenceById(req.getPostId()));
+        Long postId = req.getPostId();
+        comment.setPost(postRepository.getReferenceById(postId));
 
         if(req.getParentId() != null){
             parent = commentRepository.findByPostIdAndParentIdAndStatus(
-                    req.getPostId(), req.getParentId(), CommentStatus.NORMAL
+                    postId, req.getParentId(), CommentStatus.NORMAL
             ).orElseThrow(CommentAlreadyDeletedOrNotFoundException::new);
 
             commentRepository.increaseReplyCountById(req.getParentId());
@@ -58,13 +59,40 @@ public class CommentServiceImpl implements CommentService {
                 comment.setRoot(commentRepository.getReferenceById(parent.getRoot().getId()));
             }
         } else {
-            postRepository.increaseCommentCountById(req.getPostId(), 1);
+            postRepository.increaseCommentCountById(postId, 1);
         }
 
         comment.setParent(parent);
-        comment.setAuthor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
+        Long authorUid = UserCtxHolder.getUserUid();
+        comment.setAuthor(userRepository.getReferenceById(authorUid));
         comment.setContent(req.getContent());
         commentRepository.save(comment);
+
+        // Send reply notification
+        if (parent != null) {
+            if (!parent.getAuthor().getUid().equals(authorUid)) {
+                notificationService.onReply(
+                        parent.getAuthor().getUid(),
+                        authorUid,
+                        comment.getId(),
+                        parent.getContent(),
+                        postId,
+                        req.getContent()
+                );
+            }
+        } else {
+            Long postAuthorUid = comment.getPost().getAuthor().getUid();
+            if (!postAuthorUid.equals(authorUid)) {
+                notificationService.onPostReply(
+                        postAuthorUid,
+                        authorUid,
+                        comment.getId(),
+                        comment.getPost().getTitle(),
+                        postId,
+                        req.getContent()
+                );
+            }
+        }
     }
 
     @Transactional

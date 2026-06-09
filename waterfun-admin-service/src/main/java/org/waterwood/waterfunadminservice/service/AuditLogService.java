@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.waterfunadminservice.api.response.AuditLogResponse;
-import org.waterwood.waterfunservicecore.entity.AuditLog;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLog;
 
 import java.util.List;
 

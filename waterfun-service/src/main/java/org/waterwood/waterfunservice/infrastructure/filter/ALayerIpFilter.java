@@ -15,21 +15,22 @@ import org.waterwood.waterfunservice.service.IpBanService;
 import java.io.IOException;
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE + 1)
+@Order(Ordered.HIGHEST_PRECEDENCE)  // Ensure this filter runs before all others
 @RequiredArgsConstructor
-public class IpBanFilter extends OncePerRequestFilter {
+public class ALayerIpFilter extends OncePerRequestFilter {
     private final IpBanService ipBanService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String ip = request.getHeader("X-Real-Client-Ip");
-        if(StringUtil.isBlank(ip)) {
-            ip = getClientIp(request);
+        String clientIp = request.getHeader("X-Real-Client-Ip");
+        if(StringUtil.isBlank(clientIp)) {
+            clientIp = getClientIp(request);
         }
+        request.setAttribute("clientIp", clientIp);
 
-        if (ipBanService.isBanned(ip)) {
+        if (ipBanService.isBanned(clientIp)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             String accept = request.getHeader("Accept");
             boolean wantsJson = accept != null && accept.contains("application/json");
@@ -39,7 +40,7 @@ public class IpBanFilter extends OncePerRequestFilter {
                 response.getWriter().write("{\"code\":403,\"message\":\"IP banned\"}");
             } else {
                 response.setContentType("text/html; charset=UTF-8");
-                response.getWriter().write(html.formatted(ip));
+                response.getWriter().write(html.formatted(clientIp));
             }
             return;
         }

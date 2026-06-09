@@ -20,4 +20,5 @@ public class VerifyCodeDto {
     @NotNull
     private VerifyScene scene;
     private String deviceFp;
+    private DeviceInfoReq deviceInfo;
 }

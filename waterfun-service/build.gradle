@@ -53,6 +53,7 @@ dependencies {
     implementation("io.swagger.core.v3:swagger-annotations:2.2.41")
     // Source: https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation 'com.github.ben-manes.caffeine:caffeine:3.2.3'
+    implementation 'org.lionsoul:ip2region:2.7.0'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
     implementation 'com.ibm.icu:icu4j:78.1'

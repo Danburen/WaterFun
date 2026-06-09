@@ -3,8 +3,8 @@ package org.waterwood.waterfunadminservice.api.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.waterfunservicecore.entity.AuditLogActionType;
-import org.waterwood.waterfunservicecore.entity.AuditLogStatusType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
 
 import java.time.Instant;
 import java.util.Map;

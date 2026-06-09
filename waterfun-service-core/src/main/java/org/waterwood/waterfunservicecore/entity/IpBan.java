@@ -37,6 +37,6 @@ public class IpBan {
 
     @NotNull
     @Column(name = "expires_at")
-    private Instant expiresAt = Instant.now();
+    private Instant expiresAt;
 
 }

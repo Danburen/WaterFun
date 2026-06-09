@@ -16,8 +16,11 @@ import org.waterwood.waterfunservice.api.request.ResetPasswordDto;
 import org.waterwood.waterfunservice.api.request.SetPasswordDto;
 import org.waterwood.waterfunservice.api.request.EmailBindActivateDto;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
+import org.waterwood.waterfunservice.service.AuditLogService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
 import org.waterwood.waterfunservice.service.account.AccountService;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.user.UserDatumCoreService;
@@ -31,6 +34,7 @@ public class AuthAccountController {
     private final AccountService accountService;
     private final VerificationService verificationService;
     private final UserDatumCoreService userDatumCoreService;
+    private final AuditLogService auditLogService;
 
     @GetMapping
     public ApiResponse<AccountResp> get(){
@@ -42,19 +46,37 @@ public class AuthAccountController {
     @Operation(summary = "重置密码")
     @PostMapping("/password/reset")
     public ApiResponse<Void> resetPassword(@Valid @RequestBody ResetPasswordDto dto, HttpServletRequest request) {
-        accountService.changePwd(
-                CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), request.getCookies()),
-                dto);
-        return ApiResponse.success();
+        long userUid = UserCtxHolder.getUserUid();
+        try {
+            accountService.changePwd(
+                    CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), request.getCookies()),
+                    dto);
+            auditLogService.record(userUid, null, AuditLogActionType.CHANGE_PASSWORD,
+                    request, dto.getVerify().getDeviceInfo());
+            return ApiResponse.success();
+        } catch (Exception e) {
+            auditLogService.record(userUid, null, AuditLogActionType.CHANGE_PASSWORD,
+                    AuditLogStatusType.FAIL, e.getMessage(), request, dto.getVerify().getDeviceInfo());
+            throw e;
+        }
     }
 
     @Operation(summary = "设置密码")
     @PostMapping("/password/set")
     public ApiResponse<Void> setPassword(@Valid @RequestBody SetPasswordDto dto, HttpServletRequest request) {
-        accountService.setPassword(
-                CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), request.getCookies()),
-                dto);
-        return ApiResponse.success();
+        long userUid = UserCtxHolder.getUserUid();
+        try {
+            accountService.setPassword(
+                    CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), request.getCookies()),
+                    dto);
+            auditLogService.record(userUid, null, AuditLogActionType.CHANGE_PASSWORD,
+                    request, dto.getVerify().getDeviceInfo());
+            return ApiResponse.success();
+        } catch (Exception e) {
+            auditLogService.record(userUid, null, AuditLogActionType.CHANGE_PASSWORD,
+                    AuditLogStatusType.FAIL, e.getMessage(), request, dto.getVerify().getDeviceInfo());
+            throw e;
+        }
     }
     @Operation(summary = "绑定邮箱")
     @PostMapping("/email/bind")

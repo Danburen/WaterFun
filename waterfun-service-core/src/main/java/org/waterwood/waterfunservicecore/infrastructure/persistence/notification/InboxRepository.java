@@ -22,6 +22,7 @@ public interface InboxRepository extends JpaRepository<Inbox, Long> {
           AND i.isDeleted = false
           AND (:cursor IS NULL OR i.id < :cursor)
           AND (:unreadOnly IS NULL OR i.isRead = false)
+          AND (:types IS NULL OR i.noticeType IN :types)
         ORDER BY i.id DESC
         LIMIT :limit
         """)
@@ -29,6 +30,7 @@ public interface InboxRepository extends JpaRepository<Inbox, Long> {
             @Param("userId") Long userId,
             @Param("cursor") Long cursor,
             @Param("unreadOnly") Boolean unreadOnly,
+            @Param("types") List<NoticeType> types,
             @Param("limit") int limit
     );
 

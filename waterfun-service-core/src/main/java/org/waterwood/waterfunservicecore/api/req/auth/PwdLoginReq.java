@@ -20,5 +20,6 @@ public class PwdLoginReq {
     private String captcha;
     @NotEmpty(message = "{auth.device_fingerprint.required}")
     private String deviceFp;
+    private DeviceInfoReq deviceInfo;
 }
 

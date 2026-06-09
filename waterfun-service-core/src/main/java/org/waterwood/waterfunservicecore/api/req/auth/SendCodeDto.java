@@ -15,6 +15,7 @@ public class SendCodeDto {
     @NotNull
     private VerifyChannel channel;
     private String deviceFp;
+    private DeviceInfoReq deviceInfo;
     @NotNull
     private VerifyScene scene;
 }

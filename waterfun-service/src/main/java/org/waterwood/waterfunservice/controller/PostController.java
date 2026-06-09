@@ -54,6 +54,12 @@ public class PostController {
         return ApiResponse.success(postService.listCardPosts(spec, pageable));
     }
 
+    @GetMapping("/detail/{id}")
+    @RateLimit(key = "listPublicPosts")
+    public ApiResponse<PostDetailResp> getPostDetailPublic(@PathVariable Long id){
+        return ApiResponse.success(postService.getPostDetail(id));
+    }
+
     @GetMapping("/{id}")
     public ApiResponse<PostDetailResp> getPostDetail(@PathVariable Long id){
         return ApiResponse.success(postService.getPostDetail(id));

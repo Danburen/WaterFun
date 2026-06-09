@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.Set;
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 2)
 public class GatewayUserContextFilter extends OncePerRequestFilter {
 
     @Override
@@ -41,6 +41,7 @@ public class GatewayUserContextFilter extends OncePerRequestFilter {
         authCtx.setJti(jti);
         authCtx.setLocale(Locale.forLanguageTag(lang != null ? lang : "en"));
         authCtx.setDid(request.getHeader("X-User-Did"));
+        authCtx.setClientIp((String) request.getAttribute("clientIp"));
         // TODO: ADD PERMISSIONS INJECTION
         UserCtxHolder.set(authCtx);
         try {

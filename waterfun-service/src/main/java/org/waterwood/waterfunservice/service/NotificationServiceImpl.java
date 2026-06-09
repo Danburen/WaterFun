@@ -1,13 +1,16 @@
 package org.waterwood.waterfunservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.waterfunservice.api.response.InboxNotificationRes;
 import org.waterwood.waterfunservice.infrastructure.dto.InboxPayload;
-import org.waterwood.waterfunservice.infrastructure.dto.InterationInboxPayload;
+import org.waterwood.waterfunservice.infrastructure.dto.ReactionInboxPayload;
 import org.waterwood.waterfunservice.infrastructure.dto.MultiUserIncludedInboxPayload;
+import org.waterwood.waterfunservice.infrastructure.dto.ReplyInboxPayload;
 import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
+import org.waterwood.waterfunservice.infrastructure.dto.FollowerInboxPayload;
 import org.waterwood.waterfunservicecore.entity.notification.Inbox;
 import org.waterwood.waterfunservicecore.entity.notification.NoticeType;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
@@ -25,20 +28,24 @@ import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+@Slf4j
+
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final InboxRepository inboxRepository;
     private final InboxSystemMapper inboxSystemMapper;
     private final UserRepository userRepository;
+    private final SSEService sseService;
 
     @Override
-    public CursorPage<InboxNotificationRes, Long> list(Long cursor, Integer limit, Boolean unreadOnly) {
+    public CursorPage<InboxNotificationRes, Long> list(Long cursor, Integer limit, Boolean unreadOnly, List<NoticeType> types) {
         limit = Math.min(limit, 20);
         List<Inbox> list = inboxRepository.findByCursor(
                 UserCtxHolder.getUserUid(),
                 cursor,
                 unreadOnly,
+                types == null || types.isEmpty() ? null : types,
                 limit + 1
         );
 
@@ -98,7 +105,7 @@ public class NotificationServiceImpl implements NotificationService {
                         targetId
                 );
         if(inboxes.isEmpty()) {
-            handleSingleNewInbox(recipient, businessType, targetId, title, payload);
+            handleSingleNewInbox(recipient, type, businessType, targetId, title, payload);
         } else {
             Inbox latest = inboxes.getFirst();
 
@@ -127,12 +134,13 @@ public class NotificationServiceImpl implements NotificationService {
             latest.setCreatedAt(Instant.now());
 
             inboxRepository.save(latest);
+            pushInboxToUser(recipient, latest);
         }
     }
 
     @Override
     public void onCommentLike(Long recipient, Long userUid, Long commentId, String title, Long postId) {
-        InterationInboxPayload payload = new InterationInboxPayload(
+        ReactionInboxPayload payload = new ReactionInboxPayload(
                 List.of(userUid),
                 null,
                 "/post/" + postId + "#comment-" + commentId
@@ -142,7 +150,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void onPostLike(Long recipient, Long userUid, Long postId, String title, Long coverageResourceUuid) {
-        InterationInboxPayload payload = new InterationInboxPayload(
+        ReactionInboxPayload payload = new ReactionInboxPayload(
                 List.of(userUid),
                 coverageResourceUuid,
                 "/post/" + postId
@@ -152,7 +160,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void onPostCollect(Long recipient, Long userUid, Long postId, String title, Long coverageResourceUuid) {
-        InterationInboxPayload payload = new InterationInboxPayload(
+        ReactionInboxPayload payload = new ReactionInboxPayload(
                 List.of(userUid),
                 coverageResourceUuid,
                 "/post/" + postId
@@ -160,16 +168,71 @@ public class NotificationServiceImpl implements NotificationService {
         handleAggregateNewInbox(recipient, userUid, NoticeType.COLLECT, BusinessType.POST, postId, title, payload);
     }
 
-    private void handleSingleNewInbox(Long recipient, BusinessType type, Serializable targetId, String title,InboxPayload payload) {
+    @Override
+    public void onReply(Long recipient, Long userUid, Long commentId, String title, Long postId, String replyContent) {
+        if (recipient == null || recipient.equals(userUid)) return;
+        ReplyInboxPayload payload = new ReplyInboxPayload(
+                List.of(userUid),
+                replyContent,
+                "/post/" + postId + "#comment-" + commentId
+        );
+        handleSingleNewInbox(recipient, NoticeType.REPLY, BusinessType.COMMENT, commentId, title, payload);
+    }
+
+    @Override
+    public void onPostReply(Long recipient, Long userUid, Long commentId, String title, Long postId, String commentContent) {
+        if (recipient == null || recipient.equals(userUid)) return;
+        ReplyInboxPayload payload = new ReplyInboxPayload(
+                List.of(userUid),
+                commentContent,
+                "/post/" + postId + "#comment-" + commentId
+        );
+        handleSingleNewInbox(recipient, NoticeType.REPLY, BusinessType.POST, commentId, title, payload);
+    }
+
+    @Override
+    public void onNewFollower(Long recipient, Long followerUid) {
+        if (recipient == null || recipient.equals(followerUid)) return;
+        FollowerInboxPayload payload = new FollowerInboxPayload(
+                followerUid,
+                "/user/" + followerUid
+        );
+        handleSingleNewInbox(recipient, NoticeType.NEW_FOLLOWER, BusinessType.NONE, followerUid, "New Follower", payload);
+    }
+
+    @Override
+    public void deleteInbox(Long id) {
+        Inbox inbox = inboxRepository.findById(id).orElseThrow(
+                () -> NotFoundException.of("Inbox not found: " + id)
+        );
+        if (!inbox.getUser().getUid().equals(UserCtxHolder.getUserUid())) {
+            throw new ForbiddenException();
+        }
+        inbox.setIsDeleted(Boolean.TRUE);
+    }
+
+    private void handleSingleNewInbox(Long recipient, NoticeType noticeType, BusinessType type,
+                                       Serializable targetId, String title, InboxPayload payload) {
         Inbox inbox = new Inbox();
         inbox.setUser(userRepository.getReferenceById(recipient));
-        inbox.setNoticeType(NoticeType.LIKE);
+        inbox.setNoticeType(noticeType);
         inbox.setBusinessType(type);
         inbox.setTargetId(targetId.toString());
-
         inbox.setTitle(title);
         inbox.setContent(payload.toMap());
-
         inboxRepository.save(inbox);
+        pushInboxToUser(recipient, inbox);
+    }
+
+    private void pushInboxToUser(Long recipient, Inbox inbox) {
+        try {
+            InboxNotificationRes dto = inboxSystemMapper.toDto(inbox);
+            boolean pushed = sseService.sendToUser(recipient, dto);
+            if (pushed) {
+                log.debug("SSE pushed notification to user {}", recipient);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to push SSE notification to user {}: {}", recipient, e.getMessage());
+        }
     }
 }

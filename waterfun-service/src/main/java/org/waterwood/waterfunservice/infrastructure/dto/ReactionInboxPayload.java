@@ -9,7 +9,7 @@ import java.util.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InterationInboxPayload implements MultiUserIncludedInboxPayload {
+public class ReactionInboxPayload implements MultiUserIncludedInboxPayload {
     private List<Long> userUids;
     private Long imageUuid;
     private String nativeUrl;
@@ -27,12 +27,12 @@ public class InterationInboxPayload implements MultiUserIncludedInboxPayload {
 
     @Override
     public MultiUserIncludedInboxPayload withUserUids(LinkedHashSet<Long> userUids) {
-        return new InterationInboxPayload(new ArrayList<>(userUids), imageUuid, nativeUrl);
+        return new ReactionInboxPayload(new ArrayList<>(userUids), imageUuid, nativeUrl);
     }
 
     @Override
     public MultiUserIncludedInboxPayload formMap(Map<String, Object> map) {
-        if (map == null || map.isEmpty()) return new InterationInboxPayload();
+        if (map == null || map.isEmpty()) return new ReactionInboxPayload();
 
         Object userIdsObj = map.get("userUids");
         List<Long> userIds = new ArrayList<>();
@@ -42,7 +42,7 @@ public class InterationInboxPayload implements MultiUserIncludedInboxPayload {
             }
         }
 
-        return new InterationInboxPayload(
+        return new ReactionInboxPayload(
                 userIds,
                 Long.parseLong((String) map.get("imageUuid")),
                 (String) map.get("nativeUrl")

@@ -23,6 +23,7 @@ import org.waterwood.utils.StringUtil;
 import org.waterwood.utils.UidGenerator;
 import org.waterwood.waterfunservicecore.services.auth.RegisterService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
+import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -39,6 +40,7 @@ public class RegisterServiceImpl implements RegisterService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final VerificationService verificationService;
+    private final SiteStatisticRecorder siteStatisticRecorder;
 
     @Value("${expire.email.unverified-expire-hours:24}")
     private Long emailUnverifiedExpireHours;
@@ -118,6 +120,7 @@ public class RegisterServiceImpl implements RegisterService {
         user.setUserDatum(ud);
         user.setUserPreference(upp);
         userRepo.save(user);
+        siteStatisticRecorder.recordNewUser();
         return user;
     }
 }

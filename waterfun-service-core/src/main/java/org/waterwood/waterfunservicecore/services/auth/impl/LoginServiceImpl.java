@@ -21,6 +21,7 @@ import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.auth.LoginService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
+import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
 
 import java.util.Optional;
 
@@ -34,22 +35,24 @@ public class LoginServiceImpl implements LoginService {
     private final EncryptedKeyService encryptedKeyService;
     private final CaptchaServiceImpl captchaService;
     private final VerificationService verificationService;
+    private final SiteStatisticRecorder siteStatisticRecorder;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
     public User login(PwdLoginReq body, String verifyUUIDKey){
         Optional<User> user = userRepo.findByUsername(body.getUsername());
-        return user.map(u->{
-            if(! captchaService.verifyCode(verifyUUIDKey,body.getCaptcha()))
+        User u = user.map(uu -> {
+            if(! captchaService.verifyCode(verifyUUIDKey, body.getCaptcha()))
                 throw new AuthException(AuthCode.CAPTCHA_INVALID);
-            if(! encoder.matches(body.getPassword(), u.getPasswordHash()))
+            if(! encoder.matches(body.getPassword(), uu.getPasswordHash()))
                 throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
-            // User didn't set password so they are not allow to log in by password.
-            if( u.getPasswordHash() == null)
+            if(uu.getPasswordHash() == null)
                 throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
-            return u;
-        }).orElseThrow(()-> new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
+            return uu;
+        }).orElseThrow(() -> new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
+        siteStatisticRecorder.recordLogin();
+        return u;
     }
 
     @Override
@@ -79,6 +82,7 @@ public class LoginServiceImpl implements LoginService {
         verificationService.verifyCode(dto.getTarget(),dto.getScene(),channel,codeKey,dto.getCode());
 
         if(userDatum ==  null) throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
+        siteStatisticRecorder.recordLogin();
         return userDatum.getUser();
     }
 }

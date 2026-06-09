@@ -51,6 +51,7 @@ public class GatewaySecurityConfig {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/api/auth/**").permitAll()
                         .pathMatchers("/api/admin/auth/**").permitAll()
+                        .pathMatchers("/api/posts/list", "/api/posts/list/detail", "/api/banners").permitAll()
                         .anyExchange().authenticated()
                 )
                 .build();

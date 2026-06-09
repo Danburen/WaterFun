@@ -12,10 +12,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class SiteStatisticResponse {
     private LocalDate statDate;
-    private Long dailyVisits;
-    private Long dailyUv;
+    private Long loginCount;
+    private Long dailyPv;
     private Long newUsers;
-    private Long activeUsers;
+    private Long newPosts;
     private Long peakOnline;
     private Instant updatedAt;
 }

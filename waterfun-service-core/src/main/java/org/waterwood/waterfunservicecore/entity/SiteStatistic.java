@@ -20,25 +20,26 @@ public class SiteStatistic {
     @Column(name = "stat_date", nullable = false)
     private LocalDate id;
 
-    @ColumnDefault("'0'")
-    @Column(name = "daily_visits", columnDefinition = "int UNSIGNED")
-    private Long dailyVisits;
 
     @ColumnDefault("'0'")
-    @Column(name = "daily_uv", columnDefinition = "int UNSIGNED")
-    private Long dailyUv;
+    @Column(name = "login_count", columnDefinition = "int UNSIGNED")
+    private Long loginCount = 0L;
+
+    @ColumnDefault("'0'")
+    @Column(name = "daily_pv", columnDefinition = "int UNSIGNED")
+    private Long dailyPv = 0L;
 
     @ColumnDefault("'0'")
     @Column(name = "new_users", columnDefinition = "int UNSIGNED")
-    private Long newUsers;
+    private Long newUsers = 0L;
 
     @ColumnDefault("'0'")
-    @Column(name = "active_users", columnDefinition = "int UNSIGNED")
-    private Long activeUsers;
+    @Column(name = "new_posts", columnDefinition = "int UNSIGNED")
+    private Long newPosts = 0L;
 
     @ColumnDefault("'0'")
     @Column(name = "peak_online", columnDefinition = "int UNSIGNED")
-    private Long peakOnline;
+    private Long peakOnline = 0L;
 
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "updated_at")

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.waterfunadminservice.api.response.AuditLogResponse;
-import org.waterwood.waterfunservicecore.entity.AuditLog;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLog;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.AuditLogRepository;
 

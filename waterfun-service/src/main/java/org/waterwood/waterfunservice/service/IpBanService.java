@@ -31,7 +31,7 @@ public class IpBanService {
 
     @Scheduled(fixedRate = 60_000)
     public void refreshCache() {
-        List<IpBan> activeBans = ipBanRepository.findActiveList(LocalDateTime.now());
+        List<IpBan> activeBans = ipBanRepository.findActiveList(Instant.now());
 
         // rebuild cache
         banCache.invalidateAll();

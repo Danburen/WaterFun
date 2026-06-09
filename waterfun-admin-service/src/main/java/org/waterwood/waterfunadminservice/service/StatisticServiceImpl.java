@@ -45,10 +45,10 @@ public class StatisticServiceImpl implements StatisticService {
     private SiteStatisticResponse toResponse(SiteStatistic stat) {
         SiteStatisticResponse resp = new SiteStatisticResponse();
         resp.setStatDate(stat.getId());
-        resp.setDailyVisits(stat.getDailyVisits());
-        resp.setDailyUv(stat.getDailyUv());
+        resp.setLoginCount(stat.getLoginCount());
+        resp.setDailyPv(stat.getDailyPv());
         resp.setNewUsers(stat.getNewUsers());
-        resp.setActiveUsers(stat.getActiveUsers());
+        resp.setNewPosts(stat.getNewPosts());
         resp.setPeakOnline(stat.getPeakOnline());
         resp.setUpdatedAt(stat.getUpdatedAt());
         return resp;

@@ -12,12 +12,12 @@ public final class RateLimitUtils {
 
     // white list
     private static final List<String> WHITE_LIST = List.of(
-            "/health",
-            "/actuator",
-            "/favicon.ico",
-            "/swagger-ui",
-            "/v3/api-docs",
-            "/webjars"
+//            "/health",
+//            "/actuator",
+//            "/favicon.ico",
+//            "/swagger-ui",
+//            "/v3/api-docs",
+//            "/webjars"
     );
 
     // Set of written method

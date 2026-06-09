@@ -15,4 +15,5 @@ public class SecurityVerifyCodeDto {
     @NotNull
     private VerifyScene scene;
     private String deviceFp;
+    private DeviceInfoReq deviceInfo;
 }

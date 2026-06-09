@@ -14,8 +14,10 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InboxNotificationRes {
+    private Long id;
     private String title;
-    private String content;
+    private Short noticeType;
+    private NotificationContent content;
     private Instant createdAt;
     private Boolean isRead;
 }

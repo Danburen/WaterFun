@@ -12,6 +12,7 @@ public class SecuritySendCodeDto {
     private VerifyChannel channel;
     @NotEmpty
     private String deviceFp;
+    private DeviceInfoReq deviceInfo;
     @NotNull
     private VerifyScene scene;
 }

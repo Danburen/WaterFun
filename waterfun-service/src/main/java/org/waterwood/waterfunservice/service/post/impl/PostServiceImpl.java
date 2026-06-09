@@ -57,6 +57,7 @@ import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservice.service.post.PostService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.infrastructure.validation.UploadValidator;
+import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.UserBriefService;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
@@ -92,6 +93,7 @@ public class PostServiceImpl implements PostService {
     private final UserLikeRepository userLikeRepository;
     private final UserCollectRepository userCollectRepository;
     private final NotificationService notificationService;
+    private final SiteStatisticRecorder siteStatisticRecorder;
 
     @Value("${user.quota.collect:10000}")
     private Long userCollectExceedLimit;
@@ -214,6 +216,7 @@ public class PostServiceImpl implements PostService {
         p.setEditedContent("");
         p.setAuthor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
         postRepository.save(p);
+        siteStatisticRecorder.recordNewPost();
         return id;
     }
 

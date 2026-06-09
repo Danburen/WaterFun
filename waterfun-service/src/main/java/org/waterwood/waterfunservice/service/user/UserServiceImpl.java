@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.waterwood.waterfunservice.service.NotificationService;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.api.resp.user.UserPublicCardResp;
 import org.waterwood.waterfunservice.api.response.UserPublicProfileResp;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService{
     private final UserBriefService userBriefService;
     private final UserProfileRepository userProfileRepository;
     private final UserCounterRepository userCounterRepository;
+    private final NotificationService notificationService;
 
     @Override
     public UserPublicProfileResp getPublicUserProfile(long userUid) {
@@ -110,6 +112,7 @@ public class UserServiceImpl implements UserService{
                             userFollowerRepository.save(uf);
                             userCounterRepository.increaseUserFollowerCount(targetUid, 1);
                             userCounterRepository.increaseUserFollowingCount(userUid, 1);
+                            notificationService.onNewFollower(targetUid, userUid);
                         }
                 );
     }

@@ -21,9 +21,12 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRep
 import org.waterwood.waterfunservicecore.services.auth.*;
 import org.waterwood.waterfunservicecore.api.req.auth.*;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
+import org.waterwood.waterfunservice.service.AuditLogService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.auth.impl.AuthCoreServiceImpl;
 import org.waterwood.waterfunservicecore.services.auth.impl.CaptchaServiceImpl;
@@ -45,6 +48,7 @@ public class AuthController {
     private final AuthCoreServiceImpl authService;
     private final VerificationService verificationService;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
 
     @Operation(summary = "获取图形验证码")
@@ -101,11 +105,19 @@ public class AuthController {
     @PostMapping("/login-by-password")
     @RateLimit(key = "user.login", permits = 5)
     public ApiResponse<LoginClientData> loginByPassword(@Valid @RequestBody PwdLoginReq body, HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        User user = loginService.login(body, CookieUtil.getCookieValue(cookies, "CAPTCHA_KEY"));
-        return ApiResponse.success(
-                authService.BuildLoginResponse(response, user, body.getDeviceFp())
-        );
+        try {
+            Cookie[] cookies = request.getCookies();
+            User user = loginService.login(body, CookieUtil.getCookieValue(cookies, "CAPTCHA_KEY"));
+            auditLogService.record(user.getUid(), user.getUsername(), AuditLogActionType.LOGIN,
+                    request, body.getDeviceInfo());
+            return ApiResponse.success(
+                    authService.BuildLoginResponse(response, user, body.getDeviceFp())
+            );
+        } catch (Exception e) {
+            auditLogService.record(null, body.getUsername(), AuditLogActionType.LOGIN,
+                    AuditLogStatusType.FAIL, e.getMessage(), request, body.getDeviceInfo());
+            throw e;
+        }
     }
 
 
@@ -113,24 +125,40 @@ public class AuthController {
     @PostMapping("/login-by-code")
     @RateLimit(key = "user.login", permits = 5)
     public ApiResponse<LoginClientData> loginByCode(@Valid @RequestBody VerifyCodeDto dto, HttpServletRequest request, HttpServletResponse response) {
-        String codeKey = dto.getChannel() == VerifyChannel.SMS ? "SMS_CODE_KEY" : "EMAIL_CODE_KEY";
-        User user = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
-        return ApiResponse.success(
-                authService.BuildLoginResponse(response, user, dto.getDeviceFp())
-        );
+        try {
+            String codeKey = dto.getChannel() == VerifyChannel.SMS ? "SMS_CODE_KEY" : "EMAIL_CODE_KEY";
+            User user = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
+            auditLogService.record(user.getUid(), user.getUsername(), AuditLogActionType.LOGIN,
+                    request, dto.getDeviceInfo());
+            return ApiResponse.success(
+                    authService.BuildLoginResponse(response, user, dto.getDeviceFp())
+            );
+        } catch (Exception e) {
+            auditLogService.record(null, dto.getTarget(), AuditLogActionType.LOGIN,
+                    AuditLogStatusType.FAIL, e.getMessage(), request, dto.getDeviceInfo());
+            throw e;
+        }
     }
 
     @Operation(summary = "注册")
     @PostMapping("/register")
     @RateLimit(key = "user.login", permits = 5)
     public ApiResponse<LoginClientData> register(@Valid @RequestBody RegisterRequest dto, HttpServletRequest request, HttpServletResponse response) {
-        User user = registerService.register(
-                dto,
-                CookieUtil.getCookieValue(request.getCookies(), "SMS_CODE_KEY")
-        );
-        return ApiResponse.success(
-                authService.BuildLoginResponse(response, user, dto.getVerify().getDeviceFp())
-        );
+        try {
+            User user = registerService.register(
+                    dto,
+                    CookieUtil.getCookieValue(request.getCookies(), "SMS_CODE_KEY")
+            );
+            auditLogService.record(user.getUid(), user.getUsername(), AuditLogActionType.REGISTER,
+                    request, dto.getVerify().getDeviceInfo());
+            return ApiResponse.success(
+                    authService.BuildLoginResponse(response, user, dto.getVerify().getDeviceFp())
+            );
+        } catch (Exception e) {
+            auditLogService.record(null, dto.getUsername(), AuditLogActionType.REGISTER,
+                    AuditLogStatusType.FAIL, e.getMessage(), request, dto.getVerify().getDeviceInfo());
+            throw e;
+        }
     }
 
     @PostMapping("/refresh")

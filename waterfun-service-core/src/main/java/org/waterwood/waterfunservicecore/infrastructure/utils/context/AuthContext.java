@@ -15,4 +15,5 @@ public final class AuthContext implements Serializable {
     private String jti;
     private String did;
     private Locale locale = Locale.ENGLISH;
+    private String clientIp;
 }
