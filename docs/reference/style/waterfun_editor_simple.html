@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布新帖 - WaterFun</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== Header ========== */
+        .header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .nav a {
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-spacer { flex: 1; }
+
+        .search-box {
+            position: relative;
+            width: 320px;
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 42px 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box input::placeholder { color: var(--text-muted); }
+
+        .search-box button {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .search-box button:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .icon-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 10px 4px 4px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 4px;
+        }
+
+        .user-menu:hover { background: var(--border-light); }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* ========== Main ========== */
+        .main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 32px 24px 48px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .page-breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .page-breadcrumb a:hover { color: var(--primary); }
+
+        .page-breadcrumb i { font-size: 10px; }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        /* ========== Editor Card ========== */
+        .editor-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .editor-body {
+            padding: 28px 32px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group:last-child { margin-bottom: 0; }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-label .required { color: #ef4444; margin-left: 2px; }
+
+        .form-hint {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* Title */
+        .title-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--bg-white);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .title-input::placeholder { color: var(--text-muted); font-weight: 400; }
+
+        .title-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Category */
+        .category-select {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .category-option {
+            position: relative;
+        }
+
+        .category-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .category-option label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-white);
+        }
+
+        .category-option label i { font-size: 13px; opacity: 0.7; }
+
+        .category-option input:checked + label {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .category-option input:checked + label i { opacity: 1; }
+
+        .category-option label:hover {
+            border-color: #cbd5e1;
+            color: var(--text-primary);
+        }
+
+        /* Content */
+        .editor-textarea {
+            width: 100%;
+            min-height: 280px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            background: var(--bg-white);
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .editor-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+        }
+
+        .editor-textarea::placeholder { color: var(--text-muted); }
+
+        .editor-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Tags */
+        .tag-input-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-white);
+            min-height: 46px;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .tag-input-wrap:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .tag-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            animation: tagIn 0.2s ease;
+        }
+
+        @keyframes tagIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .tag-chip .remove {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            font-size: 11px;
+        }
+
+        .tag-chip .remove:hover { opacity: 1; }
+
+        .tag-input {
+            flex: 1;
+            min-width: 80px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: var(--text-primary);
+            background: transparent;
+            padding: 4px;
+        }
+
+        .tag-input::placeholder { color: var(--text-muted); }
+
+        .tag-suggestions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag-suggestion {
+            padding: 4px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tag-suggestion:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 32px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: #cbd5e1;
+            color: var(--text-primary);
+            background: var(--border-light);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-draft {
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .btn-draft:hover { color: var(--text-secondary); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+
+        @media (max-width: 768px) {
+            .header-inner { padding: 0 16px; gap: 12px; }
+            .nav { display: none; }
+            .search-box { width: 160px; }
+            .user-name { display: none; }
+            .main { padding: 20px 16px 40px; }
+            .editor-body { padding: 20px; }
+            .action-bar { padding: 16px 20px; flex-direction: column; gap: 12px; }
+            .action-bar > div { width: 100%; justify-content: center; }
+            .category-select { gap: 8px; }
+            .category-option label { padding: 8px 14px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">WF</div>
+                <span class="logo-text">WaterFun</span>
+            </a>
+            <nav class="nav">
+                <a href="#">首页</a>
+                <a href="#">社区</a>
+                <a href="#">游乐场</a>
+                <a href="#">聊天室</a>
+                <a href="#">关于</a>
+            </nav>
+            <div class="header-spacer"></div>
+            <div class="search-box">
+                <input type="text" placeholder="请输入搜索内容">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                <button class="icon-btn"><i class="far fa-envelope"></i></button>
+                <div class="user-menu">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hatcher" alt="avatar" class="user-avatar">
+                    <span class="user-name">Hatcher</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="page-header">
+            <div class="page-breadcrumb">
+                <a href="#"><i class="fas fa-home"></i> 首页</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="#">社区</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>发布新帖</span>
+            </div>
+            <h1 class="page-title">发布新帖</h1>
+        </div>
+
+        <div class="editor-card">
+            <div class="editor-body">
+                <div class="form-group">
+                    <label class="form-label">帖子标题 <span class="required">*</span></label>
+                    <input type="text" class="title-input" id="titleInput" placeholder="请输入标题，好的标题能吸引更多读者">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">选择分类 <span class="required">*</span></label>
+                    <div class="category-select">
+                        <div class="category-option">
+                            <input type="radio" name="category" id="cat-tech" value="tech" checked>
+                            <label for="cat-tech"><i class="fas fa-code"></i> 技术交流</label>
+                        </div>
+                        <div class="category-option">
+                            <input type="radio" name="category" id="cat-life" value="life">
+                            <label for="cat-life"><i class="fas fa-coffee"></i> 生活分享</label>
+                        </div>
+                        <div class="category-option">
+                            <input type="radio" name="category" id="cat-share" value="share">
+                            <label for="cat-share"><i class="fas fa-share-alt"></i> 资源推荐</label>
+                        </div>
+                        <div class="category-option">
+                            <input type="radio" name="category" id="cat-ask" value="ask">
+                            <label for="cat-ask"><i class="fas fa-question-circle"></i> 问答求助</label>
+                        </div>
+                        <div class="category-option">
+                            <input type="radio" name="category" id="cat-chat" value="chat">
+                            <label for="cat-chat"><i class="fas fa-comments"></i> 灌水闲聊</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">正文内容 <span class="required">*</span></label>
+                    <textarea class="editor-textarea" id="contentInput" placeholder="开始撰写你的内容...&#10;&#10;支持 Markdown 语法。分享有价值的知识，让社区因你而精彩！"></textarea>
+                    <div class="editor-footer">
+                        <span><i class="fas fa-keyboard"></i> 支持 Markdown</span>
+                        <span id="wordCount">0 字</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">添加标签</label>
+                    <div class="tag-input-wrap" id="tagWrap">
+                        <input type="text" class="tag-input" id="tagInput" placeholder="输入标签后按回车添加">
+                    </div>
+                    <div class="tag-suggestions">
+                        <span class="tag-suggestion" data-tag="前端">前端</span>
+                        <span class="tag-suggestion" data-tag="JavaScript">JavaScript</span>
+                        <span class="tag-suggestion" data-tag="React">React</span>
+                        <span class="tag-suggestion" data-tag="Vue">Vue</span>
+                        <span class="tag-suggestion" data-tag="面试">面试</span>
+                        <span class="tag-suggestion" data-tag="教程">教程</span>
+                    </div>
+                    <p class="form-hint">最多添加 5 个标签</p>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <div>
+                    <button class="btn btn-draft" id="saveDraft"><i class="far fa-save"></i> 保存草稿</button>
+                </div>
+                <div>
+                    <button class="btn btn-primary" id="publishBtn"><i class="fas fa-paper-plane"></i> 发布帖子</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">操作成功</span></div>
+
+    <script>
+        const contentInput = document.getElementById('contentInput');
+        const wordCount = document.getElementById('wordCount');
+        contentInput.addEventListener('input', () => {
+            wordCount.textContent = contentInput.value.length + ' 字';
+        });
+
+        const tagWrap = document.getElementById('tagWrap');
+        const tagInput = document.getElementById('tagInput');
+        let tags = [];
+
+        function addTag(text) {
+            text = text.trim();
+            if (!text || tags.includes(text) || tags.length >= 5) return;
+            tags.push(text);
+            const chip = document.createElement('span');
+            chip.className = 'tag-chip';
+            chip.innerHTML = text + ' <span class="remove"><i class="fas fa-times"></i></span>';
+            chip.querySelector('.remove').addEventListener('click', () => {
+                tags = tags.filter(t => t !== text);
+                chip.remove();
+            });
+            tagWrap.insertBefore(chip, tagInput);
+        }
+
+        tagInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag(tagInput.value);
+                tagInput.value = '';
+            }
+            if (e.key === 'Backspace' && !tagInput.value && tags.length > 0) {
+                tags.pop();
+                tagWrap.querySelectorAll('.tag-chip').item(tags.length)?.remove();
+            }
+        });
+
+        document.querySelectorAll('.tag-suggestion').forEach(s => {
+            s.addEventListener('click', () => addTag(s.dataset.tag));
+        });
+
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimer;
+
+        function showToast(msg, type) {
+            clearTimeout(toastTimer);
+            toastMsg.textContent = msg;
+            toast.className = 'toast ' + (type || '');
+            toast.querySelector('i').className = type === 'success' ? 'fas fa-check-circle' : type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle';
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        const titleInput = document.getElementById('titleInput');
+        document.getElementById('publishBtn').addEventListener('click', () => {
+            if (!titleInput.value.trim()) {
+                showToast('请填写帖子标题', 'error');
+                titleInput.focus();
+                return;
+            }
+            if (!contentInput.value.trim()) {
+                showToast('请填写正文内容', 'error');
+                contentInput.focus();
+                return;
+            }
+            showToast('帖子发布成功！', 'success');
+        });
+
+        document.getElementById('saveDraft').addEventListener('click', () => {
+            showToast('草稿已保存', 'success');
+        });
+    </script>
+
+</body>
+</html>

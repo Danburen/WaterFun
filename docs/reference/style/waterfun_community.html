@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区 - WaterFun</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== Header ========== */
+        .header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .nav a {
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-spacer { flex: 1; }
+
+        .search-box {
+            position: relative;
+            width: 320px;
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 42px 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box input::placeholder { color: var(--text-muted); }
+
+        .search-box button {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .search-box button:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .icon-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 10px 4px 4px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 4px;
+        }
+
+        .user-menu:hover { background: var(--border-light); }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* ========== Main ========== */
+        .main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+
+        /* ========== Left Column ========== */
+        .left-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Community Header */
+        .community-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .community-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .community-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .community-stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-new-post {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-new-post:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+        }
+
+        .filter-tab {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .filter-tab:hover { color: var(--primary); }
+
+        .filter-tab.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .filter-sort {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-sort:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Post List */
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .post-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .post-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .post-author-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .post-meta {
+            flex: 1;
+        }
+
+        .post-author-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .post-tag {
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .tag-tech { background: #dbeafe; color: #1d4ed8; }
+        .tag-life { background: #dcfce7; color: #15803d; }
+        .tag-share { background: #fef3c7; color: #b45309; }
+        .tag-ask { background: #fce7f3; color: #be185d; }
+        .tag-chat { background: #e0e7ff; color: #4338ca; }
+
+        .post-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+
+        .post-excerpt {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .post-footer {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .post-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .post-stat i { font-size: 13px; }
+
+        .post-stat.hot { color: #ef4444; }
+
+        .post-card.pinned {
+            border-left: 3px solid var(--primary);
+            background: linear-gradient(to right, var(--primary-light), var(--bg-white) 12%);
+        }
+
+        .pin-icon {
+            color: var(--primary);
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 20px 0;
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .page-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ========== Right Column ========== */
+        .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .widget {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .widget-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .widget-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .widget-title i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .widget-more {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .widget-more:hover { color: var(--primary); }
+
+        .widget-body { padding: 8px 0; }
+
+        /* User Card */
+        .user-card {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .user-card-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 3px solid var(--border);
+        }
+
+        .user-card-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-card-level {
+            font-size: 12px;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 10px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .user-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .user-stat { text-align: center; }
+
+        .user-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .btn-primary-full {
+            width: 100%;
+            padding: 10px;
+            margin-top: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary-full:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Hot Topics */
+        .hot-topic-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .hot-topic-item:hover { background: var(--bg); }
+
+        .topic-rank {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .rank-top {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+        }
+
+        .rank-normal {
+            background: var(--border-light);
+            color: var(--text-muted);
+        }
+
+        .topic-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topic-title {
+            font-size: 14px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .topic-heat {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Categories Widget */
+        .category-list {
+            padding: 8px 0;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .category-item:hover { background: var(--bg); }
+
+        .category-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .cat-icon-tech { background: #dbeafe; color: #1d4ed8; }
+        .cat-icon-life { background: #dcfce7; color: #15803d; }
+        .cat-icon-share { background: #fef3c7; color: #b45309; }
+        .cat-icon-ask { background: #fce7f3; color: #be185d; }
+        .cat-icon-chat { background: #e0e7ff; color: #4338ca; }
+
+        .category-info { flex: 1; }
+
+        .category-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .category-count {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .category-arrow {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            padding: 32px 24px;
+            margin-top: 20px;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--primary); }
+
+        .footer-copyright {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 1024px) {
+            .main { grid-template-columns: 1fr; }
+            .right-col { display: none; }
+            .search-box { width: 200px; }
+        }
+
+        @media (max-width: 768px) {
+            .header-inner { padding: 0 16px; gap: 12px; }
+            .nav { display: none; }
+            .search-box { width: 160px; }
+            .user-name { display: none; }
+            .main { padding: 16px; }
+            .community-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+            .filter-tabs { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">WF</div>
+                <span class="logo-text">WaterFun</span>
+            </a>
+            <nav class="nav">
+                <a href="#">首页</a>
+                <a href="#" class="active">社区</a>
+                <a href="#">游乐场</a>
+                <a href="#">聊天室</a>
+                <a href="#">关于</a>
+            </nav>
+            <div class="header-spacer"></div>
+            <div class="search-box">
+                <input type="text" placeholder="请输入搜索内容">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                <button class="icon-btn"><i class="far fa-envelope"></i></button>
+                <div class="user-menu">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hatcher" alt="avatar" class="user-avatar">
+                    <span class="user-name">Hatcher</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="left-col">
+            <!-- Community Header -->
+            <div class="community-header">
+                <div>
+                    <h1 class="community-title">社区</h1>
+                    <div class="community-stats">
+                        <span><i class="fas fa-file-alt"></i> 1,234 帖子</span>
+                        <span><i class="fas fa-users"></i> 5,678 成员</span>
+                        <span><i class="fas fa-fire"></i> 今日 89 新帖</span>
+                    </div>
+                </div>
+                <a href="#" class="btn-new-post"><i class="fas fa-pen"></i> 发布新帖</a>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-tabs">
+                    <button class="filter-tab active">全部</button>
+                    <button class="filter-tab">技术交流</button>
+                    <button class="filter-tab">生活分享</button>
+                    <button class="filter-tab">资源推荐</button>
+                    <button class="filter-tab">问答求助</button>
+                    <button class="filter-tab">灌水闲聊</button>
+                </div>
+                <button class="filter-sort">
+                    <i class="fas fa-sort-amount-down"></i> 最新回复
+                    <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+                </button>
+            </div>
+
+            <!-- Post List -->
+            <div class="post-list">
+                <a href="#" class="post-card pinned">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name"><i class="fas fa-thumbtack pin-icon"></i>管理员</div>
+                            <div class="post-time">2小时前</div>
+                        </div>
+                        <span class="post-tag tag-tech">公告</span>
+                    </div>
+                    <div class="post-title">WaterFun 论坛新版上线，欢迎大家提出宝贵意见与建议</div>
+                    <div class="post-excerpt">经过数月的开发与测试，WaterFun 论坛全新版本正式上线！本次更新带来了全新的界面设计、更流畅的交互体验以及多项实用功能...</div>
+                    <div class="post-footer">
+                        <span class="post-stat hot"><i class="fas fa-fire"></i> 2,847</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 156</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 12.3k</span>
+                    </div>
+                </a>
+
+                <a href="#" class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=dev1" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">CodeMaster</div>
+                            <div class="post-time">35分钟前</div>
+                        </div>
+                        <span class="post-tag tag-tech">技术</span>
+                    </div>
+                    <div class="post-title">深入理解 React 18 的并发特性与 Suspense 最佳实践</div>
+                    <div class="post-excerpt">React 18 引入了并发渲染机制，让应用能够更好地处理大量更新。本文将从底层原理出发，结合实际案例...</div>
+                    <div class="post-footer">
+                        <span class="post-stat hot"><i class="fas fa-fire"></i> 1,234</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 89</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 5.6k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 342</span>
+                    </div>
+                </a>
+
+                <a href="#" class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=photo" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">光影旅人</div>
+                            <div class="post-time">1小时前</div>
+                        </div>
+                        <span class="post-tag tag-life">生活</span>
+                    </div>
+                    <div class="post-title">周末去了一趟大理，分享一些旅途中的美好瞬间与攻略</div>
+                    <div class="post-excerpt">这次大理之行准备了很久，终于成行。洱海边的日出、古城里的石板路、还有那家藏在巷子里的咖啡馆...</div>
+                    <div class="post-footer">
+                        <span class="post-stat"><i class="far fa-comment"></i> 67</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 3.2k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 521</span>
+                    </div>
+                </a>
+
+                <a href="#" class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=tool" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">工具箱</div>
+                            <div class="post-time">2小时前</div>
+                        </div>
+                        <span class="post-tag tag-share">分享</span>
+                    </div>
+                    <div class="post-title">整理了 50+ 个前端开发必备的工具网站，持续更新中</div>
+                    <div class="post-excerpt">从代码编辑器到设计工具，从配色方案到图标库，这份清单涵盖了前端开发各个环节的实用工具...</div>
+                    <div class="post-footer">
+                        <span class="post-stat hot"><i class="fas fa-fire"></i> 892</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 45</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 4.1k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 678</span>
+                    </div>
+                </a>
+
+                <a href="#" class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=newbie" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">萌新小白</div>
+                            <div class="post-time">3小时前</div>
+                        </div>
+                        <span class="post-tag tag-ask">问答</span>
+                    </div>
+                    <div class="post-title">请教各位大佬，Vue3 组合式 API 中如何优雅地处理多个异步请求？</div>
+                    <div class="post-excerpt">最近在做一个项目，页面加载时需要同时请求用户信息和订单列表，目前是用 Promise.all 处理的...</div>
+                    <div class="post-footer">
+                        <span class="post-stat"><i class="far fa-comment"></i> 23</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 1.8k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 12</span>
+                    </div>
+                </a>
+
+                <a href="#" class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=design" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">设计狮</div>
+                            <div class="post-time">5小时前</div>
+                        </div>
+                        <span class="post-tag tag-tech">技术</span>
+                    </div>
+                    <div class="post-title">2024 年 UI 设计趋势分析：从玻璃拟态到新拟态的演变</div>
+                    <div class="post-excerpt">设计趋势总是在不断演变，从早期的扁平化到现在的玻璃拟态，每一次变化都反映了技术和审美的进步...</div>
+                    <div class="post-footer">
+                        <span class="post-stat"><i class="far fa-comment"></i> 34</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 2.9k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 215</span>
+                    </div>
+                </a>
+
+                <a href="#" class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=food" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">美食探店</div>
+                            <div class="post-time">昨天</div>
+                        </div>
+                        <span class="post-tag tag-life">生活</span>
+                    </div>
+                    <div class="post-title">藏在巷子里的宝藏面馆，一碗面让我排了半小时队</div>
+                    <div class="post-excerpt">朋友安利的一家小店，位置确实不好找，但味道真的绝了。汤底浓郁，面条劲道，加料也很实在...</div>
+                    <div class="post-footer">
+                        <span class="post-stat"><i class="far fa-comment"></i> 78</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 6.7k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 445</span>
+                    </div>
+                </a>
+
+                <a href="#" class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=chat1" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">闲聊达人</div>
+                            <div class="post-time">昨天</div>
+                        </div>
+                        <span class="post-tag tag-chat">闲聊</span>
+                    </div>
+                    <div class="post-title">大家周末一般怎么安排？来聊聊你的放松方式</div>
+                    <div class="post-excerpt">工作了一周，周末总想好好放松一下。有人选择宅家打游戏，有人喜欢户外徒步，还有人热衷于探店美食...</div>
+                    <div class="post-footer">
+                        <span class="post-stat"><i class="far fa-comment"></i> 156</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 3.8k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 89</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <a href="#" class="page-btn disabled"><i class="fas fa-chevron-left"></i></a>
+                <a href="#" class="page-btn active">1</a>
+                <a href="#" class="page-btn">2</a>
+                <a href="#" class="page-btn">3</a>
+                <span style="color: var(--text-muted);">...</span>
+                <a href="#" class="page-btn">12</a>
+                <a href="#" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <div class="right-col">
+            <!-- User Card -->
+            <div class="widget">
+                <div class="widget-body">
+                    <div class="user-card">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hatcher" alt="avatar" class="user-card-avatar">
+                        <div class="user-card-name">Hatcher</div>
+                        <div class="user-card-level">LV.8 资深会员</div>
+                        <div class="user-stats">
+                            <div class="user-stat">
+                                <div class="user-stat-value">128</div>
+                                <div class="user-stat-label">帖子</div>
+                            </div>
+                            <div class="user-stat">
+                                <div class="user-stat-value">2.4k</div>
+                                <div class="user-stat-label">获赞</div>
+                            </div>
+                            <div class="user-stat">
+                                <div class="user-stat-value">56</div>
+                                <div class="user-stat-label">关注</div>
+                            </div>
+                        </div>
+                        <button class="btn-primary-full"><i class="fas fa-pen"></i> 发布新帖</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title"><i class="fas fa-th-large"></i> 分类导航</div>
+                </div>
+                <div class="widget-body">
+                    <div class="category-list">
+                        <a href="#" class="category-item">
+                            <div class="category-icon cat-icon-tech"><i class="fas fa-code"></i></div>
+                            <div class="category-info">
+                                <div class="category-name">技术交流</div>
+                                <div class="category-count">456 帖子</div>
+                            </div>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </a>
+                        <a href="#" class="category-item">
+                            <div class="category-icon cat-icon-life"><i class="fas fa-coffee"></i></div>
+                            <div class="category-info">
+                                <div class="category-name">生活分享</div>
+                                <div class="category-count">234 帖子</div>
+                            </div>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </a>
+                        <a href="#" class="category-item">
+                            <div class="category-icon cat-icon-share"><i class="fas fa-share-alt"></i></div>
+                            <div class="category-info">
+                                <div class="category-name">资源推荐</div>
+                                <div class="category-count">189 帖子</div>
+                            </div>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </a>
+                        <a href="#" class="category-item">
+                            <div class="category-icon cat-icon-ask"><i class="fas fa-question-circle"></i></div>
+                            <div class="category-info">
+                                <div class="category-name">问答求助</div>
+                                <div class="category-count">312 帖子</div>
+                            </div>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </a>
+                        <a href="#" class="category-item">
+                            <div class="category-icon cat-icon-chat"><i class="fas fa-comments"></i></div>
+                            <div class="category-info">
+                                <div class="category-name">灌水闲聊</div>
+                                <div class="category-count">567 帖子</div>
+                            </div>
+                            <i class="fas fa-chevron-right category-arrow"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hot Topics -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title"><i class="fas fa-fire"></i> 热门话题</div>
+                    <a href="#" class="widget-more">更多 <i class="fas fa-chevron-right" style="font-size: 10px;"></i></a>
+                </div>
+                <div class="widget-body">
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-top">1</div>
+                        <div class="topic-info">
+                            <div class="topic-title">AI 辅助编程工具大盘点</div>
+                            <div class="topic-heat">🔥 12.5k 热度</div>
+                        </div>
+                    </div>
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-top">2</div>
+                        <div class="topic-info">
+                            <div class="topic-title">远程工作三年，我的一些心得</div>
+                            <div class="topic-heat">🔥 9.8k 热度</div>
+                        </div>
+                    </div>
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-top">3</div>
+                        <div class="topic-info">
+                            <div class="topic-title">2024 年前端面试题汇总</div>
+                            <div class="topic-heat">🔥 8.2k 热度</div>
+                        </div>
+                    </div>
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-normal">4</div>
+                        <div class="topic-info">
+                            <div class="topic-title">Mac 开发环境配置指南</div>
+                            <div class="topic-heat">6.1k 热度</div>
+                        </div>
+                    </div>
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-normal">5</div>
+                        <div class="topic-info">
+                            <div class="topic-title">独立开发者月入过万经验分享</div>
+                            <div class="topic-heat">5.4k 热度</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="#">关于我们</a>
+                <a href="#">社区规范</a>
+                <a href="#">隐私政策</a>
+                <a href="#">联系我们</a>
+                <a href="#">帮助中心</a>
+            </div>
+            <div class="footer-copyright">© 2026 WaterFun. All rights reserved.</div>
+        </div>
+    </footer>
+
+</body>
+</html>

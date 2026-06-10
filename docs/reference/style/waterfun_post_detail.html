@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深入理解 React 18 的并发特性与 Suspense 最佳实践 - WaterFun</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== Header ========== */
+        .header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .nav a {
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-spacer { flex: 1; }
+
+        .search-box {
+            position: relative;
+            width: 320px;
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 42px 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box input::placeholder { color: var(--text-muted); }
+
+        .search-box button {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .search-box button:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .icon-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 10px 4px 4px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 4px;
+        }
+
+        .user-menu:hover { background: var(--border-light); }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* ========== Main ========== */
+        .main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ========== Breadcrumb ========== */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: var(--primary); }
+
+        .breadcrumb i { font-size: 10px; }
+
+        /* ========== Post Detail Card ========== */
+        .post-detail {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .post-detail-header {
+            padding: 24px 28px 0;
+        }
+
+        .post-detail-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .post-detail-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .post-detail-author-info { flex: 1; }
+
+        .post-detail-author-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .post-detail-author-level {
+            display: inline-block;
+            font-size: 11px;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 1px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+
+        .post-detail-time {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .post-detail-tag {
+            padding: 3px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .post-detail-title {
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .post-detail-content {
+            padding: 0 28px 28px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .post-detail-content p {
+            margin-bottom: 16px;
+        }
+
+        .post-detail-content h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 24px 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .post-detail-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 20px 0 10px;
+        }
+
+        .post-detail-content code {
+            background: var(--bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #be185d;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .post-detail-content pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 16px 0;
+        }
+
+        .post-detail-content pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: inherit;
+        }
+
+        .post-detail-content ul, .post-detail-content ol {
+            margin: 12px 0 12px 24px;
+        }
+
+        .post-detail-content li {
+            margin-bottom: 6px;
+        }
+
+        .post-detail-content blockquote {
+            border-left: 3px solid var(--primary);
+            padding: 8px 16px;
+            margin: 16px 0;
+            background: var(--primary-light);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            color: var(--text-secondary);
+        }
+
+        .post-detail-content img {
+            max-width: 100%;
+            border-radius: var(--radius-sm);
+            margin: 16px 0;
+        }
+
+        .post-detail-content a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .post-detail-content a:hover { text-decoration: underline; }
+
+        /* Post Actions */
+        .post-actions-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 28px;
+            border-top: 1px solid var(--border-light);
+            background: var(--bg);
+        }
+
+        .post-actions-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .post-actions-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .action-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .action-btn.active:hover {
+            background: var(--primary-hover);
+        }
+
+        .action-btn i { font-size: 14px; }
+
+        .action-btn-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn-text:hover { color: var(--primary); }
+
+        /* ========== Reply Section ========== */
+        .reply-section {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .reply-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .reply-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reply-title i { color: var(--primary); font-size: 14px; }
+
+        .reply-count {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .reply-sort {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .reply-sort:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Reply Input */
+        .reply-input-area {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .reply-input-wrap {
+            display: flex;
+            gap: 12px;
+        }
+
+        .reply-input-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .reply-input-right {
+            flex: 1;
+        }
+
+        .reply-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: var(--bg-white);
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .reply-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+        }
+
+        .reply-textarea::placeholder { color: var(--text-muted); }
+
+        .reply-input-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .reply-input-tools {
+            display: flex;
+            gap: 4px;
+        }
+
+        .reply-tool-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .reply-tool-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .reply-submit-btn {
+            padding: 8px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reply-submit-btn:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Reply List */
+        .reply-list {
+            padding: 0 24px;
+        }
+
+        .reply-item {
+            display: flex;
+            gap: 14px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .reply-item:last-child { border-bottom: none; }
+
+        .reply-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .reply-content { flex: 1; min-width: 0; }
+
+        .reply-author-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .reply-author-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .reply-author-level {
+            font-size: 11px;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 1px 7px;
+            border-radius: 10px;
+        }
+
+        .reply-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .reply-body {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .reply-body p { margin-bottom: 8px; }
+        .reply-body p:last-child { margin-bottom: 0; }
+
+        .reply-body code {
+            background: var(--bg);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #be185d;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .reply-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .reply-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: color 0.2s;
+            padding: 2px 0;
+        }
+
+        .reply-action-btn:hover { color: var(--primary); }
+
+        .reply-action-btn.active { color: var(--primary); }
+
+        .reply-action-btn i { font-size: 13px; }
+
+        /* Nested Reply */
+        .nested-replies {
+            margin-top: 12px;
+            padding-left: 12px;
+            border-left: 2px solid var(--border);
+        }
+
+        .nested-reply {
+            display: flex;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .nested-reply:last-child { border-bottom: none; padding-bottom: 0; }
+        .nested-reply:first-child { padding-top: 0; }
+
+        .nested-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .nested-content { flex: 1; }
+
+        .nested-author-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .nested-author-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nested-reply-to {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .nested-reply-to span {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .nested-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .nested-body {
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* Reply Form Inline */
+        .reply-form-inline {
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            display: none;
+        }
+
+        .reply-form-inline.show { display: block; }
+
+        .reply-form-inline textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: var(--bg-white);
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+
+        .reply-form-inline textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+        }
+
+        .reply-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .btn-cancel:hover { color: var(--text-secondary); }
+
+        .btn-confirm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-confirm:hover { background: var(--primary-hover); }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .page-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ========== Related Posts ========== */
+        .related-section {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .related-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .related-header i { color: var(--primary); font-size: 14px; }
+
+        .related-list { padding: 8px 0; }
+
+        .related-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .related-item:hover { background: var(--bg); }
+
+        .related-rank {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .related-rank.top {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+        }
+
+        .related-rank.normal {
+            background: var(--border-light);
+            color: var(--text-muted);
+        }
+
+        .related-info { flex: 1; min-width: 0; }
+
+        .related-title {
+            font-size: 14px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .related-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ========== Footer ========== */
+        .footer {
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            padding: 32px 24px;
+            margin-top: 20px;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--primary); }
+
+        .footer-copyright {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* ========== Toast ========== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #10b981; }
+
+        @media (max-width: 768px) {
+            .header-inner { padding: 0 16px; gap: 12px; }
+            .nav { display: none; }
+            .search-box { width: 160px; }
+            .user-name { display: none; }
+            .main { padding: 16px; }
+            .post-detail-header { padding: 20px 20px 0; }
+            .post-detail-content { padding: 0 20px 20px; }
+            .post-actions-bar { padding: 12px 20px; flex-wrap: wrap; gap: 8px; }
+            .reply-header { padding: 14px 20px; }
+            .reply-input-area { padding: 16px 20px; }
+            .reply-list { padding: 0 20px; }
+            .post-detail-title { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">WF</div>
+                <span class="logo-text">WaterFun</span>
+            </a>
+            <nav class="nav">
+                <a href="#">首页</a>
+                <a href="#">社区</a>
+                <a href="#">游乐场</a>
+                <a href="#">聊天室</a>
+                <a href="#">关于</a>
+            </nav>
+            <div class="header-spacer"></div>
+            <div class="search-box">
+                <input type="text" placeholder="请输入搜索内容">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                <button class="icon-btn"><i class="far fa-envelope"></i></button>
+                <div class="user-menu">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hatcher" alt="avatar" class="user-avatar">
+                    <span class="user-name">Hatcher</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="#"><i class="fas fa-home"></i> 首页</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="#">社区</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="#">技术交流</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>帖子详情</span>
+        </div>
+
+        <!-- Post Detail -->
+        <article class="post-detail">
+            <div class="post-detail-header">
+                <div class="post-detail-meta">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=dev1" alt="avatar" class="post-detail-avatar">
+                    <div class="post-detail-author-info">
+                        <div class="post-detail-author-name">
+                            CodeMaster
+                            <span class="post-detail-author-level">LV.12 技术专家</span>
+                        </div>
+                        <div class="post-detail-time">发布于 2026-06-05 · 35分钟前 · 最后编辑于 10分钟前</div>
+                    </div>
+                    <span class="post-detail-tag">技术交流</span>
+                </div>
+                <h1 class="post-detail-title">深入理解 React 18 的并发特性与 Suspense 最佳实践</h1>
+            </div>
+
+            <div class="post-detail-content">
+                <p>React 18 引入了并发渲染机制，让应用能够更好地处理大量更新。本文将从底层原理出发，结合实际案例，详细讲解如何使用 <code>useTransition</code>、<code>useDeferredValue</code> 等新 Hook。</p>
+
+                <h2>一、什么是并发渲染</h2>
+                <p>并发渲染是 React 18 最核心的新特性。它允许 React 同时准备多个版本的 UI，并根据优先级决定何时展示哪个版本。这使得应用在高负载下依然保持流畅。</p>
+                <p>在 React 17 及之前，渲染是一个同步、不可中断的过程。一旦开始渲染，就必须完成，这可能导致界面卡顿。React 18 通过引入可中断的渲染，解决了这个问题。</p>
+
+                <h2>二、useTransition 的使用场景</h2>
+                <p><code>useTransition</code> 用于标记非紧急更新。当你有一个耗时的状态更新时，可以用它告诉 React："这个更新不急，可以先处理其他更紧急的更新。"</p>
+
+<pre><code>import { useTransition, useState } from 'react';
+
+function SearchResults() {
+  const [isPending, startTransition] = useTransition();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setQuery(value); // 紧急更新：输入框需要立即响应
+
+    startTransition(() => {
+      setResults(search(value)); // 非紧急更新：搜索结果可以延迟
+    });
+  };
+
+  return (
+    &lt;&gt;
+      &lt;input value={query} onChange={handleChange} /&gt;
+      {isPending && &lt;Spinner /&gt;}
+      &lt;Results data={results} /&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+
+                <h2>三、Suspense 与数据获取</h2>
+                <p>React 18 大幅增强了 Suspense 的能力，现在它可以与数据获取库（如 Relay、SWR、React Query）配合使用，实现更优雅的加载状态管理。</p>
+
+                <blockquote>
+                    Suspense 的本质是一种"约定"：当组件需要等待某些数据时，它抛出一个 Promise，React 捕获这个 Promise 并展示 fallback UI，待 Promise  resolve 后再渲染真实内容。
+                </blockquote>
+
+                <h2>四、最佳实践总结</h2>
+                <ul>
+                    <li>使用 <code>useTransition</code> 处理非紧急的 UI 更新，如过滤、搜索</li>
+                    <li>使用 <code>useDeferredValue</code> 延迟更新某些值，避免阻塞用户输入</li>
+                    <li>结合 Suspense 和错误边界，构建健壮的数据加载流程</li>
+                    <li>避免在 transition 中执行副作用，副作用应在 <code>useEffect</code> 中处理</li>
+                </ul>
+
+                <p>React 18 的并发特性为前端开发带来了全新的可能性。希望本文能帮助你更好地理解和应用这些新特性。如果有任何问题，欢迎在评论区交流讨论！</p>
+            </div>
+
+            <div class="post-actions-bar">
+                <div class="post-actions-left">
+                    <button class="action-btn" id="likeBtn"><i class="far fa-thumbs-up"></i> 342</button>
+                    <button class="action-btn"><i class="far fa-comment"></i> 89</button>
+                    <button class="action-btn"><i class="far fa-star"></i> 收藏</button>
+                </div>
+                <div class="post-actions-right">
+                    <button class="action-btn-text"><i class="fas fa-share-alt"></i> 分享</button>
+                    <button class="action-btn-text"><i class="fas fa-ellipsis-h"></i></button>
+                </div>
+            </div>
+        </article>
+
+        <!-- Reply Section -->
+        <div class="reply-section">
+            <div class="reply-header">
+                <div class="reply-title">
+                    <i class="far fa-comments"></i>
+                    全部回复 <span class="reply-count">89 条</span>
+                </div>
+                <button class="reply-sort">
+                    <i class="fas fa-sort-amount-down"></i> 最新回复
+                    <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+                </button>
+            </div>
+
+            <!-- Reply Input -->
+            <div class="reply-input-area">
+                <div class="reply-input-wrap">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hatcher" alt="avatar" class="reply-input-avatar">
+                    <div class="reply-input-right">
+                        <textarea class="reply-textarea" placeholder="写下你的评论...&#10;支持 Markdown 语法"></textarea>
+                        <div class="reply-input-footer">
+                            <div class="reply-input-tools">
+                                <button class="reply-tool-btn" title="表情"><i class="far fa-smile"></i></button>
+                                <button class="reply-tool-btn" title="图片"><i class="far fa-image"></i></button>
+                                <button class="reply-tool-btn" title="代码"><i class="fas fa-code"></i></button>
+                            </div>
+                            <button class="reply-submit-btn" id="replySubmit"><i class="fas fa-paper-plane"></i> 发布评论</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reply List -->
+            <div class="reply-list">
+                <!-- Reply 1 -->
+                <div class="reply-item">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=reply1" alt="avatar" class="reply-avatar">
+                    <div class="reply-content">
+                        <div class="reply-author-row">
+                            <span class="reply-author-name">前端小王</span>
+                            <span class="reply-author-level">LV.6</span>
+                            <span class="reply-time">30分钟前</span>
+                        </div>
+                        <div class="reply-body">
+                            <p>写得太好了！正好最近在研究 React 18 的新特性，<code>useTransition</code> 这个 Hook 确实解决了很多之前头疼的性能问题。期待作者的下一篇文章！</p>
+                        </div>
+                        <div class="reply-actions">
+                            <button class="reply-action-btn"><i class="far fa-thumbs-up"></i> 56</button>
+                            <button class="reply-action-btn reply-btn" data-target="前端小王"><i class="far fa-comment"></i> 回复</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reply 2 -->
+                <div class="reply-item">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=reply2" alt="avatar" class="reply-avatar">
+                    <div class="reply-content">
+                        <div class="reply-author-row">
+                            <span class="reply-author-name">React爱好者</span>
+                            <span class="reply-author-level">LV.9</span>
+                            <span class="reply-time">25分钟前</span>
+                        </div>
+                        <div class="reply-body">
+                            <p>有个问题想请教一下，在实际项目中，<code>useDeferredValue</code> 和 <code>useTransition</code> 的使用场景有什么区别？感觉两者都是处理延迟更新的，容易混淆。</p>
+                        </div>
+                        <div class="reply-actions">
+                            <button class="reply-action-btn"><i class="far fa-thumbs-up"></i> 23</button>
+                            <button class="reply-action-btn reply-btn" data-target="React爱好者"><i class="far fa-comment"></i> 回复</button>
+                        </div>
+
+                        <!-- Nested Replies -->
+                        <div class="nested-replies">
+                            <div class="nested-reply">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=dev1" alt="avatar" class="nested-avatar">
+                                <div class="nested-content">
+                                    <div class="nested-author-row">
+                                        <span class="nested-author-name">CodeMaster</span>
+                                        <span class="nested-reply-to">回复 <span>React爱好者</span></span>
+                                        <span class="nested-time">20分钟前</span>
+                                    </div>
+                                    <div class="nested-body">很好的问题！简单来说，<code>useTransition</code> 用于包裹状态更新函数，而 <code>useDeferredValue</code> 用于延迟某个值本身。前者控制"何时更新"，后者控制"更新什么"。</div>
+                                </div>
+                            </div>
+                            <div class="nested-reply">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=reply3" alt="avatar" class="nested-avatar">
+                                <div class="nested-content">
+                                    <div class="nested-author-row">
+                                        <span class="nested-author-name">资深码农</span>
+                                        <span class="nested-reply-to">回复 <span>React爱好者</span></span>
+                                        <span class="nested-time">15分钟前</span>
+                                    </div>
+                                    <div class="nested-body">补充一下，如果状态更新是由用户输入触发的，通常用 <code>useDeferredValue</code>；如果是按钮点击等主动操作触发的，用 <code>useTransition</code> 更合适。</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inline Reply Form -->
+                        <div class="reply-form-inline" id="replyForm2">
+                            <textarea placeholder="回复 React爱好者..."></textarea>
+                            <div class="reply-form-actions">
+                                <button class="btn-sm btn-cancel cancel-reply">取消</button>
+                                <button class="btn-sm btn-confirm submit-nested">回复</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reply 3 -->
+                <div class="reply-item">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=reply4" alt="avatar" class="reply-avatar">
+                    <div class="reply-content">
+                        <div class="reply-author-row">
+                            <span class="reply-author-name">全栈工程师</span>
+                            <span class="reply-author-level">LV.15</span>
+                            <span class="reply-time">10分钟前</span>
+                        </div>
+                        <div class="reply-body">
+                            <p>文章写得很清晰，代码示例也很实用。不过建议在 Suspense 部分补充一下与 React Query 配合使用的例子，现在很多项目都在用这个组合。</p>
+                        </div>
+                        <div class="reply-actions">
+                            <button class="reply-action-btn"><i class="far fa-thumbs-up"></i> 18</button>
+                            <button class="reply-action-btn reply-btn" data-target="全栈工程师"><i class="far fa-comment"></i> 回复</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reply 4 -->
+                <div class="reply-item">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=reply5" alt="avatar" class="reply-avatar">
+                    <div class="reply-content">
+                        <div class="reply-author-row">
+                            <span class="reply-author-name">初学者小李</span>
+                            <span class="reply-author-level">LV.2</span>
+                            <span class="reply-time">5分钟前</span>
+                        </div>
+                        <div class="reply-body">
+                            <p>作为刚入门 React 的新手，这篇文章让我对并发特性有了初步的认识。虽然还有些地方不太理解，但已经收藏了，准备多读几遍。感谢分享！</p>
+                        </div>
+                        <div class="reply-actions">
+                            <button class="reply-action-btn"><i class="far fa-thumbs-up"></i> 12</button>
+                            <button class="reply-action-btn reply-btn" data-target="初学者小李"><i class="far fa-comment"></i> 回复</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <a href="#" class="page-btn disabled"><i class="fas fa-chevron-left"></i></a>
+                <a href="#" class="page-btn active">1</a>
+                <a href="#" class="page-btn">2</a>
+                <a href="#" class="page-btn">3</a>
+                <span style="color: var(--text-muted);">...</span>
+                <a href="#" class="page-btn">9</a>
+                <a href="#" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <!-- Related Posts -->
+        <div class="related-section">
+            <div class="related-header">
+                <i class="fas fa-fire"></i> 相关推荐
+            </div>
+            <div class="related-list">
+                <a href="#" class="related-item">
+                    <div class="related-rank top">1</div>
+                    <div class="related-info">
+                        <div class="related-title">React Server Components 深入解析</div>
+                        <div class="related-meta">CodeMaster · 2.1k 阅读 · 67 评论</div>
+                    </div>
+                </a>
+                <a href="#" class="related-item">
+                    <div class="related-rank top">2</div>
+                    <div class="related-info">
+                        <div class="related-title">2026 年前端性能优化实战指南</div>
+                        <div class="related-meta">性能专家 · 3.4k 阅读 · 89 评论</div>
+                    </div>
+                </a>
+                <a href="#" class="related-item">
+                    <div class="related-rank top">3</div>
+                    <div class="related-info">
+                        <div class="related-title">TypeScript 5.0 新特性一览</div>
+                        <div class="related-meta">TS爱好者 · 1.8k 阅读 · 45 评论</div>
+                    </div>
+                </a>
+                <a href="#" class="related-item">
+                    <div class="related-rank normal">4</div>
+                    <div class="related-info">
+                        <div class="related-title">Next.js 14 App Router 迁移经验分享</div>
+                        <div class="related-meta">全栈小王 · 2.7k 阅读 · 56 评论</div>
+                    </div>
+                </a>
+                <a href="#" class="related-item">
+                    <div class="related-rank normal">5</div>
+                    <div class="related-info">
+                        <div class="related-title">Tailwind CSS 最佳实践与组件库搭建</div>
+                        <div class="related-meta">CSS达人 · 1.5k 阅读 · 34 评论</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="#">关于我们</a>
+                <a href="#">社区规范</a>
+                <a href="#">隐私政策</a>
+                <a href="#">联系我们</a>
+                <a href="#">帮助中心</a>
+            </div>
+            <div class="footer-copyright">© 2026 WaterFun. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">操作成功</span></div>
+
+    <script>
+        // Like button toggle
+        const likeBtn = document.getElementById('likeBtn');
+        likeBtn.addEventListener('click', () => {
+            likeBtn.classList.toggle('active');
+            const icon = likeBtn.querySelector('i');
+            icon.className = likeBtn.classList.contains('active') ? 'fas fa-thumbs-up' : 'far fa-thumbs-up';
+        });
+
+        // Reply submit
+        const replySubmit = document.getElementById('replySubmit');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimer;
+
+        function showToast(msg) {
+            clearTimeout(toastTimer);
+            toastMsg.textContent = msg;
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        replySubmit.addEventListener('click', () => {
+            showToast('评论发布成功！');
+        });
+
+        // Nested reply toggle
+        document.querySelectorAll('.reply-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.closest('.reply-item');
+                let form = item.querySelector('.reply-form-inline');
+                if (!form) {
+                    form = document.createElement('div');
+                    form.className = 'reply-form-inline show';
+                    const target = btn.dataset.target;
+                    form.innerHTML = `
+                        <textarea placeholder="回复 ${target}..."></textarea>
+                        <div class="reply-form-actions">
+                            <button class="btn-sm btn-cancel cancel-reply">取消</button>
+                            <button class="btn-sm btn-confirm submit-nested">回复</button>
+                        </div>
+                    `;
+                    item.querySelector('.reply-content').appendChild(form);
+                    form.querySelector('.cancel-reply').addEventListener('click', () => form.classList.remove('show'));
+                    form.querySelector('.submit-nested').addEventListener('click', () => {
+                        showToast('回复发布成功！');
+                        form.classList.remove('show');
+                    });
+                } else {
+                    form.classList.toggle('show');
+                }
+            });
+        });
+
+        // Cancel reply
+        document.querySelectorAll('.cancel-reply').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.closest('.reply-form-inline').classList.remove('show');
+            });
+        });
+
+        // Submit nested
+        document.querySelectorAll('.submit-nested').forEach(btn => {
+            btn.addEventListener('click', () => {
+                showToast('回复发布成功！');
+                btn.closest('.reply-form-inline').classList.remove('show');
+            });
+        });
+    </script>
+
+</body>
+</html>

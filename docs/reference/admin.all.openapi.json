@@ -1,0 +1,7950 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8082",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/admin/users/{uid}/roles": {
+      "get": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "List user roles",
+        "operationId": "listUserRoles",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAssignedRoleRes"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Full Replace roles ofPending user",
+        "operationId": "updateRoleToUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRoleReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Assign roles to user",
+        "operationId": "assignRoleToUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUserRoleReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Batch remove roles from user",
+        "operationId": "removeRolesFromUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveUserRolesReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{uid}/profile": {
+      "put": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Update user profile",
+        "operationId": "updateUserProfile",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileUpdateAReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{uid}/info": {
+      "put": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Update user info",
+        "operationId": "updateUserInfo",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserInfoAUpdateReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{uid}/datum": {
+      "put": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Update user datum",
+        "operationId": "updateUserDatum",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDatumUpdateAReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/tags/{id}": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTagResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "putTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "deleteTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/role/{id}": {
+      "get": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "getRole",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRoleResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "updateRole",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "deleteRole",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/role/{id}/users": {
+      "get": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "listRoleUsers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "userUid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nickname",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAssignedUserRes"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "putUserRoles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUserToRoleReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "assignUserRoles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUserToRoleReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "deleteUserRoles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveRoleUsersReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/role/{id}/permissions": {
+      "get": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "getRolePerms",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "permId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAssignedPermissionRes"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "putPermissions",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRolePermReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "assignPermissions",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRolePermReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "deleteRolePerms",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteRolePermsReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/posts/{id}": {
+      "put": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "putPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutPostReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "deletePostById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/posts/{id}/tags": {
+      "put": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "replacePostTags",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTagsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "assignTags",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTagsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "deleteTags",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTagsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/permission/{id}": {
+      "get": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "getPermission",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePermissionResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "updatePermission",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePermRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "deletePermission",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/permission/{id}/users": {
+      "get": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "listPermUsers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "userUid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nickname",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAssignedUserRes"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "putPermUsers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/assignPermToUsersReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "assignPermToUsers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/assignPermToUsersReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "deletePermUsers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/removePermUsersReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/me/updateProfile": {
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "updateProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/content/banner/{id}": {
+      "get": {
+        "tags": [
+          "banner-controller"
+        ],
+        "operationId": "get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBannerResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "banner-controller"
+        ],
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutBannerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "banner-controller"
+        ],
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/categories/{id}": {
+      "get": {
+        "tags": [
+          "category-controller"
+        ],
+        "operationId": "get_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCategoryResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "category-controller"
+        ],
+        "operationId": "update_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "category-controller"
+        ],
+        "operationId": "delete_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "post": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewUserReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "operationId": "deleteUsers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveUsersReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{uid}/role": {
+      "post": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Assign single role to user",
+        "operationId": "assignSingleRoleToUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignSingleUserRoleReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{uid}/permissions": {
+      "get": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "List user permissions",
+        "operationId": "listUserPermissions",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "permId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAssignedPermissionRes"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Assign direct permissions to user",
+        "operationId": "assignPermsToUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUserPermReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Batch remove direct permissions from user",
+        "operationId": "removePermsFromUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveUserPermsReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{uid}/permission": {
+      "post": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Assign single direct permission to user",
+        "operationId": "assignSinglePermToUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignSingleUserPermReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/upload/policy": {
+      "post": {
+        "tags": [
+          "upload-controller"
+        ],
+        "operationId": "getUploadPolity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUploadPolicyReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListPresignedResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/upload/callback": {
+      "post": {
+        "tags": [
+          "upload-controller"
+        ],
+        "operationId": "uploadCallback",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloudPutCallbackReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/tags": {
+      "post": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "createTag",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "deleteTags_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteTagsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/security/unban": {
+      "post": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "unbanIp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnbanIpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/security/ban": {
+      "post": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "banIp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanIpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseIpBanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/role": {
+      "post": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "addRole",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "deleteRoles",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteRolesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/posts": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "createPost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "deletePosts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletePostRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/permission": {
+      "post": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "addPermission",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePermRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "deletePerms",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletePermsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/online-users/{uid}/force-offline": {
+      "post": {
+        "tags": [
+          "online-user-controller"
+        ],
+        "operationId": "forceOffline",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/{taskId}/resources/{resourceUuid}/reject": {
+      "post": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "rejectResource",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "resourceUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModerateRejectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/{taskId}/resources/{resourceUuid}/approve": {
+      "post": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "approveResource",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "resourceUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/{id}/reject": {
+      "post": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "reject",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModerateRejectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/{id}/approve": {
+      "post": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "summary": "审核通过任务",
+        "description": "将任务下所有待审资源标记为通过。若存在已被标记为可疑或驳回的资源，则任务不通过，并返回这些可疑资源列表。",
+        "operationId": "approve",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListModerationResourceRes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/reject": {
+      "post": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "rejectAll",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchModerateRejectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/approve": {
+      "post": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "approveAll",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchModerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/me/info": {
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getCurrentUserInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAdminUserInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/content/banner": {
+      "post": {
+        "tags": [
+          "banner-controller"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBannerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/categories": {
+      "post": {
+        "tags": [
+          "category-controller"
+        ],
+        "operationId": "create_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "category-controller"
+        ],
+        "operationId": "deleteCategories",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveCategoriesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/auth/logout": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "logout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequestBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/auth/login-by-password": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "管理员密码登陆",
+        "operationId": "loginByPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PwdLoginReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoginClientData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{uid}": {
+      "get": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Get user detail",
+        "operationId": "getUserDetail",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserAdminDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Delete user",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/options": {
+      "get": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "operationId": "getUserOptions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/list": {
+      "get": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "List users",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nickname",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accountStatus",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdStart",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdEnd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserInfoARes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/tags/options": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getOptions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/tags/list": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "listTags",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creatorId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "createdStart",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdEnd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageTagResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/statistics/{date}": {
+      "get": {
+        "tags": [
+          "statistic-controller"
+        ],
+        "operationId": "getStatistic",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSiteStatisticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/statistics/list": {
+      "get": {
+        "tags": [
+          "statistic-controller"
+        ],
+        "operationId": "listStatistics",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageSiteStatisticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/statistics/latest": {
+      "get": {
+        "tags": [
+          "statistic-controller"
+        ],
+        "operationId": "getLatestStatistic",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSiteStatisticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/security/list": {
+      "get": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "listBanResponses",
+        "parameters": [
+          {
+            "name": "ip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bannedAtStart",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "bannedAtEnd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expiresStart",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expiresEnd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageIpBanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/security/ban/{id}": {
+      "get": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "getIpBan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseIpBanResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "deleteIpBan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/security/audit-log/{id}": {
+      "get": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "getAuditLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuditLogResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "deleteAuditLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/security/audit-log/list": {
+      "get": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "listAuditLogs",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "UNKNOWN",
+                "LOGIN",
+                "REGISTER",
+                "CHANGE_PASSWORD"
+              ]
+            }
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "FAIL",
+                "SUCCESS"
+              ]
+            }
+          },
+          {
+            "name": "createdAtStart",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createdAtEnd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAuditLogResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/role/options": {
+      "get": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "listRoleOptions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOInteger"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/role/list": {
+      "get": {
+        "tags": [
+          "role-controller"
+        ],
+        "operationId": "listRoles",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageRoleResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/posts/list": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "listPosts",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "PENDING",
+                "PUBLISHED",
+                "REJECTED",
+                "ARCHIVED"
+              ]
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "authorId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "tagIds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "slug",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePostResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/posts/id": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "getPostById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/permission/options": {
+      "get": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "getPermOptions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOInteger"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/permission/list": {
+      "get": {
+        "tags": [
+          "permission-controller"
+        ],
+        "operationId": "listPermissions",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "API",
+                "MENU",
+                "BUTTON",
+                "DATA",
+                "BAM"
+              ]
+            }
+          },
+          {
+            "name": "resource",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePermissionResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/online-users": {
+      "get": {
+        "tags": [
+          "online-user-controller"
+        ],
+        "operationId": "listOnlineUsers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "COMMON",
+                "ADMIN",
+                "BOT",
+                "MODERATOR",
+                "VIP"
+              ]
+            }
+          },
+          {
+            "name": "levelMin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "levelMax",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageOnlineUserVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/online-users/count": {
+      "get": {
+        "tags": [
+          "online-user-controller"
+        ],
+        "operationId": "getOnlineCount",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMapStringLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/monitor/system": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "system",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSystemInfoVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/monitor/jvms": {
+      "get": {
+        "tags": [
+          "monitor-controller"
+        ],
+        "operationId": "jvm",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMergedJvmInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/{taskId}/resources/{resourceUuid}": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "getResource",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "resourceUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseModerationResourceRes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/{id}": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "getTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseModerateTaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/{id}/resources": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "listResourcesByTask",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListModerationResourceRes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/resources/list": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "listResources",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED",
+                "SUSPECT"
+              ]
+            }
+          },
+          {
+            "name": "resourceType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "UNKNOWN",
+                "IMAGE",
+                "VIDEO",
+                "AUDIO",
+                "TEXT",
+                "DOCUMENT",
+                "ARCHIVE",
+                "EXECUTABLE",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "auditorId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "auditAtStart",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "auditAtEnd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageModerationResourceRes"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/list": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "list_1",
+        "parameters": [
+          {
+            "name": "taskType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "UNKNOWN",
+                "USER_AVATAR",
+                "POST",
+                "POST_COVERAGE_IMAGE",
+                "POST_CONTENT_IMAGE",
+                "BANNER_IMAGE"
+              ]
+            }
+          },
+          {
+            "name": "submitterId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "submitAtStart",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "submitAtEnd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageModerateTaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/trend": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "getTrend",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 7
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListTrendPointVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/statistics/{date}": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "getStatistic_1",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSiteStatisticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/statistics/list": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "listStatistics_1",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageSiteStatisticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/statistics/latest": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "getLatestStatistic_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSiteStatisticResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/recent-activities": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "getRecentActivities",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListDashboardRecentActivityVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/overview": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "overview",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDashboardOverviewVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/online-users": {
+      "get": {
+        "tags": [
+          "dashboard-controller"
+        ],
+        "operationId": "listOnlineUsers_1",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageOnlineUserVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/content/banner/list": {
+      "get": {
+        "tags": [
+          "banner-controller"
+        ],
+        "operationId": "list_2",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subtitle",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "position",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "HOME",
+                "SIDE"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SHOW",
+                "HIDE"
+              ]
+            }
+          },
+          {
+            "name": "startAt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endAt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "isDeleted",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageBannerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/categories/options": {
+      "get": {
+        "tags": [
+          "category-controller"
+        ],
+        "operationId": "getOptions_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/categories/list": {
+      "get": {
+        "tags": [
+          "category-controller"
+        ],
+        "operationId": "list_3",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "creatorId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "createStart",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "createEnd",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageCategoryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/auth/captcha": {
+      "get": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "获取图形验证码",
+        "operationId": "getCaptcha",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/users/{uid}/role/{roleId}": {
+      "delete": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Remove single role from user",
+        "operationId": "removeSingleRoleFromUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{uid}/permission/{permissionId}": {
+      "delete": {
+        "tags": [
+          "user-admin-controller"
+        ],
+        "summary": "Remove single direct permission from user",
+        "operationId": "removeSinglePermFromUser",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "permissionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/security/audit-log": {
+      "delete": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "deleteAuditLogs",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteAuditLogRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateUserRoleReq": {
+        "type": "object",
+        "properties": {
+          "userRoleItemDtos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRoleItemDto"
+            }
+          }
+        },
+        "required": [
+          "userRoleItemDtos"
+        ]
+      },
+      "UserRoleItemDto": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "roleId"
+        ]
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+
+          }
+        }
+      },
+      "UserProfileUpdateAReq": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "residence": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          }
+        }
+      },
+      "UserInfoAUpdateReq": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ]
+          },
+          "nickname": {
+            "type": "string",
+            "maxLength": 12,
+            "minLength": 0
+          },
+          "avatarUrl": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        }
+      },
+      "UserDatumUpdateAReq": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateTagReq": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 0
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateRoleRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orderWeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isSystem": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "AssignUserToRoleReq": {
+        "type": "object",
+        "properties": {
+          "userUids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseBatchResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BatchResult"
+          }
+        }
+      },
+      "BatchResult": {
+        "type": "object",
+        "properties": {
+          "requested": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "success": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ignored": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "failed": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RolePermItemDTO": {
+        "type": "object",
+        "properties": {
+          "permissionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "permissionId"
+        ]
+      },
+      "UpdateRolePermReq": {
+        "type": "object",
+        "properties": {
+          "perms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RolePermItemDTO"
+            }
+          }
+        }
+      },
+      "PutPostReq": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 0
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 0
+          },
+          "content": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0
+          },
+          "coverageUuid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "FANS_ONLY"
+            ]
+          },
+          "authorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "NOTICE"
+            ]
+          },
+          "isPinned": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "content",
+          "title"
+        ]
+      },
+      "AssignTagsRequest": {
+        "type": "object",
+        "properties": {
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "UpdatePermRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "orderWeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "API",
+              "MENU",
+              "BUTTON",
+              "DATA",
+              "BAM"
+            ]
+          },
+          "resource": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isSystem": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "assignPermToUsersReq": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UpdateUserProfileRequest": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date"
+          },
+          "residence": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          }
+        }
+      },
+      "PutBannerRequest": {
+        "type": "object",
+        "properties": {
+          "resourceKey": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 0
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 0
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 0
+          },
+          "linkUrl": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "position": {
+            "type": "string",
+            "enum": [
+              "HOME",
+              "SIDE"
+            ]
+          },
+          "sortNo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SHOW",
+              "HIDE"
+            ]
+          },
+          "startAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "imageUuid": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateCategoryRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateNewUserReq": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[0-9a-zA-Z_]+$"
+          },
+          "password": {
+            "type": "string"
+          },
+          "userType": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "userType",
+          "username"
+        ]
+      },
+      "AssignUserRoleReq": {
+        "type": "object",
+        "properties": {
+          "userRoles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRoleItemDto"
+            }
+          }
+        },
+        "required": [
+          "userRoles"
+        ]
+      },
+      "AssignSingleUserRoleReq": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "roleId"
+        ]
+      },
+      "AssignUserPermReq": {
+        "type": "object",
+        "properties": {
+          "userPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserPermItemDto"
+            }
+          }
+        },
+        "required": [
+          "userPermissions"
+        ]
+      },
+      "UserPermItemDto": {
+        "type": "object",
+        "properties": {
+          "permissionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "permissionId"
+        ]
+      },
+      "AssignSingleUserPermReq": {
+        "type": "object",
+        "properties": {
+          "permissionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "permissionId"
+        ]
+      },
+      "AdminUploadPolicyReq": {
+        "type": "object",
+        "properties": {
+          "bizType": {
+            "type": "string",
+            "enum": [
+              "BANNER_IMAGE"
+            ]
+          },
+          "bizId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "exts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 9,
+            "minItems": 1
+          }
+        },
+        "required": [
+          "bizId",
+          "bizType",
+          "exts"
+        ]
+      },
+      "ApiResponseListPresignedResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PresignedResp"
+            }
+          }
+        }
+      },
+      "PresignedResp": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "get",
+              "post",
+              "put",
+              "delete",
+              "patch"
+            ]
+          },
+          "token": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "errorMsg": {
+            "type": "string"
+          }
+        }
+      },
+      "CloudPutCallbackReq": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "CreateTagRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 0
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UnbanIpRequest": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "maxLength": 45,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "ip"
+        ]
+      },
+      "BanIpRequest": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "maxLength": 45,
+            "minLength": 0
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "ip"
+        ]
+      },
+      "ApiResponseIpBanResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/IpBanResponse"
+          }
+        }
+      },
+      "IpBanResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "bannedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateRoleRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "orderWeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isSystem": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "AssignRolePermReq": {
+        "type": "object",
+        "properties": {
+          "perms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RolePermItemDTO"
+            }
+          }
+        },
+        "required": [
+          "perms"
+        ]
+      },
+      "CreatePostRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 0
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 0
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0
+          },
+          "coverageUuid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "FANS_ONLY"
+            ]
+          },
+          "authorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "NOTICE"
+            ]
+          },
+          "isPinned": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "authorId",
+          "categoryId",
+          "content",
+          "status",
+          "title",
+          "visibility"
+        ]
+      },
+      "CreatePermRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "API",
+              "MENU",
+              "BUTTON",
+              "DATA",
+              "BAM"
+            ]
+          },
+          "resource": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orderWeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isSystem": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "resource"
+        ]
+      },
+      "ModerateRejectRequest": {
+        "type": "object",
+        "properties": {
+          "rejectType": {
+            "type": "string",
+            "enum": [
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CASCADE",
+              "OTHER"
+            ]
+          },
+          "rejectReason": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "rejectType"
+        ]
+      },
+      "ApiResponseListModerationResourceRes": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModerationResourceRes"
+            }
+          }
+        }
+      },
+      "CloudResPresignedUrlResp": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "expireAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "FileMeta": {
+        "type": "object",
+        "properties": {
+          "etag": {
+            "type": "string"
+          }
+        }
+      },
+      "FileProbeResult": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/FileMeta"
+          }
+        }
+      },
+      "ModerationResourceRes": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "resourceUuid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "SUSPECT"
+            ]
+          },
+          "auditAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "auditorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "rejectType": {
+            "type": "string",
+            "enum": [
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CASCADE",
+              "OTHER"
+            ]
+          },
+          "rejectReason": {
+            "type": "string"
+          },
+          "fileProbeResult": {
+            "$ref": "#/components/schemas/FileProbeResult"
+          },
+          "presignedUrl": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          }
+        }
+      },
+      "BatchModerateRejectRequest": {
+        "type": "object",
+        "properties": {
+          "auditTaskIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "rejectType": {
+            "type": "string",
+            "enum": [
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CASCADE",
+              "OTHER"
+            ]
+          },
+          "rejectReason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "auditTaskIds",
+          "rejectType"
+        ]
+      },
+      "BatchModerateRequest": {
+        "type": "object",
+        "properties": {
+          "auditTaskIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "AdminUserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "passwordHash": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isAdmin": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseAdminUserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminUserInfoResponse"
+          }
+        }
+      },
+      "CreateBannerRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 0
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 0
+          },
+          "linkUrl": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "position": {
+            "type": "string",
+            "enum": [
+              "HOME",
+              "SIDE"
+            ]
+          },
+          "sortNo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SHOW",
+              "HIDE"
+            ]
+          },
+          "startAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "imageUuid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "imageUuid",
+          "title"
+        ]
+      },
+      "CreateCategoryRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "LogoutRequestBody": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          }
+        }
+      },
+      "DeviceInfoReq": {
+        "type": "object",
+        "properties": {
+          "deviceFp": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deviceType": {
+            "type": "string"
+          },
+          "os": {
+            "type": "string"
+          },
+          "browser": {
+            "type": "string"
+          },
+          "screenResolution": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "deviceFp"
+        ]
+      },
+      "PwdLoginReq": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[0-9a-zA-Z_]+$"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 8
+          },
+          "captcha": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deviceFp": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfoReq"
+          }
+        },
+        "required": [
+          "captcha",
+          "deviceFp",
+          "password",
+          "username"
+        ]
+      },
+      "ApiResponseLoginClientData": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LoginClientData"
+          }
+        }
+      },
+      "LoginClientData": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "exp": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AccountResp": {
+        "type": "object",
+        "properties": {
+          "phoneMasked": {
+            "type": "string"
+          },
+          "emailMasked": {
+            "type": "string"
+          },
+          "phoneVerified": {
+            "type": "boolean"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseUserAdminDetail": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserAdminDetail"
+          }
+        }
+      },
+      "ExpirableOptionVOInteger": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expired": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserAdminDetail": {
+        "type": "object",
+        "properties": {
+          "info": {
+            "$ref": "#/components/schemas/UserInfoARes"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/UserProfileRes"
+          },
+          "counter": {
+            "$ref": "#/components/schemas/UserCounterARes"
+          },
+          "maskedData": {
+            "$ref": "#/components/schemas/AccountResp"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpirableOptionVOInteger"
+            },
+            "uniqueItems": true
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpirableOptionVOInteger"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "UserCounterARes": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string",
+            "format": "byte"
+          },
+          "exp": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "followerCnt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "followingCnt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likeCnt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "postCnt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "visible": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UserInfoARes": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ]
+          },
+          "userType": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "ADMIN",
+              "BOT",
+              "MODERATOR",
+              "VIP"
+            ]
+          },
+          "statusChangedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "lastActiveAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserProfileRes": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "residence": {
+            "type": "string"
+          },
+          "updateAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ApiResponsePageAssignedRoleRes": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "AssignedRoleRes": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "assignedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PageObject": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssignedRoleRes"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unpaged": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "empty": {
+            "type": "boolean"
+          },
+          "sorted": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponsePageAssignedPermissionRes": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseListOptionVOLong": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOLong"
+            }
+          }
+        }
+      },
+      "OptionVOLong": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponsePageUserInfoARes": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseTagResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TagResponse"
+          }
+        }
+      },
+      "TagResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "usageCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "creatorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageTagResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseSiteStatisticResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SiteStatisticResponse"
+          }
+        }
+      },
+      "SiteStatisticResponse": {
+        "type": "object",
+        "properties": {
+          "statDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "loginCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "dailyPv": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "newUsers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "newPosts": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "peakOnline": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageSiteStatisticResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponsePageIpBanResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseAuditLogResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuditLogResponse"
+          }
+        }
+      },
+      "AuditLogResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "LOGIN",
+              "REGISTER",
+              "CHANGE_PASSWORD"
+            ]
+          },
+          "ip": {
+            "type": "string"
+          },
+          "deviceInfo": {
+            "type": "object",
+            "additionalProperties": {
+
+            }
+          },
+          "country": {
+            "type": "string"
+          },
+          "province": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "FAIL",
+              "SUCCESS"
+            ]
+          },
+          "failReason": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageAuditLogResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseRoleResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RoleResp"
+          }
+        }
+      },
+      "RoleResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "orderWeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isSystem": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageAssignedUserRes": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseListOptionVOInteger": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOInteger"
+            }
+          }
+        }
+      },
+      "OptionVOInteger": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponsePageRoleResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponsePagePostResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "PostResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "authorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "coverImg": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "FANS_ONLY"
+            ]
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "viewCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "collectCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "NOTICE"
+            ]
+          },
+          "isPinned": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponsePostResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PostResponse"
+          }
+        }
+      },
+      "ApiResponsePermissionResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PermissionResp"
+          }
+        }
+      },
+      "PermissionResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "orderWeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "API",
+              "MENU",
+              "BUTTON",
+              "DATA",
+              "BAM"
+            ]
+          },
+          "resource": {
+            "type": "string"
+          },
+          "isSystem": {
+            "type": "boolean"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePagePermissionResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponsePageOnlineUserVO": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "UserBrief": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userType": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "ADMIN",
+              "BOT",
+              "MODERATOR",
+              "VIP"
+            ]
+          }
+        }
+      },
+      "ApiResponseMapStringLong": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "ApiResponseSystemInfoVO": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SystemInfoVO"
+          }
+        }
+      },
+      "CpuInfoVO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "physicalCores": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "logicalCores": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "usage": {
+            "type": "number",
+            "format": "double"
+          },
+          "load1m": {
+            "type": "number",
+            "format": "double"
+          },
+          "load5m": {
+            "type": "number",
+            "format": "double"
+          },
+          "load15m": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "DiskInfoVO": {
+        "type": "object",
+        "properties": {
+          "mount": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "used": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "free": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Heap": {
+        "type": "object",
+        "properties": {
+          "used": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "committed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "max": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Jvm": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "uptime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "JvmInfoVO": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "jvm": {
+            "$ref": "#/components/schemas/Jvm"
+          },
+          "heap": {
+            "$ref": "#/components/schemas/Heap"
+          },
+          "nonHeap": {
+            "$ref": "#/components/schemas/NonHeap"
+          },
+          "thread": {
+            "$ref": "#/components/schemas/Thread"
+          },
+          "os": {
+            "$ref": "#/components/schemas/Os"
+          }
+        }
+      },
+      "MemoryInfoVO": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "used": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "available": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "MergedJvmInfo": {
+        "type": "object",
+        "properties": {
+          "admin": {
+            "$ref": "#/components/schemas/JvmInfoVO"
+          },
+          "user": {
+            "$ref": "#/components/schemas/JvmInfoVO"
+          },
+          "userError": {
+            "type": "string"
+          }
+        }
+      },
+      "NetworkInfoVO": {
+        "type": "object",
+        "properties": {
+          "sent": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "received": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "timestamp": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "NonHeap": {
+        "type": "object",
+        "properties": {
+          "used": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Os": {
+        "type": "object",
+        "properties": {
+          "availableProcessors": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalMemory": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "freeMemory": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "SystemDetailVO": {
+        "type": "object",
+        "properties": {
+          "os": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "arch": {
+            "type": "string"
+          },
+          "uptime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "SystemInfoVO": {
+        "type": "object",
+        "properties": {
+          "cpu": {
+            "$ref": "#/components/schemas/CpuInfoVO"
+          },
+          "memory": {
+            "$ref": "#/components/schemas/MemoryInfoVO"
+          },
+          "disks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiskInfoVO"
+            }
+          },
+          "network": {
+            "$ref": "#/components/schemas/NetworkInfoVO"
+          },
+          "system": {
+            "$ref": "#/components/schemas/SystemDetailVO"
+          },
+          "jvms": {
+            "$ref": "#/components/schemas/MergedJvmInfo"
+          }
+        }
+      },
+      "Thread": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiResponseMergedJvmInfo": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/MergedJvmInfo"
+          }
+        }
+      },
+      "ApiResponseModerationResourceRes": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ModerationResourceRes"
+          }
+        }
+      },
+      "ApiResponseModerateTaskResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ModerateTaskResponse"
+          }
+        }
+      },
+      "AuditPayload": {
+
+      },
+      "ModerateTaskResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "USER_AVATAR",
+              "POST",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE",
+              "BANNER_IMAGE"
+            ]
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ModerationTaskPayloadRes"
+          },
+          "submitterId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "submitAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ModerationTaskPayloadRes": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "SINGLE_RESOURCE",
+              "RICH_TEXT",
+              "PLAIN_TEXT"
+            ]
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModerationResourceRes"
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "contentFormat": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "PLAINTEXT",
+              "HTML",
+              "MARKDOWN"
+            ]
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AuditPayload"
+          }
+        }
+      },
+      "ApiResponsePageModerationResourceRes": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponsePageModerateTaskResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseListTrendPointVO": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrendPointVO"
+            }
+          }
+        }
+      },
+      "TrendPointVO": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "dailyPv": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "newUsers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "newPosts": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseListDashboardRecentActivityVO": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DashboardRecentActivityVO"
+            }
+          }
+        }
+      },
+      "DashboardRecentActivityVO": {
+        "type": "object",
+        "properties": {
+          "userBrief": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "lastActiveAt": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "actionType": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "CREATE",
+              "DELETED",
+              "UPDATED",
+              "INTERACTIVE",
+              "REPORT"
+            ]
+          },
+          "businessType": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "POST",
+              "COMMENT",
+              "USER"
+            ]
+          },
+          "actionTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "targetId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseDashboardOverviewVO": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DashboardOverviewVO"
+          }
+        }
+      },
+      "DashboardOverviewVO": {
+        "type": "object",
+        "properties": {
+          "onlineUserCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalUsers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPosts": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "todayNewUsers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "todayNewPosts": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "todayPv": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pendingModerations": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseBannerResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BannerResponse"
+          }
+        }
+      },
+      "BannerResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "coverageUrl": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "linkUrl": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string",
+            "enum": [
+              "HOME",
+              "SIDE"
+            ]
+          },
+          "sortNo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SHOW",
+              "HIDE"
+            ]
+          },
+          "startAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageBannerResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseCategoryResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CategoryResponse"
+          }
+        }
+      },
+      "CategoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "creatorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updateAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageCategoryResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "RemoveUsersReq": {
+        "type": "object",
+        "properties": {
+          "userUids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "RemoveUserRolesReq": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "required": [
+          "roleIds"
+        ]
+      },
+      "RemoveUserPermsReq": {
+        "type": "object",
+        "properties": {
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "required": [
+          "permissionIds"
+        ]
+      },
+      "DeleteTagsRequest": {
+        "type": "object",
+        "properties": {
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "required": [
+          "tagIds"
+        ]
+      },
+      "DeleteAuditLogRequest": {
+        "type": "object",
+        "properties": {
+          "logIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          }
+        },
+        "required": [
+          "logIds"
+        ]
+      },
+      "DeleteRolesRequest": {
+        "type": "object",
+        "properties": {
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "RemoveRoleUsersReq": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "DeleteRolePermsReq": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "DeletePostRequest": {
+        "type": "object",
+        "properties": {
+          "postIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "DeletePermsRequest": {
+        "type": "object",
+        "properties": {
+          "permIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          }
+        },
+        "required": [
+          "permIds"
+        ]
+      },
+      "removePermUsersReq": {
+        "type": "object",
+        "properties": {
+          "userUids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "RemoveCategoriesRequest": {
+        "type": "object",
+        "properties": {
+          "categoryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    }
+  }
+}

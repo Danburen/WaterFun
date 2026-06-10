@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WaterFun - 论坛</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== Header (匹配用户上传的导航栏) ========== */
+        .header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .nav a {
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-spacer {
+            flex: 1;
+        }
+
+        .search-box {
+            position: relative;
+            width: 320px;
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 42px 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-box button {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .search-box button:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .icon-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 10px 4px 4px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 4px;
+        }
+
+        .user-menu:hover {
+            background: var(--border-light);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* ========== Main Layout ========== */
+        .main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+
+        /* ========== Left Column ========== */
+        .left-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 分类标签栏 */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        /* 帖子列表 */
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .post-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .post-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .post-author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .post-meta {
+            flex: 1;
+        }
+
+        .post-author-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .post-tag {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tag-tech { background: #dbeafe; color: #1d4ed8; }
+        .tag-life { background: #dcfce7; color: #15803d; }
+        .tag-share { background: #fef3c7; color: #b45309; }
+        .tag-ask { background: #fce7f3; color: #be185d; }
+
+        .post-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-excerpt {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .post-footer {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .post-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .post-stat i {
+            font-size: 14px;
+        }
+
+        .post-stat.hot {
+            color: #ef4444;
+        }
+
+        /* 置顶帖子特殊样式 */
+        .post-card.pinned {
+            border-left: 3px solid var(--primary);
+            background: linear-gradient(to right, var(--primary-light), var(--bg-white) 15%);
+        }
+
+        .pin-icon {
+            color: var(--primary);
+            font-size: 14px;
+            margin-right: 6px;
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 20px 0;
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .page-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ========== Right Column ========== */
+        .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .widget {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .widget-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .widget-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .widget-title i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .widget-more {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .widget-more:hover {
+            color: var(--primary);
+        }
+
+        .widget-body {
+            padding: 8px 0;
+        }
+
+        /* 用户信息卡片 */
+        .user-card {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .user-card-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 3px solid var(--border);
+        }
+
+        .user-card-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-card-level {
+            font-size: 12px;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 10px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .user-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .user-stat {
+            text-align: center;
+        }
+
+        .user-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            margin-top: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* 热门话题 */
+        .hot-topic-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .hot-topic-item:hover {
+            background: var(--bg);
+        }
+
+        .topic-rank {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .rank-top {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+        }
+
+        .rank-normal {
+            background: var(--border-light);
+            color: var(--text-muted);
+        }
+
+        .topic-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topic-title {
+            font-size: 14px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .topic-heat {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* 活跃成员 */
+        .member-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px 20px;
+        }
+
+        .member-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .member-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .member-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+            transition: border-color 0.2s;
+        }
+
+        .member-item:hover .member-avatar {
+            border-color: var(--primary);
+        }
+
+        .member-name {
+            font-size: 12px;
+            color: var(--text-secondary);
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 公告 */
+        .notice-item {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notice-item:last-child {
+            border-bottom: none;
+        }
+
+        .notice-item:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+
+        .notice-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* 友情链接 */
+        .links-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 16px 20px;
+        }
+
+        .link-item {
+            padding: 8px 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .link-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* 底部 */
+        .footer {
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            padding: 32px 24px;
+            margin-top: 20px;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-copyright {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+            .right-col {
+                display: none;
+            }
+            .search-box {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-inner {
+                padding: 0 16px;
+                gap: 12px;
+            }
+            .nav {
+                display: none;
+            }
+            .search-box {
+                width: 160px;
+            }
+            .user-name {
+                display: none;
+            }
+            .main {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">WF</div>
+                <span class="logo-text">WaterFun</span>
+            </a>
+            <nav class="nav">
+                <a href="#" class="active">首页</a>
+                <a href="#">社区</a>
+                <a href="#">游乐场</a>
+                <a href="#">聊天室</a>
+                <a href="#">关于</a>
+            </nav>
+            <div class="header-spacer"></div>
+            <div class="search-box">
+                <input type="text" placeholder="请输入搜索内容">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                <button class="icon-btn"><i class="far fa-envelope"></i></button>
+                <div class="user-menu">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hatcher" alt="avatar" class="user-avatar">
+                    <span class="user-name">Hatcher</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="left-col">
+            <!-- Category Tabs -->
+            <div class="category-tabs">
+                <div class="tab active">全部</div>
+                <div class="tab">技术交流</div>
+                <div class="tab">生活分享</div>
+                <div class="tab">资源推荐</div>
+                <div class="tab">问答求助</div>
+                <div class="tab">灌水闲聊</div>
+            </div>
+
+            <!-- Post List -->
+            <div class="post-list">
+                <!-- Pinned Post -->
+                <div class="post-card pinned">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name"><i class="fas fa-thumbtack pin-icon"></i>管理员</div>
+                            <div class="post-time">2小时前</div>
+                        </div>
+                        <span class="post-tag tag-tech">公告</span>
+                    </div>
+                    <div class="post-title">WaterFun 论坛新版上线，欢迎大家提出宝贵意见与建议</div>
+                    <div class="post-excerpt">经过数月的开发与测试，WaterFun 论坛全新版本正式上线！本次更新带来了全新的界面设计、更流畅的交互体验以及多项实用功能...</div>
+                    <div class="post-footer">
+                        <span class="post-stat hot"><i class="fas fa-fire"></i> 2,847</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 156</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 12.3k</span>
+                        <span class="post-stat"><i class="far fa-clock"></i> 置顶</span>
+                    </div>
+                </div>
+
+                <!-- Normal Posts -->
+                <div class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=dev1" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">CodeMaster</div>
+                            <div class="post-time">35分钟前</div>
+                        </div>
+                        <span class="post-tag tag-tech">技术</span>
+                    </div>
+                    <div class="post-title">深入理解 React 18 的并发特性与 Suspense 最佳实践</div>
+                    <div class="post-excerpt">React 18 引入了并发渲染机制，让应用能够更好地处理大量更新。本文将从底层原理出发，结合实际案例，详细讲解如何使用 useTransition、useDeferredValue 等新 Hook...</div>
+                    <div class="post-footer">
+                        <span class="post-stat hot"><i class="fas fa-fire"></i> 1,234</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 89</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 5.6k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 342</span>
+                    </div>
+                </div>
+
+                <div class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=photo" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">光影旅人</div>
+                            <div class="post-time">1小时前</div>
+                        </div>
+                        <span class="post-tag tag-life">生活</span>
+                    </div>
+                    <div class="post-title">周末去了一趟大理，分享一些旅途中的美好瞬间与攻略</div>
+                    <div class="post-excerpt">这次大理之行准备了很久，终于成行。洱海边的日出、古城里的石板路、还有那家藏在巷子里的咖啡馆，每一个瞬间都值得记录...</div>
+                    <div class="post-footer">
+                        <span class="post-stat"><i class="far fa-comment"></i> 67</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 3.2k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 521</span>
+                    </div>
+                </div>
+
+                <div class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=tool" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">工具箱</div>
+                            <div class="post-time">2小时前</div>
+                        </div>
+                        <span class="post-tag tag-share">分享</span>
+                    </div>
+                    <div class="post-title">整理了 50+ 个前端开发必备的工具网站，持续更新中</div>
+                    <div class="post-excerpt">从代码编辑器到设计工具，从配色方案到图标库，这份清单涵盖了前端开发各个环节的实用工具，希望对大家有所帮助...</div>
+                    <div class="post-footer">
+                        <span class="post-stat hot"><i class="fas fa-fire"></i> 892</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 45</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 4.1k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 678</span>
+                    </div>
+                </div>
+
+                <div class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=newbie" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">萌新小白</div>
+                            <div class="post-time">3小时前</div>
+                        </div>
+                        <span class="post-tag tag-ask">问答</span>
+                    </div>
+                    <div class="post-title">请教各位大佬，Vue3 组合式 API 中如何优雅地处理多个异步请求？</div>
+                    <div class="post-excerpt">最近在做一个项目，页面加载时需要同时请求用户信息和订单列表，目前是用 Promise.all 处理的，但感觉代码不够优雅，想请教一下有没有更好的方案...</div>
+                    <div class="post-footer">
+                        <span class="post-stat"><i class="far fa-comment"></i> 23</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 1.8k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 12</span>
+                    </div>
+                </div>
+
+                <div class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=design" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">设计狮</div>
+                            <div class="post-time">5小时前</div>
+                        </div>
+                        <span class="post-tag tag-tech">技术</span>
+                    </div>
+                    <div class="post-title">2024 年 UI 设计趋势分析：从玻璃拟态到新拟态的演变</div>
+                    <div class="post-excerpt">设计趋势总是在不断演变，从早期的扁平化到现在的玻璃拟态，每一次变化都反映了技术和审美的进步。本文将梳理近年来的设计趋势...</div>
+                    <div class="post-footer">
+                        <span class="post-stat"><i class="far fa-comment"></i> 34</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 2.9k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 215</span>
+                    </div>
+                </div>
+
+                <div class="post-card">
+                    <div class="post-header">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=food" alt="avatar" class="post-author-avatar">
+                        <div class="post-meta">
+                            <div class="post-author-name">美食探店</div>
+                            <div class="post-time">昨天</div>
+                        </div>
+                        <span class="post-tag tag-life">生活</span>
+                    </div>
+                    <div class="post-title">藏在巷子里的宝藏面馆，一碗面让我排了半小时队</div>
+                    <div class="post-excerpt">朋友安利的一家小店，位置确实不好找，但味道真的绝了。汤底浓郁，面条劲道，加料也很实在，强烈推荐他们的招牌牛肉面...</div>
+                    <div class="post-footer">
+                        <span class="post-stat"><i class="far fa-comment"></i> 78</span>
+                        <span class="post-stat"><i class="far fa-eye"></i> 6.7k</span>
+                        <span class="post-stat"><i class="far fa-heart"></i> 445</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <a href="#" class="page-btn disabled"><i class="fas fa-chevron-left"></i></a>
+                <a href="#" class="page-btn active">1</a>
+                <a href="#" class="page-btn">2</a>
+                <a href="#" class="page-btn">3</a>
+                <span style="color: var(--text-muted);">...</span>
+                <a href="#" class="page-btn">12</a>
+                <a href="#" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="right-col">
+            <!-- User Card -->
+            <div class="widget">
+                <div class="widget-body">
+                    <div class="user-card">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hatcher" alt="avatar" class="user-card-avatar">
+                        <div class="user-card-name">Hatcher</div>
+                        <div class="user-card-level">LV.8 资深会员</div>
+                        <div class="user-stats">
+                            <div class="user-stat">
+                                <div class="user-stat-value">128</div>
+                                <div class="user-stat-label">帖子</div>
+                            </div>
+                            <div class="user-stat">
+                                <div class="user-stat-value">2.4k</div>
+                                <div class="user-stat-label">获赞</div>
+                            </div>
+                            <div class="user-stat">
+                                <div class="user-stat-value">56</div>
+                                <div class="user-stat-label">关注</div>
+                            </div>
+                        </div>
+                        <button class="btn-primary"><i class="fas fa-pen"></i> 发布新帖</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hot Topics -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title"><i class="fas fa-fire"></i> 热门话题</div>
+                    <a href="#" class="widget-more">更多 <i class="fas fa-chevron-right" style="font-size: 10px;"></i></a>
+                </div>
+                <div class="widget-body">
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-top">1</div>
+                        <div class="topic-info">
+                            <div class="topic-title">AI 辅助编程工具大盘点</div>
+                            <div class="topic-heat">🔥 12.5k 热度</div>
+                        </div>
+                    </div>
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-top">2</div>
+                        <div class="topic-info">
+                            <div class="topic-title">远程工作三年，我的一些心得</div>
+                            <div class="topic-heat">🔥 9.8k 热度</div>
+                        </div>
+                    </div>
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-top">3</div>
+                        <div class="topic-info">
+                            <div class="topic-title">2024 年前端面试题汇总</div>
+                            <div class="topic-heat">🔥 8.2k 热度</div>
+                        </div>
+                    </div>
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-normal">4</div>
+                        <div class="topic-info">
+                            <div class="topic-title">Mac 开发环境配置指南</div>
+                            <div class="topic-heat">6.1k 热度</div>
+                        </div>
+                    </div>
+                    <div class="hot-topic-item">
+                        <div class="topic-rank rank-normal">5</div>
+                        <div class="topic-info">
+                            <div class="topic-title">独立开发者月入过万经验分享</div>
+                            <div class="topic-heat">5.4k 热度</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Members -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title"><i class="fas fa-users"></i> 活跃成员</div>
+                    <a href="#" class="widget-more">更多 <i class="fas fa-chevron-right" style="font-size: 10px;"></i></a>
+                </div>
+                <div class="widget-body">
+                    <div class="member-list">
+                        <div class="member-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=m1" alt="" class="member-avatar">
+                            <span class="member-name">小明</span>
+                        </div>
+                        <div class="member-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=m2" alt="" class="member-avatar">
+                            <span class="member-name">小红</span>
+                        </div>
+                        <div class="member-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=m3" alt="" class="member-avatar">
+                            <span class="member-name">阿强</span>
+                        </div>
+                        <div class="member-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=m4" alt="" class="member-avatar">
+                            <span class="member-name">Lisa</span>
+                        </div>
+                        <div class="member-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=m5" alt="" class="member-avatar">
+                            <span class="member-name">Tom</span>
+                        </div>
+                        <div class="member-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=m6" alt="" class="member-avatar">
+                            <span class="member-name">Amy</span>
+                        </div>
+                        <div class="member-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=m7" alt="" class="member-avatar">
+                            <span class="member-name">老王</span>
+                        </div>
+                        <div class="member-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=m8" alt="" class="member-avatar">
+                            <span class="member-name">Jessica</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notices -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title"><i class="fas fa-bullhorn"></i> 社区公告</div>
+                </div>
+                <div class="widget-body">
+                    <div class="notice-item">
+                        <span class="notice-dot"></span>
+                        <span>社区规范更新，请查阅</span>
+                    </div>
+                    <div class="notice-item">
+                        <span class="notice-dot"></span>
+                        <span>新版编辑器已上线</span>
+                    </div>
+                    <div class="notice-item">
+                        <span class="notice-dot"></span>
+                        <span>端午节活动即将开始</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Friendly Links -->
+            <div class="widget">
+                <div class="widget-header">
+                    <div class="widget-title"><i class="fas fa-link"></i> 友情链接</div>
+                </div>
+                <div class="widget-body">
+                    <div class="links-grid">
+                        <a href="#" class="link-item">GitHub</a>
+                        <a href="#" class="link-item">Stack Overflow</a>
+                        <a href="#" class="link-item">V2EX</a>
+                        <a href="#" class="link-item">掘金</a>
+                        <a href="#" class="link-item">CSDN</a>
+                        <a href="#" class="link-item">知乎</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="#">关于我们</a>
+                <a href="#">社区规范</a>
+                <a href="#">隐私政策</a>
+                <a href="#">联系我们</a>
+                <a href="#">帮助中心</a>
+            </div>
+            <div class="footer-copyright">© 2026 WaterFun. All rights reserved.</div>
+        </div>
+    </footer>
+
+</body>
+</html>

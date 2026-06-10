@@ -1,0 +1,62 @@
+<script setup lang="ts">
+import { usePostStore } from '~/stores/postStore'
+import { storeToRefs } from 'pinia'
+import { useRouter, useRoute } from 'vue-router'
+
+const postStore = usePostStore()
+const { posts, pagination, loading, categories } = storeToRefs(postStore)
+const router = useRouter()
+const route = useRoute()
+
+const selectedTab = ref('')
+
+const searchParams = reactive({
+  categoryId: undefined as string | undefined,
+  tagIds: undefined as string[] | undefined,
+  page: 1,
+  size: 10
+})
+
+const syncUrl = () => {
+  const query: Record<string, string> = {}
+  if (searchParams.categoryId) query.category = searchParams.categoryId
+  if (searchParams.page > 1) query.page = String(searchParams.page)
+  router.replace({ query })
+}
+
+const fetchPosts = async () => {
+  try {
+    await postStore.fetchPostList({ ...searchParams })
+    syncUrl()
+  } catch { /* ignore */ }
+}
+
+const handleTabChange = (tab: string) => {
+  selectedTab.value = tab
+  const cat = categories.value.find(c => c.id === tab)
+  searchParams.categoryId = cat ? cat.id : undefined
+  searchParams.page = 1
+  fetchPosts()
+}
+
+const handlePageChange = (page: number) => {
+  searchParams.page = page
+  fetchPosts()
+}
+
+const goToDetail = (id: string) => router.push(`/post/${id}`)
+const goToCreate = () => router.push('/post/create')
+const goToUser = (uid: string) => router.push(`/User/${uid}`)
+
+onMounted(() => {
+  if (route.query.category) {
+    selectedTab.value = route.query.category as string
+    searchParams.categoryId = route.query.category as string
+  }
+  if (route.query.page) {
+    searchParams.page = Math.max(1, parseInt(route.query.page as string))
+  }
+  fetchPosts()
+  postStore.fetchCategories()
+})
+</script>

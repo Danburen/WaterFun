@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统监控 - WaterFun Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+            --sidebar-width: 240px;
+            --sidebar-collapsed: 60px;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== Layout ========== */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========== Sidebar ========== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            overflow: hidden;
+        }
+
+        .sidebar-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo-text {
+            font-size: 16px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+        }
+
+        .sidebar.collapsed .sidebar-logo-text {
+            opacity: 0;
+            width: 0;
+        }
+
+        .sidebar-toggle {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #94a3b8;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            transform: rotate(180deg);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 10px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .nav-section {
+            margin-bottom: 4px;
+        }
+
+        .nav-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .nav-section-header:hover {
+            background: var(--sidebar-hover);
+        }
+
+        .nav-section-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-section-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+        }
+
+        .sidebar.collapsed .nav-section-title,
+        .sidebar.collapsed .nav-section-arrow,
+        .sidebar.collapsed .nav-badge,
+        .sidebar.collapsed .nav-item span {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .nav-section-arrow {
+            font-size: 10px;
+            color: #64748b;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-section-header.expanded .nav-section-arrow {
+            transform: rotate(90deg);
+        }
+
+        .nav-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .nav-items.expanded {
+            max-height: 400px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px 9px 44px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+            color: #e2e8f0;
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .nav-item span {
+            transition: opacity 0.2s;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            padding: 1px 8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            flex-shrink: 0;
+            transition: opacity 0.2s;
+        }
+
+        .sidebar-footer {
+            padding: 14px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .sidebar-user-info {
+            transition: opacity 0.2s;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .sidebar-user-info {
+            opacity: 0;
+            width: 0;
+        }
+
+        .sidebar-user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .sidebar-user-role {
+            font-size: 12px;
+            color: #64748b;
+            white-space: nowrap;
+        }
+
+        /* ========== Main Content ========== */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 60px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .top-btn:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+
+        .top-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 24px 28px;
+            flex: 1;
+        }
+
+        /* ========== Monitor Grid ========== */
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .monitor-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .monitor-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .monitor-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .monitor-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .monitor-card-title i {
+            font-size: 14px;
+        }
+
+        .monitor-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-healthy {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-healthy::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-warning::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #f59e0b;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .monitor-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .monitor-unit {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .monitor-bar {
+            height: 6px;
+            background: var(--border-light);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 12px;
+            position: relative;
+        }
+
+        .monitor-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .bar-green { background: linear-gradient(90deg, #10b981, #34d399); }
+        .bar-yellow { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .bar-red { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .bar-blue { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .bar-purple { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .bar-cyan { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+
+        .monitor-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ========== Stacked Memory Bar ========== */
+        .stacked-bar {
+            height: 8px;
+            background: var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 12px;
+            display: flex;
+        }
+
+        .stacked-segment {
+            height: 100%;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .stacked-segment:hover::after {
+            content: attr(data-label);
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .stacked-legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stacked-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .stacked-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        /* ========== JVM Instance Cards ========== */
+        .jvm-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .jvm-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .jvm-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .jvm-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .jvm-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .jvm-instance-tag {
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tag-admin { background: var(--primary-light); color: var(--primary); }
+        .tag-user { background: #f0fdf4; color: var(--success); }
+
+        .jvm-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .jvm-metric {
+            text-align: center;
+        }
+
+        .jvm-metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .jvm-metric-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ========== Chart Section ========== */
+        .section-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i { font-size: 14px; }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-action-btn {
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .card-action-btn:hover, .card-action-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* ECharts Container */
+        .echarts-container {
+            height: 280px;
+            width: 100%;
+        }
+
+        /* Thread / GC Info */
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-label i { color: var(--primary); font-size: 13px; }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ========== Log Section ========== */
+        .log-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .log-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .log-title {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .log-title i { color: var(--primary); font-size: 14px; }
+
+        .log-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .log-btn {
+            padding: 5px 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .log-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .log-body {
+            padding: 0;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-light);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 13px;
+        }
+
+        .log-item:last-child { border-bottom: none; }
+
+        .log-time {
+            color: var(--text-muted);
+            font-size: 12px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            width: 80px;
+        }
+
+        .log-level {
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            flex-shrink: 0;
+            width: 50px;
+            text-align: center;
+        }
+
+        .level-info { background: var(--primary-light); color: var(--primary); }
+        .level-warn { background: #fef3c7; color: #b45309; }
+        .level-error { background: #fee2e2; color: #dc2626; }
+        .level-debug { background: #f1f5f9; color: var(--text-muted); }
+
+        .log-msg {
+            color: var(--text-secondary);
+            flex: 1;
+            word-break: break-all;
+        }
+
+        /* ========== Disk & Network ========== */
+        .disk-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .disk-item {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+        }
+
+        .disk-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .disk-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .disk-size {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .disk-bar {
+            height: 8px;
+            background: var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .disk-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .disk-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 1200px) {
+            .monitor-grid { grid-template-columns: repeat(2, 1fr); }
+            .jvm-grid { grid-template-columns: 1fr; }
+            .section-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: var(--sidebar-collapsed); }
+            .sidebar .sidebar-logo-text,
+            .sidebar .nav-section-title,
+            .sidebar .nav-section-arrow,
+            .sidebar .nav-badge,
+            .sidebar .nav-item span,
+            .sidebar .sidebar-user-info {
+                opacity: 0;
+                width: 0;
+                overflow: hidden;
+            }
+            .main-content { margin-left: var(--sidebar-collapsed); }
+            .monitor-grid { grid-template-columns: 1fr; }
+            .jvm-grid { grid-template-columns: 1fr; }
+            .disk-grid { grid-template-columns: 1fr; }
+            .content-area { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-logo">
+                    <div class="sidebar-logo-icon">WF</div>
+                    <span class="sidebar-logo-text">WaterFun</span>
+                </a>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <!-- 概览 -->
+                <div class="nav-section">
+                    <div class="nav-section-header" data-section="overview">
+                        <div class="nav-section-title-wrap">
+                            <i class="nav-section-icon fas fa-compass"></i>
+                            <span class="nav-section-title">概览</span>
+                        </div>
+                        <i class="nav-section-arrow fas fa-chevron-right"></i>
+                    </div>
+                    <div class="nav-items expanded" id="nav-overview">
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-users"></i>
+                            <span>在线用户</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 内容管理 -->
+                <div class="nav-section">
+                    <div class="nav-section-header" data-section="content">
+                        <div class="nav-section-title-wrap">
+                            <i class="nav-section-icon fas fa-folder-open"></i>
+                            <span class="nav-section-title">内容管理</span>
+                        </div>
+                        <i class="nav-section-arrow fas fa-chevron-right"></i>
+                    </div>
+                    <div class="nav-items expanded" id="nav-content">
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-file-alt"></i>
+                            <span>帖子管理</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-comment"></i>
+                            <span>评论管理</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>审核管理</span>
+                            <span class="nav-badge">12</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 用户 -->
+                <div class="nav-section">
+                    <div class="nav-section-header" data-section="user">
+                        <div class="nav-section-title-wrap">
+                            <i class="nav-section-icon fas fa-user-friends"></i>
+                            <span class="nav-section-title">用户</span>
+                        </div>
+                        <i class="nav-section-arrow fas fa-chevron-right"></i>
+                    </div>
+                    <div class="nav-items expanded" id="nav-user">
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-user"></i>
+                            <span>用户管理</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-ban"></i>
+                            <span>封禁记录</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 系统 -->
+                <div class="nav-section">
+                    <div class="nav-section-header" data-section="system">
+                        <div class="nav-section-title-wrap">
+                            <i class="nav-section-icon fas fa-cogs"></i>
+                            <span class="nav-section-title">系统</span>
+                        </div>
+                        <i class="nav-section-arrow fas fa-chevron-right"></i>
+                    </div>
+                    <div class="nav-items expanded" id="nav-system">
+                        <a href="#" class="nav-item active">
+                            <i class="fas fa-heartbeat"></i>
+                            <span>系统监控</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-cog"></i>
+                            <span>系统设置</span>
+                        </a>
+                        <a href="#" class="nav-item">
+                            <i class="fas fa-history"></i>
+                            <span>操作日志</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="avatar" class="sidebar-user-avatar">
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name">Admin</div>
+                        <div class="sidebar-user-role">超级管理员</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1 class="page-title">系统监控</h1>
+                </div>
+                <div class="top-bar-right">
+                    <button class="top-btn" title="刷新数据" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="top-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                    <button class="top-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Monitor Cards -->
+                <div class="monitor-grid">
+                    <!-- CPU -->
+                    <div class="monitor-card">
+                        <div class="monitor-card-header">
+                            <div class="monitor-card-title">
+                                <i class="fas fa-microchip" style="color: var(--primary);"></i>
+                                CPU 使用率
+                            </div>
+                            <span class="monitor-status status-healthy">正常</span>
+                        </div>
+                        <div class="monitor-value">
+                            <span id="cpuValue">23.5</span><span class="monitor-unit">%</span>
+                        </div>
+                        <div class="monitor-bar">
+                            <div class="monitor-bar-fill bar-blue" id="cpuBar" style="width: 23.5%"></div>
+                        </div>
+                        <div class="monitor-detail">
+                            <span>核心数: 8</span>
+                            <span>负载: 1.87</span>
+                        </div>
+                    </div>
+
+                    <!-- Memory (Stacked with JVM instances) -->
+                    <div class="monitor-card">
+                        <div class="monitor-card-header">
+                            <div class="monitor-card-title">
+                                <i class="fas fa-memory" style="color: var(--success);"></i>
+                                内存使用
+                            </div>
+                            <span class="monitor-status status-healthy">正常</span>
+                        </div>
+                        <div class="monitor-value">
+                            <span id="memValue">5.8</span><span class="monitor-unit"> / 16 GB</span>
+                        </div>
+                        <!-- Stacked bar showing JVM instances -->
+                        <div class="stacked-bar" id="memStackedBar">
+                            <div class="stacked-segment bar-blue" id="memSegAdmin" style="width: 18.75%" data-label="管理端 JVM: 3.0 GB"></div>
+                            <div class="stacked-segment bar-green" id="memSegUser" style="width: 12.5%" data-label="用户端 JVM: 2.0 GB"></div>
+                            <div class="stacked-segment bar-yellow" id="memSegOther" style="width: 5%" data-label="其他进程: 0.8 GB"></div>
+                        </div>
+                        <div class="stacked-legend">
+                            <div class="stacked-legend-item">
+                                <div class="stacked-legend-dot" style="background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div>
+                                <span>管理端 JVM</span>
+                            </div>
+                            <div class="stacked-legend-item">
+                                <div class="stacked-legend-dot" style="background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                                <span>用户端 JVM</span>
+                            </div>
+                            <div class="stacked-legend-item">
+                                <div class="stacked-legend-dot" style="background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
+                                <span>其他进程</span>
+                            </div>
+                        </div>
+                        <div class="monitor-detail" style="margin-top: 8px;">
+                            <span>JVM 合计: <span id="jvmTotalMem">5.0</span> GB</span>
+                            <span>空闲: <span id="memFree">10.2</span> GB</span>
+                        </div>
+                    </div>
+
+                    <!-- JVM Heap (Combined overview) -->
+                    <div class="monitor-card">
+                        <div class="monitor-card-header">
+                            <div class="monitor-card-title">
+                                <i class="fas fa-coffee" style="color: var(--warning);"></i>
+                                JVM 堆内存总览
+                            </div>
+                            <span class="monitor-status status-warning">偏高</span>
+                        </div>
+                        <div class="monitor-value">
+                            <span id="jvmTotalValue">1024</span><span class="monitor-unit"> / 2048 MB</span>
+                        </div>
+                        <div class="monitor-bar">
+                            <div class="monitor-bar-fill bar-yellow" id="jvmTotalBar" style="width: 50%"></div>
+                        </div>
+                        <div class="monitor-detail">
+                            <span>管理端: <span id="jvmAdminVal">512</span> MB</span>
+                            <span>用户端: <span id="jvmUserVal">512</span> MB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JVM Instance Cards -->
+                <div class="jvm-grid">
+                    <!-- Admin JVM -->
+                    <div class="jvm-card">
+                        <div class="jvm-card-header">
+                            <div class="jvm-card-title">
+                                <i class="fas fa-server" style="color: var(--primary);"></i>
+                                管理端 JVM
+                            </div>
+                            <span class="jvm-instance-tag tag-admin">Admin Service</span>
+                        </div>
+                        <div class="jvm-metrics">
+                            <div class="jvm-metric">
+                                <div class="jvm-metric-value" id="jvmAdminHeap">512</div>
+                                <div class="jvm-metric-label">堆内存 (MB)</div>
+                            </div>
+                            <div class="jvm-metric">
+                                <div class="jvm-metric-value" id="jvmAdminGC">23</div>
+                                <div class="jvm-metric-label">GC 次数</div>
+                            </div>
+                            <div class="jvm-metric">
+                                <div class="jvm-metric-value" id="jvmAdminThreads">24</div>
+                                <div class="jvm-metric-label">活跃线程</div>
+                            </div>
+                        </div>
+                        <div class="monitor-bar">
+                            <div class="monitor-bar-fill bar-blue" id="jvmAdminBar" style="width: 50%"></div>
+                        </div>
+                        <div class="monitor-detail">
+                            <span>已用: <span id="jvmAdminUsed">512</span> / 1024 MB</span>
+                            <span>堆使用率: <span id="jvmAdminPct">50</span>%</span>
+                        </div>
+                    </div>
+
+                    <!-- User JVM -->
+                    <div class="jvm-card">
+                        <div class="jvm-card-header">
+                            <div class="jvm-card-title">
+                                <i class="fas fa-users" style="color: var(--success);"></i>
+                                用户端 JVM
+                            </div>
+                            <span class="jvm-instance-tag tag-user">User Service</span>
+                        </div>
+                        <div class="jvm-metrics">
+                            <div class="jvm-metric">
+                                <div class="jvm-metric-value" id="jvmUserHeap">512</div>
+                                <div class="jvm-metric-label">堆内存 (MB)</div>
+                            </div>
+                            <div class="jvm-metric">
+                                <div class="jvm-metric-value" id="jvmUserGC">18</div>
+                                <div class="jvm-metric-label">GC 次数</div>
+                            </div>
+                            <div class="jvm-metric">
+                                <div class="jvm-metric-value" id="jvmUserThreads">56</div>
+                                <div class="jvm-metric-label">活跃线程</div>
+                            </div>
+                        </div>
+                        <div class="monitor-bar">
+                            <div class="monitor-bar-fill bar-green" id="jvmUserBar" style="width: 50%"></div>
+                        </div>
+                        <div class="monitor-detail">
+                            <span>已用: <span id="jvmUserUsed">512</span> / 1024 MB</span>
+                            <span>堆使用率: <span id="jvmUserPct">50</span>%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts & Info -->
+                <div class="section-grid">
+                    <!-- CPU/Mem Trend (ECharts) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-chart-area"></i> 资源使用趋势</div>
+                            <div class="card-actions">
+                                <button class="card-action-btn active" data-chart="cpu">CPU</button>
+                                <button class="card-action-btn" data-chart="memory">内存</button>
+                                <button class="card-action-btn" data-chart="jvm">JVM</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="echarts-container" id="trendChart"></div>
+                        </div>
+                    </div>
+
+                    <!-- JVM Details -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-info-circle"></i> JVM 详情</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-list">
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-code-branch"></i> Java 版本</span>
+                                    <span class="info-value">21.0.2</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-server"></i> JVM 名称</span>
+                                    <span class="info-value">OpenJDK 64-Bit</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-clock"></i> 运行时间</span>
+                                    <span class="info-value" id="uptime">3d 12h 34m</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-layer-group"></i> 活跃线程</span>
+                                    <span class="info-value"><span id="totalThreads">80</span> / 200</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-trash-alt"></i> GC 次数</span>
+                                    <span class="info-value">Young: <span id="gcYoung">174</span> / Full: <span id="gcFull">5</span></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-stopwatch"></i> GC 耗时</span>
+                                    <span class="info-value">Total: <span id="gcTime">3.12</span>s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disk & Network -->
+                <div class="section-grid" style="grid-template-columns: 1fr 1fr;">
+                    <!-- Disk -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-hdd"></i> 磁盘使用</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="disk-grid">
+                                <div class="disk-item">
+                                    <div class="disk-header">
+                                        <span class="disk-name"><i class="fas fa-hdd" style="color: var(--primary); margin-right: 6px;"></i>/dev/sda1</span>
+                                        <span class="disk-size">120 / 500 GB</span>
+                                    </div>
+                                    <div class="disk-bar">
+                                        <div class="disk-bar-fill bar-blue" style="width: 24%"></div>
+                                    </div>
+                                    <div class="disk-detail">
+                                        <span>已用 24%</span>
+                                        <span>可用 380 GB</span>
+                                    </div>
+                                </div>
+                                <div class="disk-item">
+                                    <div class="disk-header">
+                                        <span class="disk-name"><i class="fas fa-hdd" style="color: var(--success); margin-right: 6px;"></i>/dev/sdb1</span>
+                                        <span class="disk-size">800 / 1000 GB</span>
+                                    </div>
+                                    <div class="disk-bar">
+                                        <div class="disk-bar-fill bar-green" style="width: 80%"></div>
+                                    </div>
+                                    <div class="disk-detail">
+                                        <span>已用 80%</span>
+                                        <span>可用 200 GB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Network -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-network-wired"></i> 网络 IO</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-list">
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-arrow-down"></i> 接收速率</span>
+                                    <span class="info-value" id="rxSpeed">1.2 MB/s</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-arrow-up"></i> 发送速率</span>
+                                    <span class="info-value" id="txSpeed">856 KB/s</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-download"></i> 总接收</span>
+                                    <span class="info-value">128.5 GB</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-upload"></i> 总发送</span>
+                                    <span class="info-value">86.2 GB</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="fas fa-ethernet"></i> 连接数</span>
+                                    <span class="info-value">1,247</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Logs -->
+                <div class="log-card" style="margin-top: 24px;">
+                    <div class="log-header">
+                        <div class="log-title"><i class="fas fa-terminal"></i> 系统日志</div>
+                        <div class="log-actions">
+                            <button class="log-btn">INFO</button>
+                            <button class="log-btn">WARN</button>
+                            <button class="log-btn">ERROR</button>
+                            <button class="log-btn"><i class="fas fa-download"></i> 导出</button>
+                        </div>
+                    </div>
+                    <div class="log-body" id="logBody">
+                        <div class="log-item">
+                            <span class="log-time">11:00:01</span>
+                            <span class="log-level level-info">INFO</span>
+                            <span class="log-msg">Scheduled task "cleanupHistory" completed, deleted 1,234 records</span>
+                        </div>
+                        <div class="log-item">
+                            <span class="log-time">11:00:15</span>
+                            <span class="log-level level-warn">WARN</span>
+                            <span class="log-msg">Slow query detected: SELECT * FROM post WHERE created_at &lt; ? took 2.34s</span>
+                        </div>
+                        <div class="log-item">
+                            <span class="log-time">11:01:02</span>
+                            <span class="log-level level-info">INFO</span>
+                            <span class="log-msg">User login: uid=10001, ip=192.168.1.100, session=sess_a1b2c3d4</span>
+                        </div>
+                        <div class="log-item">
+                            <span class="log-time">11:01:30</span>
+                            <span class="log-level level-debug">DEBUG</span>
+                            <span class="log-msg">Cache hit ratio: 87.5%, miss count: 156</span>
+                        </div>
+                        <div class="log-item">
+                            <span class="log-time">11:02:10</span>
+                            <span class="log-level level-info">INFO</span>
+                            <span class="log-msg">Post published: post_id=12345, user_id=10001, category=tech</span>
+                        </div>
+                        <div class="log-item">
+                            <span class="log-time">11:03:45</span>
+                            <span class="log-level level-warn">WARN</span>
+                            <span class="log-msg">High memory usage detected: JVM heap 78%, triggering GC</span>
+                        </div>
+                        <div class="log-item">
+                            <span class="log-time">11:04:00</span>
+                            <span class="log-level level-info">INFO</span>
+                            <span class="log-msg">GC completed: Young GC, duration=45ms, freed=128MB</span>
+                        </div>
+                        <div class="log-item">
+                            <span class="log-time">11:05:22</span>
+                            <span class="log-level level-error">ERROR</span>
+                            <span class="log-msg">Connection timeout: Unable to reach Redis at 10.0.0.5:6379, retrying...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== Sidebar Collapse ==========
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            // Resize charts when sidebar toggles
+            setTimeout(() => {
+                if (trendChartInstance) trendChartInstance.resize();
+            }, 350);
+        });
+
+        // ========== Section Collapse ==========
+        document.querySelectorAll('.nav-section-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const section = header.dataset.section;
+                const items = document.getElementById('nav-' + section);
+                header.classList.toggle('expanded');
+                items.classList.toggle('expanded');
+            });
+        });
+
+        // ========== ECharts Trend Chart ==========
+        let trendChartInstance = null;
+        let currentChartType = 'cpu';
+        const chartData = {
+            cpu: {
+                admin: [12, 15, 18, 22, 25, 28, 32, 30, 35, 38, 42, 40, 45, 48, 52, 50, 55, 58, 62, 60],
+                user: [8, 12, 15, 18, 20, 25, 28, 32, 30, 35, 38, 42, 40, 45, 48, 52, 50, 55, 58, 55],
+                color: ['#3b82f6', '#10b981']
+            },
+            memory: {
+                admin: [2.1, 2.3, 2.5, 2.8, 3.0, 3.2, 3.5, 3.3, 3.8, 4.0, 4.2, 4.0, 4.5, 4.8, 5.0, 4.8, 5.2, 5.5, 5.8, 5.5],
+                user: [1.5, 1.6, 1.8, 2.0, 2.2, 2.5, 2.8, 3.0, 2.8, 3.2, 3.5, 3.3, 3.8, 4.0, 4.2, 4.0, 4.5, 4.8, 5.0, 4.8],
+                color: ['#3b82f6', '#10b981']
+            },
+            jvm: {
+                admin: [256, 280, 320, 350, 380, 420, 450, 430, 480, 512, 540, 520, 580, 600, 620, 600, 650, 680, 700, 680],
+                user: [200, 220, 250, 280, 300, 340, 380, 400, 380, 420, 450, 430, 480, 500, 520, 500, 540, 560, 580, 560],
+                color: ['#f59e0b', '#06b6d4']
+            }
+        };
+
+        function generateLabels(count) {
+            const labels = [];
+            for (let i = count; i > 0; i--) {
+                const d = new Date();
+                d.setMinutes(d.getMinutes() - i);
+                labels.push(d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0'));
+            }
+            return labels;
+        }
+
+        function initTrendChart() {
+            const chartDom = document.getElementById('trendChart');
+            trendChartInstance = echarts.init(chartDom);
+            updateTrendChart('cpu');
+        }
+
+        function updateTrendChart(type) {
+            currentChartType = type;
+            const data = chartData[type];
+            const labels = generateLabels(data.admin.length);
+            const unit = type === 'cpu' ? '%' : type === 'memory' ? 'GB' : 'MB';
+            const maxVal = type === 'cpu' ? 100 : type === 'memory' ? 16 : 1024;
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                    borderColor: '#334155',
+                    textStyle: { color: '#e2e8f0', fontSize: 12 },
+                    formatter: function(params) {
+                        let html = '<div style="font-weight:600;margin-bottom:6px;">' + params[0].axisValue + '</div>';
+                        params.forEach(p => {
+                            html += '<div style="display:flex;align-items:center;gap:6px;margin:3px 0;">' +
+                                '<span style="width:8px;height:8px;border-radius:50%;background:' + p.color + ';"></span>' +
+                                '<span>' + p.seriesName + ': <b>' + p.value + ' ' + unit + '</b></span></div>';
+                        });
+                        return html;
+                    }
+                },
+                legend: {
+                    data: ['管理端', '用户端'],
+                    right: 0,
+                    top: 0,
+                    textStyle: { color: '#64748b', fontSize: 12 },
+                    itemWidth: 12,
+                    itemHeight: 12,
+                    itemGap: 16
+                },
+                grid: {
+                    left: 10,
+                    right: 10,
+                    top: 40,
+                    bottom: 20,
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: labels,
+                    axisLine: { lineStyle: { color: '#e2e8f0' } },
+                    axisLabel: { color: '#94a3b8', fontSize: 11, interval: 3 },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    max: maxVal,
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    axisLabel: { color: '#94a3b8', fontSize: 11, formatter: '{value}' },
+                    splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } }
+                },
+                series: [
+                    {
+                        name: '管理端',
+                        type: 'line',
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 4,
+                        showSymbol: false,
+                        lineStyle: { width: 2, color: data.color[0] },
+                        itemStyle: { color: data.color[0] },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: data.color[0] + '33' },
+                                { offset: 1, color: data.color[0] + '05' }
+                            ])
+                        },
+                        data: data.admin
+                    },
+                    {
+                        name: '用户端',
+                        type: 'line',
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 4,
+                        showSymbol: false,
+                        lineStyle: { width: 2, color: data.color[1] },
+                        itemStyle: { color: data.color[1] },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: data.color[1] + '33' },
+                                { offset: 1, color: data.color[1] + '05' }
+                            ])
+                        },
+                        data: data.user
+                    }
+                ]
+            };
+
+            trendChartInstance.setOption(option, true);
+        }
+
+        // Chart type switch
+        document.querySelectorAll('.card-action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.card-action-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                updateTrendChart(this.dataset.chart);
+            });
+        });
+
+        // ========== Real-time Data Simulation ==========
+        function random(min, max) {
+            return (Math.random() * (max - min) + min);
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        // Data history for charts
+        const history = {
+            cpu: { admin: [...chartData.cpu.admin], user: [...chartData.cpu.user] },
+            memory: { admin: [...chartData.memory.admin], user: [...chartData.memory.user] },
+            jvm: { admin: [...chartData.jvm.admin], user: [...chartData.jvm.user] }
+        };
+
+        function updateMetrics() {
+            // CPU
+            const cpu = random(15, 45).toFixed(1);
+            document.getElementById('cpuValue').textContent = cpu;
+            document.getElementById('cpuBar').style.width = cpu + '%';
+
+            // Admin JVM
+            const jvmAdmin = randomInt(400, 700);
+            const jvmAdminMax = 1024;
+            const jvmAdminPct = (jvmAdmin / jvmAdminMax * 100).toFixed(1);
+            document.getElementById('jvmAdminHeap').textContent = jvmAdmin;
+            document.getElementById('jvmAdminUsed').textContent = jvmAdmin;
+            document.getElementById('jvmAdminPct').textContent = jvmAdminPct;
+            document.getElementById('jvmAdminBar').style.width = jvmAdminPct + '%';
+            document.getElementById('jvmAdminBar').className = 'monitor-bar-fill ' + (jvmAdmin > 900 ? 'bar-red' : jvmAdmin > 700 ? 'bar-yellow' : 'bar-blue');
+            document.getElementById('jvmAdminVal').textContent = jvmAdmin;
+
+            // User JVM
+            const jvmUser = randomInt(350, 650);
+            const jvmUserMax = 1024;
+            const jvmUserPct = (jvmUser / jvmUserMax * 100).toFixed(1);
+            document.getElementById('jvmUserHeap').textContent = jvmUser;
+            document.getElementById('jvmUserUsed').textContent = jvmUser;
+            document.getElementById('jvmUserPct').textContent = jvmUserPct;
+            document.getElementById('jvmUserBar').style.width = jvmUserPct + '%';
+            document.getElementById('jvmUserBar').className = 'monitor-bar-fill ' + (jvmUser > 900 ? 'bar-red' : jvmUser > 700 ? 'bar-yellow' : 'bar-green');
+            document.getElementById('jvmUserVal').textContent = jvmUser;
+
+            // JVM Total
+            const jvmTotal = jvmAdmin + jvmUser;
+            const jvmTotalMax = 2048;
+            const jvmTotalPct = (jvmTotal / jvmTotalMax * 100).toFixed(1);
+            document.getElementById('jvmTotalValue').textContent = jvmTotal;
+            document.getElementById('jvmTotalBar').style.width = jvmTotalPct + '%';
+            document.getElementById('jvmTotalBar').className = 'monitor-bar-fill ' + (jvmTotalPct > 80 ? 'bar-red' : jvmTotalPct > 60 ? 'bar-yellow' : 'bar-green');
+
+            // Memory (convert JVM MB to GB)
+            const jvmAdminGB = (jvmAdmin / 1024).toFixed(2);
+            const jvmUserGB = (jvmUser / 1024).toFixed(2);
+            const otherGB = random(0.5, 1.5).toFixed(2);
+            const totalUsed = (parseFloat(jvmAdminGB) + parseFloat(jvmUserGB) + parseFloat(otherGB)).toFixed(2);
+            const memTotal = 16;
+            const memFree = (memTotal - totalUsed).toFixed(2);
+
+            document.getElementById('memValue').textContent = totalUsed;
+            document.getElementById('memFree').textContent = memFree;
+            document.getElementById('jvmTotalMem').textContent = (parseFloat(jvmAdminGB) + parseFloat(jvmUserGB)).toFixed(2);
+
+            // Stacked bar
+            const adminPct = (jvmAdminGB / memTotal * 100).toFixed(1);
+            const userPct = (jvmUserGB / memTotal * 100).toFixed(1);
+            const otherPct = (otherGB / memTotal * 100).toFixed(1);
+            document.getElementById('memSegAdmin').style.width = adminPct + '%';
+            document.getElementById('memSegAdmin').setAttribute('data-label', `管理端 JVM: ${jvmAdminGB} GB`);
+            document.getElementById('memSegUser').style.width = userPct + '%';
+            document.getElementById('memSegUser').setAttribute('data-label', `用户端 JVM: ${jvmUserGB} GB`);
+            document.getElementById('memSegOther').style.width = otherPct + '%';
+            document.getElementById('memSegOther').setAttribute('data-label', `其他进程: ${otherGB} GB`);
+
+            // Threads & GC
+            document.getElementById('jvmAdminThreads').textContent = randomInt(20, 35);
+            document.getElementById('jvmUserThreads').textContent = randomInt(45, 70);
+            document.getElementById('totalThreads').textContent = randomInt(70, 110);
+            document.getElementById('jvmAdminGC').textContent = randomInt(20, 30);
+            document.getElementById('jvmUserGC').textContent = randomInt(15, 25);
+            document.getElementById('gcYoung').textContent = randomInt(150, 200);
+            document.getElementById('gcFull').textContent = randomInt(3, 8);
+            document.getElementById('gcTime').textContent = random(2, 5).toFixed(2);
+
+            // Network
+            document.getElementById('rxSpeed').textContent = random(0.5, 3.0).toFixed(1) + ' MB/s';
+            document.getElementById('txSpeed').textContent = random(0.3, 2.0).toFixed(1) + ' MB/s';
+
+            // Update chart data history
+            history.cpu.admin.shift(); history.cpu.admin.push(random(15, 65));
+            history.cpu.user.shift(); history.cpu.user.push(random(10, 60));
+            history.memory.admin.shift(); history.memory.admin.push(parseFloat(jvmAdminGB) + random(0.2, 0.8));
+            history.memory.user.shift(); history.memory.user.push(parseFloat(jvmUserGB) + random(0.2, 0.8));
+            history.jvm.admin.shift(); history.jvm.admin.push(jvmAdmin);
+            history.jvm.user.shift(); history.jvm.user.push(jvmUser);
+
+            chartData.cpu.admin = history.cpu.admin;
+            chartData.cpu.user = history.cpu.user;
+            chartData.memory.admin = history.memory.admin;
+            chartData.memory.user = history.memory.user;
+            chartData.jvm.admin = history.jvm.admin;
+            chartData.jvm.user = history.jvm.user;
+
+            // Refresh chart if visible
+            if (trendChartInstance) {
+                updateTrendChart(currentChartType);
+            }
+        }
+
+        // Update every 3 seconds
+        setInterval(updateMetrics, 3000);
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            this.querySelector('i').style.animation = 'spin 1s linear';
+            updateMetrics();
+            setTimeout(() => {
+                this.querySelector('i').style.animation = '';
+            }, 1000);
+        });
+
+        // Add spin animation
+        const style = document.createElement('style');
+        style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+        document.head.appendChild(style);
+
+        // Window resize handler for ECharts
+        window.addEventListener('resize', () => {
+            if (trendChartInstance) trendChartInstance.resize();
+        });
+
+        // Initialize chart on load
+        document.addEventListener('DOMContentLoaded', initTrendChart);
+    </script>
+
+</body>
+</html>

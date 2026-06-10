@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WaterFun Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== Layout ========== */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========== Sidebar ========== */
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo-text {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 8px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+        }
+
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+            color: #e2e8f0;
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            padding: 1px 8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-user-info { flex: 1; }
+
+        .sidebar-user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .sidebar-user-role {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* ========== Main Content ========== */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 60px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .top-btn:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+
+        .top-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 24px 28px;
+            flex: 1;
+        }
+
+        /* ========== Stat Cards ========== */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+        .stat-icon.green { background: #dcfce7; color: #15803d; }
+        .stat-icon.orange { background: #fef3c7; color: #b45309; }
+        .stat-icon.red { background: #fee2e2; color: #dc2626; }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .stat-change {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-change.up { color: var(--success); }
+        .stat-change.down { color: var(--danger); }
+
+        /* ========== Chart Section ========== */
+        .section-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i { color: var(--primary); font-size: 14px; }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-action-btn {
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .card-action-btn:hover, .card-action-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Chart Placeholder */
+        .chart-placeholder {
+            height: 280px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 8px;
+            padding: 20px 0;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--primary), #93c5fd);
+            border-radius: 4px 4px 0 0;
+            min-width: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .chart-bar-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Quick Stats List */
+        .quick-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quick-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+
+        .quick-item:hover {
+            background: var(--primary-light);
+        }
+
+        .quick-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .quick-info { flex: 1; }
+
+        .quick-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .quick-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ========== Recent Activity ========== */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s;
+        }
+
+        .activity-item:last-child { border-bottom: none; }
+
+        .activity-item:hover { background: var(--bg); }
+
+        .activity-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .activity-content { flex: 1; }
+
+        .activity-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .activity-text strong {
+            font-weight: 600;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .activity-badge {
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .badge-new-post { background: #dbeafe; color: #1d4ed8; }
+        .badge-new-user { background: #dcfce7; color: #15803d; }
+        .badge-report { background: #fee2e2; color: #dc2626; }
+        .badge-audit { background: #fef3c7; color: #b45309; }
+
+        /* ========== Data Table ========== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .data-table tr:hover td {
+            background: var(--bg);
+        }
+
+        .table-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .table-user-name {
+            font-weight: 600;
+        }
+
+        .table-user-id {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-online::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        .status-offline {
+            background: #f1f5f9;
+            color: var(--text-muted);
+        }
+
+        .table-action {
+            color: var(--primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .table-action:hover { opacity: 0.7; }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 1200px) {
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .section-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar-logo-text, .nav-section-title, .nav-item span, .sidebar-user-info { display: none; }
+            .main-content { margin-left: 60px; }
+            .stat-grid { grid-template-columns: 1fr; }
+            .content-area { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-logo">
+                    <div class="sidebar-logo-icon">WF</div>
+                    <span class="sidebar-logo-text">WaterFun</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">概览</div>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>在线用户</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">内容管理</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>帖子管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-comment"></i>
+                        <span>评论管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>审核管理</span>
+                        <span class="nav-badge">12</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">用户</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-user"></i>
+                        <span>用户管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-ban"></i>
+                        <span>封禁记录</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>系统设置</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-history"></i>
+                        <span>操作日志</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="avatar" class="sidebar-user-avatar">
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name">Admin</div>
+                        <div class="sidebar-user-role">超级管理员</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1 class="page-title">Dashboard</h1>
+                </div>
+                <div class="top-bar-right">
+                    <button class="top-btn"><i class="fas fa-search"></i></button>
+                    <button class="top-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                    <button class="top-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Stat Cards -->
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">在线用户</span>
+                            <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                        </div>
+                        <div class="stat-value">1,247</div>
+                        <div class="stat-change up">
+                            <i class="fas fa-arrow-up"></i> 12.5% 较昨日
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">总用户数</span>
+                            <div class="stat-icon green"><i class="fas fa-user-plus"></i></div>
+                        </div>
+                        <div class="stat-value">45,832</div>
+                        <div class="stat-change up">
+                            <i class="fas fa-arrow-up"></i> 89 今日新增
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">总帖子数</span>
+                            <div class="stat-icon orange"><i class="fas fa-file-alt"></i></div>
+                        </div>
+                        <div class="stat-value">12,456</div>
+                        <div class="stat-change up">
+                            <i class="fas fa-arrow-up"></i> 234 今日新增
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">待审核</span>
+                            <div class="stat-icon red"><i class="fas fa-shield-alt"></i></div>
+                        </div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-change down">
+                            <i class="fas fa-arrow-down"></i> 3 较昨日
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts & Quick Stats -->
+                <div class="section-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-chart-bar"></i> 访问趋势</div>
+                            <div class="card-actions">
+                                <button class="card-action-btn active">7天</button>
+                                <button class="card-action-btn">30天</button>
+                                <button class="card-action-btn">90天</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-placeholder">
+                                <div class="chart-bar" style="height: 45%;"><span class="chart-bar-value">1.2k</span><span class="chart-bar-label">06/03</span></div>
+                                <div class="chart-bar" style="height: 62%;"><span class="chart-bar-value">1.8k</span><span class="chart-bar-label">06/04</span></div>
+                                <div class="chart-bar" style="height: 55%;"><span class="chart-bar-value">1.5k</span><span class="chart-bar-label">06/05</span></div>
+                                <div class="chart-bar" style="height: 78%;"><span class="chart-bar-value">2.1k</span><span class="chart-bar-label">06/06</span></div>
+                                <div class="chart-bar" style="height: 70%;"><span class="chart-bar-value">1.9k</span><span class="chart-bar-label">06/07</span></div>
+                                <div class="chart-bar" style="height: 85%;"><span class="chart-bar-value">2.4k</span><span class="chart-bar-label">06/08</span></div>
+                                <div class="chart-bar" style="height: 92%;"><span class="chart-bar-value">2.7k</span><span class="chart-bar-label">06/09</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-bolt"></i> 今日概览</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-list">
+                                <div class="quick-item">
+                                    <div class="quick-icon" style="background: #dbeafe; color: #1d4ed8;"><i class="fas fa-eye"></i></div>
+                                    <div class="quick-info">
+                                        <div class="quick-label">今日 PV</div>
+                                        <div class="quick-value">24,567</div>
+                                    </div>
+                                </div>
+                                <div class="quick-item">
+                                    <div class="quick-icon" style="background: #dcfce7; color: #15803d;"><i class="fas fa-user-plus"></i></div>
+                                    <div class="quick-info">
+                                        <div class="quick-label">新增用户</div>
+                                        <div class="quick-value">89</div>
+                                    </div>
+                                </div>
+                                <div class="quick-item">
+                                    <div class="quick-icon" style="background: #fef3c7; color: #b45309;"><i class="fas fa-file-alt"></i></div>
+                                    <div class="quick-info">
+                                        <div class="quick-label">新增帖子</div>
+                                        <div class="quick-value">234</div>
+                                    </div>
+                                </div>
+                                <div class="quick-item">
+                                    <div class="quick-icon" style="background: #fce7f3; color: #be185d;"><i class="fas fa-fire"></i></div>
+                                    <div class="quick-info">
+                                        <div class="quick-label">峰值在线</div>
+                                        <div class="quick-value">1,892</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-clock"></i> 最近动态</div>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" alt="avatar" class="activity-avatar">
+                            <div class="activity-content">
+                                <div class="activity-text"><strong>小明</strong> 发布了新帖子 <strong>《Vue3 性能优化实战》</strong></div>
+                                <div class="activity-time">2分钟前</div>
+                            </div>
+                            <span class="activity-badge badge-new-post">新帖</span>
+                        </div>
+                        <div class="activity-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user2" alt="avatar" class="activity-avatar">
+                            <div class="activity-content">
+                                <div class="activity-text"><strong>小红</strong> 注册成为新用户</div>
+                                <div class="activity-time">5分钟前</div>
+                            </div>
+                            <span class="activity-badge badge-new-user">新用户</span>
+                        </div>
+                        <div class="activity-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user3" alt="avatar" class="activity-avatar">
+                            <div class="activity-content">
+                                <div class="activity-text"><strong>老王</strong> 举报了帖子 <strong>《不当内容》</strong></div>
+                                <div class="activity-time">12分钟前</div>
+                            </div>
+                            <span class="activity-badge badge-report">举报</span>
+                        </div>
+                        <div class="activity-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="avatar" class="activity-avatar">
+                            <div class="activity-content">
+                                <div class="activity-text"><strong>系统</strong> 自动审核通过了 8 条帖子</div>
+                                <div class="activity-time">20分钟前</div>
+                            </div>
+                            <span class="activity-badge badge-audit">审核</span>
+                        </div>
+                        <div class="activity-item">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user4" alt="avatar" class="activity-avatar">
+                            <div class="activity-content">
+                                <div class="activity-text"><strong>CodeMaster</strong> 评论了 <strong>《React 18 并发特性》</strong></div>
+                                <div class="activity-time">30分钟前</div>
+                            </div>
+                            <span class="activity-badge badge-new-post">评论</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Users -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-user-clock"></i> 最近活跃用户</div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>用户</th>
+                                    <th>UID</th>
+                                    <th>等级</th>
+                                    <th>状态</th>
+                                    <th>最后活跃</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="table-user">
+                                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" alt="avatar" class="table-user-avatar">
+                                            <div>
+                                                <div class="table-user-name">小明</div>
+                                                <div class="table-user-id">UID: 10001</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>10001</td>
+                                    <td>LV.8</td>
+                                    <td><span class="status-badge status-online">在线</span></td>
+                                    <td>2分钟前</td>
+                                    <td><span class="table-action">查看详情</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-user">
+                                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user2" alt="avatar" class="table-user-avatar">
+                                            <div>
+                                                <div class="table-user-name">小红</div>
+                                                <div class="table-user-id">UID: 10002</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>10002</td>
+                                    <td>LV.5</td>
+                                    <td><span class="status-badge status-online">在线</span></td>
+                                    <td>5分钟前</td>
+                                    <td><span class="table-action">查看详情</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-user">
+                                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=dev1" alt="avatar" class="table-user-avatar">
+                                            <div>
+                                                <div class="table-user-name">CodeMaster</div>
+                                                <div class="table-user-id">UID: 10003</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>10003</td>
+                                    <td>LV.12</td>
+                                    <td><span class="status-badge status-offline">离线</span></td>
+                                    <td>30分钟前</td>
+                                    <td><span class="table-action">查看详情</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-user">
+                                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=photo" alt="avatar" class="table-user-avatar">
+                                            <div>
+                                                <div class="table-user-name">光影旅人</div>
+                                                <div class="table-user-id">UID: 10004</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>10004</td>
+                                    <td>LV.6</td>
+                                    <td><span class="status-badge status-offline">离线</span></td>
+                                    <td>2小时前</td>
+                                    <td><span class="table-action">查看详情</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

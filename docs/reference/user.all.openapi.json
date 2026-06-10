@@ -1,0 +1,6244 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8081",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "SSE 实时推送",
+      "description": "Server-Sent Events 长连接，用于实时推送通知到客户端"
+    }
+  ],
+  "paths": {
+    "/api/user/updateProfile": {
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Update current user profile",
+        "operationId": "updateProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/security/send-verify-code": {
+      "post": {
+        "tags": [
+          "user-security-controller"
+        ],
+        "summary": "发送验证后验证码",
+        "operationId": "sendVerifyCode",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecuritySendCodeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/security/logout": {
+      "post": {
+        "tags": [
+          "user-security-controller"
+        ],
+        "summary": "登出",
+        "operationId": "logout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/upload/policy": {
+      "post": {
+        "tags": [
+          "upload-controller"
+        ],
+        "operationId": "getUploadPolity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUploadPolicyReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListPresignedResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/upload/callback": {
+      "post": {
+        "tags": [
+          "upload-controller"
+        ],
+        "operationId": "uploadCallback",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloudPutCallbackReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/temp-save": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "tempSavePost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSaveReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/publish": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "publishPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSaveReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/like": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "like",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/collection": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "collection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/draft": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "draftNewPost",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/read/{id}": {
+      "post": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "markRead",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/markAllRead": {
+      "post": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "markAllRead",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/batchMarkRead": {
+      "post": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "batchMarkRead",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchMarkReadReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBatchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comments": {
+      "post": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "postComment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comments/{id}/like": {
+      "post": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "likeComment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/send-code": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "发送无验证验证码",
+        "operationId": "sendCode",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendCodeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "注册",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoginClientData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "refresh",
+        "parameters": [
+          {
+            "name": "deviceFp",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoginClientData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login-by-password": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "密码登陆",
+        "operationId": "loginByPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PwdLoginReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoginClientData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login-by-code": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "手机登陆",
+        "operationId": "loginByCode",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoginClientData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/phone/change": {
+      "post": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "summary": "修改手机号",
+        "operationId": "changePhone",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhoneChangeActivateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/phone/activate": {
+      "post": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "summary": "激活手机号",
+        "operationId": "activatePhone",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhoneChangeActivateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/password/set": {
+      "post": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "summary": "设置密码",
+        "operationId": "setPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPasswordDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/password/reset": {
+      "post": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "summary": "重置密码",
+        "operationId": "resetPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/email/unbind": {
+      "post": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "summary": "解绑邮箱",
+        "operationId": "unbindEmail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailBindActivateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/email/change": {
+      "post": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "summary": "修改邮箱",
+        "operationId": "changeEmail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailChangeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/email/bind": {
+      "post": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "summary": "绑定邮箱",
+        "operationId": "bindEmail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailBindActivateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/account/email/activate": {
+      "post": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "summary": "激活邮箱",
+        "operationId": "activateEmail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailBindActivateDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/userInfo": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get current user info",
+        "operationId": "getUserInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/profile": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get current user profile",
+        "operationId": "getProfile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserProfileResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/permissions": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get current user permissions",
+        "operationId": "getPermissions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSetString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/avatar": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get current user avatar",
+        "operationId": "getAvatar",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/resource/legal/{type}/{lang}/{fileName}": {
+      "get": {
+        "tags": [
+          "resource-controller"
+        ],
+        "operationId": "getLegalResource",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "getPostDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostDetailResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "deletePost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/edit": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "getEditPostDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostDraftResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/content/preview": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "previewContent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPreviewReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/me/{id}": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "getMyPostDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostAuthorDetailResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/me/list": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "listMyPost",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "PENDING",
+                "PUBLISHED",
+                "REJECTED",
+                "ARCHIVED"
+              ]
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PUBLIC",
+                "PRIVATE",
+                "FANS_ONLY"
+              ]
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "tagIds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePostAuthorCardResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/list": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "listPublicPosts",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "tagIds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1,
+              "exclusiveMinimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePostCardResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/detail/{id}": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "getPostDetailPublic",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostDetailResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/tags/{id}": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTagResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "deleteTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/tags/search": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "searchTags",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10,
+              "exclusiveMinimum": 0,
+              "maximum": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListTagResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/tags/search/options": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "searchTagOptions",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10,
+              "exclusiveMinimum": 0,
+              "maximum": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/tags/me": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getTags",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListTagResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/tags/hot": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getHotTags",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageTagResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/post/category/options": {
+      "get": {
+        "tags": [
+          "category-controller"
+        ],
+        "operationId": "getCategoryOptions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/online-users/stats": {
+      "get": {
+        "tags": [
+          "online-user-controller"
+        ],
+        "operationId": "getStats",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOnlineUserStatsVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/unreadCount": {
+      "get": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "unreadCount",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseInteger"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/sse": {
+      "get": {
+        "tags": [
+          "SSE 实时推送"
+        ],
+        "summary": "订阅 SSE 实时通知流",
+        "description": "建立 SSE 长连接，登录用户通过此接口订阅实时通知推送。\n连接建立后服务端会定时发送心跳维持连接，有通知时推送 notification 事件。\n\n## 事件类型\n| 事件名 | 说明 | 频率 |\n|--------|------|------|\n| `heartbeat` | 心跳保活，无数据 | 每 30s |\n| `notification` | 实时通知推送 | 有通知时触发 |\n\n## 前端使用示例 (JavaScript)\n```js\nconst sse = new EventSource('/api/notifications/sse', { withCredentials: true });\n\nsse.addEventListener('notification', (event) =\u003E {\n  const data = JSON.parse(event.data);\n  console.log('新通知:', data);\n});\n\nsse.addEventListener('heartbeat', () =\u003E {});\n```\n\n## 注意事项\n- 需要登录态（请求自动携带认证 Cookie/Token）\n- 断开后浏览器 EventSource 会自动重连\n",
+        "operationId": "subscribe",
+        "responses": {
+          "200": {
+            "description": "SSE 事件流，持续推送事件",
+            "headers": {
+              "Cache-Control": {
+                "description": "no-cache",
+                "style": "simple",
+                "schema": {
+                  "type": "array",
+                  "contains": {
+                    "default": ""
+                  },
+                  "items": {
+                    "default": ""
+                  },
+                  "unevaluatedItems": {
+                    "default": ""
+                  }
+                }
+              },
+              "X-Accel-Buffering": {
+                "description": "no",
+                "style": "simple",
+                "schema": {
+                  "type": "array",
+                  "contains": {
+                    "default": ""
+                  },
+                  "items": {
+                    "default": ""
+                  },
+                  "unevaluatedItems": {
+                    "default": ""
+                  }
+                }
+              },
+              "Content-Type": {
+                "description": "text/event-stream",
+                "style": "simple",
+                "schema": {
+                  "type": "array",
+                  "contains": {
+                    "default": ""
+                  },
+                  "items": {
+                    "default": ""
+                  },
+                  "unevaluatedItems": {
+                    "default": ""
+                  }
+                }
+              }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/SseEmitter",
+                  "additionalProperties": {
+                    "default": ""
+                  },
+                  "default": ""
+                },
+                "examples": {
+                  "心跳事件": {
+                    "description": "心跳事件",
+                    "value": "event: heartbeat\ndata: \n\n"
+                  },
+                  "通知事件": {
+                    "description": "通知事件",
+                    "value": "event: notification\ndata: {\"id\":1,\"title\":\"新回复\",\"noticeType\":1,\"content\":{\"text\":\"有人回复了你的帖子\",\"refId\":123},\"createdAt\":\"2026-06-10T08:00:00Z\",\"isRead\":false}\n"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "未登录，无法建立 SSE 连接",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/SseEmitter"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/list": {
+      "get": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "unreadOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "GENERAL",
+                "LIKE",
+                "REPLY",
+                "MENTION",
+                "NEW_FOLLOWER",
+                "COLLECT",
+                "PROMOTION",
+                "SYSTEM"
+              ]
+            }
+          },
+          {
+            "name": "group",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SYSTEM",
+                "INTERACTION",
+                "MISC",
+                "REPLY",
+                "MENTION"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageInboxNotificationResLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor/jvm": {
+      "get": {
+        "tags": [
+          "jvm-monitor-controller"
+        ],
+        "operationId": "jvm",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseJvmInfoVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comments/{rootId}/replies": {
+      "get": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "listReplies",
+        "parameters": [
+          {
+            "name": "rootId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "includeRootId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comments/{commentId}": {
+      "get": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "getComment",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCommentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/banners": {
+      "get": {
+        "tags": [
+          "banner-controller"
+        ],
+        "operationId": "getAllBanner",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListBannerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/banners/by-position": {
+      "get": {
+        "tags": [
+          "banner-controller"
+        ],
+        "operationId": "getBannerByPosition",
+        "parameters": [
+          {
+            "name": "position",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "HOME",
+                "SIDE"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListBannerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/csrf-token": {
+      "get": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "getCsrfToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/captcha": {
+      "get": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "获取图形验证码",
+        "operationId": "getCaptcha",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/account": {
+      "get": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "operationId": "get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAccountResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/{id}": {
+      "delete": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comments/{id}": {
+      "delete": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "deleteComment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/profile": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public profile",
+        "operationId": "getUserProfile",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public profile",
+        "operationId": "getUserProfile_2",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public profile",
+        "operationId": "getUserProfile_1",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public profile",
+        "operationId": "getUserProfile_3",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public profile",
+        "operationId": "getUserProfile_6",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public profile",
+        "operationId": "getUserProfile_5",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public profile",
+        "operationId": "getUserProfile_4",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/followings": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the following list of a user",
+        "operationId": "getFollowing",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the following list of a user",
+        "operationId": "getFollowing_2",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the following list of a user",
+        "operationId": "getFollowing_1",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the following list of a user",
+        "operationId": "getFollowing_3",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the following list of a user",
+        "operationId": "getFollowing_6",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the following list of a user",
+        "operationId": "getFollowing_5",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the following list of a user",
+        "operationId": "getFollowing_4",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/followers": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the followers list of a user",
+        "operationId": "getFollower",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the followers list of a user",
+        "operationId": "getFollower_2",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the followers list of a user",
+        "operationId": "getFollower_1",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the followers list of a user",
+        "operationId": "getFollower_3",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the followers list of a user",
+        "operationId": "getFollower_6",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the followers list of a user",
+        "operationId": "getFollower_5",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the followers list of a user",
+        "operationId": "getFollower_4",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/follow": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Follow/ unFollower a user",
+        "description": "Follow a user if not followed, otherwise unFollow the user",
+        "operationId": "follow",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Follow/ unFollower a user",
+        "description": "Follow a user if not followed, otherwise unFollow the user",
+        "operationId": "follow_2",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Follow/ unFollower a user",
+        "description": "Follow a user if not followed, otherwise unFollow the user",
+        "operationId": "follow_1",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Follow/ unFollower a user",
+        "description": "Follow a user if not followed, otherwise unFollow the user",
+        "operationId": "follow_3",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Follow/ unFollower a user",
+        "description": "Follow a user if not followed, otherwise unFollow the user",
+        "operationId": "follow_6",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Follow/ unFollower a user",
+        "description": "Follow a user if not followed, otherwise unFollow the user",
+        "operationId": "follow_5",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Follow/ unFollower a user",
+        "description": "Follow a user if not followed, otherwise unFollow the user",
+        "operationId": "follow_4",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/card": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public card",
+        "operationId": "getUserCard",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public card",
+        "operationId": "getUserCard_2",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public card",
+        "operationId": "getUserCard_1",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public card",
+        "operationId": "getUserCard_3",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public card",
+        "operationId": "getUserCard_6",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public card",
+        "operationId": "getUserCard_5",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public card",
+        "operationId": "getUserCard_4",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/avatar": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get a user avatar",
+        "operationId": "getUserAvatar",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get a user avatar",
+        "operationId": "getUserAvatar_2",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get a user avatar",
+        "operationId": "getUserAvatar_1",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get a user avatar",
+        "operationId": "getUserAvatar_3",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get a user avatar",
+        "operationId": "getUserAvatar_6",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get a user avatar",
+        "operationId": "getUserAvatar_5",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get a user avatar",
+        "operationId": "getUserAvatar_4",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comments/list": {
+      "get": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "listComments",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "includeRootId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "listComments_2",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "includeRootId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "listComments_1",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "includeRootId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "listComments_3",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "includeRootId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "listComments_6",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "includeRootId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "listComments_5",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "includeRootId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "listComments_4",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "includeRootId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateUserProfileRequest": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date"
+          },
+          "residence": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          }
+        }
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+
+          }
+        }
+      },
+      "DeviceInfoReq": {
+        "type": "object",
+        "properties": {
+          "deviceFp": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deviceType": {
+            "type": "string"
+          },
+          "os": {
+            "type": "string"
+          },
+          "browser": {
+            "type": "string"
+          },
+          "screenResolution": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "deviceFp"
+        ]
+      },
+      "SecuritySendCodeDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "sms",
+              "email"
+            ]
+          },
+          "deviceFp": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfoReq"
+          },
+          "scene": {
+            "type": "string",
+            "enum": [
+              "login",
+              "register",
+              "set_password",
+              "reset_password",
+              "change_email",
+              "change_phone",
+              "activate",
+              "bind_email",
+              "unbind"
+            ]
+          }
+        },
+        "required": [
+          "channel",
+          "deviceFp",
+          "scene"
+        ]
+      },
+      "UserUploadPolicyReq": {
+        "type": "object",
+        "properties": {
+          "bizType": {
+            "type": "string",
+            "enum": [
+              "AVATAR",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE"
+            ]
+          },
+          "bizId": {
+            "type": "string"
+          },
+          "exts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 9,
+            "minItems": 1
+          }
+        },
+        "required": [
+          "bizType",
+          "exts"
+        ]
+      },
+      "ApiResponseListPresignedResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PresignedResp"
+            }
+          }
+        }
+      },
+      "PresignedResp": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "get",
+              "post",
+              "put",
+              "delete",
+              "patch"
+            ]
+          },
+          "token": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "errorMsg": {
+            "type": "string"
+          }
+        }
+      },
+      "CloudPutCallbackReq": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "PostSaveReq": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 0
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 0
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0
+          },
+          "coverageImgId": {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 0
+          },
+          "newTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "uniqueItems": true
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "categoryId",
+          "content",
+          "title"
+        ]
+      },
+      "ApiResponseLong": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "BatchMarkReadReq": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "ApiResponseBatchResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BatchResult"
+          }
+        }
+      },
+      "BatchResult": {
+        "type": "object",
+        "properties": {
+          "requested": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "success": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ignored": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "failed": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateCommentReq": {
+        "type": "object",
+        "properties": {
+          "postId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "content",
+          "postId"
+        ]
+      },
+      "SendCodeDto": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "minLength": 1
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "sms",
+              "email"
+            ]
+          },
+          "deviceFp": {
+            "type": "string"
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfoReq"
+          },
+          "scene": {
+            "type": "string",
+            "enum": [
+              "login",
+              "register",
+              "set_password",
+              "reset_password",
+              "change_email",
+              "change_phone",
+              "activate",
+              "bind_email",
+              "unbind"
+            ]
+          }
+        },
+        "required": [
+          "channel",
+          "scene",
+          "target"
+        ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "minLength": 1
+          },
+          "username": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[0-9a-zA-Z_]+$"
+          },
+          "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "verify": {
+            "$ref": "#/components/schemas/VerifyCodeDto"
+          }
+        },
+        "required": [
+          "phone",
+          "username",
+          "verify"
+        ]
+      },
+      "VerifyCodeDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "sms",
+              "email"
+            ]
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scene": {
+            "type": "string",
+            "enum": [
+              "login",
+              "register",
+              "set_password",
+              "reset_password",
+              "change_email",
+              "change_phone",
+              "activate",
+              "bind_email",
+              "unbind"
+            ]
+          },
+          "deviceFp": {
+            "type": "string"
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfoReq"
+          }
+        },
+        "required": [
+          "channel",
+          "code",
+          "scene",
+          "target"
+        ]
+      },
+      "ApiResponseLoginClientData": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LoginClientData"
+          }
+        }
+      },
+      "LoginClientData": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "exp": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "PwdLoginReq": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[0-9a-zA-Z_]+$"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 8
+          },
+          "captcha": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deviceFp": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfoReq"
+          }
+        },
+        "required": [
+          "captcha",
+          "deviceFp",
+          "password",
+          "username"
+        ]
+      },
+      "PhoneChangeActivateDto": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verify": {
+            "$ref": "#/components/schemas/SecurityVerifyCodeDto"
+          }
+        },
+        "required": [
+          "phone",
+          "verify"
+        ]
+      },
+      "SecurityVerifyCodeDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "sms",
+              "email"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scene": {
+            "type": "string",
+            "enum": [
+              "login",
+              "register",
+              "set_password",
+              "reset_password",
+              "change_email",
+              "change_phone",
+              "activate",
+              "bind_email",
+              "unbind"
+            ]
+          },
+          "deviceFp": {
+            "type": "string"
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfoReq"
+          }
+        },
+        "required": [
+          "channel",
+          "code",
+          "scene"
+        ]
+      },
+      "SetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "newPwd": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confirmPwd": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verify": {
+            "$ref": "#/components/schemas/SecurityVerifyCodeDto"
+          }
+        },
+        "required": [
+          "confirmPwd",
+          "newPwd",
+          "verify"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "oldPwd": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPwd": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confirmPwd": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verify": {
+            "$ref": "#/components/schemas/SecurityVerifyCodeDto"
+          }
+        },
+        "required": [
+          "confirmPwd",
+          "newPwd",
+          "oldPwd",
+          "verify"
+        ]
+      },
+      "EmailBindActivateDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "verify": {
+            "$ref": "#/components/schemas/SecurityVerifyCodeDto"
+          }
+        },
+        "required": [
+          "verify"
+        ]
+      },
+      "EmailChangeDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "verify": {
+            "$ref": "#/components/schemas/SecurityVerifyCodeDto"
+          }
+        },
+        "required": [
+          "verify"
+        ]
+      },
+      "ApiResponseUserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserInfoResponse"
+          }
+        }
+      },
+      "CloudResPresignedUrlResp": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "expireAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "passwordHash": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseUserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserProfileResponse"
+          }
+        }
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthday": {
+            "type": "string"
+          },
+          "residence": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseSetString": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "ApiResponseCloudResPresignedUrlResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          }
+        }
+      },
+      "ApiResponsePostDetailResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PostDetailResp"
+          }
+        }
+      },
+      "OptionVOInteger": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PostDetailResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "coverImage": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "category": {
+            "$ref": "#/components/schemas/OptionVOInteger"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOInteger"
+            }
+          },
+          "viewCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "collectCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "NOTICE"
+            ]
+          },
+          "isPinned": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponsePostDraftResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PostDraftResp"
+          }
+        }
+      },
+      "OptionVOLong": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PostDraftResp": {
+        "type": "object",
+        "properties": {
+          "editedTitle": {
+            "type": "string"
+          },
+          "editedContent": {
+            "type": "string"
+          },
+          "editedSummary": {
+            "type": "string"
+          },
+          "coverageImgPresignedUrl": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "editedCategoryId": {
+            "$ref": "#/components/schemas/OptionVOLong"
+          },
+          "editedTagIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOLong"
+            }
+          },
+          "editedNewTagIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "editedStatus": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "PENDING"
+            ]
+          }
+        }
+      },
+      "ContentPreviewReq": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "ApiResponseString": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponsePostAuthorDetailResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PostAuthorDetailResp"
+          }
+        }
+      },
+      "PostAuthorDetailResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "coverImage": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "category": {
+            "$ref": "#/components/schemas/OptionVOInteger"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOInteger"
+            }
+          },
+          "viewCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "collectCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "FANS_ONLY"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "slug": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePagePostAuthorCardResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PagePostAuthorCardResp"
+          }
+        }
+      },
+      "PagePostAuthorCardResp": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostAuthorCardResp"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "unpaged": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PostAuthorCardResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "coverImage": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "category": {
+            "$ref": "#/components/schemas/OptionVOInteger"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOInteger"
+            }
+          },
+          "viewCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "collectCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "FANS_ONLY"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "slug": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "empty": {
+            "type": "boolean"
+          },
+          "sorted": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponsePagePostCardResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PagePostCardResp"
+          }
+        }
+      },
+      "PagePostCardResp": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostCardResp"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PostCardResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "userBrief": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "coverImage": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "category": {
+            "$ref": "#/components/schemas/OptionVOInteger"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOInteger"
+            }
+          },
+          "viewCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "collectCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "NOTICE"
+            ]
+          },
+          "isPinned": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserBrief": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userType": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "ADMIN",
+              "BOT",
+              "MODERATOR",
+              "VIP"
+            ]
+          }
+        }
+      },
+      "ApiResponseTagResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TagResponse"
+          }
+        }
+      },
+      "TagResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "usageCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseListTagResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagResponse"
+            }
+          }
+        }
+      },
+      "ApiResponseListOptionVOLong": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOLong"
+            }
+          }
+        }
+      },
+      "ApiResponsePageTagResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageTagResponse"
+          }
+        }
+      },
+      "PageTagResponse": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagResponse"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseOnlineUserStatsVO": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/OnlineUserStatsVO"
+          }
+        }
+      },
+      "OnlineUserStatsVO": {
+        "type": "object",
+        "properties": {
+          "onlineCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "todayNewUsers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "todayPeakOnline": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseInteger": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SseEmitter": {
+        "type": "object",
+        "properties": {
+          "timeout": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseCursorPageInboxNotificationResLong": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CursorPageInboxNotificationResLong"
+          }
+        }
+      },
+      "CursorPageInboxNotificationResLong": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InboxNotificationRes"
+            }
+          },
+          "nextCursor": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "InboxNotificationRes": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "noticeType": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "$ref": "#/components/schemas/NotificationContent"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isRead": {
+            "type": "boolean"
+          }
+        }
+      },
+      "NotificationContent": {
+        "type": "object",
+        "properties": {
+          "displayText": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseJvmInfoVO": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/JvmInfoVO"
+          }
+        }
+      },
+      "Heap": {
+        "type": "object",
+        "properties": {
+          "used": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "committed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "max": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Jvm": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "uptime": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "JvmInfoVO": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "jvm": {
+            "$ref": "#/components/schemas/Jvm"
+          },
+          "heap": {
+            "$ref": "#/components/schemas/Heap"
+          },
+          "nonHeap": {
+            "$ref": "#/components/schemas/NonHeap"
+          },
+          "thread": {
+            "$ref": "#/components/schemas/Thread"
+          },
+          "os": {
+            "$ref": "#/components/schemas/Os"
+          }
+        }
+      },
+      "NonHeap": {
+        "type": "object",
+        "properties": {
+          "used": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Os": {
+        "type": "object",
+        "properties": {
+          "availableProcessors": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalMemory": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "freeMemory": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Thread": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiResponseCursorPageCommentResponseLong": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CursorPageCommentResponseLong"
+          }
+        }
+      },
+      "CommentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "postId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "rootId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "content": {
+            "type": "string"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "replyCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "replyToDisplayName": {
+            "type": "string"
+          }
+        }
+      },
+      "CursorPageCommentResponseLong": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentResponse"
+            }
+          },
+          "nextCursor": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseCommentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CommentResponse"
+          }
+        }
+      },
+      "ApiResponseListBannerResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BannerResponse"
+            }
+          }
+        }
+      },
+      "BannerResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "linkUrl": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string",
+            "enum": [
+              "HOME",
+              "SIDE"
+            ]
+          },
+          "sortNo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "presignedUrl": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          }
+        }
+      },
+      "AccountResp": {
+        "type": "object",
+        "properties": {
+          "phoneMasked": {
+            "type": "string"
+          },
+          "emailMasked": {
+            "type": "string"
+          },
+          "phoneVerified": {
+            "type": "boolean"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseAccountResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AccountResp"
+          }
+        }
+      },
+      "ApiResponseUserPublicProfileResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserPublicProfileResp"
+          }
+        }
+      },
+      "UserPublicProfileResp": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userBrief": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date"
+          },
+          "residence": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "followers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "followings": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "postCount": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponsePageUserBrief": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageUserBrief"
+          }
+        }
+      },
+      "PageUserBrief": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserBrief"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseUserPublicCardResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserPublicCardResp"
+          }
+        }
+      },
+      "UserPublicCardResp": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userBrief": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "followers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "followings": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "postCount": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseCursorPageCommentResponseString": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CursorPageCommentResponseString"
+          }
+        }
+      },
+      "CursorPageCommentResponseString": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentResponse"
+            }
+          },
+          "nextCursor": {
+            "type": "string"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
