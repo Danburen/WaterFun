@@ -9,8 +9,8 @@ import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunadminservice.api.request.role.*;
 import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
-import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.waterfunservicecore.entity.Role;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 
 import java.time.Instant;
 import java.util.List;

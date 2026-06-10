@@ -1,14 +1,13 @@
 package org.waterwood.waterfunadminservice.api.request.content;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.URL;
-import org.waterwood.waterfunservicecore.entity.Banner;
-import org.waterwood.waterfunservicecore.entity.BannerPosition;
-import org.waterwood.waterfunservicecore.entity.VisibleStatus;
+import org.waterwood.waterfunservicecore.entity.content.Banner;
+import org.waterwood.waterfunservicecore.entity.content.BannerPosition;
+import org.waterwood.waterfunservicecore.entity.content.VisibleStatus;
 
 import java.io.Serializable;
 import java.time.Instant;

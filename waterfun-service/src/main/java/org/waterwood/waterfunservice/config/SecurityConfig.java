@@ -23,7 +23,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF as Gateway handles auth
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/**", "/api/public/**", "/error").permitAll() // Allow public endpoints
+                        .requestMatchers("/api/auth/**", "/api/public/**", "/error", "/api/monitor/jvm").permitAll() // Allow public endpoints
                         .anyRequest().permitAll() // Allow all internal requests (Trust Gateway for now)
                 )
                 // Add the custom filter to populate UserCtxHolder

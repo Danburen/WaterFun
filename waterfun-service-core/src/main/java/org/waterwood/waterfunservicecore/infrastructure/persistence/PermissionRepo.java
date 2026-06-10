@@ -2,9 +2,8 @@ package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.waterwood.api.VO.BatchResult;
 import org.waterwood.common.jpa.CodeUniquenessChecker;
-import org.waterwood.waterfunservicecore.entity.Permission;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,4 +14,6 @@ public interface PermissionRepo extends JpaRepository<Permission, Integer>, JpaS
     Optional<Permission> findByCode(String code);
 
     int deletePermissionsByIdIn(Collection<Integer> ids);
+
+    List<Permission> findByCodeIn(List<String> attr0);
 }

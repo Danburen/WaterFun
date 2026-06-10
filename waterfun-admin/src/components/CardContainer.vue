@@ -19,10 +19,9 @@ const props = withDefaults(defineProps<{
         <div class="header-left">
           <span>{{ title }}</span>
         </div>
-        <slot
-          class="header-right"
-          name="header-right"
-        />
+        <div class="header-right">
+          <slot name="header-right" />
+        </div>
       </div>
       <div class="header-divider" />
     </div>

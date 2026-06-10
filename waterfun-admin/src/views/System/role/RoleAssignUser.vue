@@ -11,9 +11,7 @@ import {
 import type { PageOptions } from "~/types";
 
 import { useRoute, useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
 import SelectUserDialog from "../components/SelectUserDialog.vue";
-
 
 const route = useRoute();
 const router = useRouter();
@@ -23,7 +21,7 @@ const roleName = ref("");
 
 const loading = ref(false);
 const tableData = ref<AssignedUserRes[]>([]);
-const selectedIds = ref<string[]>([]);
+const selectedIds = ref<Set<string>>(new Set());
 const pickerDialogVisible = ref(false);
 const assignExpiresAt = ref<Date | null>(null);
 
@@ -70,7 +68,7 @@ const fetchData = async () => {
       nickname: searchForm.value.nickname || undefined,
     });
     tableData.value = res.data.content || [];
-    pageOpts.value.total = res.data.page.totalElements || 0;
+    pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
   } catch (e) {
     console.error(e);
     ElMessage.error('获取角色用户失败');
@@ -99,10 +97,10 @@ const handleConfirmAddUsers = async (ids: string[]) => {
 };
 
 const handleRemove = async () => {
-  if (selectedIds.value.length === 0 || Number.isNaN(roleId.value)) return;
+  if (selectedIds.value.size === 0 || Number.isNaN(roleId.value)) return;
   try {
-    await deleteUserRoles(roleId.value, { userIds: selectedIds.value });
-    selectedIds.value = [];
+    await deleteUserRoles(roleId.value, { userIds: [...selectedIds.value] });
+    selectedIds.value = new Set();
     ElMessage.success('角色更新成功');
     await fetchData();
   } catch (e) {
@@ -122,8 +120,15 @@ const handleReset = () => {
   fetchData();
 };
 
-const handleSelectionChange = (rows: AssignedUserRes[]) => {
-  selectedIds.value = rows.map((r) => r.userUid);
+const toggleSelect = (uid: string) => {
+  const s = new Set(selectedIds.value);
+  s.has(uid) ? s.delete(uid) : s.add(uid);
+  selectedIds.value = s;
+};
+
+const toggleSelectAll = () => {
+  if (selectedIds.value.size === tableData.value.length) selectedIds.value = new Set();
+  else selectedIds.value = new Set(tableData.value.map(r => r.userUid));
 };
 
 onMounted(async () => {
@@ -132,43 +137,26 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="assign-layout">
+  <div class="list-layout">
     <SearchContainer>
-      <el-form
-        inline
-        :model="searchForm"
-        class="search-form"
-      >
-        <el-form-item label="用户ID">
-          <el-input
-            v-model="searchForm.userUid"
-            placeholder="请输入用户ID"
-          />
-        </el-form-item>
-        <el-form-item label="用户名">
-          <el-input
-            v-model="searchForm.username"
-            placeholder="请输入用户名"
-          />
-        </el-form-item>
-        <el-form-item label="昵称">
-          <el-input
-            v-model="searchForm.nickname"
-            placeholder="请输入昵称"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleSearch"
-          >
-            查询
-          </el-button>
-          <el-button @click="handleReset">
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
+      <div class="search-form">
+        <div class="search-field">
+          <label>用户ID</label>
+          <input v-model="searchForm.userUid" placeholder="请输入用户ID" @keyup.enter="handleSearch" />
+        </div>
+        <div class="search-field">
+          <label>用户名</label>
+          <input v-model="searchForm.username" placeholder="请输入用户名" @keyup.enter="handleSearch" />
+        </div>
+        <div class="search-field">
+          <label>昵称</label>
+          <input v-model="searchForm.nickname" placeholder="请输入昵称" @keyup.enter="handleSearch" />
+        </div>
+        <div class="search-actions">
+          <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <button class="btn btn-default" @click="handleReset">重置</button>
+        </div>
+      </div>
     </SearchContainer>
 
     <TableContainer
@@ -177,36 +165,31 @@ onMounted(async () => {
       :title="assignTitle"
       show-add-btn
       :total="pageOpts.total"
-      :disable-delete="selectedIds.length === 0"
+      :disable-delete="selectedIds.size === 0"
       @change="fetchData"
       @add="handleAdd"
       @remove="handleRemove"
     >
-      <el-table
-        v-loading="loading"
-        :data="tableData"
-        fit
-        highlight-current-row
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column
-          type="selection"
-          width="55"
-        />
-        <el-table-column
-          prop="userUid"
-          label="用户ID"
-        />
-        <el-table-column
-          prop="username"
-          label="用户名"
-        />
-        <el-table-column
-          prop="nickname"
-          label="昵称"
-        />
-      </el-table>
+      <div class="table-wrapper" :class="{ loading }">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:40px"><input type="checkbox" :checked="selectedIds.size === tableData.length && tableData.length > 0" @change="toggleSelectAll" /></th>
+              <th>用户ID</th>
+              <th>用户名</th>
+              <th>昵称</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in tableData" :key="row.userUid">
+              <td><input type="checkbox" :checked="selectedIds.has(row.userUid)" @change="toggleSelect(row.userUid)" /></td>
+              <td>{{ row.userUid }}</td>
+              <td>{{ row.username }}</td>
+              <td>{{ row.nickname }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </TableContainer>
 
     <SelectUserDialog
@@ -215,30 +198,24 @@ onMounted(async () => {
       @confirm="handleConfirmAddUsers"
     >
       <template #footer-extra>
-        <el-form inline>
-          <el-form-item label="过期时间">
-            <el-date-picker
-              v-model="assignExpiresAt"
-              type="datetime"
-              clearable
-              placeholder="请选择过期时间（可选）"
-            />
-          </el-form-item>
-        </el-form>
+        <label class="date-picker-label">
+          过期时间
+          <el-date-picker
+            v-model="assignExpiresAt"
+            type="datetime"
+            clearable
+            placeholder="请选择过期时间（可选）"
+          />
+        </label>
       </template>
     </SelectUserDialog>
   </div>
 </template>
 
 <style scoped>
-.assign-layout {
+.date-picker-label {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.search-form {
-  width: 100%;
+  align-items: center;
+  gap: 8px;
 }
 </style>
-

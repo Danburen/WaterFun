@@ -9,8 +9,8 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
-import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.waterfunservicecore.entity.Role;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.common.constratin.UserKeyBuilder;
@@ -62,7 +62,7 @@ public class SecurityAspect {
 
     private Set<String> getRoles(){
         long userUid = UserCtxHolder.getUserUid();
-        Set<String> roles = redisHelper.sMem(UserKeyBuilder.userRole(userUid)).stream()
+        Set<String> roles = redisHelper.setMembers(UserKeyBuilder.userRole(userUid)).stream()
                 .map(Object::toString).collect(Collectors.toSet());
         if(roles.isEmpty()){
             roles = miss(userUid).getRoles();
@@ -72,7 +72,7 @@ public class SecurityAspect {
 
     private Set<String> getPermissions(){
         long userUid = UserCtxHolder.getUserUid();
-        Set<String> permissions = redisHelper.sMem(UserKeyBuilder.userPerm(userUid)).stream()
+        Set<String> permissions = redisHelper.setMembers(UserKeyBuilder.userPerm(userUid)).stream()
                 .map(Object::toString).collect(Collectors.toSet());
         if(permissions.isEmpty()){
             permissions = miss(userUid).getPermissions();
@@ -88,9 +88,9 @@ public class SecurityAspect {
                 .map(Permission::getCode).collect(Collectors.toSet());
         attrs.setRoles(roleNameSet);
         attrs.setPermissions(permCodeSet);
-        redisHelper.sAdd(
+        redisHelper.setAdd(
                 UserKeyBuilder.userRole(userUid), roleNameSet.toArray(new String[0]));
-        redisHelper.sAdd(
+        redisHelper.setAdd(
                 UserKeyBuilder.userPerm(userUid), permCodeSet.toArray(new String[0]));
         return attrs;
     }

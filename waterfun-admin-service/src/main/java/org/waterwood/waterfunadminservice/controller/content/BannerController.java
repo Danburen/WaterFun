@@ -13,9 +13,9 @@ import org.waterwood.waterfunadminservice.api.request.content.PutBannerRequest;
 import org.waterwood.waterfunadminservice.api.response.content.BannerResponse;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.BannerMapper;
 import org.waterwood.waterfunadminservice.service.content.BannerService;
-import org.waterwood.waterfunservicecore.entity.Banner;
-import org.waterwood.waterfunservicecore.entity.BannerPosition;
-import org.waterwood.waterfunservicecore.entity.VisibleStatus;
+import org.waterwood.waterfunservicecore.entity.content.Banner;
+import org.waterwood.waterfunservicecore.entity.content.BannerPosition;
+import org.waterwood.waterfunservicecore.entity.content.VisibleStatus;
 import org.waterwood.waterfunservicecore.entity.spec.BannerSpec;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 

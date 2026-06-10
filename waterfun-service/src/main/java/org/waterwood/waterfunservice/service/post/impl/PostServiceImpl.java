@@ -60,6 +60,9 @@ import org.waterwood.waterfunservicecore.infrastructure.validation.UploadValidat
 import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.UserBriefService;
+import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
+import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
+import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
@@ -94,6 +97,7 @@ public class PostServiceImpl implements PostService {
     private final UserCollectRepository userCollectRepository;
     private final NotificationService notificationService;
     private final SiteStatisticRecorder siteStatisticRecorder;
+    private final UserActivityLogService userActivityLogService;
 
     @Value("${user.quota.collect:10000}")
     private Long userCollectExceedLimit;
@@ -105,6 +109,7 @@ public class PostServiceImpl implements PostService {
         post.setSlug(identifierGenerator.generateSlug(post.getTitle(), postRepository));
         post.setTags(tags);
         postRepository.save(post);
+        userActivityLogService.record(post.getAuthor().getUid(), UserActionType.CREATE, BusinessType.POST, post.getId());
     }
 
     @Override
@@ -116,8 +121,9 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void deletePost(Long id) {
         Post p = postRepository.getReferenceById(id);
-        if(p.getAuthor() == userRepository.getReferenceById(UserCtxHolder.getUserUid())) {
+        if(Objects.equals(p.getAuthor().getUid(), UserCtxHolder.getUserUid())) {
             postRepository.deleteById(id);
+            userActivityLogService.record(UserCtxHolder.getUserUid(), UserActionType.DELETED, BusinessType.POST, id);
         }else{
             throw new BizException(BaseResponseCode.FORBIDDEN);
         }
@@ -226,8 +232,48 @@ public class PostServiceImpl implements PostService {
         Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
                 id, UserCtxHolder.getUserUid(), false
         ).orElseThrow(PostNotFoundException::new);
-        this.save(id, req); // saved edited content to temp fields, and sync resources status
-        String targetId = id.toString();
+        this.publish(p, req);
+    }
+
+    @Transactional
+    @Override
+    public void publishNewPost(PostSaveReq req) {
+        Long id = ContentIdGenerator.nextPostId();
+        Post p = new Post();
+        p.setId(id);
+        p.setAuthor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
+        publish(p, req);
+    }
+
+    @Transactional
+    @Override
+    public void saveNewPost(PostSaveReq req) {
+        Long id = ContentIdGenerator.nextPostId();
+        Post p = new Post();
+        p.setId(id);
+        p.setAuthor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
+        save(p, req);
+    }
+
+    @Transactional
+    @Override
+    public void save(Long id, PostSaveReq request) {
+        Post p = postRepository.findByIdAndIsDeleted(id, false)
+                .orElseThrow(NotFoundException::new);
+        this.save(p, request);
+    }
+
+    /**
+     * Public a post
+     * @param p {@link Post} post entity, must contain id, not essentially exist in db
+     * @param req {@link PostSaveReq}
+     */
+    @Transactional
+    protected void publish(Post p, PostSaveReq req) {
+        // save the resource and form and synchronize the resources.
+        this.save(p, req);
+        // Preparing for audit task
+        String targetId = p.getId().toString();
         AuditTask task = auditTaskRepository
                 .findByTargetIdAndTargetTypeAndStatus(targetId, TargetType.POST, AuditStatus.PENDING)
                 .orElseGet(() -> {
@@ -238,142 +284,200 @@ public class PostServiceImpl implements PostService {
                     newTask.setSubmitter(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
                     return newTask;
                 });
+
         task.setStatus(AuditStatus.PENDING);
         task.setUserLocale(UserCtxHolder.getLocale().getLanguage());
-        task.setContentFormat(AuditContentFormat.MARKDOWN); // TODO supposed need to determines content format
+        task.setContentFormat(AuditContentFormat.MARKDOWN); // todo suppose determine the content type
         task.setContent(p.getEditedContent());
-        String editedContent =  p.getEditedContent();
         task.setPayload(new PostAuditPayload(
                 p.getEditedTitle(),
                 p.getEditedSubtitle(),
-                editedContent,
+                p.getEditedContent(),
                 p.getEditedSummary(),
-                p.getEditedCoverImg() != null ? p.getEditedCoverImg() : null,
+                p.getEditedCoverImg(),
                 p.getEditedCategory() != null ? p.getEditedCategory().getId() : null,
-                p.getEditedTagIds() != null ? p.getEditedTagIds() : null,
-                p.getEditedNewTags() != null ? p.getEditedNewTags() : null,
-                null // store is not needed
+                p.getEditedTagIds(),
+                p.getEditedNewTags(),
+                null
         ).toJson());
-        p.setStatus(PostStatus.PENDING);
 
+        p.setStatus(PostStatus.PENDING);
         postRepository.save(p);
         task = auditTaskRepository.save(task);
-
-        Set<String> resourceUuids = StringUtil.extraResPlaceholders(editedContent);
+        // Collect all the resource include content image and coverage
+        Set<String> allUuids = new HashSet<>(StringUtil.extraResPlaceholders(p.getEditedContent()));
         List<String> linkedResourceUuids = getUnDeletedLinkedResourceUuids(p.getId());
-        // all resource suppose to stay in active status after temp save
-        // content image resource
+        if (StringUtil.isNotBlank(p.getEditedCoverImg())) {
+            allUuids.add(p.getEditedCoverImg());
+        }
         AuditTask finalTask = task;
-        List<AuditResource> auditResources = new ArrayList<>(resourceRepository
-                .findByUuidInAndStatus(resourceUuids, ResourceStatus.ACTIVE)
-                .stream().filter(r -> linkedResourceUuids.contains(r.getUuid()))
+        List<AuditResource> auditResources = resourceRepository
+                .findByUuidInAndStatus(allUuids, ResourceStatus.ACTIVE)
+                .stream()
+                .filter(r -> linkedResourceUuids.contains(r.getUuid())
+                        || r.getUuid().equals(p.getEditedCoverImg()))
                 .map(res -> {
                     AuditResource ar = new AuditResource();
                     AuditResourceId arId = new AuditResourceId();
                     arId.setResourceUuid(res.getUuid());
                     arId.setTaskId(finalTask.getId());
-
                     ar.setId(arId);
                     ar.setTask(finalTask);
                     ar.setResource(res);
                     return ar;
                 })
-                .toList());
-        // coverage image resource
-        String reqCoverageUuid = req.getCoverageImgId();
-        Resource postCoverageImageRes = resourceRepository
-                .findByUuidAndStatus(reqCoverageUuid, ResourceStatus.ACTIVE)
-                .filter(r -> linkedResourceUuids.contains(r.getUuid()))
-                .orElseThrow(() -> new ResourceReferenceInvalidException(reqCoverageUuid));
-        AuditResource ar = new AuditResource();
-        AuditResourceId arId = new AuditResourceId();
-        arId.setResourceUuid(postCoverageImageRes.getUuid());
-        arId.setTaskId(task.getId());
+                .toList();
+        Set<String> existingAuditResUuids = auditTaskResourceRepository
+                .findByTaskId(task.getId())
+                .stream()
+                .map(ar -> ar.getResource().getUuid())
+                .collect(Collectors.toSet());
 
-        ar.setId(arId);
-        ar.setTask(task);
-        ar.setResource(postCoverageImageRes);
-        auditResources.add(ar);
-        auditTaskResourceRepository.saveAll(auditResources);
+        List<AuditResource> toSave = auditResources.stream()
+                .filter(ar -> !existingAuditResUuids.contains(ar.getResource().getUuid()))
+                .toList();
+
+        if (!toSave.isEmpty()) {
+            auditTaskResourceRepository.saveAll(toSave);
+        }
     }
 
+    /**
+     * Save a post
+     * @param p {@link Post} post entity, must contain id, not essentially exist in db
+     * @param req {@link PostSaveReq}
+     */
     @Transactional
-    @Override
-    public void save(Long id, PostSaveReq request) {
-        Post p = postRepository.findByIdAndIsDeleted(id, false)
-                .orElseThrow(NotFoundException::new);
-
+    public void save(Post p, PostSaveReq req) {
         if (!p.getAuthor().getUid().equals(UserCtxHolder.getUserUid())) {
-            throw new NotFoundException();
+            throw new ForbiddenException();
         }
+        p.setEditedTitle(req.getTitle());
+        p.setEditedSubtitle(req.getSubtitle());
 
-        p.setEditedTitle(request.getTitle());
-        p.setEditedSubtitle(request.getSubtitle());
+        syncResource(p, p.getEditedContent(), req.getContent());
+        p.setEditedContent(req.getContent());
+        p.setEditedSummary(req.getSummary());
+        // Coverage
+        String oldCoverageImgId = p.getEditedCoverImg();
+        String newCoverageImgId = req.getCoverageImgId();
+        boolean needReplace = StringUtil.isNotBlank(newCoverageImgId) && !newCoverageImgId.equals(oldCoverageImgId)
+                || StringUtil.isBlank(newCoverageImgId) && StringUtil.isNotBlank(oldCoverageImgId);
+        if (needReplace && StringUtil.isNotBlank(oldCoverageImgId)) {
+            resourceRepository.findByUuidAndStatusNot(oldCoverageImgId, ResourceStatus.DELETED)
+                    .ifPresent(oldRes -> {
+                        oldRes.setStatus(ResourceStatus.ORPHAN);
+                        resourceRepository.save(oldRes);
 
-        syncResource(p.getId(), p.getEditedContent(), request.getContent());
-        p.setEditedContent(request.getContent());
-        p.setEditedSummary(request.getSummary());
-
-        resourceRepository.findByUuidAndStatusNot( // unbind old coverage
-                p.getEditedCoverImg(), ResourceStatus.DELETED
-        ).ifPresent(res -> {
-            res.setStatus(ResourceStatus.ORPHAN);
-            resourceRepository.save(res);
-        });
-
-        if(request.getCoverageImgId() != null) {
-            Resource res = resourceRepository.findByUuidAndStatusNot(request.getCoverageImgId(), ResourceStatus.DELETED)
-                    .orElseThrow(() -> new ResourceReferenceInvalidException(request.getCoverageImgId()));
+                        final String oldKey = oldRes.getResourceKey();
+                        TransactionSynchronizationManager.registerSynchronization(
+                                new TransactionSynchronization() {
+                                    @Override
+                                    public void afterCommit() {
+                                        try {
+                                            // todo supposed to be after completion of whole transaction including audit task creation
+                                            cloudFileService.removeFile(CloudFSRoot.UPLOADS, oldKey);
+                                        } catch (Exception e) {
+                                            log.error("Failed to remove old cloud file: {}", oldKey, e);
+                                        }
+                                    }
+                                }
+                        );
+                    });
+        }
+        if (StringUtil.isNotBlank(newCoverageImgId)) {
+            Resource res = resourceRepository.findByUuidAndStatusNot(newCoverageImgId, ResourceStatus.DELETED)
+                    .orElseThrow(() -> new ResourceReferenceInvalidException(newCoverageImgId));
             res.setStatus(ResourceStatus.ACTIVE);
+            resourceRepository.save(res);
             p.setEditedCoverImg(res.getUuid());
-        }else {
-            p.setEditedContent(null);
+        } else {
+            p.setEditedCoverImg(null);
         }
-        Category c = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new CategoryReferenceInvalidException(request.getCategoryId()));
+
+        Category c = categoryRepository.findById(req.getCategoryId())
+                .orElseThrow(() -> new CategoryReferenceInvalidException(req.getCategoryId()));
         p.setEditedCategory(c);
         // Below should be created when public, and must after audition, not in temporary saving.
         // List<Tag> newTagCreated = tagService.createNewTags(request.getNewTags(), UserCtxHolder.getUserUid());
-        if(request.getTagIds() != null) {
-            List<Tag> tags = tagRepository.findAllById(request.getTagIds());
+        if(req.getTagIds() != null) {
+            List<Tag> tags = tagRepository.findAllById(req.getTagIds());
             p.setEditedTagIds(tags.stream().map(Tag::getId).toList());
         }
-        p.setEditedNewTags(request.getNewTags().stream()
-                .map(str -> str.trim().replace("[^a-z0-9\\\\-]", ""))
+        p.setEditedNewTags(req.getNewTags().stream()
+                .map(str -> str.trim().replaceAll("[^a-z0-9-]", ""))
                 .toList());
         postRepository.save(p);
     }
 
     /**
      * Synchronize resource for given content for a post
-     * only those resource in the new content linked by {@link PostResource} will be synchronized.
+     * only those resource in the new content linked by {@link PostResource} or associated with author will be synchronized.
      * must run in transactional
      *
-     * @param postId        target post id to identify whether new content resource belongs to the post.
+     * @param p             target post id to identify whether new content resource belongs to the post.
      * @param originContent original content
      * @param newContent    new content
      */
-    private void syncResource(Long postId, String originContent, String newContent) {
-        // original resources should all be ACTIVE(attached) instead of ORPHAN
+    private void syncResource(Post p, String originContent, String newContent) {
+        // 1. Extract resource UUIDs from content placeholders
         Set<String> originResUuids = StringUtil.extraResPlaceholders(originContent);;
-        // we shall list all available post resources and filter those resource not belong to the post, since upload
-        // phase would link resource to post. those resource which status stay ORPHAN, would be clean in schedule tasks.
-        List<String> postAvailableResources = getUnDeletedLinkedResourceUuids(postId);
-        Set<String> newResUuids = StringUtil.extraResPlaceholders(newContent).stream().filter(
-                postAvailableResources::contains
-        ).collect(Collectors.toSet());
-        if (originResUuids.equals(newResUuids)) {
+        Set<String> newResUuids = StringUtil.extraResPlaceholders(newContent);
+        // Filter new resources: must be either already linked to this post,
+        // or uploaded by the author and currently ACTIVE
+        List<String> postAvailableResources = getUnDeletedLinkedResourceUuids(p.getId());
+        Set<String> linkedNewResUuids = newResUuids.stream()
+                .filter(postAvailableResources::contains)
+                .collect(Collectors.toSet());
+        Set<String> unlinkedNewResUuids = newResUuids.stream()
+                .filter(uuid -> !postAvailableResources.contains(uuid))
+                .collect(Collectors.toSet());
+        // Author's own active resources that are referenced in new content
+        List<Resource> authorResources = resourceRepository.findByUploaderIdAndUuidInAndStatus(
+                p.getAuthor().getUid(), unlinkedNewResUuids, ResourceStatus.ACTIVE
+        );
+
+        savePostResource(p, authorResources);
+        Set<String> allValidNewResUuids = new HashSet<>(linkedNewResUuids);
+        allValidNewResUuids.addAll(authorResources.stream().map(Resource::getUuid).toList());
+        if (originResUuids.equals(allValidNewResUuids)) {
             return;
         }
         Set<String> toOrphanUuids = new HashSet<>(originResUuids);
-        toOrphanUuids.removeAll(newResUuids);
-        Set<String> toActivateUuids = new HashSet<>(newResUuids);
+        toOrphanUuids.removeAll(allValidNewResUuids);
+        Set<String> toActivateUuids = new HashSet<>(linkedNewResUuids);
         toActivateUuids.removeAll(originResUuids);
         if (!toActivateUuids.isEmpty()) {
-            resourceRepository.batchUpdateStatus(ResourceStatus.ACTIVE, toActivateUuids);
+            resourceRepository.batchUpdateStatusFromTo(ResourceStatus.ORPHAN, ResourceStatus.ACTIVE, toActivateUuids);
         }
         if (!toOrphanUuids.isEmpty()) {
-            resourceRepository.batchUpdateStatus(ResourceStatus.ORPHAN, toOrphanUuids);
+            resourceRepository.batchUpdateStatusFromTo(ResourceStatus.ACTIVE, ResourceStatus.ORPHAN, toOrphanUuids);
+        }
+    }
+
+    private void savePostResource(Post p, List<Resource> resources) {
+        Set<String> existingUuids = postResourceRepository
+                .findByPostId(p.getId())
+                .stream()
+                .map(pr -> pr.getResourceUuid().getUuid())
+                .collect(Collectors.toSet());
+
+        List<PostResource> toSave = resources.stream()
+                .filter(res -> !existingUuids.contains(res.getUuid()))
+                .map(res -> {
+                    PostResource pr = new PostResource();
+                    PostResourceId prId = new PostResourceId();
+                    prId.setResourceUuid(res.getUuid());
+                    prId.setPostId(p.getId());
+                    pr.setId(prId);
+                    pr.setPost(p);
+                    pr.setResourceUuid(res);
+                    return pr;
+                })
+                .toList();
+
+        if (!toSave.isEmpty()) {
+            postResourceRepository.saveAll(toSave);
         }
     }
 
@@ -442,13 +546,10 @@ public class PostServiceImpl implements PostService {
                     .name(p.getEditedCategory().getName())
                     .build());
         }
-        if(p.getTags() != null) {
-            resp.setEditedTagIds(p.getTags().stream()
-                    .map(tag -> OptionVO.<Long>builder()
-                            .id(tag.getId())
-                            .name(tag.getName())
-                            .build())
-                    .toList());
+        if( p.getEditedTagIds() != null) {
+            List<OptionVO<Long>> editedTags = tagRepository.findTagOptionVOsByPostIdIn(p.getEditedTagIds());
+
+            resp.setEditedTagIds(editedTags);
         }
         if(p.getEditedNewTags() != null) {
             resp.setEditedNewTagIds(p.getEditedNewTags());
@@ -470,6 +571,7 @@ public class PostServiceImpl implements PostService {
                             userCounterRepository.decreaseUserLikeCount(userUid, 1);
                             postRepository.decreaseLikeCount(postId, 1);
                             userLikeRepository.delete(like);
+                            userActivityLogService.record(userUid, UserActionType.DELETED, BusinessType.POST, postId);
                         },
                         () -> {
                             UserLike newLike = new UserLike();
@@ -477,6 +579,7 @@ public class PostServiceImpl implements PostService {
                             userLikeRepository.save(newLike);
                             userCounterRepository.increaseUserLikeCount(userUid, 1);
                             postRepository.increaseLikeCount(postId, 1);
+                            userActivityLogService.record(userUid, UserActionType.CREATE, BusinessType.POST, postId);
                             if(pdo != null) {
                                 notificationService.onPostLike(
                                         pdo.getAuthorUid(),
@@ -501,9 +604,10 @@ public class PostServiceImpl implements PostService {
         userCollectRepository.findById(new UserCollectId(userUid, postId))
                 .ifPresentOrElse(
                         collection -> {
-                            userCounterRepository.decreaseUserLikeCount(userUid, 1);
+                            userCounterRepository.decreaseUserCollectionCount(userUid, 1);
                             postRepository.decreaseCollectCount(postId, 1);
                             userCollectRepository.delete(collection);
+                            userActivityLogService.record(userUid, UserActionType.DELETED, BusinessType.POST, postId);
                         },
                         () -> {
                             if (uc.getCollectCnt() >= userCollectExceedLimit) {
@@ -511,9 +615,10 @@ public class PostServiceImpl implements PostService {
                             }
                             UserCollect newCollection = new UserCollect();
                             newCollection.setId(new UserCollectId(userUid, postId));
-                            userCollectRepository.save(newCollection);
-                            userCounterRepository.increaseUserLikeCount(userUid, 1);
+                            userCounterRepository.increaseUserCollectionCount(userUid, 1);
                             postRepository.increaseCollectCount(postId, 1);
+                            userCollectRepository.save(newCollection);
+                            userActivityLogService.record(userUid, UserActionType.CREATE, BusinessType.POST, postId);
                             if(pdo != null) {
                                 notificationService.onPostCollect(
                                         pdo.getAuthorUid(),
@@ -531,11 +636,15 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public List<PresignedResp> handlePostCoverageImageUpload(UserUploadPolicyReq request) {
-        Long bizId = Long.parseLong(request.getBizId());
+        Long bizId;
+        boolean isLinkToPost = false;
+        if(request.getBizId() == null){
+            bizId = UserCtxHolder.getUserUid();
+        } else {
+            bizId = Long.parseLong(request.getBizId());
+            isLinkToPost = true;
+        }
         FileExtension ext =  UploadValidator.validateSingleFileUpload(request, TargetType.POST_COVERAGE_IMAGE);
-        Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
-                bizId, UserCtxHolder.getUserUid(),false
-        ).orElseThrow(PostNotFoundException::new);
 
         UUID resourceUUID = UUID.randomUUID();
         BizUploadPayload payload = BizUploadPayload.of(
@@ -551,17 +660,22 @@ public class PostServiceImpl implements PostService {
         res.setUploaderId(UserCtxHolder.getUserUid());
         res.setSourceType(SourceType.USER_UPLOADED);
 
-        PostResource postResource = new PostResource();
-        PostResourceId postResourceId = new PostResourceId();
-        postResourceId.setResourceUuid(res.getUuid());
-        postResourceId.setPostId(p.getId());
-
-        postResource.setId(postResourceId);
-        postResource.setResourceUuid(res);
-        postResource.setPost(p);
-
         resourceRepository.save(res);
-        postResourceRepository.save(postResource);
+        if(isLinkToPost){
+            Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
+                    bizId, UserCtxHolder.getUserUid(),false
+            ).orElseThrow(PostNotFoundException::new);
+
+            PostResource postResource = new PostResource();
+            PostResourceId postResourceId = new PostResourceId();
+            postResourceId.setResourceUuid(res.getUuid());
+            postResourceId.setPostId(p.getId());
+
+            postResource.setId(postResourceId);
+            postResource.setResourceUuid(res);
+            postResource.setPost(p);
+            postResourceRepository.save(postResource);
+        }
 
         return List.of(cloudFileService.buildPutPolicyForUploads(cosPath, payload));
     }
@@ -569,10 +683,14 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public List<PresignedResp> handlePostContentImageUpload(UserUploadPolicyReq request) {
-        Long bizId = Long.parseLong(request.getBizId());
-        Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
-                bizId, UserCtxHolder.getUserUid(),false
-        ).orElseThrow(PostNotFoundException::new);
+        Long bizId;
+        boolean isLinkToPost = false;
+        if(StringUtil.isBlank(request.getBizId())){
+            bizId = UserCtxHolder.getUserUid();
+        } else {
+            bizId = Long.parseLong(request.getBizId());
+            isLinkToPost = true;
+        }
 
         List<PresignedResp> results = new ArrayList<>();
         List<UploadItem> validItems = new ArrayList<>();
@@ -600,19 +718,14 @@ public class PostServiceImpl implements PostService {
                         return cloudFileService.createAndSetUpUploadRes(item.uuidPlain, item.path, UserCtxHolder.getUserUid());
                     })
                     .toList();
-            List<PostResource> postResources = resources.stream()
-                    .map(res -> {
-                        PostResource pr = new PostResource();
-                        PostResourceId prId = new PostResourceId();
-                        prId.setResourceUuid(res.getUuid());
-                        prId.setPostId(p.getId());
+            resourceRepository.saveAll(resources);
+            if(isLinkToPost){
+                Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
+                        bizId, UserCtxHolder.getUserUid(),false
+                ).orElseThrow(PostNotFoundException::new);
+                savePostResource(p, resources);
+            }
 
-                        pr.setId(prId);
-                        pr.setPost(p);
-                        pr.setResourceUuid(res);
-                        return pr;
-                    })
-                    .toList();
             List<BizUploadPayload> payloads = validItems.stream()
                     .map(item -> BizUploadPayload.of(
                             bizId,
@@ -628,9 +741,6 @@ public class PostServiceImpl implements PostService {
                 int originalIndex = validItems.get(i).originalIndex();
                 results.set(originalIndex, signed.get(i));
             }
-
-            resourceRepository.saveAll(resources);
-            postResourceRepository.saveAll(postResources);
         }
         return results;
     }
@@ -644,14 +754,19 @@ public class PostServiceImpl implements PostService {
         );
 
         Long postId = ctx.getBizId();
-        Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
-                postId, UserCtxHolder.getUserUid(),false
-        ).orElseThrow(() -> new NotFoundException("Post: " + postId));
-
         String resourceUuid = ctx.getResourceUuid();
-        postResourceRepository.findByPostIdAndResourceUuidUuid(
-                postId, resourceUuid
-        ).orElseThrow(ForbiddenException::new); // ensure the resource is indeed attached to the post, and belongs to current post.
+        postRepository.findByIdAndAuthorUidAndIsDeleted(
+                postId, UserCtxHolder.getUserUid(),false
+        ).ifPresentOrElse( post -> {
+            // ensure the resource is indeed attached to the post, and belongs to current post.
+            postResourceRepository.findByPostIdAndResourceUuidUuid(
+                    postId, resourceUuid
+            ).orElseThrow(ForbiddenException::new);
+        }, () -> { // check the resource whether belong to a user
+            resourceRepository.findByUuidAndStatus(resourceUuid, ResourceStatus.UPLOAD_PENDING)
+                    .filter(res -> Objects.equals(res.getUploaderId(), UserCtxHolder.getUserUid()))
+                    .orElseThrow(ForbiddenException::new);
+        });
         // for single resource such like post coverage image, we shall check whether if there is audit task already exists
         // if exists, we replace the previous resource with new one. For content image, we suppose to be multiple resources,
         // and audit task - resource binding should be created in publish time, so here we simply bind resource to task
@@ -666,63 +781,6 @@ public class PostServiceImpl implements PostService {
                     return resourceRepository.save(res);
                 }
         ).orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid));
-
-        if(ctx.getBizType() == UserBizType.POST_COVERAGE_IMAGE){
-            AuditTask task = auditTaskRepository
-                    .findByTargetIdAndTargetTypeAndStatus(
-                            String.valueOf(ctx.getBizId()), TargetType.POST, AuditStatus.PENDING)
-                    .orElse(null);
-            Resource res;
-            if(task != null) { // task is already exists, simply update resource and register old resource deletion after commit if exists
-                AuditResource auditRes = auditTaskResourceRepository
-                        .findByTaskId(task.getId())
-                        .orElseGet(() -> {
-                            AuditResource ar = new AuditResource();
-                            AuditResourceId arId = new AuditResourceId();
-                            arId.setTaskId(task.getId());
-                            arId.setResourceUuid(resourceUuid);
-                            ar.setId(arId);
-                            ar.setTask(task);
-                            ar.setResource(resourceRepository.findByUuidAndStatus(resourceUuid, ResourceStatus.UPLOAD_PENDING)
-                                    .orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid))
-                            );
-                            return auditTaskResourceRepository.save(ar);
-                        });
-                res = auditRes.getResource();
-                if (res == null) throw new ResourceReferenceInvalidException(resourceUuid);
-                if (res.getResourceKey() != null) {
-                    final String oldKey = res.getResourceKey();
-                    TransactionSynchronizationManager.registerSynchronization(
-                            new TransactionSynchronization() {
-                                @Override
-                                public void afterCommit() {
-                                    // todo supposed to be after completion of whole transaction including audit task
-                                    // creation, but currently no such callback, need to ensure no exception throw after this point
-                                    // to avoid the case that old resource is removed but new resource is not set successfully.
-                                    try {
-                                        cloudFileService.removeFile(CloudFSRoot.UPLOADS, oldKey);
-                                    } catch (Exception e) {
-                                        log.error("Failed to remove old cloud file: {}", oldKey, e);
-                                    }
-                                }
-                            }
-                    );
-                }
-                cloudFileService.setAndValidResourceForCallback(
-                        res,
-                        CloudFSRoot.UPLOADS,
-                        // the result of setting this to active instead of orphan is that task is not null,
-                        // this only happened when a task is established before callback, which means user upload
-                        // coverage already upload before(or null) the new one(this) would replace it(bind at the same time)
-                        ResourceStatus.ACTIVE,
-                        ResourceType.IMAGE);
-                resourceRepository.save(res);
-            }
-            else {
-                // Audit task supposes to be created before callback, at the phase of
-                // preparing uploading(policy requesting)
-            }
-        }
     }
 
     private <T> T buildPostDetailResp(
@@ -731,13 +789,8 @@ public class PostServiceImpl implements PostService {
             DetailApplier<T> applier
     ) {
         T res = mapper.apply(post);
-        List<OptionVO<Integer>> tags = tagRepository.findTagsByPostIdIn(List.of(post.getId())).stream()
-                .map(arr -> (OptionVO<Integer>) arr[1])
-                .toList();
-        OptionVO<Integer> category = categoryRepository.findCategoryByPostIdIn(List.of(post.getId())).stream()
-                .map(arr -> (OptionVO<Integer>) arr[1])
-                .findFirst()
-                .orElse(null);
+        List<OptionVO<Long>> tags = tagRepository.findTagOptionVOsByPostIdIn(List.of(post.getId()));
+        OptionVO<Long> category = categoryRepository.findCategoryOptionVOByPostIdIn(List.of(post.getId())).getFirst();
         Resource coverageImgRes = post.getCoverageResource();
         CloudResPresignedUrlResp coverImg = null;
         if(coverageImgRes != null) {
@@ -756,8 +809,8 @@ public class PostServiceImpl implements PostService {
     private interface DetailApplier<T> {
         void apply(
                 T res,
-                List<OptionVO<Integer>> tags,
-                OptionVO<Integer> category,
+                List<OptionVO<Long>> tags,
+                OptionVO<Long> category,
                 CloudResPresignedUrlResp coverImg
         );
     }
@@ -772,17 +825,16 @@ public class PostServiceImpl implements PostService {
         List<Long> postIds = postPageIds.getContent();
         List<Post> posts = postRepository.findAllByIdInAndOrderBYCreatedAtDesc(postIds);
         // Post & Category Map
-        Map<Long, List<OptionVO<Integer>>> postTagMap = tagRepository.findTagsByPostIdIn(postIds).stream()
+        Map<Long, List<OptionVO<Long>>> postTagMap = tagRepository.findTagDOByPostIdIn(postIds).stream()
                 .collect(Collectors.groupingBy(
-                        arr -> (long) arr[0],
-                        Collectors.mapping(arr -> (OptionVO<Integer>) arr[1], Collectors.toList())
+                        IdOptionVOPackagedDO::getId,
+                        Collectors.mapping(IdOptionVOPackagedDO::getOptionVo, Collectors.toList())
                 ));
 
-        Map<Long, OptionVO<Integer>> postCategoryMap = categoryRepository.findCategoryByPostIdIn(postIds).stream()
+        Map<Long, OptionVO<Long>> postCategoryMap = categoryRepository.findCategoryDOByPostIdIn(postIds).stream()
                 .collect(Collectors.toMap(
-                        arr -> (long) arr[0],
-                        arr -> (OptionVO<Integer>) arr[1],
-                        (a, b) -> a
+                        IdOptionVOPackagedDO::getId,
+                        IdOptionVOPackagedDO::getOptionVo
                 ));
 
         // Post coverage resource presigned url map
@@ -819,8 +871,8 @@ public class PostServiceImpl implements PostService {
         void apply(
                 T res,
                 Post post,
-                Map<Long, List<OptionVO<Integer>>> postTagMap,
-                Map<Long, OptionVO<Integer>> postCategoryMap,
+                Map<Long, List<OptionVO<Long>>> postTagMap,
+                Map<Long, OptionVO<Long>> postCategoryMap,
                 Map<Long, CloudResPresignedUrlResp> postCoverageImgMap,
                 Map<Long, UserBrief> postUserBriefMap
         );

@@ -3,7 +3,7 @@ package org.waterwood.waterfunadminservice.api.response.role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.waterfunservicecore.entity.Role;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 
 import java.io.Serializable;
 import java.time.Instant;

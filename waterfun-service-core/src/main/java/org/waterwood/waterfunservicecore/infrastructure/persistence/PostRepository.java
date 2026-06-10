@@ -36,6 +36,7 @@ public interface PostRepository extends JpaRepository<Post, Long>,
 
     Optional<Post> findByIdAndIsDeleted(@NotNull Long id, Boolean isDeleted);
 
+    @EntityGraph(attributePaths = { "author", "category", "tags"})
     Optional<Post> findByIdAndIsDeletedAndStatus(@NotNull Long id, Boolean isDeleted, PostStatus status);
 
     List<Post> findAllByIdInAndIsDeletedAndStatus(List<Long> ids, Boolean isDeleted, PostStatus status);

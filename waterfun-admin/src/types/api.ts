@@ -4,14 +4,15 @@ export interface Page<T> {
     totalPages?: number;
     number?: number;
     size?: number;
-    page: Pagination;
-}
-
-export interface Pagination {
-    size: number;
-    number: number;
-    totalElements: number;
-    totalPages: number;
+    first?: boolean;
+    last?: boolean;
+    empty?: boolean;
+    page?: {
+        size: number;
+        number: number;
+        totalElements: number;
+        totalPages: number;
+    };
 }
 
 export interface PageOptions {
@@ -19,3 +20,4 @@ export interface PageOptions {
     pageSize?: number;
     currentPage?: number;
 }
+

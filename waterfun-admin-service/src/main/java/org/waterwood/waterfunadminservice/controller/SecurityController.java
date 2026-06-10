@@ -20,7 +20,7 @@ import org.waterwood.waterfunadminservice.service.IpBanService;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLog;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
-import org.waterwood.waterfunservicecore.entity.IpBan;
+import org.waterwood.waterfunservicecore.entity.security.IpBan;
 import org.waterwood.waterfunservicecore.entity.spec.AuditLogSpec;
 import org.waterwood.waterfunservicecore.entity.spec.IpBanSpec;
 

@@ -1,185 +1,72 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { Refresh } from '@element-plus/icons-vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import { throttle } from '@waterfun/web-core/src/triggerControl'
+import BaseDialog from '~/components/BaseDialog.vue';
 
-// 定义组件的 props
-interface Props {
-  modelValue: boolean; // 控制对话框显示隐藏
-}
+interface Props { modelValue: boolean; }
+interface Emits { (e: 'update:modelValue', value: boolean): void; (e: 'confirm', captcha: string, callback: (success: boolean) => void): void; (e: 'cancel'): void; }
 
-// 定义组件的 emits
-interface Emits {
-  (e: 'update:modelValue', value: boolean): void;
-  (e: 'confirm', captcha: string, callback: (success: boolean) => void): void;
-  (e: 'cancel'): void;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: false
-});
+const props = withDefaults(defineProps<Props>(), { modelValue: false });
 const emit = defineEmits<Emits>();
 
-// 响应式数据
 const dialogVisible = ref(props.modelValue);
 const captchaUrl = ref<string>('');
 const inputCode = ref<string>('');
 const loading = ref<boolean>(false);
 
-// 监听 modelValue 变化
-watch(() => props.modelValue, (newVal) => {
-  dialogVisible.value = newVal;
-  if (newVal) {
-    inputCode.value = '';
-    refreshCaptcha();
-  }
-});
+watch(() => props.modelValue, (v) => { dialogVisible.value = v; if (v) { inputCode.value = ''; refreshCaptcha(); } });
+watch(dialogVisible, (v) => { if (!v) emit('update:modelValue', false); });
 
-// 监听对话框关闭
-watch(dialogVisible, (newVal) => {
-  if (!newVal) {
-    emit('update:modelValue', false);
-  }
-});
-
-// 刷新验证码
 const refreshCaptcha = throttle(async () => {
   try {
     loading.value = true;
-    const response = await axios.get(import.meta.env.VITE_API_BASE + '/auth/captcha', {
-      responseType: 'arraybuffer',
-      withCredentials: true
-    });
-    
+    const response = await axios.get(import.meta.env.VITE_API_BASE + '/auth/captcha', { responseType: 'arraybuffer', withCredentials: true });
     const uint8Array = new Uint8Array(response.data);
     let binary = '';
-    for (let i = 0; i < uint8Array.byteLength; i++) {
-      binary += String.fromCharCode(uint8Array[i]);
-    }
-    const base64 = btoa(binary);
-    captchaUrl.value = `data:image/jpeg;base64,${base64}`;
-    loading.value = false;
-  } catch (error) {
-    console.error('获取验证码失败:', error);
-    loading.value = false;
-  }
+    for (let i = 0; i < uint8Array.byteLength; i++) binary += String.fromCharCode(uint8Array[i]);
+    captchaUrl.value = `data:image/jpeg;base64,${btoa(binary)}`;
+  } catch (error) { console.error('获取验证码失败:', error); }
+  finally { loading.value = false; }
 }, 1000);
 
 const confirmCaptcha = () => {
-  if (!inputCode.value.trim()) {
-    ElMessage.warning('请输入验证码');
-    return;
-  }
+  if (!inputCode.value.trim()) { ElMessage.warning('请输入验证码'); return; }
   loading.value = true;
   emit('confirm', inputCode.value.trim(), (success) => {
-    console.log('confirmCaptcha success:', success);
-    if (success && dialogVisible.value) {
-      dialogVisible.value = false;
-    }
+    if (success && dialogVisible.value) dialogVisible.value = false;
     loading.value = false;
-  })
+  });
 };
 
-const cancelCaptcha = () => {
-  emit('cancel');
-  dialogVisible.value = false;
-};
+const cancelCaptcha = () => { emit('cancel'); dialogVisible.value = false; };
 
-onMounted(() => {
-  if (props.modelValue) {
-    refreshCaptcha();
-  }
-});
+onMounted(() => { if (props.modelValue) refreshCaptcha(); });
 </script>
 
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="请输入验证码"
-    width="300px"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :show-close="false"
-    center
-  >
+  <BaseDialog v-model="dialogVisible" title="请输入验证码" width="340px">
     <div class="captcha-content">
       <div class="captcha-image-container">
-        <img
-          :src="captchaUrl"
-          alt="验证码"
-          class="captcha-image"
-          style="cursor: pointer;"
-          @click="refreshCaptcha"
-        >
-        <el-icon
-          :size="20"
-          class="refresh-icon"
-          style="cursor: pointer;"
-          @click="refreshCaptcha"
-        >
-          <Refresh />
-        </el-icon>
+        <img :src="captchaUrl" alt="验证码" class="captcha-image" style="cursor: pointer;" @click="refreshCaptcha" />
+        <i class="fa-solid fa-rotate refresh-icon" @click="refreshCaptcha"></i>
       </div>
-      <el-input
-        v-model="inputCode"
-        placeholder="请输入验证码"
-        maxlength="4"
-        style="margin-top: 15px;"
-        @keyup.enter="confirmCaptcha"
-      />
+      <input v-model="inputCode" class="form-input" placeholder="请输入验证码" maxlength="4" style="margin-top: 15px;" @keyup.enter="confirmCaptcha" />
     </div>
     <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="cancelCaptcha">
-          取消
-        </el-button>
-        <el-button
-          type="primary"
-          :loading="loading"
-          @click="confirmCaptcha"
-        >
-          确定
-        </el-button>
-      </div>
+      <button class="btn" @click="cancelCaptcha">取消</button>
+      <button class="btn btn-primary" :disabled="loading" @click="confirmCaptcha">
+        <i v-if="loading" class="fa-solid fa-spinner fa-spin"></i> 确定
+      </button>
     </template>
-  </el-dialog>
+  </BaseDialog>
 </template>
 
-
-
 <style scoped>
-.captcha-content {
-  text-align: center;
-}
-
-.captcha-image-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-.captcha-image {
-  width: 120px;
-  height: 30px;
-  border-radius: 4px;
-}
-
-.refresh-icon {
-  margin-left: 10px;
-  color: #409eff;
-  transition: transform 0.2s;
-}
-
-.refresh-icon:hover {
-  transform: rotate(90deg);
-  color: #66b1ff;
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: space-between;
-}
+.captcha-content { text-align: center; }
+.captcha-image-container { display: flex; justify-content: center; align-items: center; gap: 10px; }
+.captcha-image { width: 120px; height: 30px; border-radius: 4px; }
+.refresh-icon { cursor: pointer; color: var(--primary); transition: transform 0.2s; }
+.refresh-icon:hover { transform: rotate(90deg); }
 </style>

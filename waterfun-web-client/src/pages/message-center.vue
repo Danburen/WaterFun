@@ -7,9 +7,9 @@
       </div>
       <div class="right-column">
         <SystemNotificationModule v-show="activeTab === 'system'" :active="activeTab === 'system'" />
-        <SubscribeMessageModule v-show="activeTab === 'subscribe'" />
-        <ReplyMessageModule v-show="activeTab === 'reply'" />
-        <MentionMessageModule v-show="activeTab === 'mention'" />
+        <SubscribeMessageModule v-show="activeTab === 'subscribe'" :active="activeTab === 'subscribe'" />
+        <ReplyMessageModule v-show="activeTab === 'reply'" :active="activeTab === 'reply'" />
+        <MentionMessageModule v-show="activeTab === 'mention'" :active="activeTab === 'mention'" />
       </div>
     </div>
   </div>

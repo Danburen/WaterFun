@@ -45,13 +45,13 @@ public class RedisHelper implements RedisHelperHolder {
     }
 
     @Override
-    public void hDel(String key, String... fields) {
+    public void hashDel(String key, String... fields) {
         if (fields == null || fields.length == 0) return;
         redisTemplate.opsForHash().delete(key, (Object[]) fields);
     }
 
     @Override
-    public void hSetMap(String key, Map<String, String> map, Duration expire) {
+    public void hashSetMap(String key, Map<String, String> map, Duration expire) {
         if (map == null) return;
         redisTemplate.delete(key);
         if (!map.isEmpty()) {
@@ -61,7 +61,7 @@ public class RedisHelper implements RedisHelperHolder {
     }
 
     @Override
-    public void hSetMap(String key, Map<String, String> map) {
+    public void hashSetMap(String key, Map<String, String> map) {
         if (map == null) return;
         redisTemplate.delete(key);
         if (!map.isEmpty()) {
@@ -70,7 +70,7 @@ public class RedisHelper implements RedisHelperHolder {
     }
 
     @Override
-    public void hSetAll(String key, Map<String, String> map) {
+    public void hashSetAll(String key, Map<String, String> map) {
         if (map == null || map.isEmpty()) return;
         for (Map.Entry<String, String> entry : map.entrySet()) {
             redisTemplate.opsForHash().putIfAbsent(key, entry.getKey(), entry.getValue());
@@ -78,45 +78,45 @@ public class RedisHelper implements RedisHelperHolder {
     }
 
     @Override
-    public void hSet(String key, String field, String value) {
+    public void hashSet(String key, String field, String value) {
         redisTemplate.opsForHash().put(key, field, value);
     }
 
     @Override
-    public String hGet(String key, String field) {
+    public String hashGet(String key, String field) {
         return (String) redisTemplate.opsForHash().get(key, field);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, String> hGetAll(String key) {
+    public Map<String, String> hashGetAll(String key) {
         return (Map<String, String>) (Map<?, ?>) redisTemplate.opsForHash().entries(key);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Set<String> hKeys(String key) {
+    public Set<String> hashKeys(String key) {
         return (Set<String>) (Set<?>) redisTemplate.opsForHash().keys(key);
     }
 
     @Override
-    public void sAdd(String key, String... values) {
+    public void setAdd(String key, String... values) {
             redisTemplate.opsForSet().add(key, values);
     }
     @Override
-    public void sRem(String key, Object... values) {
+    public void setRemove(String key, Object... values) {
         redisTemplate.opsForSet().remove(key, values);
     }
 
     @Override
-    public void sRem(String key, Collection<String> members) {
+    public void setRemove(String key, Collection<String> members) {
         if(members != null && !members.isEmpty()) {
             redisTemplate.opsForSet().remove(key, members.toArray());
         }
     }
 
     @Override
-    public Set<String> sMem(String key) {
+    public Set<String> setMembers(String key) {
         return redisTemplate.opsForSet().members(key);
     }
 
@@ -147,7 +147,7 @@ public class RedisHelper implements RedisHelperHolder {
     }
 
     @Override
-    public List<String> mget(List<String> keys) {
+    public List<String> multiGet(List<String> keys) {
         if (keys == null || keys.isEmpty()) {
             return Collections.emptyList();
         }
@@ -156,7 +156,7 @@ public class RedisHelper implements RedisHelperHolder {
     }
 
     @Override
-    public List<Long> mgetExpire(List<String> keys) {
+    public List<Long> multiGetExpire(List<String> keys) {
         if (keys == null || keys.isEmpty()) {
             return Collections.emptyList();
         }
@@ -184,7 +184,7 @@ public class RedisHelper implements RedisHelperHolder {
 
     @Override
     public List<Boolean> hasKeys(List<String> keys) {
-        return mget(keys).stream().map(Objects::nonNull).toList();
+        return multiGet(keys).stream().map(Objects::nonNull).toList();
     }
 
     @Override
@@ -218,7 +218,7 @@ public class RedisHelper implements RedisHelperHolder {
 
     @Override
     public Map<String, String> hGetAllAndDel(String key) {
-        Map<String, String> res = Optional.ofNullable(hGetAll(key)).orElse(Collections.emptyMap());
+        Map<String, String> res = Optional.ofNullable(hashGetAll(key)).orElse(Collections.emptyMap());
         del(key);
         return res;
     }

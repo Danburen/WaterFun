@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.waterwood.api.VO.ToExpirableDictOption;
-import org.waterwood.waterfunservicecore.entity.Role;
 
 import java.time.Instant;
 

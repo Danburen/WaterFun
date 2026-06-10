@@ -2,8 +2,7 @@
 import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
-import SearchContainer from "~/components/SearchContainer.vue";
-import TableContainer from "~/components/TableContainer.vue";
+import ListPage from "~/components/ListPage.vue";
 import { deleteUser, deleteUsers, getUserList, type AccountStatus, type UserAdminDto } from "~/api/user";
 import type { PageOptions } from "~/types";
 import UserEditDialog from "./components/UserEditDialog.vue";
@@ -12,55 +11,17 @@ const router = useRouter();
 
 const loading = ref(false);
 const userList = ref<UserAdminDto[]>([]);
-const selectedUserUids = ref<string[]>([]);
+const selectedUserUids = ref<Set<string>>(new Set());
 const editDialogVisible = ref(false);
 const dialogMode = ref<"create" | "edit">("edit");
 const currentEditUid = ref<string | null>(null);
-const selectable = (row: UserAdminDto) => row.userType !== 2 && row.userType !== 3 && row.userType !== 4;
-const searchForm = ref<{
-  username: string;
-  nickname: string;
-  accountStatus: "" | AccountStatus;
-}>({
-  username: "",
-  nickname: "",
-  accountStatus: "",
+const searchForm = ref<{ username: string; nickname: string; accountStatus: "" | AccountStatus }>({
+  username: "", nickname: "", accountStatus: "",
 });
+const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
 
-const pageOpts = ref<PageOptions>({
-  currentPage: 1,
-  pageSize: 10,
-  total: 0,
-});
-
-const statusTypeMap: Record<AccountStatus, "success" | "warning" | "danger" | "info"> = {
-  ACTIVE: "success",
-  SUSPENDED: "warning",
-  DEACTIVATED: "danger",
-  DELETED: "info",
-};
-
-const statusLabel = (status: AccountStatus) =>
-  ({ ACTIVE: '正常', SUSPENDED: '已停用', DEACTIVATED: '已注销', DELETED: '已删除' })[status];
-
-const userTypeTagTypeMap: Record<number, "primary" | "success" | "warning" | "danger" | "info"> = {
-  0: "primary",
-  1: "warning",
-  2: "danger",
-  3: "info",
-  4: "danger",
-};
-
-const userTypeI18nKeyMap: Record<number, string> = {
-  0: "normal",
-  1: "tester",
-  2: "admin",
-  3: "system",
-  4: "superAdmin",
-};
-
-const userTypeLabel = (userType: number) =>
-  ({ 0: '普通用户', 1: '测试用户', 2: '管理员', 3: '系统', 4: '超级管理员' })[userType] ?? '普通用户';
+const statusLabel = (s: AccountStatus) => ({ ACTIVE: '正常', SUSPENDED: '已停用', DEACTIVATED: '已注销', DELETED: '已删除' })[s];
+const userTypeLabel = (t: number) => ({ 0: '普通用户', 1: '测试用户', 2: '管理员', 3: '系统', 4: '超级管理员' })[t] ?? '普通用户';
 
 const fetchData = async () => {
   loading.value = true;
@@ -73,7 +34,7 @@ const fetchData = async () => {
       accountStatus: searchForm.value.accountStatus || undefined,
     });
     userList.value = res.data.content || [];
-    pageOpts.value.total = res.data.page.totalElements || 0;
+    pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
   } catch (error) {
     console.error(error);
     ElMessage.error('获取用户列表失败');
@@ -82,323 +43,140 @@ const fetchData = async () => {
   }
 };
 
-const handleSearch = () => {
-  pageOpts.value.currentPage = 1;
-  fetchData();
-};
-
+const handleSearch = () => { pageOpts.value.currentPage = 1; fetchData(); };
 const handleReset = () => {
   pageOpts.value.currentPage = 1;
-  searchForm.value = {
-    username: "",
-    nickname: "",
-    accountStatus: "",
-  };
+  searchForm.value = { username: "", nickname: "", accountStatus: "" };
   fetchData();
 };
+const gotoDetail = (uid: string) => router.push({ name: "userDetail", params: { uid: String(uid) } });
+const gotoEdit = (uid: string) => { dialogMode.value = "edit"; currentEditUid.value = String(uid); editDialogVisible.value = true; };
+const handleAdd = () => { dialogMode.value = "create"; currentEditUid.value = null; editDialogVisible.value = true; };
 
-const gotoDetail = (uid: string) => {
-  router.push({ name: "userDetail", params: { uid: String(uid) } });
+const toggleSelect = (uid: string) => {
+  const s = new Set(selectedUserUids.value);
+  s.has(uid) ? s.delete(uid) : s.add(uid);
+  selectedUserUids.value = s;
 };
-
-const gotoEdit = (uid: string) => {
-  dialogMode.value = "edit";
-  currentEditUid.value = String(uid);
-  editDialogVisible.value = true;
-};
-
-const handleAdd = () => {
-  dialogMode.value = "create";
-  currentEditUid.value = null;
-  editDialogVisible.value = true;
+const toggleSelectAll = () => {
+  if (selectedUserUids.value.size === userList.value.length) {
+    selectedUserUids.value = new Set();
+  } else {
+    selectedUserUids.value = new Set(userList.value.map(u => u.uid));
+  }
 };
 
 const handleDelete = async (uid: string) => {
   try {
-    await ElMessageBox.confirm('确定删除该用户吗？', '删除', {
-      type: "warning",
-    });
+    await ElMessageBox.confirm('确定删除该用户吗？', '删除', { type: "warning" });
     await deleteUser(uid);
     ElMessage.success('用户删除成功');
     fetchData();
   } catch (e) {
-    if (e !== "cancel") {
-      console.error(e);
-      ElMessage.error('删除用户失败');
-    }
+    if (e !== "cancel") { console.error(e); ElMessage.error('删除用户失败'); }
   }
-};
-
-const handleSelectionChange = (rows: UserAdminDto[]) => {
-  selectedUserUids.value = rows.map(item => item.uid);
 };
 
 const handleBatchDelete = async () => {
-  if (selectedUserUids.value.length === 0) {
-    return;
-  }
-
+  const ids = [...selectedUserUids.value];
+  if (!ids.length) return;
   try {
-    await ElMessageBox.confirm(
-      `确定删除选中的 ${selectedUserUids.value.length} 个用户吗？`,
-      '删除',
-      { type: "warning" }
-    );
-
-    const res = await deleteUsers(selectedUserUids.value);
+    await ElMessageBox.confirm(`确定删除选中的 ${ids.length} 个用户吗？`, '删除', { type: "warning" });
+    const res = await deleteUsers(ids);
     const result = res.data;
-
-    if (result.success === result.requested) {
-      ElMessage.success('用户删除成功');
-    } else if (result.success === 0) {
-      ElMessage.error('删除用户失败');
-    } else {
-      ElMessage.warning(`${'用户删除成功'} ${result.success}/${result.requested}`);
-    }
-
-    selectedUserUids.value = [];
+    if (result.success === result.requested) ElMessage.success('用户删除成功');
+    else if (result.success === 0) ElMessage.error('删除用户失败');
+    else ElMessage.warning(`用户删除成功 ${result.success}/${result.requested}`);
+    selectedUserUids.value = new Set();
     fetchData();
   } catch (e) {
-    if (e !== "cancel") {
-      console.error(e);
-      ElMessage.error('删除用户失败');
-    }
+    if (e !== "cancel") { console.error(e); ElMessage.error('删除用户失败'); }
   }
 };
 
-const handleEditSuccess = () => {
-  fetchData();
-};
-
+const handleEditSuccess = () => fetchData();
 onMounted(fetchData);
 </script>
 
 <template>
-  <div class="list-layout">
-    <SearchContainer>
-      <el-form
-        inline
-        :model="searchForm"
-        class="search-form"
-      >
-        <el-form-item label="用户名">
-          <el-input
-            v-model="searchForm.username"
-            placeholder="请输入用户名"
-          />
-        </el-form-item>
-        <el-form-item label="昵称">
-          <el-input
-            v-model="searchForm.nickname"
-            placeholder="请输入昵称"
-          />
-        </el-form-item>
-        <el-form-item label="用户状态">
-          <el-select
-            v-model="searchForm.accountStatus"
-            clearable
-            style="width: 150px"
-          >
-            <el-option
-              :label="statusLabel('ACTIVE')"
-              value="ACTIVE"
-            />
-            <el-option
-              :label="statusLabel('SUSPENDED')"
-              value="SUSPENDED"
-            />
-            <el-option
-              :label="statusLabel('DEACTIVATED')"
-              value="DEACTIVATED"
-            />
-            <el-option
-              :label="statusLabel('DELETED')"
-              value="DELETED"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleSearch"
-          >
-            查询
-          </el-button>
-          <el-button @click="handleReset">
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </SearchContainer>
+  <ListPage
+    title="用户管理"
+    :loading="loading"
+    :total="pageOpts.total"
+    v-model:page="pageOpts.currentPage"
+    v-model:pageSize="pageOpts.pageSize"
+    @change="fetchData"
+  >
+    <template #search>
+      <div class="search-form">
+        <div class="search-field">
+          <label>用户名</label>
+          <input v-model="searchForm.username" placeholder="请输入用户名" @keyup.enter="handleSearch" />
+        </div>
+        <div class="search-field">
+          <label>昵称</label>
+          <input v-model="searchForm.nickname" placeholder="请输入昵称" @keyup.enter="handleSearch" />
+        </div>
+        <div class="search-field">
+          <label>用户状态</label>
+          <select v-model="searchForm.accountStatus">
+            <option value="">全部</option>
+            <option value="ACTIVE">正常</option>
+            <option value="SUSPENDED">已停用</option>
+            <option value="DEACTIVATED">已注销</option>
+            <option value="DELETED">已删除</option>
+          </select>
+        </div>
+        <div class="search-actions">
+          <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <button class="btn btn-default" @click="handleReset">重置</button>
+        </div>
+      </div>
+    </template>
+    <template #header>
+      <button class="btn btn-primary" @click="handleAdd"><i class="fa-solid fa-plus"></i> 新增</button>
+      <button class="btn btn-danger" :disabled="selectedUserUids.size === 0" @click="handleBatchDelete"><i class="fa-solid fa-trash"></i> 删除</button>
+    </template>
 
-    <TableContainer
-      v-model:page-size="pageOpts.pageSize"
-      v-model:current-page="pageOpts.currentPage"
-      title="用户管理"
-      show-add-btn
-      :show-remove-btn="true"
-      :disable-delete="selectedUserUids.length === 0"
-      :total="pageOpts.total"
-      @add="handleAdd"
-      @remove="handleBatchDelete"
-      @change="fetchData"
-    >
-      <el-table
-        v-loading="loading"
-        :data="userList"
-        border
-        fit
-        highlight-current-row
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column
-          type="selection"
-          :selectable="selectable"
-          width="55"
-        />
-        <el-table-column
-          prop="uid"
-          label="UID"
-          min-width="140"
-        />
-        <el-table-column
-          prop="username"
-          label="用户名"
-        >
-          <template #default="{ row }">
-            <el-link
-              type="primary"
-              :underline="false"
-              @click="gotoDetail(row.uid)"
-            >
-              {{ row.username }}
-            </el-link>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="nickname"
-          label="昵称"
-        >
-          <template #default="{ row }">
-            {{ row.nickname || '无' }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="userType"
-          label="用户类型"
-          min-width="120"
-        >
-          <template #default="{ row }">
-            <el-tag
-              size="small"
-              :type="userTypeTagTypeMap[row.userType]"
-            >
-              {{ userTypeLabel(row.userType) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="accountStatus"
-          label="用户状态"
-        >
-          <template #default="{ row }">
-            <el-tag
-              size="small"
-              :type="statusTypeMap[row.accountStatus]"
-            >
-              {{ statusLabel(row.accountStatus) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="createdAt"
-          label="创建时间"
-        >
-          <template #default="{ row }">
-            {{ formatISOData(row.createdAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          min-width="120"
-          fixed="right"
-        >
-          <template #default="{ row }">
-            <el-button
-              size="small"
-              type="primary"
-              @click="gotoEdit(row.uid)"
-            >
-              编辑
-            </el-button>
-            <el-button
-              size="small"
-              type="danger"
-              @click="handleDelete(row.uid)"
-            >
-              删除
-            </el-button>
-            <el-popover
-              placement="bottom"
-              trigger="click"
-              :width="100"
-              popper-style="min-width: auto; padding: 8px;"
-            >
-              <template #reference>
-                <el-button
-                  size="small"
-                  type="success"
-                  style="margin-left: 12px;"
-                >
-                  更多
-                </el-button>
-              </template>
-              <div style="display: flex; flex-direction: column; gap: 8px;">
-                <el-button
-                  size="small"
-                  type="primary"
-                  plain
-                  style="margin: 0; width: 100%;"
-                  @click="router.push({ name: 'userRoleAssign', params: { uid: String(row.uid) } })"
-                >
-                  分配角色
-                </el-button>
-                <el-button
-                  size="small"
-                  type="primary"
-                  plain
-                  style="margin: 0; width: 100%;"
-                  @click="router.push({ name: 'userPermissionAssign', params: { uid: String(row.uid) } })"
-                >
-                  分配权限
-                </el-button>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:40px"><input type="checkbox" :checked="selectedUserUids.size === userList.length && userList.length > 0" @change="toggleSelectAll" /></th>
+          <th>UID</th>
+          <th>用户名</th>
+          <th>昵称</th>
+          <th>用户类型</th>
+          <th>用户状态</th>
+          <th>创建时间</th>
+          <th style="width:200px">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in userList" :key="row.uid">
+          <td><input type="checkbox" :checked="selectedUserUids.has(row.uid)" @change="toggleSelect(row.uid)" /></td>
+          <td>{{ row.uid }}</td>
+          <td><a class="link" @click="gotoDetail(row.uid)">{{ row.username }}</a></td>
+          <td>{{ row.nickname || '无' }}</td>
+          <td><span :class="['badge', row.userType === 2 || row.userType === 4 ? 'badge-red' : row.userType === 1 ? 'badge-yellow' : 'badge-gray']">{{ userTypeLabel(row.userType) }}</span></td>
+          <td><span :class="['badge', row.accountStatus === 'ACTIVE' ? 'badge-green' : row.accountStatus === 'SUSPENDED' ? 'badge-yellow' : 'badge-gray']">{{ statusLabel(row.accountStatus) }}</span></td>
+          <td>{{ formatISOData(row.createdAt) }}</td>
+          <td>
+            <div class="table-actions">
+              <button class="action-btn" @click="gotoEdit(row.uid)">编辑</button>
+              <button class="action-btn danger" @click="handleDelete(row.uid)">删除</button>
+              <div class="dropdown">
+                <button class="action-btn">更多</button>
+                <div class="dropdown-menu">
+                  <a @click="router.push({ name: 'userRoleAssign', params: { uid: String(row.uid) } })">分配角色</a>
+                  <a @click="router.push({ name: 'userPermissionAssign', params: { uid: String(row.uid) } })">分配权限</a>
+                </div>
               </div>
-            </el-popover>
-          </template>
-        </el-table-column>
-      </el-table>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-      <UserEditDialog
-        v-model="editDialogVisible"
-        :mode="dialogMode"
-        :uid="currentEditUid"
-        @success="handleEditSuccess"
-      />
-    </TableContainer>
-  </div>
+    <UserEditDialog v-model="editDialogVisible" :mode="dialogMode" :uid="currentEditUid" @success="handleEditSuccess" />
+  </ListPage>
 </template>
-
-<style scoped>
-.search-form {
-  margin-bottom: 0;
-}
-
-.list-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-</style>
-
-

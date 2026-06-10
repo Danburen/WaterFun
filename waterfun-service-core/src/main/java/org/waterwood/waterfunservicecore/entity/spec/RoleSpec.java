@@ -3,7 +3,7 @@ package org.waterwood.waterfunservicecore.entity.spec;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.utils.StringUtil;
-import org.waterwood.waterfunservicecore.entity.Role;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 
 import java.util.ArrayList;
 import java.util.List;

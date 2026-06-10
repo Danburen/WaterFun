@@ -46,8 +46,8 @@ public class UserSecurityController {
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@RequestBody String deviceFp, HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = CookieUtil.getCookieValue(request.getCookies(),"REFRESH_TOKEN");
-        boolean  result = loginService.logout(refreshToken, deviceFp);
-        if(result) CookieUtil.cleanTokenCookie(response);
+        loginService.logout(refreshToken, deviceFp);
+        CookieUtil.cleanTokenCookie(response);
         return ApiResponse.success();
     }
 }

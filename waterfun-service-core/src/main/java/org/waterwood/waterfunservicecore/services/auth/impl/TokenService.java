@@ -65,7 +65,7 @@ public class TokenService implements AuthTokenService {
         String family = redisHelper.getValue(buildRtFamilyCacheKey(userUid,deviceId));
         if(family == null) { // no family ,we create a new one
             family = StringUtil.noDashRandomUUIDString();
-            redisHelper.sAdd( // a user only have one rt-families
+            redisHelper.setAdd( // a user only have one rt-families
                     buildRtFamiliesCacheKey(userUid),
                     family,
                     String.valueOf(System.currentTimeMillis())
@@ -103,7 +103,7 @@ public class TokenService implements AuthTokenService {
      */
     @Override
     public RefreshTokenPayload validateRefreshToken(long userUid, String refreshToken, String dfp) {
-        String calculatedHashDid = deviceService.calculaateDid(userUid,dfp);
+        String calculatedHashDid = deviceService.calculaateDid(userUid, dfp);
         String familyId = redisHelper.getValue(buildRtFamilyCacheKey(userUid, calculatedHashDid));
         if(familyId == null) throw new BizException(BaseResponseCode.REAUTHENTICATE_REQUIRED); // INVALID Refresh token family
         boolean isNewDevice = deviceService.isNewDeviceDid(userUid, calculatedHashDid);
@@ -162,7 +162,7 @@ public class TokenService implements AuthTokenService {
 
     @Override
     public Set<String> getFamilyIds(long userUid) {
-        return redisHelper.sMem(buildRtFamiliesCacheKey(userUid));
+        return redisHelper.setMembers(buildRtFamiliesCacheKey(userUid));
     }
 
     @Override
@@ -194,7 +194,7 @@ public class TokenService implements AuthTokenService {
     private long processBatchRTFamiliesClean(List<String> batch) {
         long removed = 0;
         for(String key: batch){
-            Set<String> familiesSet = redisHelper.sMem(key);
+            Set<String> familiesSet = redisHelper.setMembers(key);
             if(familiesSet == null || familiesSet.isEmpty()) {
                 redisHelper.del(key);
                 continue;
@@ -211,7 +211,7 @@ public class TokenService implements AuthTokenService {
                     toRemove.add(family);
                 }
             }
-            redisHelper.sRem(key, toRemove);
+            redisHelper.setRemove(key, toRemove);
         }
         return removed;
     }

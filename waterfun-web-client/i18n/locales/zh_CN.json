@@ -17,7 +17,14 @@
       "account": "账号安全",
       "notification": "通知与隐私",
       "location": "所在地",
-      "residence": "居住地"
+      "residence": "居住地",
+      "followers": "粉丝",
+      "followings": "关注",
+      "posts": "帖子",
+      "likes": "获赞",
+      "follow": "关注",
+      "unfollow": "取消关注",
+      "following": "已关注"
     }
   },
   "info": {
@@ -145,17 +152,113 @@
       "registerSuccess": "注册成功",
       "verificationCodeSent": "验证码已发送,请注意查收",
       "logoutSuccess": "登出成功",
-      "saveSuccess": "保存成功"
+      "saveSuccess": "保存成功",
+      "commentSuccess": "评论成功",
+      "replySuccess": "回复成功",
+      "publishSuccess": "发布成功",
+      "draftSaved": "草稿已保存",
+      "draftCreated": "草稿已创建",
+      "followSuccess": "已关注",
+      "unfollowSuccess": "已取消关注",
+      "markedAllRead": "已全部标记为已读"
     },
     "failed": {
-      "saveFailed": "保存失败，请重试"
+      "saveFailed": "保存失败，请重试",
+      "commentFailed": "评论失败",
+      "replyFailed": "回复失败",
+      "publishFailed": "发布失败",
+      "draftCreateFailed": "创建草稿失败",
+      "operationFailed": "操作失败"
     },
     "tooltip": {
       "optionalField": "以下区域的内容是选填字段，可选填充或不填。"
     },
     "throttled": {
       "clickTooFast": "点击的太快了哦，休息一下吧"
-    }
+    },
+    "empty": {
+      "noPosts": "暂无帖子",
+      "noComments": "暂无评论",
+      "noReplies": "暂无回复",
+      "noFollowers": "暂无粉丝",
+      "noFollowings": "暂无关注",
+      "noNotifications": "暂无{type}通知"
+    },
+    "endOfList": "已经到底了",
+    "loadMore": "加载更多",
+    "loadMoreComments": "加载更多评论",
+    "loadMoreReplies": "加载更多回复",
+    "commentTitle": "评论 ({count})"
+  },
+  "post": {
+    "create": "发布新帖",
+    "edit": "编辑文章",
+    "title": "帖子标题",
+    "content": "正文内容",
+    "summary": "摘要",
+    "subtitle": "副标题",
+    "category": "选择分类",
+    "tags": "添加标签",
+    "placeholder": {
+      "title": "请输入标题，好的标题能吸引更多读者",
+      "content": "开始撰写你的内容..."
+    },
+    "publish": "发布帖子",
+    "saveDraft": "保存草稿",
+    "createDraft": "请先创建草稿",
+    "publishRequired": "请填写标题、内容并选择分类",
+    "backToList": "返回列表",
+    "notFound": "帖子不存在或已删除",
+    "viewCount": "浏览",
+    "likeCount": "点赞",
+    "commentCount": "评论",
+    "collectCount": "收藏",
+    "newTags": "新标签",
+    "addTag": "添加",
+    "tagLimit": "最多添加 5 个自定义标签",
+    "tabEdit": "编辑",
+    "tabPreview": "预览",
+    "announcement": "公告",
+    "pinned": "置顶",
+    "supportsMarkdown": "支持 Markdown"
+  },
+  "comment": {
+    "writeComment": "写下你的评论...",
+    "submitComment": "发表评论",
+    "writeReply": "写下你的回复...",
+    "submitReply": "提交回复",
+    "replyTo": "回复 {name}",
+    "cancel": "取消",
+    "reply": "回复",
+    "expand": "展开",
+    "collapse": "收起",
+    "liked": "已赞"
+  },
+  "notification": {
+    "center": "消息中心",
+    "system": "系统通知",
+    "subscribe": "订阅消息",
+    "reply": "回复我的",
+    "mention": "提及消息",
+    "markAllRead": "全部已读",
+    "noMore": "已经到底了",
+    "loading": "加载中..."
+  },
+  "community": {
+    "title": "社区",
+    "all": "全部",
+    "publish": "发布新帖",
+    "welcome": "欢迎来到 WaterFun",
+    "welcomeDesc": "分享知识，共同成长",
+    "loginPrompt": "登录后即可参与讨论",
+    "loginNow": "立即登录",
+    "hotTopics": "热门话题",
+    "announcements": "社区公告",
+    "friendLinks": "友情链接",
+    "onlineCount": "当前在线",
+    "todayNew": "今日新增",
+    "todayPeak": "今日峰值",
+    "onlineStats": "社区动态"
   },
   "confirm": {
     "confirmReadLicences": "我已阅读悉知并同意",
@@ -167,6 +270,16 @@
     "yes": "是",
     "no": "否",
     "search": "搜索",
-    "select": "选择"
+    "select": "选择",
+    "more": "更多"
+  },
+  "general": {
+    "loading": "加载中...",
+    "noData": "暂无数据",
+    "error": "加载失败",
+    "retry": "重试",
+    "backHome": "返回首页",
+    "userNotExist": "用户不存在",
+    "anonymous": "匿名"
   }
 }

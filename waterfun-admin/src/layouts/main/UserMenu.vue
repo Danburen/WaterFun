@@ -7,39 +7,27 @@ import { logout } from '@/api/auth'
 import { getCurrentUserInfo, updateCurrentUserProfile } from '@/api/me'
 import type { AdminUserInfoResponse, UpdateUserProfileRequest } from '@/api/me'
 import { useAuthStore } from '@/stores/authStore'
+import BaseDialog from '~/components/BaseDialog.vue'
 
 const authStore = useAuthStore()
 
 const loading = ref(false)
 const saving = ref(false)
 const profileDialogVisible = ref(false)
-
 const userInfo = ref<AdminUserInfoResponse | null>(null)
 
 const profileForm = reactive<UpdateUserProfileRequest>({
-  bio: '',
-  gender: 'UNKNOWN',
-  birthday: '',
-  residence: ''
+  bio: '', gender: 'UNKNOWN', birthday: '', residence: ''
 })
 
-const displayName = computed(() => {
-  if (!userInfo.value) return 'Admin'
-  return userInfo.value.nickname || userInfo.value.username || 'Admin'
-})
-
+const displayName = computed(() => userInfo.value?.nickname || userInfo.value?.username || 'Admin')
 const avatarUrl = computed(() => userInfo.value?.avatar?.url || '')
 
 const fetchCurrentUserInfo = async () => {
   loading.value = true
-  try {
-    const res = await getCurrentUserInfo()
-    userInfo.value = res.data
-  } catch (e) {
-    ElMessage.error('获取当前用户信息失败')
-  } finally {
-    loading.value = false
-  }
+  try { const res = await getCurrentUserInfo(); userInfo.value = res.data; Object.assign(profileForm, { bio: '', gender: 'UNKNOWN', birthday: '', residence: '' }) }
+  catch { ElMessage.error('获取当前用户信息失败') }
+  finally { loading.value = false }
 }
 
 const openProfileDialog = async () => {
@@ -50,233 +38,107 @@ const openProfileDialog = async () => {
 const saveProfile = async () => {
   saving.value = true
   try {
-    await updateCurrentUserProfile({
-      bio: profileForm.bio?.trim() || undefined,
-      gender: profileForm.gender || undefined,
-      birthday: profileForm.birthday || undefined,
-      residence: profileForm.residence?.trim() || undefined
-    })
-    ElMessage.success('个人资料更新成功')
-    profileDialogVisible.value = false
-  } catch (e) {
-    ElMessage.error('个人资料更新失败')
-  } finally {
-    saving.value = false
-  }
+    await updateCurrentUserProfile({ bio: profileForm.bio?.trim() || undefined, gender: profileForm.gender || undefined, birthday: profileForm.birthday || undefined, residence: profileForm.residence?.trim() || undefined })
+    ElMessage.success('个人资料更新成功'); profileDialogVisible.value = false
+  } catch { ElMessage.error('个人资料更新失败') }
+  finally { saving.value = false }
 }
 
-const handleChangePassword = () => {
-  ElMessage.info('修改密码功能暂未开放')
-}
+const handleChangePassword = () => { ElMessage.info('修改密码功能暂未开放') }
 
 const handleLogout = async () => {
-  try {
-    const deviceFp = await generateFingerprint()
-    await logout(deviceFp)
-  } catch (e) {
-    // ignore logout api error and continue local cleanup
-  } finally {
-    authStore.removeToken()
-    await router.push({ name: 'login' })
-    ElMessage.success('已退出登录')
-  }
+  try { const deviceFp = await generateFingerprint(); await logout(deviceFp) } catch { /* ignore */ }
+  finally { authStore.removeToken(); await router.push({ name: 'login' }); ElMessage.success('已退出登录') }
 }
 
-onMounted(() => {
-  fetchCurrentUserInfo()
-})
+onMounted(() => { fetchCurrentUserInfo() })
 </script>
 
 <template>
-  <div
-    v-loading="loading"
-    class="user-menu"
-  >
-    <el-dropdown trigger="click">
-      <el-button
-        link
-        class="dropdown-header"
-      >
-        <el-avatar
-          :src="avatarUrl"
-          class="avatar"
-        >
-          {{ displayName.slice(0, 1).toUpperCase() }}
-        </el-avatar>
-        <span class="display">{{ displayName }}</span>
-      </el-button>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item @click="openProfileDialog">
-            个人中心
-          </el-dropdown-item>
-          <el-dropdown-item @click="handleChangePassword">
-            修改密码
-          </el-dropdown-item>
-          <el-dropdown-item
-            divided
-            @click="handleLogout"
-          >
-            退出登录
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
-
-    <el-dialog
-      v-model="profileDialogVisible"
-      title="个人中心"
-      width="580px"
-      :close-on-click-modal="false"
-    >
-      <div class="profile-grid">
-        <div class="left-panel">
-          <el-avatar
-            :src="avatarUrl"
-            :size="64"
-            class="mb-8"
-          >
-            {{ displayName.slice(0, 1).toUpperCase() }}
-          </el-avatar>
-          <div class="title">
-            {{ displayName }}
-          </div>
-          <div class="desc">
-            账号：{{ userInfo?.username || '-' }}
-          </div>
-          <div class="desc">
-            状态：{{ userInfo?.accountStatus || '-' }}
-          </div>
-          <div class="desc">
-            角色：{{ userInfo?.roles?.join(', ') || '-' }}
-          </div>
+  <div class="user-menu">
+    <div class="dropdown">
+      <button class="user-btn">
+        <div class="user-avatar">
+          <img v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
+          <span v-else>{{ displayName.slice(0, 1).toUpperCase() }}</span>
         </div>
+        <span class="user-name">{{ displayName }}</span>
+        <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: var(--text-muted);"></i>
+      </button>
+      <div class="dropdown-menu">
+        <a @click="openProfileDialog"><i class="fa-regular fa-user"></i> 个人中心</a>
+        <a @click="handleChangePassword"><i class="fa-solid fa-key"></i> 修改密码</a>
+        <div class="dropdown-divider"></div>
+        <a @click="handleLogout"><i class="fa-solid fa-sign-out-alt"></i> 退出登录</a>
+      </div>
+    </div>
 
+    <BaseDialog v-model="profileDialogVisible" title="个人中心" width="600px">
+      <div v-if="loading" class="loading-wrap"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+      <div v-else class="profile-grid">
+        <div class="left-panel">
+          <div class="profile-avatar">
+            <img v-if="avatarUrl" :src="avatarUrl" :alt="displayName" />
+            <span v-else>{{ displayName.slice(0, 1).toUpperCase() }}</span>
+          </div>
+          <div class="profile-name">{{ displayName }}</div>
+          <div class="profile-meta">账号：{{ userInfo?.username || '-' }}</div>
+          <div class="profile-meta">状态：{{ ({ ACTIVE: '正常', SUSPENDED: '已停用', DEACTIVATED: '已注销' })[userInfo?.accountStatus || ''] || '-' }}</div>
+          <div class="profile-meta">角色：{{ userInfo?.roles?.join(', ') || '-' }}</div>
+        </div>
         <div class="right-panel">
-          <el-form label-width="90px">
-            <el-form-item label="个人简介">
-              <el-input
-                v-model="profileForm.bio"
-                type="textarea"
-                :rows="3"
-                maxlength="500"
-                show-word-limit
-                placeholder="请输入个人简介"
-              />
-            </el-form-item>
-            <el-form-item label="性别">
-              <el-select
-                v-model="profileForm.gender"
-                placeholder="请选择"
-              >
-                <el-option
-                  label="未知"
-                  value="UNKNOWN"
-                />
-                <el-option
-                  label="男"
-                  value="MALE"
-                />
-                <el-option
-                  label="女"
-                  value="FEMALE"
-                />
-                <el-option
-                  label="其他"
-                  value="OTHER"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="生日">
-              <el-date-picker
-                v-model="profileForm.birthday"
-                type="date"
-                value-format="YYYY-MM-DD"
-                placeholder="请选择生日"
-              />
-            </el-form-item>
-            <el-form-item label="居住地">
-              <el-input
-                v-model="profileForm.residence"
-                maxlength="50"
-                show-word-limit
-                placeholder="请输入居住地"
-              />
-            </el-form-item>
-          </el-form>
+          <div class="form-block">
+            <div class="form-field">
+              <label class="form-label" style="width: 80px; min-width: 80px;">个人简介</label>
+              <div class="form-content"><textarea v-model="profileForm.bio" class="form-textarea" rows="3" maxlength="500" placeholder="请输入个人简介"></textarea></div>
+            </div>
+            <div class="form-field">
+              <label class="form-label" style="width: 80px; min-width: 80px;">性别</label>
+              <div class="form-content">
+                <select v-model="profileForm.gender" class="form-select" style="max-width: 200px;">
+                  <option value="UNKNOWN">未知</option>
+                  <option value="MALE">男</option>
+                  <option value="FEMALE">女</option>
+                  <option value="OTHER">其他</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label" style="width: 80px; min-width: 80px;">生日</label>
+              <div class="form-content"><input v-model="profileForm.birthday" type="date" class="form-input" style="max-width: 200px;" /></div>
+            </div>
+            <div class="form-field">
+              <label class="form-label" style="width: 80px; min-width: 80px;">居住地</label>
+              <div class="form-content"><input v-model="profileForm.residence" class="form-input" maxlength="50" placeholder="请输入居住地" /></div>
+            </div>
+          </div>
         </div>
       </div>
-
       <template #footer>
-        <el-button @click="profileDialogVisible = false">
-          取消
-        </el-button>
-        <el-button
-          type="primary"
-          :loading="saving"
-          @click="saveProfile"
-        >
-          保存
-        </el-button>
+        <button class="btn" @click="profileDialogVisible = false">取消</button>
+        <button class="btn btn-primary" :disabled="saving" @click="saveProfile"><i v-if="saving" class="fa-solid fa-spinner fa-spin"></i> 保存</button>
       </template>
-    </el-dialog>
+    </BaseDialog>
   </div>
 </template>
 
 <style scoped>
-.user-menu {
-  position: relative;
-  display: inline-block;
-}
+.user-menu { position: relative; }
+.user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-white); cursor: pointer; transition: all 0.2s; font-family: inherit; }
+.user-btn:hover { border-color: var(--primary); }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--primary-light); color: var(--primary); font-weight: 600; font-size: 14px; flex-shrink: 0; }
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-name { font-size: 14px; color: var(--text-primary); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.avatar {
-  height: 32px;
-  width: 32px;
-  margin-right: 5px;
-}
+.dropdown-menu { min-width: 160px; }
+.dropdown-menu a { display: flex; align-items: center; gap: 8px; }
+.dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
 
-.dropdown-header {
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  height: 40px;
-  color: var(--default-dark);
-}
-
-.display {
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.profile-grid {
-  display: flex;
-  gap: 18px;
-}
-
-.left-panel {
-  min-width: 170px;
-  border-right: 1px solid #f0f0f0;
-  padding-right: 10px;
-}
-
-.right-panel {
-  flex: 1;
-}
-
-.title {
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.desc {
-  color: #909399;
-  font-size: 12px;
-  margin-bottom: 6px;
-}
-
-.mb-8 {
-  margin-bottom: 8px;
-}
+.profile-grid { display: flex; gap: 24px; }
+.left-panel { min-width: 160px; border-right: 1px solid var(--border); padding-right: 16px; display: flex; flex-direction: column; align-items: center; }
+.profile-avatar { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--primary-light); color: var(--primary); font-weight: 600; font-size: 24px; margin-bottom: 12px; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-name { font-weight: 600; font-size: 16px; margin-bottom: 8px; text-align: center; }
+.profile-meta { color: var(--text-muted); font-size: 12px; margin-bottom: 4px; text-align: center; }
+.right-panel { flex: 1; }
 </style>

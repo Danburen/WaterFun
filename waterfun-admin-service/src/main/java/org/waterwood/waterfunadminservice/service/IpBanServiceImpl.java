@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunadminservice.api.response.IpBanResponse;
-import org.waterwood.waterfunservicecore.entity.IpBan;
+import org.waterwood.waterfunservicecore.entity.security.IpBan;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.IpBanRepository;
 

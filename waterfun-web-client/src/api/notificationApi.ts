@@ -1,28 +1,39 @@
 import request from "../utils/axiosRequest";
 import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 
-export interface SystemNotificationRes {
-  id?: string;
+export interface InboxNotificationRes {
+  id: number;
   title: string;
-  content: string;
+  noticeType: number;
+  content: NotificationContent;
   createdAt: string;
-  isRead?: boolean;
+  isRead: boolean;
+}
+
+export interface NotificationContent {
+  displayText: string;
 }
 
 export interface CursorPageLong<T> {
   list: T[];
-  nextCursor: string | null;
+  nextCursor: number | null;
   hasNext: boolean;
 }
 
-export interface ListSystemNotificationParams {
-  cursor?: string;
-  limit: number;
-  unreadOnly?: boolean;
+export type NotificationType = 'GENERAL' | 'LIKE' | 'REPLY' | 'MENTION' | 'NEW_FOLLOWER' | 'COLLECT' | 'PROMOTION' | 'SYSTEM';
+
+export type NotificationGroup = 'SYSTEM' | 'INTERACTION' | 'MISC' | 'REPLY' | 'MENTION';
+
+export interface ListNotificationParams {
+  cursor?: number
+  limit?: number
+  unreadOnly?: boolean
+  type?: NotificationType
+  group?: NotificationGroup
 }
 
 export interface BatchMarkReadReq {
-  ids: string[];
+  ids: number[];
 }
 
 export interface BatchResult {
@@ -32,26 +43,30 @@ export interface BatchResult {
   failed: number;
 }
 
-export const listSystemNotifications = (
-  params: ListSystemNotificationParams
-): PromiseResBody<CursorPageLong<SystemNotificationRes>> => {
-  return request.get("/notifications/system/list", { params });
+export const listNotifications = (
+  params: ListNotificationParams
+): PromiseResBody<CursorPageLong<InboxNotificationRes>> => {
+  return request.get("/notifications/list", { params });
 };
 
-export const getSystemNotificationUnreadCount = (): PromiseResBody<number> => {
-  return request.get("/notifications/system/unreadCount");
+export const getUnreadCount = (): PromiseResBody<number> => {
+  return request.get("/notifications/unreadCount");
 };
 
-export const markSystemNotificationReadById = (id: string): PromiseResBody<void> => {
-  return request.post(`/notifications/system/${id}/batchMarkRead`);
+export const markNotificationRead = (id: number): PromiseResBody<void> => {
+  return request.post(`/notifications/read/${id}`);
 };
 
-export const markAllSystemNotificationsRead = (): PromiseResBody<void> => {
-  return request.post("/notifications/system/markAllRead");
+export const markAllNotificationsRead = (): PromiseResBody<void> => {
+  return request.post("/notifications/markAllRead");
 };
 
-export const batchMarkSystemNotificationsRead = (
+export const batchMarkNotificationsRead = (
   data: BatchMarkReadReq
 ): PromiseResBody<BatchResult> => {
-  return request.post("/notifications/system/markRead", data);
+  return request.post("/notifications/batchMarkRead", data);
+};
+
+export const deleteNotification = (id: number): PromiseResBody<void> => {
+  return request.delete(`/notifications/${id}`);
 };

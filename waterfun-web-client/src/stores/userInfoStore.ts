@@ -4,7 +4,7 @@ import { getUserInfo } from "@/api/userApi";
 import type { CloudResourceUrlResp } from "@waterfun/web-core/src/types/api/response";
 interface UserInfo {
   username: string;
-  uid: string;
+  uid: number;
   nickname: string;
   avatar: CloudResourceUrlResp;
   accountStatus: string;
@@ -15,7 +15,7 @@ interface UserInfo {
 export const useUserInfoStore = defineStore('userInfoStore', () => {
   const userInfo = ref<UserInfo>({
     username: '',
-    uid: '',
+    uid: 0,
     nickname: '',
     avatar: {
         url: '',
@@ -31,7 +31,7 @@ export const useUserInfoStore = defineStore('userInfoStore', () => {
   };
 
   const clearUserInfo = () => {
-    userInfo.value = { username: '', uid: '', nickname: '', avatar: { url: '', expireAt: 0 }, accountStatus: '', createdAt: '', passwordHash: false };
+    userInfo.value = { username: '', uid: 0, nickname: '', avatar: { url: '', expireAt: 0 }, accountStatus: '', createdAt: '', passwordHash: false };
   };
 
   const fetchAndUpdateUserInfo = async() =>{

@@ -17,7 +17,10 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCou
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserFollowerRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
+import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
+import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
 import org.waterwood.waterfunservicecore.services.user.*;
 
 import java.util.List;
@@ -32,6 +35,7 @@ public class UserServiceImpl implements UserService{
     private final UserProfileRepository userProfileRepository;
     private final UserCounterRepository userCounterRepository;
     private final NotificationService notificationService;
+    private final UserActivityLogService userActivityLogService;
 
     @Override
     public UserPublicProfileResp getPublicUserProfile(long userUid) {
@@ -104,6 +108,7 @@ public class UserServiceImpl implements UserService{
                             userFollowerRepository.delete(uf);
                             userCounterRepository.decreaseUserFollowerCount(targetUid, 1);
                             userCounterRepository.decreaseUserFollowingCount(userUid, 1);
+                            userActivityLogService.record(userUid, UserActionType.DELETED, BusinessType.NONE, targetUid);
                         },
                         () -> {
                             UserFollower uf = new UserFollower();
@@ -113,6 +118,7 @@ public class UserServiceImpl implements UserService{
                             userCounterRepository.increaseUserFollowerCount(targetUid, 1);
                             userCounterRepository.increaseUserFollowingCount(userUid, 1);
                             notificationService.onNewFollower(targetUid, userUid);
+                            userActivityLogService.record(userUid, UserActionType.CREATE, BusinessType.NONE, targetUid);
                         }
                 );
     }

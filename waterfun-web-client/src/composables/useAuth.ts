@@ -32,6 +32,9 @@ export const useAuth = () => {
         await userProfileStore.fetchAndUpdateUserProfile();
         await userAccountStore.fetchAccountInfoAndUpdate();
         console.log('用户账户信息:', userAccountStore.userAccount);
+
+        const { useNotificationStore } = await import('~/stores/notificationStore');
+        useNotificationStore().connectSSE();
     }
 
 
@@ -66,6 +69,9 @@ export const useAuth = () => {
             userInfoStore.clearUserInfo();
             userProfileStore.clearUserProfile();
             authStore.removeToken();
+            import('~/stores/notificationStore').then(({ useNotificationStore }) => {
+                useNotificationStore().disconnectSSE();
+            });
         })
     }
 

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.entity.user.User;
@@ -53,7 +52,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public String generateAndStoreDeviceId(Long userUid, String dfp) {
         String deviceId = this.calculaateDid(userUid, dfp);
-        redisHelper.sAdd(getDevicesKey(userUid), deviceId, String.valueOf(System.currentTimeMillis()));
+        redisHelper.setAdd(getDevicesKey(userUid), deviceId, String.valueOf(System.currentTimeMillis()));
         return deviceId;
     }
 
@@ -77,12 +76,11 @@ public class DeviceServiceImpl implements DeviceService {
                 // Get all the devices that are older than the max expire time
                 devices.entrySet().removeIf(
                         entry-> (System.currentTimeMillis() - entry.getValue()) < deviceExpireMaxTimeMillis);
-                redisHelper.hDel(getDevicesKey(user.getUid()), devices.keySet().toArray(new String[0]));
+                redisHelper.hashDel(getDevicesKey(user.getUid()), devices.keySet().toArray(new String[0]));
             });
         }
     }
 
-    @Scheduled(cron = "0 0 3 * * *")
     @Override
     public void scheduledCleanup() {
         cleanZombieDevicesBatch(1000);
@@ -90,7 +88,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public Set<String> getUserDeviceIds(Long userUid) {
-        return redisHelper.sMem(getDevicesKey(userUid));
+        return redisHelper.setMembers(getDevicesKey(userUid));
     }
 
     @Override
@@ -122,7 +120,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         List<String> keys = deviceIds.stream().map(id -> String.format(getDeviceLastActiveKey(userUid, id))).toList();
-        List<String> values = redisHelper.mget(keys);
+        List<String> values = redisHelper.multiGet(keys);
         int index = 0;
         for (String deviceId : deviceIds) {
             String value = values.get(index++);

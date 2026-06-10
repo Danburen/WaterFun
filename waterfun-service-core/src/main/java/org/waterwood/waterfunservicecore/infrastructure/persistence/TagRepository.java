@@ -4,8 +4,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunservicecore.entity.post.IdOptionVOPackagedDO;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.waterwood.common.jpa.SlugUniquenessChecker;
 
@@ -28,11 +31,19 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
 
 
   @Query("""
-    SELECT p.id, new org.waterwood.api.VO.OptionVO(t.id, t.slug, t.name, false)
+    SELECT new org.waterwood.api.VO.OptionVO(t.id, t.slug, t.name, false)
     FROM Post p JOIN p.tags t
     WHERE p.id IN :postIds
 """)
-  List<Object[]> findTagsByPostIdIn(List<Long> postIds);
+  List<OptionVO<Long>> findTagOptionVOsByPostIdIn(List<Long> postIds);
+
+  @Query("""
+        SELECT new org.waterwood.waterfunservicecore.entity.post.IdOptionVOPackagedDO
+            (t.id, t.slug, t.name, false)
+        FROM Post p JOIN p.tags t
+        WHERE p.id IN :postIds
+    """)
+  List<IdOptionVOPackagedDO<Long>> findTagDOByPostIdIn(@Param("postIds") List<Long> postIds);
 
   List<Tag> findAllByNameIn(Set<String> newTagNames);
 
@@ -49,5 +60,20 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
     """)
   List<Tag> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
-    List<Tag> findAllByIdInAndIsDeleted(Collection<Long> ids, Boolean isDeleted);
+  List<Tag> findAllByIdInAndIsDeleted(Collection<Long> ids, Boolean isDeleted);
+
+  @Modifying
+  @Query("""
+   UPDATE Tag t
+   SET t.usageCount = t.usageCount + :count
+   WHERE t.id IN :ids
+   """)
+    void increaseUsageCountInIds(@Param("ids") List<Long> tagIds, @Param("count") int count);
+  @Modifying
+  @Query("""
+    UPDATE Tag t
+    SET t.usageCount = GREATEST (t.usageCount - :count, 0)
+    WHERE t.id IN :ids
+""")
+  void decreaseUsageCountInIds(@Param("ids") List<Long> removedTagIds, @Param("count") int count);
 }

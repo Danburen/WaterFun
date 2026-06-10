@@ -16,7 +16,7 @@ import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
 import org.waterwood.waterfunservicecore.api.resp.user.UserProfileResponse;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
-import org.waterwood.waterfunservicecore.entity.Permission;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserCoreMapper;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserProfileCoreMapper;

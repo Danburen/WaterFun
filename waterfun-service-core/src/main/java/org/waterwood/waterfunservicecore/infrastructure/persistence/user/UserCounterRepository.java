@@ -34,4 +34,18 @@ public interface UserCounterRepository extends JpaRepository<UserCounter, Long> 
     @Modifying
     @Query("UPDATE UserCounter uc SET uc.followingCnt = uc.followingCnt + :count WHERE uc.user.uid = :userUid")
     void increaseUserFollowingCount(@Param("userUid") Long userUid, @Param("count") int count);
+
+    @Modifying
+    @Query("UPDATE UserCounter uc SET uc.postCnt = GREATEST (uc.postCnt - :count, 0) WHERE uc.user.uid = :userUid")
+    void decreaseUserPostCount(@Param("userUid") Long userUid, @Param("count") int count);
+    @Modifying
+    @Query("UPDATE UserCounter uc SET uc.postCnt = uc.postCnt + :count WHERE uc.user.uid = :userUid")
+    void increaseUserPostCount(@Param("userUid") Long userUid, @Param("count") int count);
+
+    @Modifying
+    @Query("UPDATE UserCounter uc SET uc.collectCnt = GREATEST (uc.collectCnt - :count, 0) WHERE uc.user.uid = :userUid")
+    void decreaseUserCollectionCount(@Param("userUid") Long userUid, @Param("count") int count);
+    @Modifying
+    @Query("UPDATE UserCounter uc SET uc.collectCnt = uc.collectCnt + :count WHERE uc.user.uid = :userUid")
+    void increaseUserCollectionCount(@Param("userUid") Long userUid, @Param("count") int count);
 }

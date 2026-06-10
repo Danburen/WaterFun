@@ -4,6 +4,7 @@ package org.waterwood.waterfunservicecore.infrastructure.utils.context;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * ThreadLocal Util
@@ -14,6 +15,12 @@ public class UserCtxHolder {
     private static final ThreadLocal<AuthContext> THREAD_LOCAL = new ThreadLocal<>();
     public static AuthContext get(){
         return THREAD_LOCAL.get();
+    }
+    public static Optional<Long> safeGetUserId() {
+        return Optional.ofNullable(get()).map(AuthContext::getUserUid);
+    }
+    public static Optional<AuthContext> safeGet() {
+        return Optional.ofNullable(get());
     }
     public static Long getUserUid(){
         return get().getUserUid();
@@ -44,5 +51,9 @@ public class UserCtxHolder {
 
     public static Locale getLocale() {
         return get().getLocale();
+    }
+
+    public static String getClientIp() {
+        return get().getClientIp();
     }
 }

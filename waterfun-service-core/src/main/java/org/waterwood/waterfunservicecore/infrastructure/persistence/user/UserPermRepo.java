@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface UserPermRepo extends JpaRepository<UserPermission,Long>, JpaSpecificationExecutor<UserPermission> {
+    @EntityGraph(attributePaths = "permission")
     Set<UserPermission> findByUserUid(Long userUid);
     Page<UserPermission> findByPermissionId(Integer permissionId, Pageable pageable);
     Optional<UserPermission> findByUserUidAndPermissionId(Long userUid, Integer permissionId);

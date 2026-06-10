@@ -4,16 +4,18 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.waterwood.waterfunservicecore.entity.IpBan;
+import org.waterwood.waterfunservicecore.entity.security.IpBan;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.IpBanRepository;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * This class handle ip ban services
+ * will rotation check baned ip list from database and cache in memory for fast check
+ */
 @Component
 @RequiredArgsConstructor
 public class IpBanService {
@@ -29,7 +31,6 @@ public class IpBanService {
         refreshCache();
     }
 
-    @Scheduled(fixedRate = 60_000)
     public void refreshCache() {
         List<IpBan> activeBans = ipBanRepository.findActiveList(Instant.now());
 

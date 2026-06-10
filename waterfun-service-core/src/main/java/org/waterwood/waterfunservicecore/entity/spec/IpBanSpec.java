@@ -3,7 +3,7 @@ package org.waterwood.waterfunservicecore.entity.spec;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.utils.StringUtil;
-import org.waterwood.waterfunservicecore.entity.IpBan;
+import org.waterwood.waterfunservicecore.entity.security.IpBan;
 
 import java.time.Instant;
 import java.util.ArrayList;

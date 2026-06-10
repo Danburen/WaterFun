@@ -8,6 +8,7 @@ import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
 import org.waterwood.waterfunservice.service.upload.UploadStrategyFactory;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.BanCheck;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
@@ -21,6 +22,7 @@ public class UploadController {
     private final UploadStrategyFactory uploadStrategyFactory;
     private final CloudFileService cloudFileService;
 
+    @BanCheck("ban:upload")
     @RateLimit(key = "avatarUpload", permits = 5)
     @PostMapping("/policy")
     public ApiResponse<List<PresignedResp>> getUploadPolity(@RequestBody @Valid UserUploadPolicyReq request) {

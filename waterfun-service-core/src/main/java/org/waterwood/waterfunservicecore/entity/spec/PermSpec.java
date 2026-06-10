@@ -2,9 +2,9 @@ package org.waterwood.waterfunservicecore.entity.spec;
 
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-import org.waterwood.api.enums.PermissionType;
+import org.waterwood.waterfunservicecore.entity.perm.PermissionType;
 import org.waterwood.utils.StringUtil;
-import org.waterwood.waterfunservicecore.entity.Permission;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
 
 import java.util.ArrayList;
 import java.util.List;

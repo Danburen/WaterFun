@@ -26,8 +26,8 @@ public class PostAuthorDetailResp {
     private String summary;
 
     private CloudResPresignedUrlResp coverImage;
-    private OptionVO<Integer> category;
-    private List<OptionVO<Integer>> tags;
+    private OptionVO<Long> category;
+    private List<OptionVO<Long>> tags;
 
     private Long viewCount;
     private Long likeCount;

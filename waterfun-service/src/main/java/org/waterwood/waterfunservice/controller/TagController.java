@@ -1,10 +1,10 @@
 package org.waterwood.waterfunservice.controller;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
-import org.waterwood.waterfunservice.api.request.content.CreateTagRequest;
-import org.waterwood.waterfunservice.api.request.content.UpdateTagRequest;
 import org.waterwood.waterfunservice.api.response.post.TagResponse;
 import org.waterwood.waterfunservice.infrastructure.mapper.TagMapper;
 import org.waterwood.waterfunservice.service.post.TagService;
@@ -29,19 +27,15 @@ public class TagController {
     private final TagService tagService;
     private final TagMapper tagMapper;
 
-    @PostMapping
-    public ApiResponse<Void> addTag(@RequestBody @Valid CreateTagRequest request){
-        tagService.createTag(request);
-        return ApiResponse.success();
-    }
     @GetMapping("/hot")
     public ApiResponse<Page<TagResponse>> getHotTags(
-            @PageableDefault(page = 0, size = 10)Pageable pageable) {
-        return ApiResponse.success(
-                tagService.getHotTags(pageable).map(tagMapper::toResponseDto)
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.success(tagService.getHotTags(pageable)
+                .map(tagMapper::toResponseDto)
         );
     }
-
     @GetMapping("/search/options")
     public ApiResponse<List<OptionVO<Long>>> searchTagOptions(
             @RequestParam String keyword,
@@ -73,12 +67,6 @@ public class TagController {
     public ApiResponse<TagResponse> getTag(@PathVariable Long id){
         Tag tag = tagService.getTag(id);
         return ApiResponse.success(tagMapper.toResponseDto(tag));
-    }
-
-    @PutMapping
-    public ApiResponse<Void> updateTag(@RequestBody @Valid UpdateTagRequest request){
-        tagService.updateTag(tagMapper.toEntity(request));
-        return ApiResponse.success();
     }
 
     @DeleteMapping("/{id}")

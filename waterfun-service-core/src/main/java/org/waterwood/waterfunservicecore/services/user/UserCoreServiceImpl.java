@@ -8,10 +8,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.api.enums.PermissionType;
-import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.waterfunservicecore.entity.Role;
-import org.waterwood.waterfunservicecore.entity.RolePermission;
+import org.waterwood.waterfunservicecore.entity.perm.PermissionType;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
+import org.waterwood.waterfunservicecore.entity.user.Role;
+import org.waterwood.waterfunservicecore.entity.user.RolePermission;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
 import org.waterwood.waterfunservicecore.entity.user.UserRole;
@@ -24,9 +24,12 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPer
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRoleRepo;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.entity.spec.UserPermSpec;
 import org.waterwood.waterfunservicecore.entity.spec.UserSpec;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
+import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -48,6 +51,8 @@ public class UserCoreServiceImpl implements UserCoreService {
     private final PermissionRepo permissionRepo;
     private final UserRoleCoreService userRoleCoreService;
     private final ResourceRepository resourceRepository;
+    private final AuditLogCoreService auditLogCoreService;
+    private final UserActivityLogService userActivityLogService;
 
     @Override
     public Set<Permission> getUserPermissions(long userUid) {
@@ -81,7 +86,9 @@ public class UserCoreServiceImpl implements UserCoreService {
             throw new BizException(BaseResponseCode.PASSWORD_TWO_PASSWORD_MUST_DIFFERENT);
         }
         u.setPasswordHash(encoder.encode(newPwd));
-        return userRepository.save(u);
+        User saved = userRepository.save(u);
+        auditLogCoreService.record(userUid, saved.getUsername(), AuditLogActionType.CHANGE_PASSWORD);
+        return saved;
     }
 
     @Override
@@ -106,19 +113,6 @@ public class UserCoreServiceImpl implements UserCoreService {
     }
 
     @Override
-    public Permission getUserPermission(long uid, int id) {
-        if(! userRoleRepo.existsById(uid)){
-            throw new BizException(BaseResponseCode.USER_NOT_FOUND);
-        }
-        if(! permissionRepo.existsById(id)){
-            throw new BizException(BaseResponseCode.PERMISSION_NOT_FOUND);
-        }
-        return userPermRepo.findByUserUidAndPermissionId(uid, id)
-                .orElseThrow(() -> new BizException(BaseResponseCode.USER_PERMISSION_NOT_FOUND))
-                .getPermission();
-    }
-
-    @Override
     public Page<User> listUsers(String username, String nickname, String accountStatus, Instant createdStart, Instant createdEnd, Pageable pageable) {
         Specification<User> spec = UserSpec.of(username, nickname, accountStatus, createdStart, createdEnd);
         return userRepository.findAll(spec, pageable);
@@ -126,10 +120,15 @@ public class UserCoreServiceImpl implements UserCoreService {
 
     @Override
     public int updateAvatarResourceUuid(Long userUid, String uuid) {
-        return userRepository.updateAvatarResourceByUid(
+        int updated = userRepository.updateAvatarResourceByUid(
                 uuid == null ? null : resourceRepository.getReferenceByUuid(uuid),
                 userUid
         );
+        // TODO: USUALLY SYSTEM CALLBACK UPDATE THIS
+//        if (updated > 0) {
+//            userActivityLogService.record(userUid, UserActionType.UPDATED, BusinessType.USER, null);
+//        }
+        return updated;
     }
 
     @Override

@@ -9,7 +9,7 @@ import org.mapstruct.ReportingPolicy;
 import org.waterwood.waterfunadminservice.api.request.content.CreateBannerRequest;
 import org.waterwood.waterfunadminservice.api.request.content.PutBannerRequest;
 import org.waterwood.waterfunadminservice.api.response.content.BannerResponse;
-import org.waterwood.waterfunservicecore.entity.Banner;
+import org.waterwood.waterfunservicecore.entity.content.Banner;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,

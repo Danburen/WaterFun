@@ -10,12 +10,12 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
-import org.waterwood.api.enums.PermissionType;
+import org.waterwood.waterfunservicecore.entity.perm.PermissionType;
 import org.waterwood.waterfunadminservice.api.request.perm.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunadminservice.api.response.perm.PermissionResp;
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
-import org.waterwood.waterfunservicecore.entity.Permission;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.PermissionMapper;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;
 import org.waterwood.waterfunservicecore.entity.spec.PermSpec;
@@ -72,8 +72,8 @@ public class PermissionController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> deletePermission(@PathVariable String id){
-        permissionService.deletePerm(Integer.parseInt(id));
+    public ApiResponse<Void> deletePermission(@PathVariable Integer id){
+        permissionService.deletePerm(id);
         return ApiResponse.success();
     }
 

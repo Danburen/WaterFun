@@ -3,438 +3,150 @@ import type { OptionResItem } from "@waterfun/web-core/src/types";
 import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
-import SearchContainer from "~/components/SearchContainer.vue";
-import TableContainer from "~/components/TableContainer.vue";
-import {
-  deletePerms,
-  deletePermission,
-  getPermOptions,
-  listPermissions,
-  type PermissionResp,
-  type PermissionType,
-} from "~/api/permission";
+import ListPage from "~/components/ListPage.vue";
+import { deletePerms, deletePermission, getPermOptions, listPermissions, type PermissionResp, type PermissionType } from "~/api/permission";
 import { ElMessage } from "element-plus";
 import type { PageOptions } from "~/types";
 import PermEditDialog from "./components/PermEditDialog.vue";
 
 const router = useRouter();
-
 const permissionList = ref<PermissionResp[]>([]);
 const permOptions = ref<OptionResItem[]>([]);
-
-const searchForm = ref<{
-  name: string;
-  code: string;
-  type: PermissionType | "";
-  resource: string;
-  parentId: number | null;
-}>({
-  name: "",
-  code: "",
-  type: "",
-  resource: "",
-  parentId: null,
-});
-
-const pageOpts = ref<PageOptions>({
-  currentPage: 1,
-  pageSize: 10,
-  total: 0,
-});
-
+const searchForm = ref<{ name: string; code: string; type: PermissionType | ""; resource: string; parentId: number | null }>({ name: "", code: "", type: "", resource: "", parentId: null });
+const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
 const loading = ref(false);
 const dialogVisible = ref(false);
 const dialogMode = ref<"create" | "edit">("create");
 const currentPermId = ref<number | null>(null);
-const selectedPermIds = ref<number[]>([]);
+const selectedPermIds = ref<Set<number>>(new Set());
 
+const permTypeLabel: Record<string, string> = { MENU: "菜单", BUTTON: "按钮", API: "接口", DATA: "数据", OTHER: "其他" };
 const permTypeOptions: { label: string; value: PermissionType }[] = [
-  { label: "菜单", value: "MENU" },
-  { label: "按钮", value: "BUTTON" },
-  { label: "接口", value: "API" },
-  { label: "数据", value: "DATA" },
-  { label: "其他", value: "OTHER" },
+  { label: "菜单", value: "MENU" }, { label: "按钮", value: "BUTTON" }, { label: "接口", value: "API" }, { label: "数据", value: "DATA" }, { label: "其他", value: "OTHER" },
 ];
 
-const selectable = (row: PermissionResp) => row.isSystem === false;
-
 const fetchPermOptions = async () => {
-  try {
-    const res = await getPermOptions();
-    permOptions.value = res.data;
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取权限信息失败');
-  }
+  try { const res = await getPermOptions(); permOptions.value = res.data; } catch (e) { console.error(e); ElMessage.error('获取权限信息失败'); }
 };
 
 const fetchData = async () => {
   loading.value = true;
   try {
-    const res = await listPermissions({
-      page: (pageOpts.value.currentPage || 1) - 1,
-      size: pageOpts.value.pageSize,
-      name: searchForm.value.name || undefined,
-      code: searchForm.value.code || undefined,
-      type: searchForm.value.type || undefined,
-      resource: searchForm.value.resource || undefined,
-      parentId: searchForm.value.parentId ?? undefined,
-    });
-
+    const res = await listPermissions({ page: (pageOpts.value.currentPage || 1) - 1, size: pageOpts.value.pageSize, name: searchForm.value.name || undefined, code: searchForm.value.code || undefined, type: searchForm.value.type || undefined, resource: searchForm.value.resource || undefined, parentId: searchForm.value.parentId ?? undefined });
     permissionList.value = res.data.content || [];
-    pageOpts.value.total = res.data.page.totalElements || 0;
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取数据失败');
-  } finally {
-    loading.value = false;
-  }
+    pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
+  } catch (e) { console.error(e); ElMessage.error('获取数据失败'); } finally { loading.value = false; }
 };
 
-const handleAdd = () => {
-  dialogMode.value = "create";
-  currentPermId.value = null;
-  dialogVisible.value = true;
-};
-
-const handleEdit = (row: PermissionResp) => {
-  dialogMode.value = "edit";
-  currentPermId.value = row.id;
-  dialogVisible.value = true;
-};
+const handleAdd = () => { dialogMode.value = "create"; currentPermId.value = null; dialogVisible.value = true; };
+const handleEdit = (row: PermissionResp) => { dialogMode.value = "edit"; currentPermId.value = row.id; dialogVisible.value = true; };
 
 const handleDelete = async (row: PermissionResp) => {
   try {
-    await ElMessageBox.confirm('确定删除该权限吗？', '删除', {
-      type: "warning",
-    });
-    await deletePermission(row.id);
-    ElMessage.success('权限删除成功');
-    await fetchData();
-  } catch (e) {
-    if (e !== "cancel") {
-      console.error(e);
-      ElMessage.error('删除权限失败');
-    }
-  }
+    await ElMessageBox.confirm('确定删除该权限吗？', '删除', { type: "warning" });
+    await deletePermission(row.id); ElMessage.success('权限删除成功'); await fetchData();
+  } catch (e) { if (e !== "cancel") { console.error(e); ElMessage.error('删除权限失败'); } }
 };
 
-const handleSelectionChange = (rows: PermissionResp[]) => {
-  selectedPermIds.value = rows.map(item => item.id);
+const toggleSelect = (id: number) => { const s = new Set(selectedPermIds.value); s.has(id) ? s.delete(id) : s.add(id); selectedPermIds.value = s; };
+const toggleSelectAll = () => {
+  if (selectedPermIds.value.size === permissionList.value.length) selectedPermIds.value = new Set();
+  else selectedPermIds.value = new Set(permissionList.value.map(r => r.id));
 };
 
 const handleBatchDelete = async () => {
-  if (selectedPermIds.value.length === 0) {
-    return;
-  }
-
+  const ids = [...selectedPermIds.value];
+  if (!ids.length) return;
   try {
-    await ElMessageBox.confirm(
-      `确定删除选中的 ${selectedPermIds.value.length} 个权限吗？`,
-      '删除',
-      { type: "warning" }
-    );
-
-    const res = await deletePerms(selectedPermIds.value);
+    await ElMessageBox.confirm(`确定删除选中的 ${ids.length} 个权限吗？`, '删除', { type: "warning" });
+    const res = await deletePerms(ids);
     const result = res.data;
-
-    if (result.success === result.requested) {
-      ElMessage.success('权限删除成功');
-    } else if (result.success === 0) {
-      ElMessage.error('删除权限失败');
-    } else {
-      ElMessage.warning(`${'权限删除成功'} ${result.success}/${result.requested}`);
-    }
-
-    selectedPermIds.value = [];
-    await fetchData();
-  } catch (e) {
-    if (e !== "cancel") {
-      console.error(e);
-      ElMessage.error('删除权限失败');
-    }
-  }
+    if (result.success === result.requested) ElMessage.success('权限删除成功');
+    else if (result.success === 0) ElMessage.error('删除权限失败');
+    else ElMessage.warning(`权限删除成功 ${result.success}/${result.requested}`);
+    selectedPermIds.value = new Set(); await fetchData();
+  } catch (e) { if (e !== "cancel") { console.error(e); ElMessage.error('删除权限失败'); } }
 };
 
-const handleSearch = () => {
-  pageOpts.value.currentPage = 1;
-  fetchData();
-};
+const handleSearch = () => { pageOpts.value.currentPage = 1; fetchData(); };
+const handleReset = () => { pageOpts.value.currentPage = 1; searchForm.value = { name: "", code: "", type: "", resource: "", parentId: null }; fetchData(); };
+const handleDialogSuccess = async () => { await Promise.all([fetchData(), fetchPermOptions()]); };
+const gotoDetail = (row: PermissionResp | number) => { const id = typeof row === "number" ? row : row.id; router.push({ name: "permissionDetail", params: { id } }); };
 
-const handleReset = () => {
-  pageOpts.value.currentPage = 1;
-  searchForm.value = {
-    name: "",
-    code: "",
-    type: "",
-    resource: "",
-    parentId: null,
-  };
-  fetchData();
-};
-
-const handleDialogSuccess = async () => {
-  await Promise.all([fetchData(), fetchPermOptions()]);
-};
-
-const gotoDetail = (row: PermissionResp | number) => {
-  const id = typeof row === "number" ? row : row.id;
-  router.push({ name: "permissionDetail", params: { id } });
-};
-
-onMounted(async () => {
-  await Promise.all([fetchData(), fetchPermOptions()]);
-});
+onMounted(async () => { await Promise.all([fetchData(), fetchPermOptions()]); });
 </script>
 
 <template>
-  <div class="list-layout">
-    <SearchContainer>
-      <el-form
-        inline
-        class="search-form"
-        :model="searchForm"
-      >
-        <el-form-item label="权限名称">
-          <el-input
-            v-model="searchForm.name"
-            placeholder="请输入权限名称"
-          />
-        </el-form-item>
+  <ListPage title="权限管理" :loading="loading" :total="pageOpts.total" v-model:page="pageOpts.currentPage" v-model:pageSize="pageOpts.pageSize" @change="fetchData">
+    <template #search>
+      <div class="search-form">
+        <div class="search-field"><label>权限名称</label><input v-model="searchForm.name" placeholder="权限名称" @keyup.enter="handleSearch" /></div>
+        <div class="search-field"><label>权限编码</label><input v-model="searchForm.code" placeholder="权限编码" @keyup.enter="handleSearch" /></div>
+        <div class="search-field">
+          <label>权限类型</label>
+          <select v-model="searchForm.type">
+            <option value="">全部</option>
+            <option v-for="item in permTypeOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
+          </select>
+        </div>
+        <div class="search-field"><label>资源标识</label><input v-model="searchForm.resource" placeholder="资源标识" @keyup.enter="handleSearch" /></div>
+        <div class="search-field">
+          <label>父级权限</label>
+          <select v-model="searchForm.parentId">
+            <option :value="null">全部</option>
+            <option v-for="item in permOptions" :key="item.id" :value="item.id" :disabled="item.disabled">{{ item.id }} ({{ item.name }})</option>
+          </select>
+        </div>
+        <div class="search-actions">
+          <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <button class="btn btn-default" @click="handleReset">重置</button>
+        </div>
+      </div>
+    </template>
+    <template #header>
+      <button class="btn btn-primary" @click="handleAdd"><i class="fa-solid fa-plus"></i> 新增</button>
+      <button class="btn btn-danger" :disabled="selectedPermIds.size === 0" @click="handleBatchDelete"><i class="fa-solid fa-trash"></i> 删除</button>
+    </template>
 
-        <el-form-item label="权限编码">
-          <el-input
-            v-model="searchForm.code"
-            placeholder="请输入权限编码"
-          />
-        </el-form-item>
-
-        <el-form-item label="权限类型">
-          <el-select
-            v-model="searchForm.type"
-            clearable
-            style="width: 140px"
-          >
-            <el-option
-              v-for="item in permTypeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="资源标识">
-          <el-input
-            v-model="searchForm.resource"
-            placeholder="请输入资源标识"
-          />
-        </el-form-item>
-
-        <el-form-item label="父级权限ID">
-          <el-select
-            v-model="searchForm.parentId"
-            clearable
-            placeholder="请选择父级权限"
-            style="width: 180px"
-          >
-            <el-option
-              v-for="item in permOptions"
-              :key="item.id"
-              :label="`${item.id} (${item.name} 【${item.code}】)`"
-              :value="item.id"
-              :disabled="item.disabled || false"
-            />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleSearch"
-          >
-            查询
-          </el-button>
-          <el-button @click="handleReset">
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </SearchContainer>
-
-    <TableContainer
-      v-model:page-size="pageOpts.pageSize"
-      v-model:current-page="pageOpts.currentPage"
-      title="权限管理"
-      show-add-btn
-      :show-remove-btn="true"
-      :disable-delete="selectedPermIds.length === 0"
-      :total="pageOpts.total"
-      @add="handleAdd"
-      @remove="handleBatchDelete"
-      @change="fetchData"
-    >
-      <el-table
-        v-loading="loading"
-        :data="permissionList"
-        border
-        fit
-        highlight-current-row
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column
-          type="selection"
-          :selectable="selectable"
-          width="55"
-        />
-        <el-table-column
-          prop="id"
-          label="ID"
-          width="80"
-        />
-
-        <el-table-column
-          prop="name"
-          label="权限名称"
-          min-width="140"
-        >
-          <template #default="{ row }">
-            <el-link
-              type="primary"
-              :underline="false"
-              @click="gotoDetail(row)"
-            >
-              {{ row.name }}
-            </el-link>
-          </template>
-        </el-table-column>
-
-        <el-table-column
-          prop="code"
-          label="权限编码"
-          min-width="140"
-        />
-
-        <el-table-column
-          prop="type"
-          label="权限类型"
-          width="110"
-        >
-          <template #default="{ row }">
-            {{ ({ menu: '菜单', button: '按钮', api: '接口', data: '数据', other: '其他' })[row.type?.toLowerCase?.() || 'other'] }}
-          </template>
-        </el-table-column>
-
-        <el-table-column
-          prop="resource"
-          label="资源标识"
-          min-width="180"
-          show-overflow-tooltip
-        />
-
-        <el-table-column
-          prop="parentId"
-          label="父级权限ID"
-          width="120"
-        >
-          <template #default="{ row }">
-            <el-link
-              v-if="row.parentId != null"
-              type="primary"
-              :underline="false"
-              @click="gotoDetail(row.parentId)"
-            >
-              {{ row.parentId }}
-            </el-link>
-            <span v-else>无</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column
-          prop="orderWeight"
-          label="排序权重"
-          width="90"
-        />
-
-        <el-table-column
-          prop="isSystem"
-          label="系统权限"
-          width="100"
-        >
-          <template #default="{ row }">
-            <el-tag
-              size="small"
-              :type="row.isSystem ? 'warning' : 'info'"
-            >
-              {{ row.isSystem ? '是' : '否' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-
-        <el-table-column
-          prop="description"
-          label="权限描述"
-          min-width="180"
-          show-overflow-tooltip
-        />
-
-        <el-table-column
-          prop="createdAt"
-          label="创建时间"
-          min-width="170"
-        >
-          <template #default="{ row }">
-            <span>{{ formatISOData(row.createdAt) }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column
-          label="操作"
-          width="150"
-          fixed="right"
-        >
-          <template #default="scope">
-            <el-button
-              type="primary"
-              size="small"
-              @click="handleEdit(scope.row)"
-            >
-              编辑
-            </el-button>
-            <el-button
-              type="danger"
-              size="small"
-              @click="handleDelete(scope.row)"
-            >
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <PermEditDialog
-        v-model="dialogVisible"
-        :mode="dialogMode"
-        :permission-id="currentPermId"
-        :perm-options="permOptions"
-        :disabled-parent-ids="currentPermId ? [currentPermId] : []"
-        @success="handleDialogSuccess"
-      />
-    </TableContainer>
-  </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:40px"><input type="checkbox" :checked="selectedPermIds.size === permissionList.length && permissionList.length > 0" @change="toggleSelectAll" /></th>
+          <th style="width:60px">ID</th>
+          <th>权限名称</th>
+          <th>权限编码</th>
+          <th style="width:80px">类型</th>
+          <th>资源标识</th>
+          <th style="width:100px">父级ID</th>
+          <th style="width:80px">排序</th>
+          <th style="width:80px">系统</th>
+          <th>描述</th>
+          <th style="width:150px">创建时间</th>
+          <th style="width:130px">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in permissionList" :key="row.id">
+          <td><input type="checkbox" :checked="selectedPermIds.has(row.id)" @change="toggleSelect(row.id)" :disabled="row.isSystem" /></td>
+          <td>{{ row.id }}</td>
+          <td><a class="link" @click="gotoDetail(row)">{{ row.name }}</a></td>
+          <td>{{ row.code }}</td>
+          <td>{{ permTypeLabel[row.type] || row.type }}</td>
+          <td>{{ row.resource }}</td>
+          <td><a v-if="row.parentId != null" class="link" @click="gotoDetail(row.parentId)">{{ row.parentId }}</a><span v-else>无</span></td>
+          <td>{{ row.orderWeight }}</td>
+          <td><span :class="['badge', row.isSystem ? 'badge-yellow' : 'badge-gray']">{{ row.isSystem ? '是' : '否' }}</span></td>
+          <td>{{ row.description }}</td>
+          <td>{{ formatISOData(row.createdAt) }}</td>
+          <td>
+            <div class="table-actions">
+              <button class="action-btn" @click="handleEdit(row)">编辑</button>
+              <button class="action-btn danger" @click="handleDelete(row)">删除</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <PermEditDialog v-model="dialogVisible" :mode="dialogMode" :permission-id="currentPermId" :perm-options="permOptions" :disabled-parent-ids="currentPermId ? [currentPermId] : []" @success="handleDialogSuccess" />
+  </ListPage>
 </template>
-
-<style scoped>
-.search-form {
-  margin-bottom: 0;
-}
-
-.list-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-</style>
-
-

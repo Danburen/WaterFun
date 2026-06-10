@@ -8,6 +8,7 @@ import org.waterwood.waterfunservice.api.request.CreateCommentReq;
 import org.waterwood.waterfunservice.api.response.CommentResponse;
 import org.waterwood.waterfunservice.service.post.CommentService;
 import org.waterwood.waterfunservicecore.api.CursorPage;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.BanCheck;
 
 @RequiredArgsConstructor
 @RestController
@@ -39,6 +40,7 @@ public class CommentController {
        return ApiResponse.success( commentService.getComment(commentId));
     }
 
+    @BanCheck("ban:comment")
     @PostMapping
     public ApiResponse<Void> postComment(@RequestBody @Valid CreateCommentReq req){
         commentService.create(req);

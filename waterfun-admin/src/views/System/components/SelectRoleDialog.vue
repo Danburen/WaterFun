@@ -1,262 +1,113 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
 import type { OptionResItem } from "@waterfun/web-core/src/types";
-import SearchContainer from "~/components/SearchContainer.vue";
-import TableContainer from "~/components/TableContainer.vue";
 import { getRoleAllIds, listRoles, type RoleResp } from "~/api/role";
 import type { PageOptions } from "~/types";
-
 import { ElMessage } from "element-plus";
+import BaseDialog from "~/components/BaseDialog.vue";
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: boolean;
-    disabledRoleIds?: number[];
-  }>(),
-  {
-    disabledRoleIds: () => [],
-  }
-);
+const props = withDefaults(defineProps<{ modelValue: boolean; disabledRoleIds?: number[] }>(), { disabledRoleIds: () => [] });
+const emit = defineEmits<{ "update:modelValue": [value: boolean]; confirm: [ids: number[]] }>();
 
-const emit = defineEmits<{
-  "update:modelValue": [value: boolean];
-  confirm: [ids: number[]];
-}>();
-
-
-
-const visible = computed({
-  get: () => props.modelValue,
-  set: (value: boolean) => emit("update:modelValue", value),
-});
-
-const loading = ref(false);
-const tableData = ref<RoleResp[]>([]);
-const selectedIds = ref<number[]>([]);
+const visible = computed({ get: () => props.modelValue, set: v => emit("update:modelValue", v) });
+const loading = ref(false); const tableData = ref<RoleResp[]>([]); const selectedIds = ref<Set<number>>(new Set());
 const roleOptions = ref<OptionResItem<number>[]>([]);
-
-const searchForm = ref({
-  name: "",
-  code: "",
-  parentId: null as number | null,
-});
-
-const pageOpts = ref<PageOptions>({
-  currentPage: 1,
-  pageSize: 10,
-  total: 0,
-});
+const searchName = ref(''); const searchCode = ref(''); const searchParentId = ref<number | null>(null);
+const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
 
 const selectable = (row: RoleResp) => !props.disabledRoleIds.includes(row.id);
+const toggleRow = (row: RoleResp) => { if (!selectable(row)) return; const id = row.id; if (selectedIds.value.has(id)) selectedIds.value.delete(id); else selectedIds.value.add(id); };
+const allSelected = computed(() => tableData.value.length > 0 && tableData.value.filter(selectable).every(r => selectedIds.value.has(r.id)));
+const toggleAll = () => { if (allSelected.value) { tableData.value.filter(selectable).forEach(r => selectedIds.value.delete(r.id)); } else { tableData.value.filter(selectable).forEach(r => selectedIds.value.add(r.id)); } };
 
-const fetchRoleOptions = async () => {
-  try {
-    const res = await getRoleAllIds();
-    roleOptions.value = res.data || [];
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取角色信息失败');
-  }
-};
+const fetchRoleOptions = async () => { try { const res = await getRoleAllIds(); roleOptions.value = res.data || []; } catch { ElMessage.error('获取角色信息失败'); } };
 
 const fetchData = async () => {
   loading.value = true;
   try {
-    const res = await listRoles(
-      (pageOpts.value.currentPage || 1) - 1,
-      pageOpts.value.pageSize,
-      searchForm.value.name || undefined,
-      searchForm.value.code || undefined,
-      searchForm.value.parentId ?? undefined
-    );
-    tableData.value = res.data.content || [];
-    pageOpts.value.total = res.data.page.totalElements || 0;
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取角色信息失败');
-  } finally {
-    loading.value = false;
-  }
+    const res = await listRoles((pageOpts.value.currentPage || 1) - 1, pageOpts.value.pageSize, searchName.value || undefined, searchCode.value || undefined, searchParentId.value ?? undefined);
+    tableData.value = res.data.content || []; pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
+  } catch { ElMessage.error('获取角色信息失败'); }
+  finally { loading.value = false; }
 };
 
-const handleSearch = () => {
-  pageOpts.value.currentPage = 1;
-  fetchData();
-};
+const handleSearch = () => { pageOpts.value.currentPage = 1; fetchData(); };
+const handleReset = () => { pageOpts.value.currentPage = 1; searchName.value = ''; searchCode.value = ''; searchParentId.value = null; fetchData(); };
+const handleConfirm = () => { emit("confirm", [...selectedIds.value]); visible.value = false; };
 
-const handleReset = () => {
-  pageOpts.value.currentPage = 1;
-  searchForm.value = { name: "", code: "", parentId: null };
-  fetchData();
-};
-
-const handleSelectionChange = (rows: RoleResp[]) => {
-  selectedIds.value = rows.map((r) => r.id);
-};
-
-const handleConfirm = () => {
-  emit("confirm", selectedIds.value);
-  visible.value = false;
-};
-
-watch(
-  () => visible.value,
-  async (open) => {
-    if (!open) return;
-    selectedIds.value = [];
-    pageOpts.value.currentPage = 1;
-    await Promise.all([fetchRoleOptions(), fetchData()]);
-  }
-);
+watch(() => visible.value, async (open) => { if (!open) return; selectedIds.value = new Set(); pageOpts.value.currentPage = 1; await Promise.all([fetchRoleOptions(), fetchData()]); });
 </script>
 
 <template>
-  <el-dialog
-    v-model="visible"
-    title="选择角色"
-    width="1200"
-    destroy-on-close
-  >
-    <div class="picker-layout">
-      <SearchContainer>
-        <el-form
-          inline
-          :model="searchForm"
-          class="search-form"
-        >
-          <el-form-item label="角色名称">
-            <el-input
-              v-model="searchForm.name"
-              placeholder="请输入角色名称"
-            />
-          </el-form-item>
-          <el-form-item label="角色编码">
-            <el-input
-              v-model="searchForm.code"
-              placeholder="请输入角色编码"
-            />
-          </el-form-item>
-          <el-form-item label="父级角色ID">
-            <el-select
-              v-model="searchForm.parentId"
-              clearable
-              placeholder="请选择父级角色"
-              style="width: 180px"
-            >
-              <el-option
-                v-for="item in roleOptions"
-                :key="item.id"
-                :label="`${item.id} (${item.name}${item.code ? ` 【${item.code}】` : ''})`"
-                :value="item.id"
-                :disabled="item.disabled || false"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              type="primary"
-              @click="handleSearch"
-            >
-              查询
-            </el-button>
-            <el-button @click="handleReset">
-              重置
-            </el-button>
-          </el-form-item>
-        </el-form>
-      </SearchContainer>
+  <BaseDialog v-model="visible" title="选择角色" width="960px">
+    <div class="list-layout">
+      <div class="search-form">
+        <div class="search-field"><label>角色名称</label><input v-model="searchName" class="form-input" placeholder="请输入角色名称" @keyup.enter="handleSearch" /></div>
+        <div class="search-field"><label>角色编码</label><input v-model="searchCode" class="form-input" placeholder="请输入角色编码" @keyup.enter="handleSearch" /></div>
+        <div class="search-field"><label>父级角色ID</label><select v-model="searchParentId" class="form-select"><option :value="null">无</option><option v-for="item in roleOptions" :key="item.id" :value="item.id" :disabled="item.disabled">{{ item.id }} ({{ item.name }}{{ item.code ? ` 【${item.code}】` : '' }})</option></select></div>
+        <div class="search-actions">
+          <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <button class="btn" @click="handleReset">重置</button>
+        </div>
+      </div>
 
-      <TableContainer
-        v-model:page-size="pageOpts.pageSize"
-        v-model:current-page="pageOpts.currentPage"
-        title="role.list"
-        :show-add-btn="false"
-        :show-remove-btn="false"
-        :total="pageOpts.total"
-        @change="fetchData"
-      >
-        <el-table
-          v-loading="loading"
-          :data="tableData"
-          border
-          fit
-          highlight-current-row
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-        >
-          <el-table-column
-            type="selection"
-            :selectable="selectable"
-            width="55"
-          />
-          <el-table-column
-            prop="id"
-            label="ID"
-            width="90"
-          />
-          <el-table-column
-            prop="name"
-            label="角色名称"
-            min-width="180"
-          />
-          <el-table-column
-            prop="code"
-            label="角色编码"
-            min-width="180"
-          />
-          <el-table-column
-            prop="parentId"
-            label="父级角色ID"
-            width="120"
-          >
-            <template #default="{ row }">
-              <span>{{ row.parentId ?? '无' }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="createdAt"
-            label="创建时间"
-            min-width="170"
-          >
-            <template #default="{ row }">
-              {{ formatISOData(row.createdAt) }}
-            </template>
-          </el-table-column>
-        </el-table>
-      </TableContainer>
+      <div class="card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;"><input type="checkbox" :checked="allSelected" :indeterminate="!allSelected && selectedIds.size > 0" @change="toggleAll" /></th>
+              <th style="width: 80px;">ID</th>
+              <th>角色名称</th>
+              <th>角色编码</th>
+              <th style="width: 120px;">父级角色ID</th>
+              <th style="width: 160px;">创建时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="loading"><td colspan="6" class="loading-wrap"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</td></tr>
+            <tr v-for="row in tableData" :key="row.id" :class="{ 'row-disabled': !selectable(row) }" @click="toggleRow(row)">
+              <td><input type="checkbox" :checked="selectedIds.has(row.id)" :disabled="!selectable(row)" @click.stop="toggleRow(row)" /></td>
+              <td>{{ row.id }}</td>
+              <td>{{ row.name }}</td>
+              <td>{{ row.code }}</td>
+              <td>{{ row.parentId ?? '无' }}</td>
+              <td>{{ formatISOData(row.createdAt) }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination-wrap">
+          <span class="pagination-info">共 {{ pageOpts.total }} 条</span>
+          <div class="pagination">
+            <button class="page-btn" :disabled="(pageOpts.currentPage || 1) <= 1" @click="pageOpts.currentPage!--; fetchData()"><i class="fa-solid fa-chevron-left"></i></button>
+            <button v-for="p in Math.ceil(pageOpts.total / (pageOpts.pageSize || 10))" :key="p" :class="['page-btn', { active: (pageOpts.currentPage || 1) === p }]" @click="pageOpts.currentPage = p; fetchData()">{{ p }}</button>
+            <button class="page-btn" :disabled="(pageOpts.currentPage || 1) >= Math.ceil(pageOpts.total / (pageOpts.pageSize || 10))" @click="pageOpts.currentPage!++; fetchData()"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
 
       <div class="dialog-extra">
-        <slot
-          name="footer-extra"
-          :selected-ids="selectedIds"
-        />
+        <slot name="footer-extra" :selected-ids="[...selectedIds]" />
       </div>
     </div>
-
     <template #footer>
-      <el-button @click="visible = false">
-        取消
-      </el-button>
-      <el-button
-        type="primary"
-        :disabled="selectedIds.length === 0"
-        @click="handleConfirm"
-      >
-        保存
-      </el-button>
+      <button class="btn" @click="visible = false">取消</button>
+      <button class="btn btn-primary" :disabled="selectedIds.size === 0" @click="handleConfirm">保存</button>
     </template>
-  </el-dialog>
+  </BaseDialog>
 </template>
 
 <style scoped>
-.picker-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.dialog-extra {
-  padding-top: 4px;
-}
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { text-align: left; padding: 10px 12px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg); white-space: nowrap; }
+.data-table td { padding: 10px 12px; font-size: 13px; color: var(--text-primary); border-bottom: 1px solid var(--border-light); vertical-align: middle; cursor: pointer; }
+.data-table tr:hover td { background: var(--bg); }
+.data-table tr.row-disabled td { opacity: 0.4; cursor: not-allowed; }
+.pagination-wrap { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--border-light); }
+.pagination-info { font-size: 13px; color: var(--text-muted); }
+.pagination { display: flex; gap: 4px; }
+.page-btn { min-width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); background: var(--bg-white); border-radius: 4px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.page-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.dialog-extra { padding-top: 4px; }
 </style>
-

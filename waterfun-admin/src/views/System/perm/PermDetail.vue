@@ -13,213 +13,113 @@ const permissionId = computed(() => Number(route.params.id));
 const loading = ref(false);
 const permOptions = ref<OptionResItem[]>([]);
 const permissionDetail = ref<PermissionResp | null>(null);
-
 const editDialogVisible = ref(false);
+const collapseUsers = ref(true);
+
 type SimpleOption = { id: string; name: string };
 const assignedUserOptions = ref<SimpleOption[]>([]);
-const collapseActive = ref(["users"]);
 
 const fetchPermOptions = async () => {
-  try {
-    const res = await getPermOptions();
-    permOptions.value = res.data;
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取权限信息失败');
-  }
+  try { const res = await getPermOptions(); permOptions.value = res.data; }
+  catch { ElMessage.error('获取权限信息失败'); }
 };
 
 const fetchPermDetail = async () => {
-  if (Number.isNaN(permissionId.value)) {
-    ElMessage.error('无效的权限 ID');
-    router.back();
-    return;
-  }
-
+  if (Number.isNaN(permissionId.value)) { ElMessage.error('无效的权限 ID'); router.back(); return; }
   loading.value = true;
-  try {
-    const res = await getPermission(permissionId.value);
-    permissionDetail.value = res.data;
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取权限信息失败');
-  } finally {
-    loading.value = false;
-  }
-};
-
-const openEditDialog = () => {
-  if (Number.isNaN(permissionId.value)) return;
-  editDialogVisible.value = true;
-};
-
-const gotoPermissionDetail = (id: number) => {
-  router.push({ name: "permissionDetail", params: { id } });
-};
-
-const gotoUserDetail = (uid: string) => {
-  router.push({ name: "userDetail", params: { uid: String(uid) } });
+  try { const res = await getPermission(permissionId.value); permissionDetail.value = res.data; }
+  catch { ElMessage.error('获取权限信息失败'); }
+  finally { loading.value = false; }
 };
 
 const fetchPermUsersPreview = async () => {
   if (Number.isNaN(permissionId.value)) return;
   try {
-    const all: SimpleOption[] = [];
-    let page = 0;
-    let totalPages = 1;
+    const all: SimpleOption[] = []; let page = 0; let totalPages = 1;
     while (page < totalPages) {
       const res = await getPermUsers(permissionId.value, page, 100);
-      (res.data.content || []).forEach((item) => {
-        all.push({ id: item.userUid, name: `${item.username}${item.nickname ? ` (${item.nickname})` : ""}` });
-      });
-      totalPages = res.data.page.totalPages || 0;
-      page += 1;
+      (res.data.content || []).forEach(item => all.push({ id: item.userUid, name: `${item.username}${item.nickname ? ` (${item.nickname})` : ""}` }));
+      totalPages = (res.data.totalPages ?? res.data.page?.totalPages ?? 0) || 0; page += 1;
     }
     assignedUserOptions.value = all;
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取权限用户失败');
-  }
+  } catch { ElMessage.error('获取权限用户失败'); }
 };
 
-const handleEditSuccess = async () => {
-  await Promise.all([fetchPermDetail(), fetchPermOptions()]);
-};
+const openEditDialog = () => { if (!Number.isNaN(permissionId.value)) editDialogVisible.value = true; };
+const gotoPermissionDetail = (id: number) => router.push({ name: "permissionDetail", params: { id } });
+const gotoUserDetail = (uid: string) => router.push({ name: "userDetail", params: { uid: String(uid) } });
+const handleEditSuccess = async () => { await Promise.all([fetchPermDetail(), fetchPermOptions()]) };
 
-onMounted(async () => {
-  await Promise.all([fetchPermOptions(), fetchPermDetail(), fetchPermUsersPreview()]);
-});
+onMounted(async () => { await Promise.all([fetchPermOptions(), fetchPermDetail(), fetchPermUsersPreview()]); });
 </script>
 
 <template>
-  <div
-    v-loading="loading"
-    class="perm-detail"
-  >
+  <div>
     <CardContainer title="权限详情">
       <template #header-right>
-        <el-button
-          text
-          @click="router.back()"
-        >
-          返回
-        </el-button>
-        <el-button
-          type="primary"
-          plain
-          @click="openEditDialog"
-        >
-          编辑
-        </el-button>
+        <button class="btn" @click="router.back()">返回</button>
+        <button class="btn btn-primary" @click="openEditDialog">编辑</button>
       </template>
 
-      <el-descriptions
-        v-if="permissionDetail"
-        :column="2"
-        border
-      >
-        <el-descriptions-item label="ID">
-          {{ permissionDetail.id }}
-        </el-descriptions-item>
-        <el-descriptions-item label="权限名称">
-          {{ permissionDetail.name }}
-        </el-descriptions-item>
-        <el-descriptions-item label="权限编码">
-          {{ permissionDetail.code || '无' }}
-        </el-descriptions-item>
-        <el-descriptions-item label="权限类型">
-          {{ ({ menu: '菜单', button: '按钮', api: '接口', data: '数据', other: '其他' })[permissionDetail.type.toLowerCase()] || '其他' }}
-        </el-descriptions-item>
-        <el-descriptions-item label="资源标识">
-          {{ permissionDetail.resource || '无' }}
-        </el-descriptions-item>
-        <el-descriptions-item label="父级权限ID">
-          <el-link
-            v-if="permissionDetail.parentId != null"
-            type="primary"
-            :underline="false"
-            @click="gotoPermissionDetail(permissionDetail.parentId)"
-          >
-            {{ permissionDetail.parentId }}
-          </el-link>
-          <span v-else>无</span>
-        </el-descriptions-item>
-        <el-descriptions-item label="排序权重">
-          {{ permissionDetail.orderWeight ?? '无' }}
-        </el-descriptions-item>
-        <el-descriptions-item label="系统权限">
-          <el-tag
-            size="small"
-            :type="permissionDetail.isSystem ? 'warning' : 'info'"
-          >
-            {{ permissionDetail.isSystem ? '是' : '否' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="权限描述">
-          {{ permissionDetail.description || '无' }}
-        </el-descriptions-item>
-        <el-descriptions-item label="创建时间">
-          {{ formatISOData(permissionDetail.createdAt) }}
-        </el-descriptions-item>
-        <el-descriptions-item label="更新时间">
-          {{ formatISOData(permissionDetail.updatedAt) }}
-        </el-descriptions-item>
-      </el-descriptions>
+      <div v-if="loading" class="loading-wrap"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>
+      <table v-else-if="permissionDetail" class="detail-table">
+        <tbody>
+        <tr>
+          <td class="label">ID</td>
+          <td class="value">{{ permissionDetail.id }}</td>
+          <td class="label">权限名称</td>
+          <td class="value">{{ permissionDetail.name }}</td>
+        </tr>
+        <tr>
+          <td class="label">权限编码</td>
+          <td class="value">{{ permissionDetail.code || '无' }}</td>
+          <td class="label">权限类型</td>
+          <td class="value">{{ ({ menu: '菜单', button: '按钮', api: '接口', data: '数据', other: '其他' })[permissionDetail.type.toLowerCase()] || '其他' }}</td>
+        </tr>
+        <tr>
+          <td class="label">资源标识</td>
+          <td class="value">{{ permissionDetail.resource || '无' }}</td>
+          <td class="label">父级权限</td>
+          <td class="value">
+            <span v-if="permissionDetail.parentId != null" class="link" @click="gotoPermissionDetail(permissionDetail.parentId)">{{ permissionDetail.parentId }}</span>
+            <span v-else>无</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="label">排序权重</td>
+          <td class="value">{{ permissionDetail.orderWeight ?? '无' }}</td>
+          <td class="label">系统权限</td>
+          <td class="value"><span :class="['badge', permissionDetail.isSystem ? 'badge-yellow' : 'badge-gray']">{{ permissionDetail.isSystem ? '是' : '否' }}</span></td>
+        </tr>
+        <tr>
+          <td class="label">描述</td>
+          <td class="value" colspan="3">{{ permissionDetail.description || '无' }}</td>
+        </tr>
+        <tr>
+          <td class="label">创建时间</td>
+          <td class="value">{{ formatISOData(permissionDetail.createdAt) }}</td>
+          <td class="label">更新时间</td>
+          <td class="value">{{ formatISOData(permissionDetail.updatedAt) }}</td>
+        </tr>
+      </tbody>
+      </table>
     </CardContainer>
 
-    <CardContainer
-      style="margin-top: 12px"
-      title="已分配用户"
-    >
-      <el-collapse v-model="collapseActive">
-        <el-collapse-item
-          title="已分配用户"
-          name="users"
-        >
-          <el-row :gutter="10">
-            <el-col
-              v-for="item in assignedUserOptions"
-              :key="`user-${item.id}`"
-              :xs="24"
-              :sm="12"
-              :md="8"
-              :lg="6"
-              class="option-col"
-            >
-              <el-link
-                type="primary"
-                :underline="false"
-                @click="gotoUserDetail(item.id)"
-              >
-                {{ item.name }}
-              </el-link>
-            </el-col>
-            <el-col
-              v-if="assignedUserOptions.length === 0"
-              :span="24"
-            >
-              暂无数据
-            </el-col>
-          </el-row>
-        </el-collapse-item>
-      </el-collapse>
+    <CardContainer style="margin-top: 12px" title="已分配用户">
+      <div class="collapse-section">
+        <div class="collapse-title" @click="collapseUsers = !collapseUsers">
+          已分配用户 ({{ assignedUserOptions.length }})
+          <i :class="collapseUsers ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"></i>
+        </div>
+        <div v-show="collapseUsers" class="collapse-content">
+          <div v-if="assignedUserOptions.length" class="option-grid">
+            <span v-for="item in assignedUserOptions" :key="`user-${item.id}`" class="link" @click="gotoUserDetail(item.id)">{{ item.name }}</span>
+          </div>
+          <span v-else style="color: var(--text-muted); font-size: 14px;">暂无数据</span>
+        </div>
+      </div>
     </CardContainer>
 
-    <PermEditDialog
-      v-model="editDialogVisible"
-      mode="edit"
-      :permission-id="permissionId"
-      :perm-options="permOptions"
-      :disabled-parent-ids="[permissionId]"
-      @success="handleEditSuccess"
-    />
+    <PermEditDialog v-model="editDialogVisible" mode="edit" :permission-id="permissionId" :perm-options="permOptions" :disabled-parent-ids="[permissionId]" @success="handleEditSuccess" />
   </div>
 </template>
-
-<style scoped>
-.option-col {
-  margin-bottom: 8px;
-}
-</style>
-
-

@@ -18,6 +18,7 @@ import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.PostStatus;
 import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.BanCheck;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.entity.spec.PostSpec;
 import org.waterwood.waterfunservice.service.post.PostService;
@@ -81,12 +82,14 @@ public class PostController {
         return ApiResponse.success(postService.listAuthorCardPosts(spec, Pageable.ofSize(size).withPage(page - 1)));
     }
 
+    @BanCheck("ban:post")
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deletePost(@PathVariable Long id){
         postService.deletePost(id);
         return ApiResponse.success();
     }
 
+    @BanCheck("ban:post")
     @PostMapping("/draft")
     public ApiResponse<Long> draftNewPost(){
         return ApiResponse.success(postService.draftNew());
@@ -97,9 +100,16 @@ public class PostController {
         return ApiResponse.success(postService.getEditPostDraft(id));
     }
 
+    @BanCheck("ban:post")
     @PostMapping("/{id}/publish")
     public ApiResponse<Void> publishPost(@PathVariable Long id, @Valid @RequestBody PostSaveReq req){
         postService.publish(id, req);
+        return ApiResponse.success();
+    }
+    @BanCheck("ban:post")
+    @PostMapping("/publish")
+    public ApiResponse<Void> publicNewPost(@Valid @RequestBody PostSaveReq req){
+        postService.publishNewPost(req);
         return ApiResponse.success();
     }
 
@@ -111,6 +121,12 @@ public class PostController {
     @PostMapping("/{id}/temp-save")
     public ApiResponse<Void> tempSavePost(@PathVariable Long id, @Valid @RequestBody PostSaveReq req){
         postService.save(id, req);
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/temp-save")
+    public ApiResponse<Void> tempSavenewPost(@PathVariable Long id, @Valid @RequestBody PostSaveReq req){
+        postService.saveNewPost(req);
         return ApiResponse.success();
     }
 

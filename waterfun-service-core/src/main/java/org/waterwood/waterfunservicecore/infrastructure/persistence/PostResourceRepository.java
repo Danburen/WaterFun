@@ -20,5 +20,8 @@ public interface PostResourceRepository extends JpaRepository<PostResource, Post
 
     List<PostResource> findByPostIdAndResourceUuidStatusNot(@NotNull Long postId, ResourceStatus resourceUuidStatus);
 
-    List<String> findUuidsByPostId(@NotNull Long postId);
+    @Query("SELECT pr.resourceUuid.uuid FROM PostResource pr WHERE pr.post.id = :postId")
+    List<String> findUuidsByPostId(@Param("postId") Long postId);
+
+    List<PostResource> findByPostId(@NotNull Long postId);
 }

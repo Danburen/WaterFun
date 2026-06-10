@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
-import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunadminservice.infrastructure.exception.BuiltInResourceProtectedException;
+import org.waterwood.waterfunadminservice.infrastructure.exception.PermissionReferenceInvalidException;
+import org.waterwood.waterfunadminservice.infrastructure.exception.RoleReferenceInvalidException;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.utils.UidGenerator;
@@ -19,15 +21,14 @@ import org.waterwood.waterfunadminservice.api.request.user.*;
 import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
 import org.waterwood.waterfunadminservice.api.response.role.AssignedRoleRes;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
-import org.waterwood.waterfunadminservice.infrastructure.exception.PermException;
 import org.waterwood.waterfunadminservice.infrastructure.exception.UserAdminException;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserAdminMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserCounterMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserProfileMapper;
 import org.waterwood.waterfunservicecore.api.resp.AccountResp;
-import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.waterfunservicecore.entity.Role;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunservicecore.entity.user.*;
 import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
@@ -76,16 +77,9 @@ public class UserAdminServiceImpl implements UserAdminService {
     private final UserFollowerRepository userFollowerRepository;
 
     @Override
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(
-                ()-> new UserAdminException(BaseResponseCode.USER_NOT_FOUND)
-        );
-    }
-
-    @Override
     public User getUserById(long id) {
         return  userRepository.findById(id).orElseThrow(
-                ()-> new UserAdminException(BaseResponseCode.USER_NOT_FOUND)
+                ()-> new UserNotFoundException(id)
         );
     }
 
@@ -94,10 +88,10 @@ public class UserAdminServiceImpl implements UserAdminService {
     public void deleteUser(long uid) {
         // TODO: ADD AUDIT LOG
         User u = userRepository.findById(uid).orElseThrow(
-                ()-> new UserAdminException(BaseResponseCode.USER_NOT_FOUND)
+                ()-> new UserNotFoundException(uid)
         );
         if(u.getUserType() == UserType.ADMIN){
-            throw new BizException(BaseResponseCode.CAN_NOT_DELETE_SUPER_ADMIN_USER);
+            throw new BuiltInResourceProtectedException("ADMIN");
         }
         userRepository.deleteUserByUid(uid);
     }
@@ -420,7 +414,7 @@ public class UserAdminServiceImpl implements UserAdminService {
             List<Integer> notFounds = roleIds.stream()
                     .filter(id -> !roleMap.containsKey(id))
                     .toList();
-            throw new UserAdminException(BaseResponseCode.ROLE_NOT_FOUND_WITH_ARGS, notFounds);
+            throw new RoleReferenceInvalidException(notFounds.toArray());
         }
 
         return deduplicatedItems.values().stream()
@@ -456,7 +450,7 @@ public class UserAdminServiceImpl implements UserAdminService {
             List<Integer> notFounds = permissionIds.stream()
                     .filter(pid -> !permissionMap.containsKey(pid))
                     .toList();
-            throw new PermException(BaseResponseCode.PERMISSION_NOT_FOUND_ARGS, notFounds);
+            throw new PermissionReferenceInvalidException(notFounds.toString());
         }
 
         return deduplicatedItems.values().stream()

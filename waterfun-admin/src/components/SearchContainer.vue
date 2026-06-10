@@ -7,24 +7,6 @@
 </template>
 
 <style scoped>
-.search-container {
-  padding: 12px;
-}
-
-.search-content {
-  display: flex;
-  width: 100%;
-}
-
-.search-content :deep(.search-form) {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.search-content :deep(.search-form .el-form-item) {
-  margin-bottom: 5px;
-}
-
+.search-container { padding: 16px; }
+.search-content { width: 100%; }
 </style>

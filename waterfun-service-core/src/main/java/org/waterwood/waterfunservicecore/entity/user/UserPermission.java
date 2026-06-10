@@ -8,7 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.waterwood.api.VO.ToExpirableDictOption;
-import org.waterwood.waterfunservicecore.entity.Permission;
+import org.waterwood.waterfunservicecore.entity.security.BanReasonType;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
 
 import java.time.Instant;
 
@@ -39,6 +40,10 @@ public class UserPermission implements ToExpirableDictOption<Long> {
     @Column(name = "created_at")
     @CreationTimestamp
     private Instant createdAt;
+
+    @Enumerated
+    @Column(name = "ban_reason_type", columnDefinition = "tinyint UNSIGNED")
+    private BanReasonType banReasonType;
 
 
     @Override

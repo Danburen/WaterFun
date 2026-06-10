@@ -1,5 +1,6 @@
 package org.waterwood.waterfunservice.service.post;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -72,6 +73,8 @@ public interface PostService {
 
     /**
      * Handle post coverage image upload
+     * if {@link UserUploadPolicyReq#getBizId()} is provided, then the image will be associated with the post id in bizId,
+     * if not, will use Current user uid as biz id, means the resource is associated with target user
      * @param request upload policy request body
      * @return List of presigned resp usually only one element
      */
@@ -79,6 +82,8 @@ public interface PostService {
 
     /**
      * Hande post content images upload
+     * if {@link UserUploadPolicyReq#getBizId()} is provided, then the image will be associated with the post id in bizId,
+     * if not, will use Current user uid as biz id, means the resource is associated with target user
      * @param request upload policy request body
      * @return List of presigned resp
      */
@@ -124,4 +129,16 @@ public interface PostService {
      * @param id target post id
      */
     void collection(Long id);
+
+    /**
+     * Draft a new post and publish directly, which means the post will be created and published immediately.
+     * @param req {@link PostSaveReq}
+     */
+    void publishNewPost(@Valid PostSaveReq req);
+
+    /**
+     * Draft a new post and temp-save it
+     * @param req {@link  PostSaveReq}
+     */
+    void saveNewPost(@Valid PostSaveReq req);
 }

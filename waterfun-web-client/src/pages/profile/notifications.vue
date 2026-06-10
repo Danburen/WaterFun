@@ -170,7 +170,6 @@
 import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { getUserSettings, updateUserSettings } from '~/api/userApi';
-const userSettingsStore = useUserSettingsStore();
 
 definePageMeta({
   ssr: false
@@ -207,11 +206,7 @@ const saveSettings = async () => {
       notifications: notificationSettings.value,
       privacy: privacySettings.value
     });
-    userSettingsStore.updateSettings({
-      notifications: notificationSettings.value,
-      privacy: privacySettings.value
-    });
-    
+
     ElMessage.success('设置保存成功');
   } catch (error) {
     ElMessage.error('设置保存失败，请重试');

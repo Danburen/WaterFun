@@ -109,7 +109,7 @@ public class TencentCosService implements CloudFileService {
         if (client != null) {
             URL url = client.generatePresignedUrl(request);
             // Token
-            redisHelper.hSetMap(buildUploadRedisKey(payload.getResourceUuid()),
+            redisHelper.hashSetMap(buildUploadRedisKey(payload.getResourceUuid()),
                     payload.toMap(),
                     Duration.ofSeconds(uploadTokenExpires)
             );
@@ -152,7 +152,7 @@ public class TencentCosService implements CloudFileService {
             URL url = client.generatePresignedUrl(request);
 
             // Token
-            redisHelper.hSetMap(
+            redisHelper.hashSetMap(
                     buildUploadRedisKey(payload.getResourceUuid()),
                     payload.toMap(),
                     Duration.ofSeconds(uploadTokenExpires)
@@ -255,7 +255,7 @@ public class TencentCosService implements CloudFileService {
 //                redisHelper.hGetAllAndDel(
 //                        buildUploadRedisKey(token)
 //                )
-                redisHelper.hGetAll(
+                redisHelper.hashGetAll(
                         buildUploadRedisKey(token)
                 )
         );
@@ -375,7 +375,7 @@ public class TencentCosService implements CloudFileService {
             keys.add(redisKey);
         }
         // batch try hit cache
-        List<String> cached = redisHelper.mget(keys);
+        List<String> cached = redisHelper.multiGet(keys);
         Map<ID, CloudResPresignedUrlResp> result = new HashMap<>(bizIdCosPathMap.size());
         List<Integer> missIndices = new ArrayList<>();
 

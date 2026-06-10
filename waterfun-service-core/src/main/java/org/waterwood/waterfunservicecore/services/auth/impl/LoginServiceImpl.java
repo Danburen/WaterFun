@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.AuthCode;
+import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
@@ -13,14 +14,20 @@ import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
 import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
+import org.waterwood.waterfunservicecore.entity.security.BanReasonType;
+import org.waterwood.waterfunservicecore.entity.user.UserPermission;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPayload;
 import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.services.auth.LoginService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
+import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
+import org.waterwood.waterfunservicecore.services.online.OnlineUserService;
 import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
 
 import java.util.Optional;
@@ -36,6 +43,9 @@ public class LoginServiceImpl implements LoginService {
     private final CaptchaServiceImpl captchaService;
     private final VerificationService verificationService;
     private final SiteStatisticRecorder siteStatisticRecorder;
+    private final AuditLogCoreService auditLogCoreService;
+    private final OnlineUserService onlineUserService;
+    private final UserPermRepo userPermRepo;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -52,16 +62,19 @@ public class LoginServiceImpl implements LoginService {
             return uu;
         }).orElseThrow(() -> new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
         siteStatisticRecorder.recordLogin();
+        checkLoginBan(u.getUid());
+        onlineUserService.updateLastActive(u.getUid());
+        auditLogCoreService.record(u.getUid(), u.getUsername(), AuditLogActionType.LOGIN);
         return u;
     }
 
     @Override
-    public boolean logout(String refreshToken, String dfp) {
+    public void logout(String refreshToken, String dfp) {
+        if(StringUtil.isBlank(refreshToken)) throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
         long userUid = UserCtxHolder.getUserUid();
         RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
         tokenService.removeAccessToken(payload.userUid(), payload.deviceId());
         tokenService.removeRefreshToken(userUid, dfp, refreshToken);
-        return true;
     }
 
     @Override
@@ -83,6 +96,23 @@ public class LoginServiceImpl implements LoginService {
 
         if(userDatum ==  null) throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
         siteStatisticRecorder.recordLogin();
-        return userDatum.getUser();
+        User user = userDatum.getUser();
+        checkLoginBan(user.getUid());
+        onlineUserService.updateLastActive(user.getUid());
+        auditLogCoreService.record(user.getUid(), user.getUsername(), AuditLogActionType.LOGIN);
+        return user;
+    }
+
+    private void checkLoginBan(Long userUid) {
+        for (UserPermission up : userPermRepo.findByUserUid(userUid)) {
+            if (up.getPermission() == null || up.getExpiresAt() != null
+                    && up.getExpiresAt().isBefore(java.time.Instant.now())) continue;
+            if ("ban:login".equals(up.getPermission().getCode())) {
+                BanReasonType reason = up.getBanReasonType() != null ? up.getBanReasonType() : BanReasonType.UNSPECIFIED;
+                String messageKey = reason.getMessageKey() != null ? reason.getMessageKey() : "http.forbidden";
+                log.warn("Login banned: uid={}, reason={}", userUid, reason);
+                throw new AuthException(org.waterwood.api.AuthCode.REAUTHORIZATION_REQUIRED);
+            }
+        }
     }
 }

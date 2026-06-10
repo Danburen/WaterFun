@@ -16,6 +16,7 @@ import org.waterwood.waterfunservicecore.entity.post.PostStatus;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.TagLimitExceededException;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.CategoryRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
@@ -37,6 +38,7 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
     private final PostRepository postRepository;
     private final TagService tagService;
     private final TagRepository tagRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public Set<TargetType> getTargetTypes() {
@@ -47,6 +49,7 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
         );
     }
 
+    @Transactional
     @Override
     public void handle(ModerationConsumerMessage msg) {
         AuditTask task = auditTaskRepository.findById(msg.getId())
@@ -83,11 +86,11 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
             p.setSubtitle(p.getEditedSubtitle());
             p.setContent(p.getEditedContent());
             p.setSummary(p.getEditedSummary());
-            p.setCategory(p.getEditedCategory());
-            List<Tag> existsTags = tagRepository.findAllById(p.getEditedTagIds());
+            List<Tag> editedTags = tagRepository.findAllById(p.getEditedTagIds());
+            List<Tag> oldTags = p.getTags();
             List<Tag> allTags = Stream.concat(
                             newTagList.stream(),
-                            existsTags.stream()
+                            editedTags.stream()
                     )
                     .collect(Collectors.toMap(
                             Tag::getId,
@@ -97,6 +100,17 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
                     .values()
                     .stream()
                     .toList();
+
+            List<Long> newTagIds = allTags.stream().map(Tag::getId).toList();
+            List<Long> removedTagIds = oldTags.stream().filter(t-> ! editedTags.contains(t)).map(Tag::getId).toList();
+
+            tagRepository.increaseUsageCountInIds(newTagIds, 1);
+            tagRepository.decreaseUsageCountInIds(removedTagIds, 1);
+            categoryRepository.increaseUsageCountById(p.getEditedCategory().getId(), 1);
+            if(!Objects.equals(p.getCategory().getId(), p.getEditedCategory().getId())){
+                categoryRepository.decreaseUsageCountById(p.getCategory().getId(), 1);
+            }
+            p.setCategory(p.getEditedCategory());
             p.setTags(allTags);
             p.setVersion(p.getVersion() + 1);
             p.setStatus(PostStatus.PUBLISHED);

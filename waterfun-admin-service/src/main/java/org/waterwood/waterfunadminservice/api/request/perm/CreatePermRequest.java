@@ -3,7 +3,7 @@ package org.waterwood.waterfunadminservice.api.request.perm;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.waterwood.api.enums.PermissionType;
+import org.waterwood.waterfunservicecore.entity.perm.PermissionType;
 
 import java.io.Serializable;
 

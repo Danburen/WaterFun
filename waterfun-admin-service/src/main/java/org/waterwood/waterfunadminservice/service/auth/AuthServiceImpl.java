@@ -9,6 +9,7 @@ import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.entity.user.User;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRoleRepo;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.services.auth.AuthCoreService;
@@ -28,9 +29,7 @@ public class AuthServiceImpl implements AuthService {
         Cookie[] cookies = request.getCookies();
         User user = loginService.login(body, CookieUtil.getCookieValue(cookies, "ADMIN_CAPTCHA_KEY"));
         List<String> roles = userRoleRepo.findByUserUid(user.getUid()).stream()
-                .map(r-> {
-                    return r.getRole().getCode();
-                }).toList();
+                .map(r-> r.getRole().getCode()).toList();
 //        return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp()).getData();
         if(roles.contains("ADMIN")) {
             return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp());

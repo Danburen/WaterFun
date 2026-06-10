@@ -13,7 +13,7 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     AutoImport({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver({ importStyle: 'css' })],
       imports: ['vue', 'vue-router'],
       dts: 'src/auto-imports.d.ts', 
       eslintrc: {
@@ -21,7 +21,7 @@ export default defineConfig({
       },
     }),
     Components({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver({ importStyle: 'css' })],
       dts: 'src/components.d.ts', // 生成组件类型文件
     }),
   ],

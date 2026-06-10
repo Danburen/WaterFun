@@ -1,7 +1,6 @@
 package org.waterwood.waterfunservicecore.services.auth;
 
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.Set;
 
@@ -15,7 +14,6 @@ public interface DeviceService {
     @Async
     void cleanZombieDevicesBatch(int batchSize);
 
-    @Scheduled(cron = "0 0 3 * * *")
     void scheduledCleanup();
 
     String getDeviceHashSalt();

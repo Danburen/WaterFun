@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.waterwood.waterfunservicecore.entity.IpBan;
+import org.waterwood.waterfunservicecore.entity.security.IpBan;
 
 import java.time.Instant;
 import java.util.List;

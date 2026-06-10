@@ -3,7 +3,7 @@ import { usePostStore } from '~/stores/postStore'
 import { useAuthStore } from '~/stores/authStore'
 import { useUserInfoStore } from '~/stores/userInfoStore'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import BannerCarousel from '~/components/BannerCarousel.vue'
 //@ts-ignore
 import { View, Star, ChatDotSquare, ArrowRight, Edit, User, Bell, Link as IconLink } from '@element-plus/icons-vue'
@@ -14,27 +14,44 @@ const userInfoStore = useUserInfoStore()
 const { posts, pagination, loading, categories } = storeToRefs(postStore)
 const { userInfo } = storeToRefs(userInfoStore)
 const router = useRouter()
+const route = useRoute()
 
-const selectedCategoryId = ref<string | undefined>(undefined)
+const onlineStats = ref<{ onlineCount: number; todayNewUsers: number; todayPeakOnline: number } | null>(null)
 
-const selectCategory = (id: string | undefined) => {
+const fetchOnlineStats = async () => {
+  try {
+    const { default: request } = await import('~/utils/axiosRequest')
+    const res = await request.get('/online-users/stats')
+    onlineStats.value = res.data as { onlineCount: number; todayNewUsers: number; todayPeakOnline: number }
+  } catch { /* ignore */ }
+}
+
+const selectedCategoryId = ref<number | undefined>(
+  route.query.category ? parseInt(route.query.category as string) || undefined : undefined
+)
+
+const selectCategory = (id: number | undefined) => {
   selectedCategoryId.value = id
-  postStore.fetchPostList({ categoryId: id, page: 0, size: 12 })
+  router.replace({ query: { ...route.query, category: id ? String(id) : undefined, page: '1' } })
+  postStore.fetchPostList({ categoryId: id, page: 1, size: 12 })
 }
 
 const currentPage = computed({
   get: () => pagination.value.number + 1,
   set: (page: number) => {
-    postStore.fetchPostList({ categoryId: selectedCategoryId.value, page: page - 1, size: 12 })
+    router.replace({ query: { ...route.query, page: String(page) } })
+    postStore.fetchPostList({ categoryId: selectedCategoryId.value, page, size: 12 })
   }
 })
 
-const goToDetail = (id: string) => router.push(`/post/${id}`)
+const goToDetail = (id: number) => router.push(`/post/${id}`)
 const goToCreate = () => router.push('/post/create')
 
 onMounted(async () => {
-  try { await postStore.fetchPostList({ page: 0, size: 12 }) } catch { /* ignore */ }
+  const page = route.query.page ? Math.max(1, parseInt(route.query.page as string)) : 1
+  try { await postStore.fetchPostList({ categoryId: selectedCategoryId.value, page, size: 12 }) } catch { /* ignore */ }
   postStore.fetchCategories()
+  fetchOnlineStats()
 })
 </script>
 <template>
@@ -50,7 +67,7 @@ onMounted(async () => {
               :effect="selectedCategoryId === undefined ? 'dark' : 'plain'"
               style="cursor:pointer;border-radius:20px;padding:0 16px;height:34px;line-height:34px"
               @click="selectCategory(undefined)"
-            >全部</el-tag>
+            >{{ $t('community.all') }}</el-tag>
             <el-tag
               v-for="cat in categories"
               :key="cat.id"
@@ -63,8 +80,8 @@ onMounted(async () => {
 
           <el-skeleton :loading="loading" :count="3" animated>
             <template #default>
-              <el-empty v-if="posts.length === 0" description="暂无文章">
-                <el-button type="primary" @click="goToCreate">发布第一篇</el-button>
+              <el-empty v-if="posts.length === 0" :description="$t('message.empty.noPosts')">
+                <el-button type="primary" @click="goToCreate">{{ $t('community.publish') }}</el-button>
               </el-empty>
               <div v-else style="display:flex;flex-direction:column;gap:12px">
                 <el-card
@@ -111,14 +128,14 @@ onMounted(async () => {
                     <el-avatar :size="64" :src="userInfo.avatar?.url || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" style="margin-bottom:10px" />
                     <div style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:4px">{{ userInfo.nickname || userInfo.username }}</div>
                     <el-button type="primary" style="width:100%;margin-top:16px" @click="goToCreate">
-                      <el-icon size="14" style="margin-right:4px"><Edit /></el-icon> 发布新帖
+                      <el-icon size="14" style="margin-right:4px"><Edit /></el-icon> {{ $t('community.publish') }}
                     </el-button>
                   </template>
                   <template v-else>
-                    <div style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:8px">欢迎来到 WaterFun</div>
-                    <p style="font-size:13px;color:#64748b;margin-bottom:16px">登录后即可参与讨论</p>
+                    <div style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:8px">{{ $t('community.welcome') }}</div>
+                    <p style="font-size:13px;color:#64748b;margin-bottom:16px">{{ $t('community.loginPrompt') }}</p>
                     <el-button type="primary" style="width:100%" @click="router.push('/login')">
-                      <el-icon size="14" style="margin-right:4px"><User /></el-icon> 立即登录
+                      <el-icon size="14" style="margin-right:4px"><User /></el-icon> {{ $t('community.loginNow') }}
                     </el-button>
                   </template>
                 </div>
@@ -128,8 +145,8 @@ onMounted(async () => {
             <el-card shadow="never">
               <template #header>
                 <div style="display:flex;align-items:center;justify-content:space-between">
-                  <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px">🔥 热门话题</span>
-                  <NuxtLink to="/post" style="font-size:13px;color:#94a3b8;text-decoration:none">更多 <el-icon size="12"><ArrowRight /></el-icon></NuxtLink>
+                  <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px">🔥 {{ $t('community.hotTopics') }}</span>
+                  <NuxtLink to="/post" style="font-size:13px;color:#94a3b8;text-decoration:none">{{ $t('option.more') }} <el-icon size="12"><ArrowRight /></el-icon></NuxtLink>
                 </div>
               </template>
               <div
@@ -153,7 +170,7 @@ onMounted(async () => {
 
             <el-card shadow="never">
               <template #header>
-                <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px"><el-icon size="16"><Bell /></el-icon> 社区公告</span>
+                <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px"><el-icon size="16"><Bell /></el-icon> {{ $t('community.announcements') }}</span>
               </template>
               <div
                 v-for="(notice, i) in ['社区规范更新，请查阅', '新版编辑器已上线', '端午节活动即将开始']"
@@ -165,9 +182,29 @@ onMounted(async () => {
               </div>
             </el-card>
 
+            <el-card shadow="never" v-if="onlineStats">
+              <template #header>
+                <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px"><el-icon size="16"><User /></el-icon> {{ $t('community.onlineStats') }}</span>
+              </template>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 20px">
+                <div style="text-align:center">
+                  <div style="font-size:20px;font-weight:700;color:#3b82f6">{{ onlineStats.onlineCount }}</div>
+                  <div style="font-size:12px;color:#94a3b8;margin-top:2px">{{ $t('community.onlineCount') }}</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:20px;font-weight:700;color:#67c23a">{{ onlineStats.todayNewUsers }}</div>
+                  <div style="font-size:12px;color:#94a3b8;margin-top:2px">{{ $t('community.todayNew') }}</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:20px;font-weight:700;color:#e6a23c">{{ onlineStats.todayPeakOnline }}</div>
+                  <div style="font-size:12px;color:#94a3b8;margin-top:2px">{{ $t('community.todayPeak') }}</div>
+                </div>
+              </div>
+            </el-card>
+
             <el-card shadow="never">
               <template #header>
-                <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px"><el-icon size="16"><IconLink /></el-icon> 友情链接</span>
+                <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px"><el-icon size="16"><IconLink /></el-icon> {{ $t('community.friendLinks') }}</span>
               </template>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px 20px">
                 <a

@@ -13,7 +13,7 @@ import org.waterwood.waterfunadminservice.api.request.role.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
-import org.waterwood.waterfunservicecore.entity.Role;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunadminservice.api.response.role.RoleResp;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;

@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum BusinessType {
     NONE(0),
     POST(1),
-    COMMENT(2),;
+    COMMENT(2),
+    USER(3),;
 
     private final short value;
     private BusinessType(final int value) {

@@ -1,11 +1,11 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
+import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunservicecore.entity.post.Category;
 import org.waterwood.common.jpa.SlugUniquenessChecker;
+import org.waterwood.waterfunservicecore.entity.post.IdOptionVOPackagedDO;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,11 +22,19 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSp
     int deleteByIdIn(Collection<Long> ids);
 
     @Query("""
-        SELECT p.id, new org.waterwood.api.VO.OptionVO(c.id, c.slug, c.name, false)
+        SELECT new org.waterwood.api.VO.OptionVO(c.id, c.slug, c.name, false)
         FROM Post p JOIN p.category c
         WHERE p.id IN :postIds
     """)
-    List<Object[]> findCategoryByPostIdIn(List<Long> postIds);
+    List<OptionVO<Long>> findCategoryOptionVOByPostIdIn(@Param("postIds") List<Long> postIds);
+
+    @Query("""
+        SELECT new org.waterwood.waterfunservicecore.entity.post.IdOptionVOPackagedDO
+            (c.id, c.slug, c.name, false)
+        FROM Post p JOIN p.category c
+        WHERE p.id IN :postIds
+    """)
+    List<IdOptionVOPackagedDO<Long>> findCategoryDOByPostIdIn(@Param("postIds") List<Long> postIds);
 
     List<Category> findAllByIsDeleted(Boolean isDeleted);
 
@@ -37,4 +45,20 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSp
         ORDER BY c.usageCount DESC
        """)
     List<Category> findAllByIsDeletedWithParentOrderByUsageCountDesc();
+
+    @Modifying
+    @Query("""
+       UPDATE Category c
+        SET c.usageCount = c.usageCount + :count
+        WHERE c.id = :id
+    """)
+    void increaseUsageCountById(@Param("id") Long id, @Param("count") int count);
+
+    @Modifying
+    @Query("""
+         UPDATE Category c
+          SET c.usageCount = GREATEST ( c.usageCount - :count, 0)
+          WHERE c.id = :id
+""")
+    void decreaseUsageCountById(@Param("id") Long id, @Param("count") int count);
 }

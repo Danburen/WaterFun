@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
-import { ElMessageBox } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
 import {
   getModerationResource,
@@ -10,7 +9,6 @@ import {
   type ModerateRejectType,
   type ModerationResourceRes,
 } from "~/api/moderation";
-import { ElMessage } from "element-plus";
 import CardContainer from "~/components/CardContainer.vue";
 
 const route = useRoute();
@@ -139,89 +137,94 @@ watch([taskId, resourceUuid], fetchDetail);
 </script>
 
 <template>
-  <div v-loading="loading" class="resource-detail">
-    <CardContainer title="资源详情">
-      <template #header-right>
-        <el-button text @click="router.back()">返回</el-button>
-        <el-button type="success" :disabled="!resourceUuid" @click="handleApprove">通过</el-button>
-        <el-button type="warning" :disabled="!resourceUuid" @click="openRejectDialog">驳回</el-button>
-      </template>
+  <div class="resource-detail">
+    <div class="page-loading" v-if="loading">加载中...</div>
+    <template v-else>
+      <CardContainer title="资源详情">
+        <template #header-right>
+          <button class="btn btn-default" @click="router.back()">返回</button>
+          <button class="btn btn-success" :disabled="!resourceUuid" @click="handleApprove">通过</button>
+          <button class="btn btn-warning" :disabled="!resourceUuid" @click="openRejectDialog">驳回</button>
+        </template>
 
-      <div v-if="detail" class="detail-layout">
-        <div class="image-pane">
-          <div class="image-stage">
-            <img
-              v-if="previewUrl"
-              :src="previewUrl"
-              :alt="detail.resourceUuid || ''"
-              class="full-image"
-            >
-            <el-empty v-else description="暂无数据" />
+        <div v-if="detail" class="detail-layout">
+          <div class="image-pane">
+            <div class="image-stage">
+              <img
+                v-if="previewUrl"
+                :src="previewUrl"
+                :alt="detail.resourceUuid || ''"
+                class="full-image"
+              >
+              <el-empty v-else description="暂无数据" />
+            </div>
+            <div v-if="previewUrl" class="image-actions">
+              <el-link :href="previewUrl" target="_blank" type="primary">打开原图</el-link>
+            </div>
           </div>
-          <div v-if="previewUrl" class="image-actions">
-            <el-link :href="previewUrl" target="_blank" type="primary">打开原图</el-link>
+
+          <div class="info-pane">
+            <el-descriptions :column="1" border>
+              <el-descriptions-item label="资源UUID">
+                {{ detail.resourceUuid || "无" }}
+              </el-descriptions-item>
+              <el-descriptions-item label="所属任务ID">
+                {{ detail.taskId || "无" }}
+              </el-descriptions-item>
+              <el-descriptions-item label="审核状态">
+                <el-tag :type="statusTagType(detail.status)">
+                  {{ statusLabel(detail.status) }}
+                </el-tag>
+              </el-descriptions-item>
+              <el-descriptions-item label="MIME类型">
+                {{ detail.fileProbeResult?.mimeType || "无" }}
+              </el-descriptions-item>
+              <el-descriptions-item label="文件大小">
+                {{ formatFileSize(detail.fileProbeResult?.size) }}
+              </el-descriptions-item>
+              <el-descriptions-item label="审核人ID">
+                {{ detail.auditorId || "无" }}
+              </el-descriptions-item>
+              <el-descriptions-item label="审核时间">
+                {{ formatISOData(getInstantIso(detail.auditAt)) || "无" }}
+              </el-descriptions-item>
+              <el-descriptions-item label="驳回类型">
+                {{ rejectTypeLabel(detail.rejectType) }}
+              </el-descriptions-item>
+              <el-descriptions-item label="驳回原因">
+                {{ detail.rejectReason || "无" }}
+              </el-descriptions-item>
+            </el-descriptions>
           </div>
         </div>
 
-        <div class="info-pane">
-          <el-descriptions :column="1" border>
-            <el-descriptions-item label="资源UUID">
-              {{ detail.resourceUuid || "无" }}
-            </el-descriptions-item>
-            <el-descriptions-item label="所属任务ID">
-              {{ detail.taskId || "无" }}
-            </el-descriptions-item>
-            <el-descriptions-item label="审核状态">
-              <el-tag :type="statusTagType(detail.status)">
-                {{ statusLabel(detail.status) }}
-              </el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="MIME类型">
-              {{ detail.fileProbeResult?.mimeType || "无" }}
-            </el-descriptions-item>
-            <el-descriptions-item label="文件大小">
-              {{ formatFileSize(detail.fileProbeResult?.size) }}
-            </el-descriptions-item>
-            <el-descriptions-item label="审核人ID">
-              {{ detail.auditorId || "无" }}
-            </el-descriptions-item>
-            <el-descriptions-item label="审核时间">
-              {{ formatISOData(getInstantIso(detail.auditAt)) || "无" }}
-            </el-descriptions-item>
-            <el-descriptions-item label="驳回类型">
-              {{ rejectTypeLabel(detail.rejectType) }}
-            </el-descriptions-item>
-            <el-descriptions-item label="驳回原因">
-              {{ detail.rejectReason || "无" }}
-            </el-descriptions-item>
-          </el-descriptions>
+        <el-empty v-else description="暂无数据" />
+      </CardContainer>
+
+      <el-dialog v-model="rejectDialogVisible" title="驳回审核资源" width="520">
+        <div class="dialog-form">
+          <div class="form-row">
+            <label class="form-label">驳回类型</label>
+            <el-select v-model="rejectForm.rejectType" style="width: 100%">
+              <el-option
+                v-for="item in rejectTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">驳回原因</label>
+            <el-input v-model="rejectForm.rejectReason" type="textarea" :rows="4" placeholder="请输入驳回原因（可选）" />
+          </div>
         </div>
-      </div>
-
-      <el-empty v-else description="暂无数据" />
-    </CardContainer>
-
-    <el-dialog v-model="rejectDialogVisible" title="驳回审核资源" width="520">
-      <el-form label-width="100px">
-        <el-form-item label="驳回类型">
-          <el-select v-model="rejectForm.rejectType" style="width: 100%">
-            <el-option
-              v-for="item in rejectTypeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="驳回原因">
-          <el-input v-model="rejectForm.rejectReason" type="textarea" :rows="4" placeholder="请输入驳回原因（可选）" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="rejectDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="rejectSubmitting" @click="submitReject">保存</el-button>
-      </template>
-    </el-dialog>
+        <template #footer>
+          <button class="btn btn-default" @click="rejectDialogVisible = false">取消</button>
+          <button class="btn btn-primary" :disabled="rejectSubmitting" @click="submitReject">保存</button>
+        </template>
+      </el-dialog>
+    </template>
   </div>
 </template>
 
@@ -230,6 +233,15 @@ watch([taskId, resourceUuid], fetchDetail);
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #909399;
+  font-size: 14px;
 }
 
 .detail-layout {
@@ -269,6 +281,32 @@ watch([taskId, resourceUuid], fetchDetail);
 
 .info-pane {
   overflow: hidden;
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.form-label {
+  min-width: 100px;
+  text-align: right;
+  font-size: 14px;
+  color: #606266;
+  line-height: 32px;
+  flex-shrink: 0;
+}
+
+.form-row .el-select,
+.form-row .el-textarea {
+  flex: 1;
 }
 
 @media (max-width: 992px) {

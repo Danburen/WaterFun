@@ -43,6 +43,36 @@ const localCurrentPage = computed({
     emit("change");
   },
 });
+
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(props.total / props.pageSize))
+);
+
+const pageNumbers = computed(() => {
+  const total = totalPages.value;
+  const current = localCurrentPage.value;
+  const pages: number[] = [];
+  const start = Math.max(1, current - 2);
+  const end = Math.min(total, current + 2);
+  for (let i = start; i <= end; i++) pages.push(i);
+  return pages;
+});
+
+const goPrev = () => {
+  if (localCurrentPage.value > 1) {
+    localCurrentPage.value = localCurrentPage.value - 1;
+  }
+};
+
+const goNext = () => {
+  if (localCurrentPage.value < totalPages.value) {
+    localCurrentPage.value = localCurrentPage.value + 1;
+  }
+};
+
+const goPage = (p: number) => {
+  localCurrentPage.value = p;
+};
 </script>
 
 <template>
@@ -57,26 +87,78 @@ const localCurrentPage = computed({
 
     <slot />
 
-    <div
-      v-if="showPagination"
-      class="pagination-container"
-    >
-      <el-pagination
-        v-model:current-page="localCurrentPage"
-        v-model:page-size="localPageSize"
-        :page-sizes="pageSizes"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-      />
+    <div v-if="showPagination" class="pagination-wrap">
+      <span class="pagination-info">共 {{ total }} 条</span>
+      <div class="pagination">
+        <select v-model="localPageSize" class="page-size-select">
+          <option v-for="s in pageSizes" :key="s" :value="s">{{ s }} 条/页</option>
+        </select>
+        <button class="page-btn" :disabled="localCurrentPage <= 1" @click="goPrev"><i class="fa-solid fa-chevron-left"></i></button>
+        <button v-for="p in pageNumbers" :key="p" :class="['page-btn', { active: localCurrentPage === p }]" @click="goPage(p)">{{ p }}</button>
+        <button class="page-btn" :disabled="localCurrentPage >= totalPages" @click="goNext"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
     </div>
   </CardContainer>
 </template>
 
 <style scoped>
-.pagination-container {
-  margin-top: 10px;
-  text-align: center;
-  padding: 0 20px 20px 20px;
+.pagination-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-light);
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pagination {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.page-size-select {
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-white);
+  padding: 0 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-right: 8px;
+}
+
+.page-btn {
+  min-width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  background: var(--bg-white);
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.page-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 </style>
-

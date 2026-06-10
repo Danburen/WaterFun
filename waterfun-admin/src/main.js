@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
-import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
 import '@/assets/global.css'
-import "element-plus/dist/index.css"
 import App from './App.vue'
 import router from "@/router/index";
 import {createPinia} from "pinia";
@@ -16,7 +15,6 @@ const app = createApp(App)
 app.component('VChart', ECharts)
 app.use(pinia)
 app.use(router)
-app.use(ElementPlus)
 
 const authStore = useAuthStore();
 authStore.restore();

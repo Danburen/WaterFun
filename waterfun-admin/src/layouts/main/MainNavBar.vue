@@ -1,104 +1,140 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type {BreadNavItemType} from "@/types/ui/tagNav.js";
-// @ts-ignore
-import {Expand, Fold} from "@element-plus/icons-vue";
-import {useBreadcrumbs} from "@/composables/useBreadcrumbs.js";
-import UserMenu from "@/layouts/main/UserMenu.vue";
-const menuCollapse = ref(false)
+import type { BreadNavItemType } from "@/types/ui/tagNav.js"
+import { useBreadcrumbs } from "@/composables/useBreadcrumbs.js"
+import UserMenu from "@/layouts/main/UserMenu.vue"
+
 const emit = defineEmits(['collapse'])
-const collapseButtonClick = () =>{
+const menuCollapse = ref(false)
+
+const collapseButtonClick = () => {
   menuCollapse.value = !menuCollapse.value
   emit('collapse')
 }
 
-const bcStore = useBreadcrumbs();
-
+const bcStore = useBreadcrumbs()
 </script>
+
 <template>
-  <div class="header-container">
-    <el-header class="app-header items-center">
-      <div class="header-left">
-        <div class="align-center logo">
-          <el-button
-            size="large"
-            style="width: 40px;height: 40px;"
-            link
-            @click="collapseButtonClick"
-          >
-            <div
-              v-if="!menuCollapse"
-              class="collapse-icon"
-            >
-              <Fold />
-            </div>
-            <div
-              v-else
-              class="collapse-icon"
-            >
-              <Expand />
-            </div>
-          </el-button>
-          <img
-            src="../../assets/logo.svg"
-            width="35px"
-            height="35px"
-            alt="WaterFun"
-          >
-          <span style="margin-left: 0.5em; font-size: 1em">WaterFun</span>
-        </div>
-        <el-breadcrumb
-          class="bread-nav"
-          separator="/"
-        >
-          <el-breadcrumb-item
-            v-for="item in bcStore.breadcrumbs.value"
-            :to="item.to"
-          >
-            {{ item.locale }}
-          </el-breadcrumb-item>
-        </el-breadcrumb>
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <button class="collapse-btn" @click="collapseButtonClick">
+        <i :class="menuCollapse ? 'fa-solid fa-chevron-right' : 'fa-solid fa-bars'"></i>
+      </button>
+      <div class="breadcrumb">
+        <span v-for="(item, idx) in bcStore.breadcrumbs.value" :key="idx" class="breadcrumb-item">
+          <span v-if="idx > 0" class="separator">/</span>
+          <span class="breadcrumb-text">{{ item.locale }}</span>
+        </span>
       </div>
-      <div class="header-right float-right">
-        <UserMenu />
-      </div>
-    </el-header>
-  </div>
+    </div>
+    <div class="top-bar-right">
+      <button class="top-btn"><i class="fa-regular fa-bell"></i></button>
+      <UserMenu />
+    </div>
+  </header>
 </template>
 
 <style scoped>
-.header-container {
-  width: 100%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  z-index: 1;
-}
-.app-header {
-  justify-content: space-between;
+.top-bar {
   height: 60px;
-}
-
-.header-left {
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  gap: 16px; /* 控制子元素间距 */
-  flex: 1; /* 占据剩余空间 */
-  min-width: 0; /* 防止内容溢出 */
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  flex-shrink: 0;
 }
 
-.header-right {
+.top-bar-left {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-right: auto;
+  flex: 1;
+  min-width: 0;
 }
 
-.collapse-icon {
-  color: #303133;
-  width: 1.5em;
-  height: 1.5em;
+.collapse-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
 }
 
-.bread-nav {
-  padding: 0.5em 1em;
+.collapse-btn:hover {
+  background: var(--bg);
+  color: var(--primary);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.separator {
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+.breadcrumb-text {
+  color: var(--text-secondary);
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.top-btn:hover {
+  background: var(--bg);
+  color: var(--primary);
+}
+
+.top-btn .badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  border: 2px solid var(--bg-white);
 }
 </style>

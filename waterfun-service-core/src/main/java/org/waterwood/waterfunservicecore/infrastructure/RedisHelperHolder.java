@@ -22,24 +22,24 @@ public interface RedisHelperHolder {
 
     void set(String key, String value, Duration expire);
 
-    void hSet(String key, String field, String value);
+    void hashSet(String key, String field, String value);
 
-    String hGet(String key, String field);
+    String hashGet(String key, String field);
 
-    void hSetMap(String key, Map<String, String> map, Duration expire);
+    void hashSetMap(String key, Map<String, String> map, Duration expire);
 
-    void hSetMap(String key, Map<String, String> map);
+    void hashSetMap(String key, Map<String, String> map);
 
-    void hSetAll(String key, Map<String, String> map);
+    void hashSetAll(String key, Map<String, String> map);
 
-    Map<String, String> hGetAll(String key);
-    Set<String> hKeys(String key);
+    Map<String, String> hashGetAll(String key);
+    Set<String> hashKeys(String key);
 
-    void hDel(String key, String... fields);
-    void sAdd(String key, String... values);
-    void sRem(String key, Object... values);
-    void sRem(String key, Collection<String> members);
-    Set<String> sMem(String key);
+    void hashDel(String key, String... fields);
+    void setAdd(String key, String... values);
+    void setRemove(String key, Object... values);
+    void setRemove(String key, Collection<String> members);
+    Set<String> setMembers(String key);
 
     <T> T getValue(String key, Class<T> clazz);
 
@@ -50,12 +50,12 @@ public interface RedisHelperHolder {
     Long getExpire(String key);
 
     /**
-     * Redis pipeline mget
+     * Redis pipeline multiGet
      *
      * @param keys redis keys
      * @return redis value, same size of input
      */
-    List<String> mget(List<String> keys);
+    List<String> multiGet(List<String> keys);
 
     /**
      * Batch get TTL (time-to-live) for multiple keys using pipeline.
@@ -64,7 +64,7 @@ public interface RedisHelperHolder {
      * @return list of TTL in seconds, aligned with input order.
      *         -1 if key has no expiration, -2 if key does not exist
      */
-    List<Long> mgetExpire(List<String> keys);
+    List<Long> multiGetExpire(List<String> keys);
 
     Cursor<String> scan(ScanOptions options);
 

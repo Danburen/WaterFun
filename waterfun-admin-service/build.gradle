@@ -40,6 +40,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'cn.hutool:hutool-captcha:5.8.26'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // Source: https://mvnrepository.com/artifact/com.github.oshi/oshi-core
+    implementation("com.github.oshi:oshi-core:7.3.0")
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.5'

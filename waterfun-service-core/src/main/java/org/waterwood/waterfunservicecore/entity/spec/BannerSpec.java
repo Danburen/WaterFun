@@ -3,9 +3,9 @@ package org.waterwood.waterfunservicecore.entity.spec;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.utils.StringUtil;
-import org.waterwood.waterfunservicecore.entity.Banner;
-import org.waterwood.waterfunservicecore.entity.BannerPosition;
-import org.waterwood.waterfunservicecore.entity.VisibleStatus;
+import org.waterwood.waterfunservicecore.entity.content.Banner;
+import org.waterwood.waterfunservicecore.entity.content.BannerPosition;
+import org.waterwood.waterfunservicecore.entity.content.VisibleStatus;
 
 import java.time.Instant;
 import java.util.ArrayList;

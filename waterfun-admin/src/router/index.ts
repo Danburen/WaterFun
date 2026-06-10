@@ -23,18 +23,18 @@ export const routes: RouteRecordRaw[] = [
                 name: "dashboard",
                 meta: {
                     locale: '仪表盘',
-                    icon: 'DashBoard',
+                    icon: 'dashboard',
                 }
             },
             {
                 path: '/system',
                 component: () => import('@/layouts/EmptyLayout.vue'),
-                meta: { locale:'系统管理', icon: 'el-Edit' },
+                meta: { locale:'系统管理', icon: 'system' },
                 children: [
                     {
                         path: 'user',
                         name: 'userManager',
-                        meta: { locale:'用户管理' },
+                        meta: { locale:'用户管理', icon: 'users' },
                         component: () => import("@/views/System/user/UserList.vue")
                     },
                     {
@@ -70,7 +70,7 @@ export const routes: RouteRecordRaw[] = [
                     {
                         path: 'role',
                         name: 'roleManager',
-                        meta: { locale:'角色管理'},
+                        meta: { locale:'角色管理', icon: 'user-tag' },
                         component: () => import("~/views/System/role/RoleList.vue")
                     },
                     {
@@ -106,7 +106,7 @@ export const routes: RouteRecordRaw[] = [
                     {
                         path: 'permission',
                         name: 'permissionManager',
-                        meta: { locale:'权限管理' },
+                        meta: { locale:'权限管理', icon: 'key' },
                         component: () => import("~/views/System/perm/PermList.vue")
                     },
                     {
@@ -124,24 +124,24 @@ export const routes: RouteRecordRaw[] = [
             {
                 path: '/monitor',
                 component: () => import('@/layouts/EmptyLayout.vue'),
-                meta: { locale: '系统监控' ,icon: 'el-VideoCamera' },
+                meta: { locale: '系统监控' ,icon: 'monitor' },
                 children: [
                     {
                         path: 'online-users',
                         name: 'online-users',
-                        meta: { locale: '在线用户' },
+                        meta: { locale: '在线用户', icon: 'user-clock' },
                         component: () => import("@/views/System/OnlineMonitorView.vue")
                     },
                     {
                         path: 'status',
                         name: 'status',
-                        meta: { locale: '系统状态' },
+                        meta: { locale: '系统状态', icon: 'heart-pulse' },
                         component: () => import("@/views/System/StatusMonitorView.vue")
                     },
                     {
                         path: 'global',
                         name: 'global',
-                        meta: { locale: '全局视图' },
+                        meta: { locale: '全局视图', icon: 'globe' },
                         component: () => import('@/views/System/GlobalViewMonitorView.vue')
                     }
                 ]
@@ -149,12 +149,12 @@ export const routes: RouteRecordRaw[] = [
             {
                 path: '/moderation',
                 component: () => import('@/layouts/EmptyLayout.vue'),
-                meta: { locale: '内容审核', icon: 'el-Check' },
+                meta: { locale: '内容审核', icon: 'moderation' },
                 children: [
                     {
                         path: 'workbench',
                         name: 'moderationWorkbench',
-                        meta: { locale: '审核工作台' },
+                        meta: { locale: '审核工作台', icon: 'clipboard-check' },
                         component: () => import('@/views/Moderation/ContentModerationWorkbench.vue')
                     },
                     {
@@ -180,7 +180,7 @@ export const routes: RouteRecordRaw[] = [
                     {
                         path: 'resources',
                         name: 'moderationResourceList',
-                        meta: { locale: '资源列表' },
+                        meta: { locale: '资源列表', icon: 'cubes' },
                         component: () => import('@/views/Moderation/ResourceModerationList.vue')
                     }
                 ]
@@ -188,12 +188,12 @@ export const routes: RouteRecordRaw[] = [
             {
                 path: '/content',
                 component: () => import('@/layouts/EmptyLayout.vue'),
-                meta: { locale: '内容管理', icon: 'el-Document' },
+                meta: { locale: '内容管理', icon: 'content' },
                 children: [
                     {
                         path: 'post',
                         name: 'contentPostList',
-                        meta: { locale: '帖子管理' },
+                        meta: { locale: '帖子管理', icon: 'file-lines' },
                         component: () => import('@/views/Content/PostList.vue')
                     },
                     {
@@ -209,7 +209,7 @@ export const routes: RouteRecordRaw[] = [
                     {
                         path: 'tag',
                         name: 'contentTagList',
-                        meta: { locale: '标签管理' },
+                        meta: { locale: '标签管理', icon: 'tags' },
                         component: () => import('@/views/Content/TagList.vue')
                     },
                     {
@@ -225,7 +225,7 @@ export const routes: RouteRecordRaw[] = [
                     {
                         path: 'category',
                         name: 'contentCategoryList',
-                        meta: { locale: '分类管理' },
+                        meta: { locale: '分类管理', icon: 'folder-tree' },
                         component: () => import('@/views/Content/CategoryList.vue')
                     },
                     {
@@ -241,7 +241,7 @@ export const routes: RouteRecordRaw[] = [
                     {
                         path: 'banner',
                         name: 'contentBannerList',
-                        meta: { locale: '横幅管理' },
+                        meta: { locale: '横幅管理', icon: 'flag' },
                         component: () => import('@/views/Content/BannerList.vue')
                     },
                     {

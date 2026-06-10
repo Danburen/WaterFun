@@ -18,7 +18,10 @@ import org.waterwood.waterfunservicecore.infrastructure.mapper.UserProfileCoreMa
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
+import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
+import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 
 import java.util.List;
@@ -37,6 +40,7 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     private final RedisHelper redisHelper;
     private final UserProfileRepository userProfileRepository;
     private final ResourceRepository resourceRepository;
+    private final UserActivityLogService userActivityLogService;
 
     @Override
     public void addUserProfile(UserProfile up) {
@@ -56,6 +60,7 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
 
         upRepo.save(profile);
         userRepository.save(u);
+        userActivityLogService.record(userUid, UserActionType.UPDATED, BusinessType.USER, null);
     }
 
     @Override

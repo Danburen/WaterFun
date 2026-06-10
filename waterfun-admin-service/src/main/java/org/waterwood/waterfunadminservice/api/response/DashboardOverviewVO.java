@@ -13,5 +13,7 @@ public class DashboardOverviewVO {
     private long totalPosts;
     private long todayNewUsers;
     private long todayNewPosts;
+    private long todayPv;
     private long pendingModerations;
+    private long peakOnline;
 }

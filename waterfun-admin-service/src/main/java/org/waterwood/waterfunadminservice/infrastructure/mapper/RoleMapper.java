@@ -4,7 +4,7 @@ import org.mapstruct.*;
 import org.waterwood.waterfunadminservice.api.request.role.CreateRoleRequest;
 import org.waterwood.waterfunadminservice.api.request.role.UpdateRoleRequest;
 import org.waterwood.waterfunadminservice.api.response.role.RoleResp;
-import org.waterwood.waterfunservicecore.entity.Role;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface RoleMapper {

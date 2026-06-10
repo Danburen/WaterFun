@@ -9,28 +9,32 @@ import org.waterwood.waterfunservicecore.entity.SiteStatistic;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface SiteStatisticRepository extends JpaRepository<SiteStatistic, LocalDate>, JpaSpecificationExecutor<SiteStatistic> {
     Optional<SiteStatistic> findTopByOrderByUpdatedAtDesc();
 
     @Modifying
-    @Query("UPDATE SiteStatistic s SET s.loginCount = s.loginCount + 1, s.updatedAt = :now WHERE s.id = :date")
-    int incrementLoginCount(@Param("date") LocalDate date, @Param("now") Instant now);
+    @Query("UPDATE SiteStatistic s SET s.loginCount = s.loginCount + :delta, s.updatedAt = :now WHERE s.id = :date")
+    int incrementLoginCount(@Param("date") LocalDate date, @Param("delta") long delta, @Param("now") Instant now);
 
     @Modifying
-    @Query("UPDATE SiteStatistic s SET s.newUsers = s.newUsers + 1, s.updatedAt = :now WHERE s.id = :date")
-    int incrementNewUsers(@Param("date") LocalDate date, @Param("now") Instant now);
+    @Query("UPDATE SiteStatistic s SET s.newUsers = s.newUsers + :delta, s.updatedAt = :now WHERE s.id = :date")
+    int incrementNewUsers(@Param("date") LocalDate date, @Param("delta") long delta, @Param("now") Instant now);
 
     @Modifying
-    @Query("UPDATE SiteStatistic s SET s.newPosts = s.newPosts + 1, s.updatedAt = :now WHERE s.id = :date")
-    int incrementNewPosts(@Param("date") LocalDate date, @Param("now") Instant now);
+    @Query("UPDATE SiteStatistic s SET s.newPosts = s.newPosts + :delta, s.updatedAt = :now WHERE s.id = :date")
+    int incrementNewPosts(@Param("date") LocalDate date, @Param("delta") long delta, @Param("now") Instant now);
 
     @Modifying
-    @Query("UPDATE SiteStatistic s SET s.dailyPv = s.dailyPv + 1, s.updatedAt = :now WHERE s.id = :date")
-    int incrementDailyPv(@Param("date") LocalDate date, @Param("now") Instant now);
+    @Query("UPDATE SiteStatistic s SET s.dailyPv = s.dailyPv + :delta, s.updatedAt = :now WHERE s.id = :date")
+    int incrementDailyPv(@Param("date") LocalDate date, @Param("delta") long delta, @Param("now") Instant now);
 
     @Modifying
     @Query("UPDATE SiteStatistic s SET s.peakOnline = GREATEST(s.peakOnline, :count), s.updatedAt = :now WHERE s.id = :date")
     int updatePeakOnline(@Param("date") LocalDate date, @Param("count") long count, @Param("now") Instant now);
+
+    @Query("SELECT s FROM SiteStatistic s WHERE s.id >= :startDate ORDER BY s.id ASC")
+    List<SiteStatistic> findFromDate(@Param("startDate") LocalDate startDate);
 }

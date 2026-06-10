@@ -1,61 +1,38 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 const props = withDefaults(defineProps<{
-    modelValue: boolean;
-    title: string;
-    width?: string;
-    destroyOnClose?: boolean;
-    confirmButtonText?: string;
-    cancelButtonText?: string;
+  modelValue: boolean;
+  title: string;
+  width?: string;
 }>(), {
-    modelValue: false,
-    title: '提示',
-    width: '30%',
-    destroyOnClose: true,
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-})
-
-const visible = computed({
-    get: () => props.modelValue,
-    set: (val) => emit('update:modelValue', val)    
+  width: '640px',
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean];
-  confirm: [];
-  cancel: [];
   close: [];
-}>();
+}>()
+
+const visible = computed({ get: () => props.modelValue, set: v => emit('update:modelValue', v) })
+const handleOverlay = (e: MouseEvent) => { if ((e.target as HTMLElement).classList.contains('dialog-overlay')) visible.value = false }
 </script>
+
 <template>
-  <el-dialog
-    v-model="visible"
-    :title="title"
-    :width="width"
-    :destroy-on-close="destroyOnClose"
-    :confirm-button-text="confirmButtonText"
-    :cancel-button-text="cancelButtonText"
-    @close="emit('close')"
-  >
-    <slot />
-    <template #footer>
-      <el-button
-        type="primary"
-        @click="emit('confirm')"
-      >
-        {{ confirmButtonText }}
-      </el-button>
-      <el-button @click="emit('cancel')">
-        {{ cancelButtonText }}
-      </el-button>
-    </template>
-  </el-dialog>
+  <Teleport to="body">
+    <transition name="dialog-fade">
+      <div v-if="visible" class="dialog-overlay" @click="handleOverlay">
+        <div class="dialog-panel" :style="{ maxWidth: width }">
+          <div class="dialog-header">
+            <span class="dialog-title">{{ title }}</span>
+            <button class="dialog-close" @click="visible = false">&times;</button>
+          </div>
+          <div class="dialog-body">
+            <slot />
+          </div>
+          <div v-if="$slots.footer" class="dialog-footer">
+            <slot name="footer" />
+          </div>
+        </div>
+      </div>
+    </transition>
+  </Teleport>
 </template>
-<style scoped>
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-</style>

@@ -18,9 +18,13 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     List<Resource> findByUuidIn(Collection<String> uuids);
 
     @Modifying
+    @Query("UPDATE Resource r SET r.status = :to WHERE r.uuid IN :uuids AND r.status = :from")
+    void batchUpdateStatusFromTo(@Param("from") ResourceStatus From,
+                                 @Param("to") ResourceStatus status,
+                                 @Param("uuids") Collection<String> uuids);
+    @Modifying
     @Query("UPDATE Resource r SET r.status = :status WHERE r.uuid IN :uuids")
-    void batchUpdateStatus(@Param("status") ResourceStatus status,
-                           @Param("uuids") Collection<String> uuids);
+    void batchUpdateStatusFromTo(@Param("status") ResourceStatus status, @Param("uuids") Collection<String> uuids);
 
     List<Resource> findByUuidInAndUploaderId(Collection<String> uuids, Long uploaderId);
 
@@ -36,4 +40,7 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     List<String> findResourceResourceKeyByUuidIn(Collection<String> uuids);
 
     List<Resource> findByUuidIn(List<String> attr0);
+
+    List<Resource> findByUploaderIdAndUuidInAndStatus(Long uploaderId, Set<String> attr0, ResourceStatus status);
+
 }

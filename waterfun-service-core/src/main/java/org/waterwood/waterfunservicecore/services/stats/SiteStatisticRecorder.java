@@ -10,6 +10,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.SiteStatisti
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -18,72 +19,114 @@ public class SiteStatisticRecorder {
 
     private final SiteStatisticRepository repository;
 
-    @Transactional
+    private volatile StatsDelta delta = new StatsDelta(LocalDate.now());
+
     public void recordLogin() {
-        incrementOrCreate(repository::incrementLoginCount, stat -> {
-            stat.setLoginCount(1L);
-            return stat;
-        });
+        delta.loginCount.incrementAndGet();
     }
 
-    @Transactional
     public void recordNewUser() {
-        incrementOrCreate(repository::incrementNewUsers, stat -> {
-            stat.setNewUsers(1L);
-            return stat;
-        });
+        delta.newUsers.incrementAndGet();
     }
 
-    @Transactional
     public void recordNewPost() {
-        incrementOrCreate(repository::incrementNewPosts, stat -> {
-            stat.setNewPosts(1L);
-            return stat;
-        });
+        delta.newPosts.incrementAndGet();
     }
 
-    @Transactional
     public void recordPageView() {
-        incrementOrCreate(repository::incrementDailyPv, stat -> {
-            stat.setDailyPv(1L);
-            return stat;
-        });
+        delta.dailyPv.incrementAndGet();
+    }
+
+    public void recordPeakOnline(long count) {
+        delta.peakOnline.updateAndGet(prev -> Math.max(prev, count));
+    }
+
+    public long getCachedNewUsers() {
+        return delta.newUsers.get();
+    }
+
+    public long getCachedPeakOnline() {
+        return delta.peakOnline.get();
     }
 
     @Transactional
-    public void recordPeakOnline(long currentCount) {
-        LocalDate today = LocalDate.now();
+    public void flush() {
+        StatsDelta old = delta;
+        delta = new StatsDelta(LocalDate.now());
+
+        long loginCount = old.loginCount.getAndSet(0);
+        long newUsers = old.newUsers.getAndSet(0);
+        long newPosts = old.newPosts.getAndSet(0);
+        long dailyPv = old.dailyPv.getAndSet(0);
+        long peakOnline = old.peakOnline.getAndSet(-1);
+
+        if (loginCount == 0 && newUsers == 0 && newPosts == 0 && dailyPv == 0 && peakOnline < 0) {
+            return;
+        }
+
         Instant now = Instant.now();
-        int updated = repository.updatePeakOnline(today, currentCount, now);
-        if (updated == 0) {
-            try {
-                SiteStatistic stat = new SiteStatistic();
-                stat.setId(today);
-                stat.setPeakOnline(currentCount);
-                stat.setUpdatedAt(now);
-                repository.save(stat);
-            } catch (DataIntegrityViolationException e) {
-                repository.updatePeakOnline(today, currentCount, now);
+        LocalDate date = old.date;
+
+        if (loginCount > 0) {
+            applyDelta(date, now, loginCount, repository::incrementLoginCount, SiteStatistic::setLoginCount);
+        }
+        if (newUsers > 0) {
+            applyDelta(date, now, newUsers, repository::incrementNewUsers, SiteStatistic::setNewUsers);
+        }
+        if (newPosts > 0) {
+            applyDelta(date, now, newPosts, repository::incrementNewPosts, SiteStatistic::setNewPosts);
+        }
+        if (dailyPv > 0) {
+            applyDelta(date, now, dailyPv, repository::incrementDailyPv, SiteStatistic::setDailyPv);
+        }
+        if (peakOnline >= 0) {
+            int updated = repository.updatePeakOnline(date, peakOnline, now);
+            if (updated == 0) {
+                try {
+                    SiteStatistic stat = new SiteStatistic();
+                    stat.setId(date);
+                    stat.setUpdatedAt(now);
+                    stat.setPeakOnline(peakOnline);
+                    repository.save(stat);
+                } catch (DataIntegrityViolationException e) {
+                    repository.updatePeakOnline(date, peakOnline, now);
+                }
             }
         }
     }
 
-    private void incrementOrCreate(
-            java.util.function.BiFunction<LocalDate, Instant, Integer> incrementFn,
-            java.util.function.Function<SiteStatistic, SiteStatistic> initializer
-    ) {
-        LocalDate today = LocalDate.now();
-        Instant now = Instant.now();
-        int updated = incrementFn.apply(today, now);
+    private void applyDelta(LocalDate date, Instant now, long delta,
+                            IncrementFunction incrementFn,
+                            java.util.function.BiConsumer<SiteStatistic, Long> setter) {
+        int updated = incrementFn.apply(date, delta, now);
         if (updated == 0) {
             try {
-                SiteStatistic stat = initializer.apply(new SiteStatistic());
-                stat.setId(today);
+                SiteStatistic stat = new SiteStatistic();
+                stat.setId(date);
                 stat.setUpdatedAt(now);
+                setter.accept(stat, delta);
                 repository.save(stat);
             } catch (DataIntegrityViolationException e) {
-                incrementFn.apply(today, now);
+                incrementFn.apply(date, delta, now);
             }
+        }
+    }
+
+    @FunctionalInterface
+    private interface IncrementFunction {
+        int apply(LocalDate date, long delta, Instant now);
+    }
+
+    private static class StatsDelta {
+        final LocalDate date;
+        final AtomicLong loginCount = new AtomicLong(0);
+        final AtomicLong newUsers = new AtomicLong(0);
+        final AtomicLong newPosts = new AtomicLong(0);
+        final AtomicLong dailyPv = new AtomicLong(0);
+        final AtomicLong peakOnline = new AtomicLong(-1);
+
+        StatsDelta(LocalDate date) {
+            this.date = date;
         }
     }
 }

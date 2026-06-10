@@ -4,12 +4,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.api.enums.PermissionType;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
+import org.waterwood.waterfunservicecore.entity.perm.PermissionType;
 
 import java.io.Serializable;
 
 /**
- * DTO for {@link org.waterwood.waterfunservicecore.entity.Permission}
+ * DTO for {@link Permission}
  */
 @Data
 @AllArgsConstructor

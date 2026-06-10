@@ -108,7 +108,7 @@ public class UserModerateCallbackStrategy implements ModerationCallbackStrategy 
                 List<String> uuids = uidToResource.values().stream()
                         .map(r -> r.getId().getResourceUuid())
                         .toList();
-                resourceRepository.batchUpdateStatus(ResourceStatus.ORPHAN, uuids);
+                resourceRepository.batchUpdateStatusFromTo(, ResourceStatus.ORPHAN, uuids);
             }
         });
         moderationInboxMessageHandler.handleBatch(msgs);

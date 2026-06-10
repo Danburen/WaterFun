@@ -19,7 +19,10 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentLikeR
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
+import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
+import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.UserBriefService;
 
@@ -35,6 +38,7 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final NotificationService notificationService;
+    private final UserActivityLogService userActivityLogService;
 
     private static final int DEFAULT_LIMIT = 10;
     private static final int MAX_LIMIT = 20;
@@ -67,6 +71,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setAuthor(userRepository.getReferenceById(authorUid));
         comment.setContent(req.getContent());
         commentRepository.save(comment);
+        userActivityLogService.record(authorUid, UserActionType.CREATE, BusinessType.COMMENT, comment.getId());
 
         // Send reply notification
         if (parent != null) {
@@ -109,6 +114,7 @@ public class CommentServiceImpl implements CommentService {
 
         comment.setStatus(CommentStatus.DELETED);
         commentRepository.save(comment);
+        userActivityLogService.record(UserCtxHolder.getUserUid(), UserActionType.DELETED, BusinessType.COMMENT, id);
         if (comment.isTopLevel()) {
             postRepository.decreaseCommentCountById(comment.getPostId(), deletedReplies + 1);
         } else {
@@ -127,6 +133,7 @@ public class CommentServiceImpl implements CommentService {
                 cl -> {
                     commentLikeRepository.delete(cl);
                     commentRepository.decreaseLikeCountById(id, 1);
+                    userActivityLogService.record(userUid, UserActionType.DELETED, BusinessType.COMMENT, id);
                 },
                 () -> {
                     CommentLikeId commentLikeId = new CommentLikeId(id, userUid);
@@ -143,6 +150,7 @@ public class CommentServiceImpl implements CommentService {
                                 commentDO.getPostId()
                         );
                     }
+                    userActivityLogService.record(userUid, UserActionType.CREATE, BusinessType.COMMENT, id);
                 }
         );
     }

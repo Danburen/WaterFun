@@ -3,24 +3,24 @@ package org.waterwood.waterfunadminservice.service.perm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
 import org.waterwood.utils.CollectionUtil;
+import org.waterwood.utils.StringUtil;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunadminservice.api.request.perm.CreatePermRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.DeletePermsRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.UpdatePermRequest;
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
-import org.waterwood.waterfunadminservice.infrastructure.exception.PermException;
+import org.waterwood.waterfunadminservice.infrastructure.exception.BuiltInResourceProtectedException;
+import org.waterwood.waterfunadminservice.infrastructure.exception.PermissionNotFoundException;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.PermissionMapper;
-import org.waterwood.waterfunservicecore.entity.Permission;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
@@ -46,12 +46,11 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Permission getPermission(int PermId){
         return permissionRepo.findById(PermId)
-                .orElseThrow(() -> new PermException(BaseResponseCode.PERMISSION_NOT_FOUND));
+                .orElseThrow(PermissionNotFoundException::new);
     }
 
     @Override
     public Page<Permission> listPermissions(Specification<Permission> spec, Pageable pageable) {
-        log.info("Listing permissions with of: {} and pageable: {}", spec, pageable);
         return permissionRepo.findAll(spec, pageable);
     }
 
@@ -72,13 +71,29 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Permission fullUpdate(int id, UpdatePermRequest req) {
         Permission perm = getPermission(id);
-        updatePerm(perm, req.getParentId(), req.getCode(), req.getName());
+        Integer parentId = req.getParentId();
+        String code = req.getCode();
+        if(parentId != null){
+            Permission parent = permissionRepo.findById(parentId)
+                    .orElseThrow(PermissionNotFoundException::new);
+            perm.setParent(parent);
+        }
+        if(StringUtil.isNotBlank(code) && !code.equals(perm.getCode())){
+            perm.setCode(identifierGenerator
+                    .fromCode(code, StringUtil.isBlank(req.getName()) ? code : req.getName(), permissionRepo)
+            );
+        }
         permissionMapper.update(req, perm);
         return permissionRepo.save(perm);
     }
 
     @Override
-    public void deletePerm(int id) {
+    public void deletePerm(Integer id) {
+        Permission perm = permissionRepo.findById(id)
+                        .orElseThrow(PermissionNotFoundException::new);
+        if(perm.getIsSystem()){
+            throw new BuiltInResourceProtectedException("Permission");
+        }
         permissionRepo.deleteById(id);
     }
 
@@ -169,16 +184,4 @@ public class PermissionServiceImpl implements PermissionService {
         return BatchResult.of(req.getPermIds().size(), deleted);
     }
 
-    private void updatePerm(Permission perm, @Nullable Integer parentId, @Nullable String code, @Nullable String name) {
-        if(parentId != null){
-            if(parentId.equals(perm.getId()))
-                throw new PermException(BaseResponseCode.PARENT_MUST_DIFFERENT, perm);
-            Permission parent = getPermission(parentId);
-            perm.setParent(parent);
-        }
-        if(code != null){
-           if(code.equals(perm.getCode())) return;
-           perm.setCode(identifierGenerator.fromCode(code, name == null ? code : name, permissionRepo));
-        }
-    }
 }

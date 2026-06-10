@@ -61,42 +61,42 @@ export const getAccountInfo = (): PromiseResBody<AccountInfo> => {
     return request.get('/auth/account');
 }
 
-export const resetPassword = (resetPasswordData: ResetPasswordRequest): PromiseResBody<string> => {
+export const resetPassword = (resetPasswordData: ResetPasswordRequest): PromiseResBody<void> => {
     return request.post('/auth/account/password/reset', resetPasswordData);
 }
 
-export const setPassword = (setPasswordData: SetPasswordRequest): PromiseResBody<string> => {
+export const setPassword = (setPasswordData: SetPasswordRequest): PromiseResBody<void> => {
     return request.post('/auth/account/password/set', setPasswordData);
 }
 
-export const sendVerifyCode = (sendCodeData: SendCodeType): PromiseResBody<string> => {
+export const sendVerifyCode = (sendCodeData: SendCodeType): PromiseResBody<void> => {
     return request.post('/auth/account/send-verify-code', sendCodeData);
 }
 
-export const bindEmail = (bindEmailData: BindEmailRequest): PromiseResBody<string> => {
+export const bindEmail = (bindEmailData: BindEmailRequest): PromiseResBody<void> => {
     return request.post('/auth/account/email/bind', bindEmailData);
 }
 
-export const activateEmail = (activateEmailData: ActivateEmailRequest): PromiseResBody<string> => {
+export const activateEmail = (activateEmailData: ActivateEmailRequest): PromiseResBody<void> => {
     return request.post('/auth/account/email/activate', activateEmailData);
 }
 
-export const changeEmail = (changeEmailData: ChangeEmailRequest): PromiseResBody<string> => {
+export const changeEmail = (changeEmailData: ChangeEmailRequest): PromiseResBody<void> => {
     return request.post('/auth/account/email/change', changeEmailData);
 }
     
-export const bindPhone = (bindPhoneData: BindPhoneRequest): PromiseResBody<string> => {
+export const bindPhone = (bindPhoneData: BindPhoneRequest): PromiseResBody<void> => {
     return request.post('/auth/account/phone/bind', bindPhoneData);
 }
     
-export const activatePhone = (activatePhoneData: ActivatePhoneRequest): PromiseResBody<string> => {
+export const activatePhone = (activatePhoneData: ActivatePhoneRequest): PromiseResBody<void> => {
     return request.post('/auth/account/phone/activate', activatePhoneData);
 }
     
-export const changePhone = (changePhoneData: ChangePhoneRequest): PromiseResBody<string> => {
+export const changePhone = (changePhoneData: ChangePhoneRequest): PromiseResBody<void> => {
     return request.post('/auth/account/phone/change', changePhoneData);
 }
 
-export const unbindEmail = (unbindEmailData: UnbindEmailRequest): PromiseResBody<string> => {
+export const unbindEmail = (unbindEmailData: UnbindEmailRequest): PromiseResBody<void> => {
     return request.post('/auth/account/email/unbind', unbindEmailData);
 }

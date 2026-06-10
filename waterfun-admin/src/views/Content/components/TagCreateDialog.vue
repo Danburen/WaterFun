@@ -1,135 +1,87 @@
 <script setup lang="ts">
-import type { FormInstance, FormRules } from "element-plus";
-
-import { createTag, getTag, putTag, type CreateTagRequest } from "~/api/tag";
+import { createTag, getTag, putTag } from "~/api/tag";
 import { ElMessage } from "element-plus";
+import BaseDialog from "~/components/BaseDialog.vue";
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: boolean;
-    mode?: "create" | "edit";
-    tagId?: number;
-  }>(),
-  {
-    mode: "create",
-    tagId: 0,
-  }
-);
+const props = withDefaults(defineProps<{
+  modelValue: boolean;
+  mode?: "create" | "edit";
+  tagId?: number;
+}>(), { mode: "create", tagId: 0 });
 
-const emit = defineEmits<{
-  "update:modelValue": [value: boolean];
-  success: [];
-}>();
+const emit = defineEmits<{ "update:modelValue": [value: boolean]; success: [] }>();
 
-
-const formRef = ref<FormInstance>();
 const submitting = ref(false);
+const name = ref(''); const slug = ref(''); const description = ref('');
+const nameErr = ref(''); const slugErr = ref(''); const descErr = ref('');
 
-const formModel = ref<CreateTagRequest>({
-  name: "",
-  slug: "",
-  description: "",
-});
+const dialogTitle = computed(() => props.mode === "edit" ? '编辑标签' : '新增标签');
 
-const rules: FormRules<CreateTagRequest> = {
-  name: [
-    { required: true, message: '请输入标签名', trigger: "blur" },
-    { max: 30, message: "Max 30", trigger: "blur" },
-  ],
-  slug: [{ max: 50, message: "Max 50", trigger: "blur" }],
-  description: [{ max: 500, message: "Max 500", trigger: "blur" }],
-};
-
-const dialogTitle = computed(() =>
-  props.mode === "edit" ? '编辑标签' : '新增标签'
-);
-
-const visible = computed({
-  get: () => props.modelValue,
-  set: (value: boolean) => emit("update:modelValue", value),
-});
+const visible = computed({ get: () => props.modelValue, set: v => emit("update:modelValue", v) });
 
 const loadDetail = async () => {
   if (props.mode !== "edit" || !props.tagId) return;
-  try {
-    const res = await getTag(props.tagId);
-    formModel.value = {
-      name: res.data.name || "",
-      slug: res.data.slug || "",
-      description: res.data.description || "",
-    };
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取数据失败');
-  }
+  try { const res = await getTag(props.tagId); name.value = res.data.name || ''; slug.value = res.data.slug || ''; description.value = res.data.description || ''; }
+  catch { ElMessage.error('获取数据失败'); }
 };
 
-watch(
-  () => visible.value,
-  (open) => {
-    if (open) {
-      loadDetail();
-    }
-  }
-);
+watch(() => visible.value, (open) => { if (open) { resetForm(); loadDetail(); } });
 
-const resetForm = () => {
-  formModel.value = {
-    name: "",
-    slug: "",
-    description: "",
-  };
-  formRef.value?.resetFields();
+const resetForm = () => { name.value = ''; slug.value = ''; description.value = ''; clearErrs(); };
+const clearErrs = () => { nameErr.value = ''; slugErr.value = ''; descErr.value = ''; };
+
+const validate = () => {
+  clearErrs(); let ok = true;
+  if (!name.value.trim()) { nameErr.value = '请输入标签名'; ok = false; }
+  else if (name.value.length > 30) { nameErr.value = 'Max 30'; ok = false; }
+  if (slug.value.length > 50) { slugErr.value = 'Max 50'; ok = false; }
+  if (description.value.length > 500) { descErr.value = 'Max 500'; ok = false; }
+  return ok;
 };
 
 const handleSave = async () => {
-  const valid = await formRef.value?.validate().catch(() => false);
-  if (!valid) return;
-
+  if (!validate()) return;
   submitting.value = true;
   try {
-    const payload = {
-      name: formModel.value.name,
-      slug: formModel.value.slug || undefined,
-      description: formModel.value.description || undefined,
-    };
-
-    if (props.mode === "edit" && props.tagId) {
-      await putTag(props.tagId, payload);
-      ElMessage.success('标签更新成功');
-    } else {
-      await createTag(payload);
-      ElMessage.success('标签创建成功');
-    }
-
-    visible.value = false;
-    emit("success");
-  } catch (e) {
-    console.error(e);
-    ElMessage.error(props.mode === "edit" ? '标签保存失败' : '标签创建失败');
-  } finally {
-    submitting.value = false;
-  }
+    const payload = { name: name.value.trim(), slug: slug.value.trim() || undefined, description: description.value.trim() || undefined };
+    if (props.mode === "edit" && props.tagId) { await putTag(props.tagId, payload); ElMessage.success('标签更新成功'); }
+    else { await createTag(payload); ElMessage.success('标签创建成功'); }
+    visible.value = false; emit("success");
+  } catch { ElMessage.error(props.mode === "edit" ? '标签保存失败' : '标签创建失败'); }
+  finally { submitting.value = false; }
 };
 </script>
 
 <template>
-  <el-dialog v-model="visible" :title="dialogTitle" width="560" destroy-on-close @closed="resetForm">
-    <el-form ref="formRef" :model="formModel" :rules="rules" label-width="100px" status-icon>
-      <el-form-item prop="name" label="标签名">
-        <el-input v-model="formModel.name" placeholder="请输入标签名" />
-      </el-form-item>
-      <el-form-item prop="slug" label="唯一标识符">
-        <el-input v-model="formModel.slug" placeholder="请输入唯一标识符" />
-      </el-form-item>
-      <el-form-item prop="description" label="描述">
-        <el-input v-model="formModel.description" type="textarea" :rows="4" />
-      </el-form-item>
-    </el-form>
+  <BaseDialog v-model="visible" :title="dialogTitle" width="560px">
+    <div class="form-block">
+      <div class="form-field">
+        <label class="form-label">标签名</label>
+        <div class="form-content">
+          <input v-model="name" class="form-input" placeholder="请输入标签名" />
+          <div v-if="nameErr" class="form-error">{{ nameErr }}</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">唯一标识符</label>
+        <div class="form-content">
+          <input v-model="slug" class="form-input" placeholder="请输入唯一标识符" />
+          <div v-if="slugErr" class="form-error">{{ slugErr }}</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">描述</label>
+        <div class="form-content">
+          <textarea v-model="description" class="form-textarea" rows="4"></textarea>
+          <div v-if="descErr" class="form-error">{{ descErr }}</div>
+        </div>
+      </div>
+    </div>
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSave">保存</el-button>
+      <button class="btn" @click="visible = false">取消</button>
+      <button class="btn btn-primary" :disabled="submitting" @click="handleSave">
+        <i v-if="submitting" class="fa-solid fa-spinner fa-spin"></i> 保存
+      </button>
     </template>
-  </el-dialog>
+  </BaseDialog>
 </template>
-

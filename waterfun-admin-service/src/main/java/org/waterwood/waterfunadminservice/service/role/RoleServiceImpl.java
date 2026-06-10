@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
+import org.waterwood.waterfunadminservice.infrastructure.exception.RoleNotFoundException;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.generator.IdentifierGenerator;
@@ -19,9 +20,9 @@ import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRe
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunadminservice.infrastructure.exception.RoleException;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
-import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.waterfunservicecore.entity.Role;
-import org.waterwood.waterfunservicecore.entity.RolePermission;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
+import org.waterwood.waterfunservicecore.entity.user.Role;
+import org.waterwood.waterfunservicecore.entity.user.RolePermission;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserRole;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
@@ -65,7 +66,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role getRole(int id) {
         return roleRepo.findById(id)
-                .orElseThrow(()-> new RoleException(BaseResponseCode.ROLE_NOT_FOUND_WITH_ARGS, id));
+                .orElseThrow(RoleNotFoundException::new);
     }
 
     @Override

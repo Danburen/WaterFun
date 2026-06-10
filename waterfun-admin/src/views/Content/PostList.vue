@@ -4,59 +4,32 @@ import { formatDate } from "@waterfun/web-core/src/timer";
 import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { getCategoryOptions } from "~/api/category";
-import SearchContainer from "~/components/SearchContainer.vue";
-import TableContainer from "~/components/TableContainer.vue";
-import {
-  deletePostById,
-  deletePosts,
-  listPosts,
-  type PostResp,
-  type PostStatus,
-} from "~/api/post";
+import ListPage from "~/components/ListPage.vue";
+import { deletePostById, deletePosts, listPosts, type PostResp, type PostStatus } from "~/api/post";
 import { getUserOptions } from "~/api/user";
 import type { PageOptions } from "~/types/api";
 import PostCreateDialog from "~/views/Content/components/PostCreateDialog.vue";
 import { ElMessage } from "element-plus";
 
 const router = useRouter();
-
 const loading = ref(false);
 const loadingOptions = ref(false);
 const postList = ref<PostResp[]>([]);
-const selectedPostIds = ref<string[]>([]);
+const selectedPostIds = ref<Set<string>>(new Set());
 const createDialogVisible = ref(false);
 const dialogMode = ref<"create" | "edit">("create");
 const currentPostId = ref<string>("");
 const categoryOptions = ref<OptionResItem<number>[]>([]);
 const userOptions = ref<OptionResItem<string>[]>([]);
 
-const searchForm = ref<{
-  title: string;
-  status: PostStatus | "";
-  categoryId: string | null;
-  authorId: string | null;
-  slug: string;
-}>({
-  title: "",
-  status: "",
-  categoryId: null,
-  authorId: null,
-  slug: "",
+const searchForm = ref<{ title: string; status: PostStatus | ""; categoryId: string | null; authorId: string | null; slug: string }>({
+  title: "", status: "", categoryId: null, authorId: null, slug: "",
 });
 
-const pageOpts = ref<PageOptions>({
-  currentPage: 1,
-  pageSize: 10,
-  total: 0,
-});
+const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
 
-const postStatusOptions: { label: string; value: PostStatus }[] = [
-  { label: "草稿", value: "DRAFT" },
-  { label: "待审核", value: "PENDING" },
-  { label: "已发布", value: "PUBLISHED" },
-  { label: "已拒绝", value: "REJECTED" },
-  { label: "已归档", value: "ARCHIVED" },
-];
+const postStatusLabel: Record<string, string> = { DRAFT: "草稿", PENDING: "待审核", PUBLISHED: "已发布", REJECTED: "已拒绝", ARCHIVED: "已归档" };
+const postStatusBadge: Record<string, string> = { DRAFT: "badge-gray", PENDING: "badge-yellow", PUBLISHED: "badge-green", REJECTED: "badge-red", ARCHIVED: "badge-gray" };
 
 const loadOptions = async () => {
   loadingOptions.value = true;
@@ -64,336 +37,132 @@ const loadOptions = async () => {
     const [categoryRes, userRes] = await Promise.all([getCategoryOptions(), getUserOptions()]);
     categoryOptions.value = categoryRes.data || [];
     userOptions.value = userRes.data || [];
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取数据失败');
-  } finally {
-    loadingOptions.value = false;
-  }
+  } catch (e) { console.error(e); ElMessage.error('获取数据失败'); } finally { loadingOptions.value = false; }
 };
 
 const fetchData = async () => {
   loading.value = true;
   try {
     const res = await listPosts({
-      page: (pageOpts.value.currentPage || 1) - 1,
-      size: pageOpts.value.pageSize,
-      title: searchForm.value.title || undefined,
-      status: searchForm.value.status || undefined,
-      categoryId: searchForm.value.categoryId ?? undefined,
-      authorId: searchForm.value.authorId ?? undefined,
+      page: (pageOpts.value.currentPage || 1) - 1, size: pageOpts.value.pageSize,
+      title: searchForm.value.title || undefined, status: searchForm.value.status || undefined,
+      categoryId: searchForm.value.categoryId ?? undefined, authorId: searchForm.value.authorId ?? undefined,
       slug: searchForm.value.slug || undefined,
     });
     postList.value = res.data.content || [];
-    pageOpts.value.total = res.data.page?.totalElements || 0;
-  } catch (e) {
-    console.error(e);
-    ElMessage.error('获取数据失败');
-  } finally {
-    loading.value = false;
-  }
+    pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
+  } catch (e) { console.error(e); ElMessage.error('获取数据失败'); } finally { loading.value = false; }
 };
 
-const handleSearch = () => {
-  pageOpts.value.currentPage = 1;
-  fetchData();
-};
+const handleSearch = () => { pageOpts.value.currentPage = 1; fetchData(); };
+const handleReset = () => { pageOpts.value.currentPage = 1; searchForm.value = { title: "", status: "", categoryId: null, authorId: null, slug: "" }; fetchData(); };
+const handleAdd = () => { dialogMode.value = "create"; currentPostId.value = ""; createDialogVisible.value = true; };
+const handleEdit = (id?: string | number) => { if (!id) return; dialogMode.value = "edit"; currentPostId.value = String(id); createDialogVisible.value = true; };
+const gotoDetail = (id?: string | number) => { if (!id) return; router.push({ name: "contentPostDetail", params: { id: String(id) } }); };
+const handleCreateSuccess = () => fetchData();
 
-const handleReset = () => {
-  pageOpts.value.currentPage = 1;
-  searchForm.value = {
-    title: "",
-    status: "",
-    categoryId: null,
-    authorId: null,
-    slug: "",
-  };
-  fetchData();
-};
-
-const handleAdd = () => {
-  dialogMode.value = "create";
-  currentPostId.value = "";
-  createDialogVisible.value = true;
-};
-
-const handleEdit = (id?: string | number) => {
-  if (!id) return;
-  dialogMode.value = "edit";
-  currentPostId.value = String(id);
-  createDialogVisible.value = true;
-};
-
-const gotoDetail = (id?: string | number) => {
-  if (!id) return;
-  router.push({ name: "contentPostDetail", params: { id: String(id) } });
-};
-
-const handleCreateSuccess = () => {
-  fetchData();
-};
-
-const handleSelectionChange = (rows: PostResp[]) => {
-  selectedPostIds.value = rows.map((item) => item.id).filter((id) => !!id);
+const toggleSelect = (id: string) => { const s = new Set(selectedPostIds.value); s.has(id) ? s.delete(id) : s.add(id); selectedPostIds.value = s; };
+const toggleSelectAll = () => {
+  if (selectedPostIds.value.size === postList.value.length) selectedPostIds.value = new Set();
+  else selectedPostIds.value = new Set(postList.value.map(r => r.id).filter(Boolean));
 };
 
 const handleDelete = async (id?: string | number) => {
   if (!id) return;
   try {
-    await ElMessageBox.confirm('确定删除该文章吗？', '删除', {
-      type: "warning",
-    });
-    await deletePostById(id);
-    ElMessage.success('文章删除成功');
-    fetchData();
-  } catch (e) {
-    if (e !== "cancel") {
-      console.error(e);
-      ElMessage.error('文章删除失败');
-    }
-  }
+    await ElMessageBox.confirm('确定删除该文章吗？', '删除', { type: "warning" });
+    await deletePostById(id); ElMessage.success('文章删除成功'); fetchData();
+  } catch (e) { if (e !== "cancel") { console.error(e); ElMessage.error('文章删除失败'); } }
 };
 
 const handleBatchDelete = async () => {
-  if (!selectedPostIds.value.length) return;
-
+  const ids = [...selectedPostIds.value];
+  if (!ids.length) return;
   try {
-    await ElMessageBox.confirm(
-      `确定删除选中的 ${selectedPostIds.value.length} 篇文章吗？`,
-      '删除',
-      { type: "warning" }
-    );
-
-    const res = await deletePosts(selectedPostIds.value);
+    await ElMessageBox.confirm(`确定删除选中的 ${ids.length} 篇文章吗？`, '删除', { type: "warning" });
+    const res = await deletePosts(ids);
     const result = res.data;
-
-    if (result.success === result.requested) {
-      ElMessage.success('文章删除成功');
-    } else if (result.success === 0) {
-      ElMessage.error('文章删除失败');
-    } else {
-      ElMessage.warning(`${'文章删除成功'} ${result.success}/${result.requested}`);
-    }
-
-    selectedPostIds.value = [];
-    fetchData();
-  } catch (e) {
-    if (e !== "cancel") {
-      console.error(e);
-      ElMessage.error('文章删除失败');
-    }
-  }
+    if (result.success === result.requested) ElMessage.success('文章删除成功');
+    else if (result.success === 0) ElMessage.error('文章删除失败');
+    else ElMessage.warning(`文章删除成功 ${result.success}/${result.requested}`);
+    selectedPostIds.value = new Set(); fetchData();
+  } catch (e) { if (e !== "cancel") { console.error(e); ElMessage.error('文章删除失败'); } }
 };
 
-onMounted(() => {
-  fetchData();
-  loadOptions();
-});
+onMounted(() => { fetchData(); loadOptions(); });
 </script>
 
 <template>
-  <div class="list-layout">
-    <SearchContainer>
-      <el-form
-        inline
-        class="search-form"
-        :model="searchForm"
-      >
-        <el-form-item label="标题">
-          <el-input
-            v-model="searchForm.title"
-            placeholder="请输入标题"
-          />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select
-            v-model="searchForm.status"
-            clearable
-            style="width: 150px"
-          >
-            <el-option
-              v-for="item in postStatusOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="分类ID">
-          <el-select
-            v-model="searchForm.categoryId"
-            clearable
-            filterable
-            :loading="loadingOptions"
-            placeholder="请选择分类"
-            style="width: 220px"
-          >
-            <el-option
-              v-for="item in categoryOptions"
-              :key="item.id"
-              :label="`${item.id} (${item.name})`"
-              :value="item.id"
-              :disabled="item.disabled || false"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="作者ID">
-          <el-select
-            v-model="searchForm.authorId"
-            clearable
-            filterable
-            :loading="loadingOptions"
-            placeholder="请选择作者"
-            style="width: 220px"
-          >
-            <el-option
-              v-for="item in userOptions"
-              :key="item.id"
-              :label="`${item.id} (${item.name}${item.code ? ` / ${item.code}` : ''})`"
-              :value="item.id"
-              :disabled="item.disabled || false"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="唯一标识符">
-          <el-input
-            v-model="searchForm.slug"
-            placeholder="请输入唯一标识符"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleSearch"
-          >
-            查询
-          </el-button>
-          <el-button @click="handleReset">
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </SearchContainer>
+  <ListPage title="文章管理" :loading="loading" :total="pageOpts.total" v-model:page="pageOpts.currentPage" v-model:pageSize="pageOpts.pageSize" @change="fetchData">
+    <template #search>
+      <div class="search-form">
+        <div class="search-field"><label>标题</label><input v-model="searchForm.title" placeholder="请输入标题" @keyup.enter="handleSearch" /></div>
+        <div class="search-field">
+          <label>状态</label>
+          <select v-model="searchForm.status">
+            <option value="">全部</option>
+            <option v-for="(label, key) in postStatusLabel" :key="key" :value="key">{{ label }}</option>
+          </select>
+        </div>
+        <div class="search-field">
+          <label>分类</label>
+          <select v-model="searchForm.categoryId">
+            <option :value="null">全部</option>
+            <option v-for="item in categoryOptions" :key="item.id" :value="item.id" :disabled="item.disabled">{{ item.id }} ({{ item.name }})</option>
+          </select>
+        </div>
+        <div class="search-field">
+          <label>作者</label>
+          <select v-model="searchForm.authorId">
+            <option :value="null">全部</option>
+            <option v-for="item in userOptions" :key="item.id" :value="item.id" :disabled="item.disabled">{{ item.id }} ({{ item.name }})</option>
+          </select>
+        </div>
+        <div class="search-field"><label>标识符</label><input v-model="searchForm.slug" placeholder="唯一标识符" @keyup.enter="handleSearch" /></div>
+        <div class="search-actions">
+          <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <button class="btn btn-default" @click="handleReset">重置</button>
+        </div>
+      </div>
+    </template>
+    <template #header>
+      <button class="btn btn-primary" @click="handleAdd"><i class="fa-solid fa-plus"></i> 新增</button>
+      <button class="btn btn-danger" :disabled="selectedPostIds.size === 0" @click="handleBatchDelete"><i class="fa-solid fa-trash"></i> 删除</button>
+    </template>
 
-    <TableContainer
-      v-model:page-size="pageOpts.pageSize"
-      v-model:current-page="pageOpts.currentPage"
-      title="文章管理"
-      show-add-btn
-      :show-remove-btn="true"
-      :disable-delete="selectedPostIds.length === 0"
-      :total="pageOpts.total"
-      @add="handleAdd"
-      @remove="handleBatchDelete"
-      @change="fetchData"
-    >
-      <el-table
-        v-loading="loading"
-        :data="postList"
-        border
-        fit
-        highlight-current-row
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column
-          type="selection"
-          width="55"
-        />
-        <el-table-column
-          prop="id"
-          label="ID"
-          width="200"
-        />
-        <el-table-column
-          prop="title"
-          label="标题"
-          min-width="180"
-          show-overflow-tooltip
-        >
-          <template #default="{ row }">
-            <el-link
-              type="primary"
-              :underline="false"
-              @click="gotoDetail(row.id)"
-            >
-              {{ row.title }}
-            </el-link>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="status"
-          label="状态"
-          width="130"
-        >
-          <template #default="{ row }">
-            {{ ({ draft: '草稿', pending: '待审核', published: '已发布', rejected: '已拒绝', archived: '已归档' })[row.status?.toLowerCase()] || '无' }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="categoryId"
-          label="分类ID"
-          width="110"
-        />
-        <el-table-column
-          prop="authorId"
-          label="作者ID"
-          width="110"
-        />
-        <el-table-column
-          prop="slug"
-          label="唯一标识符"
-          min-width="150"
-          show-overflow-tooltip
-        />
-        <el-table-column
-          prop="createdAt"
-          label="创建时间"
-          min-width="170"
-        >
-          <template #default="{ row }">
-            {{ formatDate(row.createdAt) || '无' }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          width="180"
-          fixed="right"
-        >
-          <template #default="{ row }">
-            <el-button
-              size="small"
-              type="primary"
-              @click="handleEdit(row.id)"
-            >
-              编辑
-            </el-button>
-            <el-button
-              size="small"
-              type="danger"
-              @click="handleDelete(row.id)"
-            >
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <PostCreateDialog
-        v-model="createDialogVisible"
-        :mode="dialogMode"
-        :post-id="currentPostId"
-        @success="handleCreateSuccess"
-      />
-    </TableContainer>
-  </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:40px"><input type="checkbox" :checked="selectedPostIds.size === postList.length && postList.length > 0" @change="toggleSelectAll" /></th>
+          <th style="width:80px">ID</th>
+          <th>标题</th>
+          <th style="width:90px">状态</th>
+          <th style="width:80px">分类ID</th>
+          <th style="width:80px">作者ID</th>
+          <th>标识符</th>
+          <th style="width:160px">创建时间</th>
+          <th style="width:160px">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in postList" :key="row.id">
+          <td><input type="checkbox" :checked="selectedPostIds.has(row.id)" @change="toggleSelect(row.id)" /></td>
+          <td>{{ row.id }}</td>
+          <td><a class="link" @click="gotoDetail(row.id)">{{ row.title }}</a></td>
+          <td><span :class="['badge', postStatusBadge[row.status?.toUpperCase() || ''] || 'badge-gray']">{{ postStatusLabel[row.status?.toUpperCase() || ''] || '未知' }}</span></td>
+          <td>{{ row.categoryId }}</td>
+          <td>{{ row.authorId }}</td>
+          <td>{{ row.slug }}</td>
+          <td>{{ formatDate(row.createdAt) || '无' }}</td>
+          <td>
+            <div class="table-actions">
+              <button class="action-btn" @click="handleEdit(row.id)">编辑</button>
+              <button class="action-btn danger" @click="handleDelete(row.id)">删除</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <PostCreateDialog v-model="createDialogVisible" :mode="dialogMode" :post-id="currentPostId" @success="handleCreateSuccess" />
+  </ListPage>
 </template>
-
-<style scoped>
-.list-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-</style>
-

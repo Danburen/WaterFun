@@ -10,7 +10,7 @@ import org.waterwood.waterfunadminservice.api.request.perm.CreatePermRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.DeletePermsRequest;
 import org.waterwood.waterfunadminservice.api.request.perm.UpdatePermRequest;
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
-import org.waterwood.waterfunservicecore.entity.Permission;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
 
 import java.time.Instant;
 import java.util.List;
@@ -53,7 +53,7 @@ public interface PermissionService {
      * Delete permission
      * @param id permission ID
      */
-    void deletePerm(int id);
+    void deletePerm(Integer id);
 
     /**
      * Batch assign perm to users

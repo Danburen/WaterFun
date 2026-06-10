@@ -3,13 +3,14 @@ import type {
     PromiseResBody,
     CloudResourceUrlResp,
  } from "@waterfun/web-core/src/types/api/response.d.ts";
-import { getUploadPolicy, uploadCallback, uploadFileToCos as genericUploadFileToCos, type PresignedResp } from "./uploadApi";
+import { getUploadPolicy, uploadCallback, uploadFileToCos as genericUploadFileToCos, type PresignedResp, type UploadCallbackResp } from "./uploadApi";
+import type { UserBrief } from "~/api/postApi";
 
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export interface UserInfoResponse {
-    uid: string;
+    uid: number;
     username: string;
     nickname: string;
     avatar: CloudResourceUrlResp;
@@ -73,7 +74,7 @@ export const getAvatarUploadPolicy = (suffix: string): PromiseResBody<PresignedR
 // 导出通用的上传API，防止如果原来的业务组件里正在用它产生冲突
 export const uploadFileToCos = genericUploadFileToCos;
 
-export const callbackAvatarUpload = (data: { token: string }): PromiseResBody<null> => {
+export const callbackAvatarUpload = (data: { token: string }): PromiseResBody<UploadCallbackResp> => {
     return uploadCallback(data);
 }
 
@@ -87,4 +88,31 @@ export const getUserSettings = (): PromiseResBody<UserSettingsDto> => {
 
 export const updateUserSettings = (data: UserSettingsDto): PromiseResBody<null> => {
     return request.put(`/user/settings`, data);
+}
+
+export const getPermissions = (): PromiseResBody<string[]> => {
+    return request.get(`/user/permissions`);
+}
+
+export const followUser = (uid: number): PromiseResBody<void> => {
+    return request.post(`/user/${uid}/follow`);
+}
+
+export interface PageUserBrief {
+    content: UserBrief[]
+    totalElements: number
+    totalPages: number
+    size: number
+    number: number
+    first: boolean
+    last: boolean
+    empty: boolean
+}
+
+export const getFollowings = (uid: number, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
+    return request.get(`/user/${uid}/followings`, { params: { page, size } });
+}
+
+export const getFollowers = (uid: number, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
+    return request.get(`/user/${uid}/followers`, { params: { page, size } });
 }

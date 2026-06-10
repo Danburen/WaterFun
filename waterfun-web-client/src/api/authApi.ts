@@ -110,11 +110,11 @@ export const sendCode = async (sendCodeData: SendCodeType): PromiseResBody<void>
 
 export const sendAuthenticationCode = async (sendCodeData: SecuritySendCodeType): PromiseResBody<void> => {
     const body = await enrichWithDeviceInfo(sendCodeData as any)
-    return request.post('/auth/security/send-verify-code', body)
+    return request.post('/user/security/send-verify-code', body)
 }
 
 export const logout = async (deviceFp: string): PromiseResBody<void> => {
-    return request.post('/auth/logout', deviceFp)
+    return request.post('/user/security/logout', deviceFp)
 }
 
 export const getCsrfToken = (): PromiseResBody<void> => {

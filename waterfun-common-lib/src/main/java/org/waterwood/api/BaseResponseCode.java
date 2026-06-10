@@ -60,17 +60,15 @@ public enum BaseResponseCode implements ResponseCode {
     AUDIT_TASK_RESOURCE_REJECT_OR_SUSPECT("audit_task_resource_reject_or_suspect"),
 
     // Role & Permissions
-    ROLE_NOT_FOUND("role.not_found"),
-    ROLE_NOT_FOUND_WITH_ARGS("role.not_found.args"),
-
-    ROLE_ALREADY_EXISTS("role.already_exists"),
-    ROLE_ALREADY_EXISTS_WITH_ARGS("role.already_exists.args"),
-
-    PERMISSION_NOT_FOUND("permission.not_found"),
-    PERMISSION_NOT_FOUND_ARGS("permission.not_found.args"),
-    PERMISSION_ALREADY_EXISTS("permission.already_exists"),
-    PERMISSION_ALREADY_EXISTS_ARGS("permission.already_exists.args"),
-
+    ROLE_NOT_FOUND("admin.role.not_found"),
+    ROLE_NOT_FOUND_WITH_ARGS("admin.role.not_found.args"),
+    ROLE_ALREADY_EXISTS("admin.role.already_exists"),
+    ROLE_ALREADY_EXISTS_WITH_ARGS("admin.role.already_exists.args"),
+    PERMISSION_NOT_FOUND("admin.permission.not_found"),
+    PERMISSION_NOT_FOUND_ARGS("admin.permission.not_found.args"),
+    PERMISSION_ALREADY_EXISTS("admin.permission.already_exists"),
+    PERMISSION_ALREADY_EXISTS_ARGS("admin.permission.already_exists.args"),
+    BUILT_IN_RESOURCE_PROTECTED("admin.system.built_in_resource_protected"),
     // System
     REDUNDANT_OPERATION("system.redundant_operation"),
     INVALID_PATH("system.invalid_path"),
@@ -133,7 +131,7 @@ public enum BaseResponseCode implements ResponseCode {
     ILLEGAL_UPLOAD_FILE_ARGUMENTS("system.illegal_upload_file_arguments"),
     INVALID_REFERENCE("system.invalid_reference"),
     BIZ_TYPE_NOT_ALLOW_ARGS("system.biz_type_not_allow_args"),
-    BANNER_NOT_FOUND("system.banner.not_found"), ;
+    BANNER_NOT_FOUND("system.banner.not_found"),;
     private final String code;
     // private final String defaultMessage;
 

@@ -1,251 +1,299 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/authStore'
 import { REGEX } from '@waterfun/web-core/src/regex'
 import { generateFingerprint } from '@waterfun/web-core/src/fingerprint';
 import { APIError } from '@waterfun/web-core/src/errors/APIError';
-
-type ValidatorRule = unknown;
-type ValidatorCallback = (error?: Error | string) => void;
-
-const validateAuthname = (loginType: string) => {
-  return (rule: ValidatorRule, value: string, callback: ValidatorCallback) => {
-    if (value === '') {
-      callback(new Error('登录名不能为空'));
-      return;
-    }
-    switch (loginType) {
-      case 'email':
-        if (!REGEX.email.test(value)) {
-          callback(new Error('邮箱格式有误'));
-        }
-        break;
-      case 'sms':
-        if (!REGEX.phone.test(value)) {
-          callback(new Error('手机号有误'));
-        }
-        break;
-      case 'password':
-        if (value.length < 4 || value.length > 20) {
-          callback(new Error('用户名长度超出限制(4-20字符)'));
-        } else if (!REGEX.username.test(value)) {
-          callback(new Error('用户名格式有误'));
-        }
-        break;
-    }
-    callback();
-  }
-}
-
-const validatePassword = (allowEmpty?: boolean) => {
-  return (_rule: ValidatorRule, value: string, callback: ValidatorCallback) => {
-    if (!value && !allowEmpty) {
-      callback(new Error('密码不能为空'));
-      return;
-    }
-
-    if (allowEmpty && !value) {
-      callback();
-      return;
-    }
-
-    if (value.length < 8) {
-      callback(new Error('密码长度必须大于8个字符'));
-      return;
-    }
-
-    if (value.length > 20) {
-      callback(new Error('密码长度不能超过20个字符'));
-      return;
-    }
-
-    if (!/[a-z]/.test(value) || !/[A-Z]/.test(value) || !/[0-9]/.test(value)) {
-      callback(new Error('密码必须包含大小写字母和数字!'));
-      return;
-    }
-
-    callback();
-  };
-}
-
-const validateVerifyCode = (allowEmpty: boolean) => {
-  return (rule: ValidatorRule, value: string, callback: ValidatorCallback) => {
-    if (!value && !allowEmpty) {
-      callback(new Error('验证码不能为空'));
-    } else {
-      callback();
-    }
-  }
-}
+import CaptchaDialog from '@/components/CaptchaDialog.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const loginFormRef = ref(null)
-const loginForm = ref({
-  username: '',
-  password: '',
-  captcha: ''
-})
 
-const captchaDialogVisible = ref(false);
+const loginForm = ref({ username: '', password: '', captcha: '' })
+const usernameErr = ref('')
+const passwordErr = ref('')
+const captchaDialogVisible = ref(false)
+const loading = ref(false)
 
-const validRules = reactive({
-  username:[{validator: validateAuthname('password'),trigger: "blur" }],
-  password:[{validator: validatePassword(false),trigger: "blur"}],
-  captcha:[{validator: validateVerifyCode(false), trigger: "blur"}],
-})
-
-const handleCaptchaCancel = () => {
-  captchaDialogVisible.value = false;
-}
+const validate = () => {
+  usernameErr.value = ''; passwordErr.value = ''; let ok = true;
+  const u = loginForm.value.username;
+  if (!u) { usernameErr.value = '登录名不能为空'; ok = false; }
+  else if (u.length < 4 || u.length > 20) { usernameErr.value = '用户名长度超出限制(4-20字符)'; ok = false; }
+  else if (!REGEX.username.test(u)) { usernameErr.value = '用户名格式有误'; ok = false; }
+  const p = loginForm.value.password;
+  if (!p) { passwordErr.value = '密码不能为空'; ok = false; }
+  else if (p.length < 8) { passwordErr.value = '密码长度必须大于8个字符'; ok = false; }
+  else if (!/[a-z]/.test(p) || !/[A-Z]/.test(p) || !/[0-9]/.test(p)) { passwordErr.value = '密码必须包含大小写字母和数字'; ok = false; }
+  return ok;
+};
 
 const handleCaptchaConfirm = (code: string, callback: (success: boolean) => void) => {
   loginForm.value.captcha = code;
-   generateFingerprint().then(deviceFp => {
-        authStore.tryLogin({
-          ...loginForm.value,
-          deviceFp: deviceFp,
-        }).then(_ => {
-          ElMessage.success('登录成功');
-          router.push({ name: 'dashboard' })
-        }).catch((err: APIError) => {
-
-          ElMessage.error(err.message || '登录失败');
-          console.log(err);
-        })
-      })
+  loading.value = true;
+  generateFingerprint().then(deviceFp => {
+    authStore.tryLogin({ ...loginForm.value, deviceFp }).then(_ => {
+      ElMessage.success('登录成功'); router.push({ name: 'dashboard' })
+    }).catch((err: APIError) => {
+      ElMessage.error(err.message || '登录失败')
+    }).finally(() => { loading.value = false })
+  });
   callback(true);
-}
+};
 
 const submitLoginForm = () => {
-  loginFormRef.value?.validate((valid) => {
-    if (valid) {
-      captchaDialogVisible.value = true;
-    } 
-  });
+  if (validate()) captchaDialogVisible.value = true;
 }
 </script>
 
 <template>
-  <div class="container full-page-container items-center">
-    <div class="main">
-      <div class="left items-center">
-        <div class="logo items-center">
-          <img
-            src="../assets/logo.svg"
-            style="height: 65px;width: 65px;padding: 10px"
-            alt=""
-          >
-          <span>WaterFun</span>
+  <div class="login-page full-page-container items-center justify-center">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-logo">
+          <img src="../assets/logo.svg" alt="WaterFun" />
+        </div>
+        <h1 class="brand-title">WaterFun</h1>
+        <p class="brand-desc">内容管理平台</p>
+        <div class="brand-decoration">
+          <div class="deco-circle deco-circle-1"></div>
+          <div class="deco-circle deco-circle-2"></div>
+          <div class="deco-circle deco-circle-3"></div>
         </div>
       </div>
-      <div class="form-container items-center">
-        <el-form 
-          ref="loginFormRef" 
-          class="form"
-          label-width="auto"
-          :model="loginForm"
-          :rules="validRules"
-        >
-          <el-form-item
-            prop="username"
-            label="用户名"
-          >
-            <el-input
-              v-model="loginForm.username"
-              placeholder="用户名"
-            />
-          </el-form-item>
-          <el-form-item
-            prop="password"
-            label="密码"
-          >
-            <el-input
-              v-model="loginForm.password"
-              type="password"
-              placeholder="密码"
-            />
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              class="login-btn"
-              type="primary" 
-              @click="submitLoginForm"
-            >
-              登录
-            </el-button>
-          </el-form-item>
-        </el-form>
+      <div class="login-form-wrapper">
+        <div class="login-form-inner">
+          <h2 class="form-title">欢迎回来</h2>
+          <p class="form-subtitle">请登录您的账户以继续</p>
+          <div class="form-group">
+            <label class="form-label-style">用户名</label>
+            <input v-model="loginForm.username" class="form-input" :class="{ 'input-error': usernameErr }" placeholder="请输入用户名" maxlength="20" />
+            <p v-if="usernameErr" class="form-error">{{ usernameErr }}</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label-style">密码</label>
+            <input v-model="loginForm.password" type="password" class="form-input" :class="{ 'input-error': passwordErr }" placeholder="请输入密码" maxlength="20" @keyup.enter="submitLoginForm" />
+            <p v-if="passwordErr" class="form-error">{{ passwordErr }}</p>
+          </div>
+          <button class="btn btn-primary login-btn" :class="{ loading }" :disabled="loading" @click="submitLoginForm">
+            <span v-if="loading" class="btn-spinner"></span>
+            <span v-else>登 录</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
-  <CaptchaDialog
-    v-model="captchaDialogVisible"
-    @confirm="handleCaptchaConfirm"
-    @cancel="handleCaptchaCancel"
-  />
+  <CaptchaDialog v-model="captchaDialogVisible" @confirm="handleCaptchaConfirm" @cancel="captchaDialogVisible = false" />
 </template>
 
 <style scoped>
-.container {
-  background: linear-gradient(135deg, #3da5f3 0%, #dbeaff 100%);
-}
-.main {
-  width: 800px;
-  height: 494px;
-  display: flex;
-  flex-direction: row;
-  background-color: var(--default-white);
-  border-radius: 15px;
+.login-page {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
-.left {
-  width: 494px;
-  height: 100%;
-  background: linear-gradient(15deg, #7d00ff 0%, #33c2ff 100%);
-  background-size: cover;
+.login-page::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+  animation: bgShift 20s ease-in-out infinite alternate;
+}
+
+@keyframes bgShift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(2%, 2%) rotate(3deg); }
+}
+
+.login-card {
+  display: flex;
+  width: 820px;
+  min-height: 500px;
+  background: var(--bg-white);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+  animation: cardEnter 0.5s ease-out;
+}
+
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.login-brand {
+  width: 380px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 40%, #3b82f6 100%);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 40px 20px;
 }
 
-.logo {
-  font-size: 30px;
-  color: var(--default-white);
-  padding: 10px 0;
+.brand-logo img {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 16px;
 }
 
-.form-container {
-  background-color: var(--default-white);
-  margin: 25px;
-  display: flex;
-  flex-direction: column;
+.brand-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.brand-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.brand-decoration {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.deco-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.deco-circle-1 {
+  width: 280px;
+  height: 280px;
+  top: -80px;
+  right: -70px;
+  animation: floatSlow 8s ease-in-out infinite alternate;
+}
+
+.deco-circle-2 {
+  width: 180px;
+  height: 180px;
+  bottom: -40px;
+  left: -40px;
+  animation: floatSlow 10s ease-in-out infinite alternate-reverse;
+}
+
+.deco-circle-3 {
+  width: 100px;
+  height: 100px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-color: rgba(255, 255, 255, 0.04);
+  animation: pulseGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes floatSlow {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(20px, -20px) scale(1.05); }
+}
+
+@keyframes pulseGlow {
+  from { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+  to { transform: translate(-50%, -50%) scale(1.3); opacity: 0.8; }
+}
+
+.login-form-wrapper {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 40px;
 }
 
-.form {
-  max-width: 230px;
+.login-form-inner {
+  width: 100%;
+  max-width: 320px;
+}
+
+.form-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.form-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label-style {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.form-input.input-error {
+  border-color: var(--danger);
+  background: #fef2f2;
+}
+
+.form-input.input-error:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
 }
 
 .login-btn {
   width: 100%;
+  padding: 10px 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 4px;
+  justify-content: center;
 }
 
-.captcha-container {
-  display: flex;
-  align-items: center;
-  width: 100%;
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
-.captcha-image {
-  padding: 0px 5px;
-  width: 120px;
-  height: 25px;
-  cursor: pointer;
+
+.login-btn.loading {
+  background: var(--primary);
+  opacity: 0.7;
+  cursor: not-allowed;
 }
-.verify-code-input {
-  flex: 1;
+
+.btn-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>

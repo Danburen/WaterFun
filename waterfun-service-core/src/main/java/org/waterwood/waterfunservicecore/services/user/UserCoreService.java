@@ -2,9 +2,9 @@ package org.waterwood.waterfunservicecore.services.user;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.waterwood.api.enums.PermissionType;
-import org.waterwood.waterfunservicecore.entity.Permission;
-import org.waterwood.waterfunservicecore.entity.Role;
+import org.waterwood.waterfunservicecore.entity.perm.PermissionType;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 
@@ -58,14 +58,6 @@ public interface UserCoreService {
      * @return page ofPending permissions
      */
     Page<Permission> listPermissions(long uid, String name, String code, String resource, PermissionType type, Integer parentId,Pageable pageable);
-
-    /**
-     * Get user permission
-     * @param uid user id
-     * @param id permission id
-     * @return  permission
-     */
-    Permission getUserPermission(long uid, int id);
 
     /**
      * List users

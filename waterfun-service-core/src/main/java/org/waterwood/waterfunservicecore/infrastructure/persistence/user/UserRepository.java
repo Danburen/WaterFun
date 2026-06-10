@@ -6,6 +6,7 @@ import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserBriefDO;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,10 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
     @EntityGraph(attributePaths = "avatarResource")
     List<User> findAllByUidIn(List<Long> attr0);
 
+
+    @Modifying
+    @Query("UPDATE User u SET u.lastActiveAt = :lastActiveAt WHERE u.uid = :uid")
+    int updateLastActiveAt(@Param("uid") Long uid, @Param("lastActiveAt") Instant lastActiveAt);
 
     @Query("""
         SELECT new org.waterwood.waterfunservicecore.entity.user.UserBriefDO(

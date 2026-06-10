@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
-import org.waterwood.waterfunservicecore.entity.BannerPosition;
+import org.waterwood.waterfunservicecore.entity.content.BannerPosition;
 
 import java.time.Instant;
 

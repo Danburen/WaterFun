@@ -10,10 +10,12 @@ import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunadminservice.api.response.user.AdminUserInfoResponse;
 import org.waterwood.waterfunadminservice.service.auth.AuthService;
 import org.waterwood.waterfunadminservice.service.auth.UserService;
+import org.waterwood.waterfunservicecore.api.req.auth.LogoutRequestBody;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.entity.user.User;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.services.auth.AuthCoreService;
 import org.waterwood.waterfunservicecore.services.auth.CaptchaService;
@@ -38,6 +40,7 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @RateLimit(key = "auth.login.captcha", permits = 5)
     @Operation(summary = "获取图形验证码")
     @GetMapping("/captcha")
     public void getCaptcha(HttpServletResponse response) throws IOException {
@@ -56,6 +59,7 @@ public class AuthController {
         result.captcha().write(response.getOutputStream());
     }
 
+    @RateLimit(key = "admin.login.in", permits = 3, window = 60)
     @Operation(summary = "管理员密码登陆")
     @PostMapping("/login-by-password")
     public ApiResponse<LoginClientData> loginByPassword(@Valid @RequestBody PwdLoginReq body, HttpServletRequest request, HttpServletResponse response) {
@@ -64,10 +68,10 @@ public class AuthController {
         );
     }
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(@RequestBody String deviceFp, HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = CookieUtil.getCookieValue(request.getCookies(),"REFRESH_TOKEN");
-        boolean  result = loginService.logout(refreshToken, deviceFp);
-        if(result) CookieUtil.cleanTokenCookie(response);
+    public ApiResponse<Void> logout(@RequestBody @Valid LogoutRequestBody req, HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = CookieUtil.getCookieValue(request.getCookies(),"ADMIN_REFRESH_TOKEN");
+        loginService.logout(refreshToken, req.getDeviceId());
+        CookieUtil.cleanTokenCookie(response);
         return ApiResponse.success();
     }
 }

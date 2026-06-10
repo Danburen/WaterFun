@@ -1,13 +1,12 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.waterwood.waterfunservicecore.entity.Banner;
-import org.waterwood.waterfunservicecore.entity.VisibleStatus;
+import org.waterwood.waterfunservicecore.entity.content.Banner;
+import org.waterwood.waterfunservicecore.entity.content.VisibleStatus;
 
 import java.time.Instant;
 import java.util.List;

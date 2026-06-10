@@ -10,6 +10,7 @@ import org.waterwood.api.AuthCode;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.entity.user.*;
+import org.waterwood.waterfunservicecore.exception.UserNameAlreadyExistException;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
 import org.waterwood.common.exceptions.AuthException;
@@ -21,6 +22,8 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRep
 import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.utils.UidGenerator;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
+import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
 import org.waterwood.waterfunservicecore.services.auth.RegisterService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
@@ -41,6 +44,7 @@ public class RegisterServiceImpl implements RegisterService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final VerificationService verificationService;
     private final SiteStatisticRecorder siteStatisticRecorder;
+    private final AuditLogCoreService auditLogCoreService;
 
     @Value("${expire.email.unverified-expire-hours:24}")
     private Long emailUnverifiedExpireHours;
@@ -52,7 +56,10 @@ public class RegisterServiceImpl implements RegisterService {
         String phone = body.getPhone();
         EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
 
-        // STEP 1: Verify phone
+        userRepo.findByUsername(body.getUsername()).ifPresent(_ -> {
+            throw new UserNameAlreadyExistException();
+        });
+        // Verify phone
         VerifyCodeDto verify = body.getVerify();
         if(! verify.getTarget().equals(phone)){
             throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
@@ -64,22 +71,15 @@ public class RegisterServiceImpl implements RegisterService {
                     throw new BizException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
                 }
         );
-        // STEP 2: Verify email
-        boolean emailNotBlank = StringUtil.isNotBlank(email);
-        if (emailNotBlank) {
+        // Verify email
+        if (StringUtil.isNotBlank(email)) {
             userDatumRepo.findByEmailHash(HashUtil.Sha256HmacString(email, hmacKey.getEncryptedKey())).ifPresent(
                     _ -> {
                         throw new BizException(BaseResponseCode.EMAIL_ALREADY_USED);
                     }
             );
         }
-
-        // STEP 3: Verify user whether  exists
-        userRepo.findByUsername(body.getUsername()).ifPresent(_ -> {
-            throw new BizException(BaseResponseCode.USER_ALREADY_EXISTS);
-        });
-
-        // STEP 4: Encrypt email, phone, password
+        // Encrypt email, phone, password
         EncryptionDataKey aesKet = encryptedKeyService.getAesKey();
         String encryptedPhone = EncryptionHelper.encryptField(phone, aesKet);
         String password = body.getPassword();
@@ -98,7 +98,7 @@ public class RegisterServiceImpl implements RegisterService {
         ud.setPhoneEncrypted(encryptedPhone);
         ud.setPhoneHash(HashUtil.Sha256HmacString(phone, hmacKey.getEncryptedKey()));
 
-        if(emailNotBlank) {
+        if(StringUtil.isNotBlank(email)) {
             String encryptedEmail = EncryptionHelper.encryptField(email, aesKet);
             ud.setEmailEncrypted(encryptedEmail);
             ud.setEmailHash(HashUtil.Sha256HmacString(email, hmacKey.getEncryptedKey()));
@@ -121,6 +121,7 @@ public class RegisterServiceImpl implements RegisterService {
         user.setUserPreference(upp);
         userRepo.save(user);
         siteStatisticRecorder.recordNewUser();
+        auditLogCoreService.record(user.getUid(), user.getUsername(), AuditLogActionType.REGISTER);
         return user;
     }
 }

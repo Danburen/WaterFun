@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservice.api.response.BannerResponse;
 import org.waterwood.waterfunservice.service.sys.BannerService;
-import org.waterwood.waterfunservicecore.entity.BannerPosition;
+import org.waterwood.waterfunservicecore.entity.content.BannerPosition;
 
 import java.util.List;
 

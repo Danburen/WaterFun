@@ -14,7 +14,6 @@ import org.waterwood.waterfunservicecore.exception.BizException;
 import java.util.List;
 
 public interface UserAdminService {
-    User getUserByUsername(String username);
 
     /**
      * Get user by id

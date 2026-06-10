@@ -1,5 +1,6 @@
 package org.waterwood.common.io;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import org.waterwood.utils.JsonUtil;
 public class FileMeta {
     private String eTag;
 
-    public String toJson(){
+    public String toJson() {
         return JsonUtil.toJson(this);
     }
 }

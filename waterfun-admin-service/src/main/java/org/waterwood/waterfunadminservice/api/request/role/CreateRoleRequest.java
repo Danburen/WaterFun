@@ -5,11 +5,12 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 
 import java.io.Serializable;
 
 /**
- * DTO for {@link org.waterwood.waterfunservicecore.entity.Role}
+ * DTO for {@link Role}
  */
 @Data
 @AllArgsConstructor

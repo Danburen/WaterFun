@@ -12,9 +12,7 @@ import {
 import type { PageOptions } from "~/types";
 
 import { useRoute, useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
 import SelectPermissionDialog from "../components/SelectPermissionDialog.vue";
-
 
 const route = useRoute();
 const router = useRouter();
@@ -24,7 +22,7 @@ const roleName = ref("");
 
 const loading = ref(false);
 const tableData = ref<AssignedPermissionRes[]>([]);
-const selectedIds = ref<number[]>([]);
+const selectedIds = ref<Set<number>>(new Set());
 const pickerDialogVisible = ref(false);
 const assignExpiresAt = ref<Date | null>(null);
 
@@ -69,7 +67,7 @@ const fetchData = async () => {
       code: searchForm.value.code || undefined,
     });
     tableData.value = res.data.content || [];
-    pageOpts.value.total = res.data.page.totalElements || 0;
+    pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
   } catch (e) {
     console.error(e);
     ElMessage.error('获取角色权限失败');
@@ -100,10 +98,10 @@ const handleConfirmAddPerms = async (ids: number[]) => {
 };
 
 const handleRemove = async () => {
-  if (selectedIds.value.length === 0 || Number.isNaN(roleId.value)) return;
+  if (selectedIds.value.size === 0 || Number.isNaN(roleId.value)) return;
   try {
-    await deleteRolePerms(roleId.value, { ids: selectedIds.value });
-    selectedIds.value = [];
+    await deleteRolePerms(roleId.value, { ids: [...selectedIds.value] });
+    selectedIds.value = new Set();
     ElMessage.success('角色更新成功');
     await fetchData();
   } catch (e) {
@@ -123,8 +121,15 @@ const handleReset = () => {
   fetchData();
 };
 
-const handleSelectionChange = (rows: AssignedPermissionRes[]) => {
-  selectedIds.value = rows.map((r) => r.id);
+const toggleSelect = (id: number) => {
+  const s = new Set(selectedIds.value);
+  s.has(id) ? s.delete(id) : s.add(id);
+  selectedIds.value = s;
+};
+
+const toggleSelectAll = () => {
+  if (selectedIds.value.size === tableData.value.length) selectedIds.value = new Set();
+  else selectedIds.value = new Set(tableData.value.map(r => r.id));
 };
 
 onMounted(async () => {
@@ -133,37 +138,22 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="assign-layout">
+  <div class="list-layout">
     <SearchContainer>
-      <el-form
-        inline
-        :model="searchForm"
-        class="search-form"
-      >
-        <el-form-item label="权限名称">
-          <el-input
-            v-model="searchForm.name"
-            placeholder="请输入权限名称"
-          />
-        </el-form-item>
-        <el-form-item label="权限编码">
-          <el-input
-            v-model="searchForm.code"
-            placeholder="请输入权限编码"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleSearch"
-          >
-            查询
-          </el-button>
-          <el-button @click="handleReset">
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
+      <div class="search-form">
+        <div class="search-field">
+          <label>权限名称</label>
+          <input v-model="searchForm.name" placeholder="请输入权限名称" @keyup.enter="handleSearch" />
+        </div>
+        <div class="search-field">
+          <label>权限编码</label>
+          <input v-model="searchForm.code" placeholder="请输入权限编码" @keyup.enter="handleSearch" />
+        </div>
+        <div class="search-actions">
+          <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <button class="btn btn-default" @click="handleReset">重置</button>
+        </div>
+      </div>
     </SearchContainer>
 
     <TableContainer
@@ -172,53 +162,35 @@ onMounted(async () => {
       :title="assignTitle"
       show-add-btn
       :total="pageOpts.total"
-      :disable-delete="selectedIds.length === 0"
+      :disable-delete="selectedIds.size === 0"
       @change="fetchData"
       @add="handleAdd"
       @remove="handleRemove"
     >
-      <el-table
-        v-loading="loading"
-        :data="tableData"
-        fit
-        highlight-current-row
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column
-          type="selection"
-          width="55"
-        />
-        <el-table-column
-          prop="id"
-          label="ID"
-          width="80"
-        />
-        <el-table-column
-          prop="name"
-          label="权限名称"
-        />
-        <el-table-column
-          prop="code"
-          label="权限编码"
-        />
-        <el-table-column
-          prop="assignedAt"
-          label="创建时间"
-        >
-          <template #default="{ row }">
-            {{ formatISOData(row.assignedAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="expiresAt"
-          label="过期时间"
-        >
-          <template #default="{ row }">
-            {{ row.expiresAt ? formatISOData(row.expiresAt) : '无' }}
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="table-wrapper" :class="{ loading }">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:40px"><input type="checkbox" :checked="selectedIds.size === tableData.length && tableData.length > 0" @change="toggleSelectAll" /></th>
+              <th style="width:80px">ID</th>
+              <th>权限名称</th>
+              <th>权限编码</th>
+              <th>创建时间</th>
+              <th>过期时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in tableData" :key="row.id">
+              <td><input type="checkbox" :checked="selectedIds.has(row.id)" @change="toggleSelect(row.id)" /></td>
+              <td>{{ row.id }}</td>
+              <td>{{ row.name }}</td>
+              <td>{{ row.code }}</td>
+              <td>{{ formatISOData(row.assignedAt) }}</td>
+              <td>{{ row.expiresAt ? formatISOData(row.expiresAt) : '无' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </TableContainer>
 
     <SelectPermissionDialog
@@ -227,30 +199,24 @@ onMounted(async () => {
       @confirm="handleConfirmAddPerms"
     >
       <template #footer-extra>
-        <el-form inline>
-          <el-form-item label="过期时间">
-            <el-date-picker
-              v-model="assignExpiresAt"
-              type="datetime"
-              clearable
-              placeholder="请选择过期时间（可选）"
-            />
-          </el-form-item>
-        </el-form>
+        <label class="date-picker-label">
+          过期时间
+          <el-date-picker
+            v-model="assignExpiresAt"
+            type="datetime"
+            clearable
+            placeholder="请选择过期时间（可选）"
+          />
+        </label>
       </template>
     </SelectPermissionDialog>
   </div>
 </template>
 
 <style scoped>
-.assign-layout {
+.date-picker-label {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.search-form {
-  width: 100%;
+  align-items: center;
+  gap: 8px;
 }
 </style>
-
