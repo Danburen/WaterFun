@@ -30,11 +30,10 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     @Query("SELECT p.id FROM Post p WHERE p.isDeleted = false")
     Page<Long> findAllIds(Specification<Post> spec, Pageable pageable);
 
-    Optional<Post> findByIdAndAuthorUidAndIsDeleted(Long id, Long id1, boolean attr0);
+    @Query("SELECT p FROM Post p WHERE p.id = :id AND p.author.uid = :authorUid AND p.isDeleted = :isDeleted")
+    Optional<Post> findByIdAndAuthorUidAndIsDeleted(@Param("id") Long id, @Param("authorUid") Long authorUid,@Param("isDeleted")  boolean isDeleted);
 
     Optional<Post> findByIdAndAuthorUidAndIsDeletedAndStatus(Long id, Long authorUid, Boolean isDeleted, PostStatus status);
-
-    Optional<Post> findByIdAndIsDeleted(@NotNull Long id, Boolean isDeleted);
 
     @EntityGraph(attributePaths = { "author", "category", "tags"})
     Optional<Post> findByIdAndIsDeletedAndStatus(@NotNull Long id, Boolean isDeleted, PostStatus status);
@@ -69,4 +68,13 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     @Query("SELECT new org.waterwood.waterfunservicecore.entity.post.PostAuthorUidTitleDO(p.author.uid, p.title, p.coverageResource.id) " +
             "FROM Post p WHERE p.id = :id")
     Optional<PostAuthorUidTitleDO> findPostAuthorIdTitleDOById(@Param("id") Long id);
+
+    @Query("SELECT COALESCE(SUM(p.likeCount), 0) FROM Post p WHERE p.author.uid = :authorUid AND p.isDeleted = false")
+    Long sumLikeCountByAuthorUid(@Param("authorUid") Long authorUid);
+
+    long countByAuthorUidAndStatusAndIsDeleted(Long authorUid, PostStatus status, Boolean isDeleted);
+
+    long countByAuthorUidAndIsDeleted(Long authorUid, Boolean isDeleted);
+
+    List<Post> findAllByIdInAndAuthorUidAndIsDeleted(List<Long> ids, Long authorUid, Boolean isDeleted);
 }

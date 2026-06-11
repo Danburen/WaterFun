@@ -30,9 +30,10 @@ public class UserAvatarUploadStrategy implements UploadBizStrategy<UserUploadPol
     }
 
     @Override
-    public void handleCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
+    public String handleCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
         userProfileService.uploadAvatarCallback(
                 request, payload.toContext(UserBizType.class, Long.class, UserUploadContext::new)
         );
+        return payload.getResourceUuid();
     }
 }

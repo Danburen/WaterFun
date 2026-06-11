@@ -23,6 +23,10 @@ export interface CloudPutCallbackReq {
   token: string;
 }
 
+export interface UploadCallbackResp {
+  uuid: string;
+}
+
 export const getUploadPolicy = (data: UploadPolicyReq): PromiseResBody<PresignedResp[]> => {
   return request.post<PresignedResp[]>("/upload/policy", data);
 };
@@ -37,6 +41,6 @@ export const uploadFileToStorage = (url: string, method: HttpMethod | string, fi
   return fetch(url, fetchOptions);
 };
 
-export const uploadCallback = (data: CloudPutCallbackReq): PromiseResBody<null> => {
-  return request.post<null>("/upload/callback", data);
+export const uploadCallback = (data: CloudPutCallbackReq): PromiseResBody<UploadCallbackResp> => {
+  return request.post<UploadCallbackResp>("/upload/callback", data);
 };

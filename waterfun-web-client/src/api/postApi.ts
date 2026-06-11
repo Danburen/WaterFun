@@ -43,6 +43,7 @@ export interface PostCardResp {
 export interface PostAuthorCardResp extends PostCardResp {
   visibility: 'PUBLIC' | 'PRIVATE' | 'FANS_ONLY'
   status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
+  updatedAt: string | null
 }
 
 export interface PostDetailResp {
@@ -147,6 +148,19 @@ export interface PostListParams {
   size?: number
 }
 
+export interface MyPostsStatsResp {
+  totalCount: number
+  publishedCount: number
+  draftCount: number
+  pendingCount: number
+  rejectedCount: number
+  totalLikeCount: number
+}
+
+export interface ContentPreviewReq {
+  content: string
+}
+
 export interface MyPostListParams {
   status?: string
   visibility?: string
@@ -172,6 +186,10 @@ export const fetchMyPostDetail = (id: number): PromiseResBody<PostAuthorDetailRe
   return request.get(`/posts/me/${id}`)
 }
 
+export const fetchMyPostStats = (): PromiseResBody<MyPostsStatsResp> => {
+  return request.get('/posts/me/stats')
+}
+
 export const fetchMyPostList = (params: MyPostListParams): PromiseResBody<PageResult<PostAuthorCardResp>> => {
   return request.get('/posts/me/list', { params })
 }
@@ -189,7 +207,7 @@ export const publishPost = (id: number, data: PostSaveReq): PromiseResBody<void>
 }
 
 export const previewContent = (id: number, content: string): PromiseResBody<string> => {
-  return request.get(`/posts/${id}/content/preview`, { data: { content } })
+  return request.post(`/posts/${id}/content/preview`, { content })
 }
 
 export const tempSavePost = (id: number, data: PostSaveReq): PromiseResBody<void> => {
@@ -234,4 +252,16 @@ export const deleteTag = (id: number): PromiseResBody<void> => {
 
 export const getHotTags = (params: { page?: number; size?: number; sort?: string[] }): PromiseResBody<PageResult<TagResponse>> => {
   return request.get('/post/tags/hot', { params })
+}
+
+export const publishNewPost = (data: PostSaveReq): PromiseResBody<void> => {
+  return request.post('/posts/publish', data)
+}
+
+export const tempSaveNewPost = (data: PostSaveReq): PromiseResBody<void> => {
+  return request.post('/posts/temp-save', data)
+}
+
+export const previewContentAlone = (content: string): PromiseResBody<string> => {
+  return request.post('/posts/content/preview', { content })
 }

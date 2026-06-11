@@ -42,5 +42,5 @@ export default defineNuxtConfig({
       optimizeTranslationDirective: false // 显式禁用
     },
   },
-  css: ['@/assets/styles/global.css'],
+  css: ['@fortawesome/fontawesome-free/css/all.min.css', '@/assets/styles/global.css'],
 })

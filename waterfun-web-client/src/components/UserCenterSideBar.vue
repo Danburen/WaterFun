@@ -77,6 +77,7 @@ const navItems = shallowRef([
   { id: 'profile', label: '个人资料', icon: User, disabled: false },
   { id: 'security', label: '账号安全', icon: Lock, disabled: false },
   { id: 'notification', label: '通知与隐私', icon: Bell, disabled: false },
+  { id: 'posts', label: '我的帖子', icon: Document, disabled: false },
   { id: 'notes', label: '个人笔记', icon: Document, disabled: true },
   { id: 'solutions', label: '我的解题', icon: Check, disabled: true },
   { id: 'creator', label: '创作激励', icon: Star, disabled: true, badge: 'Beta' },

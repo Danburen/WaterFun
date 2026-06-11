@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.waterwood.waterfunservicecore.entity.Priority;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
@@ -58,13 +59,14 @@ public class AuditTask {
     private TargetType targetType = TargetType.UNKNOWN;
 
     @ColumnDefault("'0'")
-    @Column(name = "content_format", columnDefinition = "tinyint UNSIGNED not null")
-    private AuditContentFormat contentFormat = AuditContentFormat.PLAINTEXT;
+    @Column(name = "format", columnDefinition = "tinyint UNSIGNED not null")
+    private AuditContentFormat format = AuditContentFormat.DEFAULT;
 
     @ColumnDefault("'1'")
     @Column(name = "status", columnDefinition = "tinyint UNSIGNED not null")
     private AuditStatus status = AuditStatus.PENDING;
 
+    @Deprecated
     @Lob
     @Column(name = "content")
     private String content;
@@ -83,8 +85,22 @@ public class AuditTask {
     @Column(name = "pending_target_id", length = 64, updatable = false, insertable = false) // the application usually won't use this
     private String pendingTargetId;
 
+    @Deprecated
     @Size(max = 255)
     @Column(name = "suspect_reason")
     private String suspectReason;
+
+    @Column(name = "trigger_type", columnDefinition = "tinyint UNSIGNED not null")
+    private AuditTriggerType triggerType = AuditTriggerType.UNKNOWN;
+
+    @Size(max = 255)
+    @Column(name = "trigger_source")
+    private String triggerSource;
+
+    @ColumnDefault("'2'")
+    @Convert(disableConversion = true)
+    @Enumerated
+    @Column(name = "priority", columnDefinition = "tinyint UNSIGNED not null")
+    private Priority priority = Priority.MEDIUM;
 
 }

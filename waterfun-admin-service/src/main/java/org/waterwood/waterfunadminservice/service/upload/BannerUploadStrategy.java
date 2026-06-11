@@ -33,11 +33,12 @@ public class BannerUploadStrategy implements UploadBizStrategy<AdminUploadPolicy
     }
 
     @Override
-    public void handleCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
+    public String handleCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
             bannerService.handleBannerUploadCallback(request, payload.toContext(
                     AdminBizType.class,
                     Long.class,
                     AdminUploadContext::new
             ));
+            return payload.getResourceUuid();
     }
 }

@@ -3,20 +3,16 @@ package org.waterwood.waterfunservice.service.user;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.ResourceType;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.UserUploadContext;
 import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
+import org.waterwood.waterfunservicecore.api.moderation.AuditPayload;
+import org.waterwood.waterfunservicecore.api.moderation.ImageAuditPayload;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
-import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
-import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
-import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.resource.AuditResourceId;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
@@ -29,11 +25,11 @@ import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.services.audit.ContentAuditService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerator;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +41,8 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final UserRepository userRepository;
     private final AuditTaskResourceRepository auditTaskResourceRepository;
     private final ResourceRepository resourceRepository;
+    private final ContentAuditService contentAuditService;
+
     @Transactional
     @Override
     public List<PresignedResp> handleUserAvatarUpload(UserUploadPolicyReq request) {
@@ -84,60 +82,30 @@ public class UserProfileServiceImpl implements UserProfileService {
         String resourceUuid = ctx.getResourceUuid();
         Long bizId = UserCtxHolder.getUserUid();
         if(! bizId.equals(ctx.getBizId())) throw new ForbiddenException();
-        AuditTask task = auditTaskRepository
-                .findByTargetIdAndTargetTypeAndStatus(bizId.toString(), TargetType.USER_AVATAR,AuditStatus.PENDING)
-                .orElseGet(() -> {
-                    AuditTask newTask = new AuditTask();
-                    newTask.setTargetId(bizId.toString());
-                    newTask.setSubmitAt(Instant.now());
-                    newTask.setTargetType(TargetType.USER_AVATAR);
-                    newTask.setSubmitter(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
-                    return newTask;
-                });
-
-        auditTaskRepository.save(task);
-        Resource res;
-        AuditResource auditRes = auditTaskResourceRepository
-                .findByTaskId(task.getId())
-                .orElseGet(() -> {
-                    AuditResource ar = new AuditResource();
-                    ar.setTask(task);
-                    return ar;
-                });
-        res = auditRes.getResource();
-        if(res != null){ // old resource
-            // clean old pending cloud resource if exists, to ensure no floating resource
-            if (res.getResourceKey() != null) {
-                final String oldKey = res.getResourceKey();
-                TransactionSynchronizationManager.registerSynchronization(
-                        new TransactionSynchronization() {
-                            @Override
-                            public void afterCommit() {
-                                cloudFileService.removeFile(CloudFSRoot.USER, oldKey);
-                            }
-                        }
-                );
-            }
-            res.setStatus(ResourceStatus.DELETED);
-        }
-
-        res = resourceRepository.findByUuidAndStatus(resourceUuid, ResourceStatus.UPLOAD_PENDING)
+        // Set up new resource
+        Resource newRes = resourceRepository.findByUuidAndStatus(resourceUuid, ResourceStatus.UPLOAD_PENDING)
                 .orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid));
-        auditRes.setResource(res);
-        AuditResourceId id = new AuditResourceId();
-        id.setResourceUuid(resourceUuid);
-        id.setTaskId(task.getId());
-        auditRes.setId(id);
-
         cloudFileService.setAndValidResourceForCallback(
-                res,
+                newRes,
                 CloudFSRoot.USER,
                 ResourceStatus.ACTIVE,
                 ResourceType.IMAGE
         );
-
-        resourceRepository.save(res);
-        auditTaskResourceRepository.save(auditRes);
+        resourceRepository.save(newRes);
+        // Update old resource status to orphan if exists
+        String newResourceUuid = contentAuditService
+                .getLinkedResourcesUuids(bizId, TargetType.USER_AVATAR).getFirst();
+        if (newResourceUuid != null) {
+            resourceRepository.updateStatusTo(ResourceStatus.ORPHAN, newResourceUuid);
+        }
+        // Submit audit task
+        AuditPayload payload = new ImageAuditPayload(newRes);
+        contentAuditService.handleUserSubmit(
+                bizId,
+                TargetType.USER_AVATAR,
+                payload,
+                List.of(resourceUuid)
+        );
     }
 
 }

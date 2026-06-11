@@ -1,23 +1,24 @@
 package org.waterwood.waterfunservicecore.entity.notification;
 
 import lombok.Getter;
+import org.waterwood.waterfunservicecore.entity.Priority;
 
 @Getter
 public enum NoticeType {
-    GENERAL(0, NoticeGroup.MISC, NoticePriority.MEDIUM),
-    LIKE(1, NoticeGroup.INTERACTION, NoticePriority.MEDIUM),
-    REPLY(2, NoticeGroup.REPLY, NoticePriority.HIGH),
-    MENTION(3, NoticeGroup.MENTION, NoticePriority.EMERGENCY),
-    NEW_FOLLOWER(4, NoticeGroup.INTERACTION, NoticePriority.MEDIUM),
-    COLLECT(5, NoticeGroup.INTERACTION, NoticePriority.MEDIUM),
-    PROMOTION(9, NoticeGroup.SYSTEM, NoticePriority.LOW),
-    SYSTEM(10, NoticeGroup.SYSTEM, NoticePriority.MEDIUM),;
+    GENERAL(0, NoticeGroup.MISC, Priority.MEDIUM),
+    LIKE(1, NoticeGroup.INTERACTION, Priority.MEDIUM),
+    REPLY(2, NoticeGroup.REPLY, Priority.HIGH),
+    MENTION(3, NoticeGroup.MENTION, Priority.EMERGENCY),
+    NEW_FOLLOWER(4, NoticeGroup.INTERACTION, Priority.MEDIUM),
+    COLLECT(5, NoticeGroup.INTERACTION, Priority.MEDIUM),
+    PROMOTION(9, NoticeGroup.SYSTEM, Priority.LOW),
+    SYSTEM(10, NoticeGroup.SYSTEM, Priority.MEDIUM),;
 
 
     private final NoticeGroup group;
-    private final NoticePriority priority;
+    private final Priority priority;
     private final short code;
-    NoticeType(final int code, final NoticeGroup group, final NoticePriority priority) {
+    NoticeType(final int code, final NoticeGroup group, final Priority priority) {
         this.code = (short) code;
         this.group = group;
         this.priority = priority;
@@ -33,7 +34,7 @@ public enum NoticeType {
     }
 
     public boolean isSendImmediately() {
-        return this.priority == NoticePriority.HIGH;
+        return this.priority == Priority.HIGH;
     }
 
     public boolean isAggregatable() {

@@ -7,9 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
+import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -48,4 +51,15 @@ public interface AuditTaskResourceRepository extends JpaRepository<AuditResource
             @Param("oldStatus") AuditStatus oldStatus);
 
     List<AuditResource> findByTaskIdIn(List<Long> attr0);
+
+    @Query("SELECT ar.resource FROM AuditResource ar JOIN ar.task t " +
+            "WHERE t.targetId = :targetId AND t.targetType = :targetType")
+    List<Resource> findByTaskTargetIdAndTaskTargetType(
+            @Param("targetId") String targetId,
+            @Param("targetType") TargetType targetType);
+    @Query("SELECT ar.resource.uuid FROM AuditResource ar JOIN ar.task t " +
+            "WHERE t.targetId = :targetId AND t.targetType = :targetType")
+    List<String> findResourceUuidByTaskTargetIdAndTaskTargetType(
+            @Param("targetId") String targetId,
+            @Param("targetType") TargetType targetType);
 }

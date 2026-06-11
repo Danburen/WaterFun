@@ -1,4 +1,4 @@
-package org.waterwood.waterfunservice.service;
+package org.waterwood.waterfunservice.service.log;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

@@ -4,11 +4,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.api.VO.BatchResult;
+import org.waterwood.waterfunadminservice.api.request.AuditResponse;
+import org.waterwood.waterfunadminservice.api.request.ModerationBaseQuery;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRejectRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.ModerateRejectRequest;
-import org.waterwood.waterfunadminservice.api.response.ModerateTaskResponse;
+import org.waterwood.waterfunadminservice.api.response.AuditTaskRes;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
+import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
@@ -16,18 +19,11 @@ import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import java.util.List;
 
 public interface ModerationService {
-    /**
-     * List audit tasks by specification and pageable
-     * @param spec specification
-     * @param pageable pageable
-     * @return page of AuditTask entity
-     */
-    Page<AuditTask> listTasks(Specification<AuditTask> spec, Pageable pageable);
 
     /**
      * List tasks and assemble moderation payload (resource urls/rendered content).
      */
-    Page<ModerateTaskResponse> listTasksWithPayload(Specification<AuditTask> spec, Pageable pageable);
+    Page<AuditTaskRes> listTasksWithPayload(Specification<AuditTask> spec, Pageable pageable);
 
     /**
      * List resources for one task.
@@ -92,5 +88,13 @@ public interface ModerationService {
      * @param id target task id
      * @return ModerationTaskResponse of target post
      */
-    ModerateTaskResponse getTask(Long id);
+    AuditTaskRes getTask(Long id);
+
+    /**
+     * List post audit tasks with payload assembled.
+     * @param query {@link ModerationBaseQuery} query params
+     * @param pageable pageable
+     * @return page of {@link AuditResponse<PostAuditPayload>}
+     */
+    Page<AuditResponse<PostAuditPayload>> listPendingPostTasks(ModerationBaseQuery query, Pageable pageable);
 }

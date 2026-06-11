@@ -162,7 +162,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
+                  "$ref": "#/components/schemas/ApiResponseUploadCallbackResp"
                 }
               }
             }
@@ -175,15 +175,18 @@
         "tags": [
           "post-controller"
         ],
+        "summary": "Save changes to an existing draft",
+        "description": "Temporarily save content into an existing draft post identified by {id}. Returns empty body on success.",
         "operationId": "tempSavePost",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "Existing draft post ID to save into",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "default": ""
             }
           }
         ],
@@ -216,15 +219,18 @@
         "tags": [
           "post-controller"
         ],
+        "summary": "Publish an existing draft post",
+        "description": "Publish the draft post specified by {id}. Returns empty body on success.",
         "operationId": "publishPost",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "Existing post ID to publish",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "default": ""
             }
           }
         ],
@@ -283,6 +289,50 @@
         }
       }
     },
+    "/api/posts/{id}/content/preview": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "summary": "Preview content with post-bound resources",
+        "description": "Preview content, will replace Res://\u003Cuuid\u003E to accessable url. Resources bound to the post or the user will be rendered. Requires an existing post {id}.",
+        "operationId": "previewContent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Existing post ID for resource resolution",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPreviewReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/posts/{id}/collection": {
       "post": {
         "tags": [
@@ -314,6 +364,138 @@
         }
       }
     },
+    "/api/posts/temp-save": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "summary": "Create a new draft and save initial content",
+        "description": "Create a new draft post and save the provided content. Returns the newly created draft post ID.",
+        "operationId": "tempSaveNewPost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSaveReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/publish": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "summary": "Create and publish a new post in one step",
+        "description": "Create a new post and publish it immediately. Returns the newly created post ID.",
+        "operationId": "publicNewPost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSaveReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/me/batch-publish": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "batchPublishPost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/me/batch-delete": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "batchDeletePost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/posts/draft": {
       "post": {
         "tags": [
@@ -327,6 +509,38 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/content/preview": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "summary": "Preview content with user-bound resources only",
+        "description": "Preview content, will replace Res://\u003Cuuid\u003E to accessable url. Only resources bound to the current user will be rendered, no post scope.",
+        "operationId": "previewContent_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPreviewReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseString"
                 }
               }
             }
@@ -1008,66 +1222,6 @@
         }
       }
     },
-    "/api/posts/{id}": {
-      "get": {
-        "tags": [
-          "post-controller"
-        ],
-        "operationId": "getPostDetail",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePostDetailResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "post-controller"
-        ],
-        "operationId": "deletePost",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/posts/{id}/edit": {
       "get": {
         "tags": [
@@ -1099,12 +1253,12 @@
         }
       }
     },
-    "/api/posts/{id}/content/preview": {
+    "/api/posts/{id}/detail": {
       "get": {
         "tags": [
           "post-controller"
         ],
-        "operationId": "previewContent",
+        "operationId": "getPostDetailPublic",
         "parameters": [
           {
             "name": "id",
@@ -1116,23 +1270,13 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ContentPreviewReq"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseString"
+                  "$ref": "#/components/schemas/ApiResponsePostDetailResp"
                 }
               }
             }
@@ -1171,6 +1315,26 @@
         }
       }
     },
+    "/api/posts/me/stats": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "getMyPostStats",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMyPostsStatsResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/posts/me/list": {
       "get": {
         "tags": [
@@ -1178,6 +1342,14 @@
         ],
         "operationId": "listMyPost",
         "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "status",
             "in": "query",
@@ -1245,6 +1417,15 @@
               "type": "integer",
               "format": "int32",
               "default": 10
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "newest"
             }
           }
         ],
@@ -1319,37 +1500,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponsePagePostCardResp"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/posts/detail/{id}": {
-      "get": {
-        "tags": [
-          "post-controller"
-        ],
-        "operationId": "getPostDetailPublic",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePostDetailResp"
                 }
               }
             }
@@ -2012,6 +2162,37 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseAccountResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}": {
+      "delete": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "deletePost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
                 }
               }
             }
@@ -4231,6 +4412,31 @@
           "token"
         ]
       },
+      "ApiResponseUploadCallbackResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UploadCallbackResp"
+          }
+        }
+      },
+      "UploadCallbackResp": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
       "PostSaveReq": {
         "type": "object",
         "properties": {
@@ -4283,6 +4489,35 @@
           "content",
           "title"
         ]
+      },
+      "ContentPreviewReq": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "ApiResponseString": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          }
+        }
       },
       "ApiResponseLong": {
         "type": "object",
@@ -4823,111 +5058,6 @@
           }
         }
       },
-      "ApiResponsePostDetailResp": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/PostDetailResp"
-          }
-        }
-      },
-      "OptionVOInteger": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "disabled": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PostDetailResp": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "subtitle": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "coverImage": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          },
-          "category": {
-            "$ref": "#/components/schemas/OptionVOInteger"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OptionVOInteger"
-            }
-          },
-          "viewCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "likeCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "commentCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "collectCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "publishedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "COMMON",
-              "NOTICE"
-            ]
-          },
-          "isPinned": {
-            "type": "boolean"
-          }
-        }
-      },
       "ApiResponsePostDraftResp": {
         "type": "object",
         "properties": {
@@ -5002,19 +5132,7 @@
           }
         }
       },
-      "ContentPreviewReq": {
-        "type": "object",
-        "properties": {
-          "content": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "content"
-        ]
-      },
-      "ApiResponseString": {
+      "ApiResponsePostDetailResp": {
         "type": "object",
         "properties": {
           "success": {
@@ -5027,7 +5145,77 @@
             "type": "string"
           },
           "data": {
+            "$ref": "#/components/schemas/PostDetailResp"
+          }
+        }
+      },
+      "PostDetailResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
             "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "coverImage": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "category": {
+            "$ref": "#/components/schemas/OptionVOLong"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOLong"
+            }
+          },
+          "viewCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "collectCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "NOTICE"
+            ]
+          },
+          "isPinned": {
+            "type": "boolean"
           }
         }
       },
@@ -5071,12 +5259,12 @@
             "$ref": "#/components/schemas/CloudResPresignedUrlResp"
           },
           "category": {
-            "$ref": "#/components/schemas/OptionVOInteger"
+            "$ref": "#/components/schemas/OptionVOLong"
           },
           "tags": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OptionVOInteger"
+              "$ref": "#/components/schemas/OptionVOLong"
             }
           },
           "viewCount": {
@@ -5123,6 +5311,52 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseMyPostsStatsResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/MyPostsStatsResp"
+          }
+        }
+      },
+      "MyPostsStatsResp": {
+        "type": "object",
+        "properties": {
+          "totalCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "publishedCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "draftCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pendingCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "rejectedCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalLikeCount": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -5235,12 +5469,12 @@
             "$ref": "#/components/schemas/CloudResPresignedUrlResp"
           },
           "category": {
-            "$ref": "#/components/schemas/OptionVOInteger"
+            "$ref": "#/components/schemas/OptionVOLong"
           },
           "tags": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OptionVOInteger"
+              "$ref": "#/components/schemas/OptionVOLong"
             }
           },
           "viewCount": {
@@ -5281,6 +5515,10 @@
             "type": "string"
           },
           "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
             "type": "string",
             "format": "date-time"
           }
@@ -5386,12 +5624,12 @@
             "$ref": "#/components/schemas/CloudResPresignedUrlResp"
           },
           "category": {
-            "$ref": "#/components/schemas/OptionVOInteger"
+            "$ref": "#/components/schemas/OptionVOLong"
           },
           "tags": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OptionVOInteger"
+              "$ref": "#/components/schemas/OptionVOLong"
             }
           },
           "viewCount": {

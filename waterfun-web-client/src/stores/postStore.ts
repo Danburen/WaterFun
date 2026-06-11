@@ -11,10 +11,12 @@ import type {
   TagResponse,
   PostListParams,
   MyPostListParams,
+  MyPostsStatsResp,
   PageResult
 } from '~/api/postApi'
 
 interface PostState {
+  myPostStats: MyPostsStatsResp | null
   posts: PostCardResp[]
   myPosts: PostAuthorCardResp[]
   currentPost: PostDetailResp | null
@@ -45,6 +47,7 @@ export const usePostStore = defineStore('post', {
     currentPost: null,
     currentMyPost: null,
     editDraft: null,
+    myPostStats: null,
     categories: [],
     tags: [],
     pagination: {
@@ -182,6 +185,36 @@ export const usePostStore = defineStore('post', {
         await postApi.tempSavePost(id, data)
       } catch (err) {
         console.error('保存草稿失败:', err)
+        throw err
+      }
+    },
+
+    async fetchMyPostStats(): Promise<MyPostsStatsResp | null> {
+      try {
+        const res = await postApi.fetchMyPostStats()
+        const data = res.data as unknown as MyPostsStatsResp
+        this.myPostStats = data
+        return data
+      } catch (err) {
+        console.error('获取帖子统计失败:', err)
+        return null
+      }
+    },
+
+    async publishNewPost(data: PostSaveReq): Promise<void> {
+      try {
+        await postApi.publishNewPost(data)
+      } catch (err) {
+        console.error('发布帖子失败:', err)
+        throw err
+      }
+    },
+
+    async tempSaveNewPost(data: PostSaveReq): Promise<void> {
+      try {
+        await postApi.tempSaveNewPost(data)
+      } catch (err) {
+        console.error('保存帖子失败:', err)
         throw err
       }
     },

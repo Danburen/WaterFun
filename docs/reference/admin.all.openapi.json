@@ -1918,7 +1918,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
+                  "$ref": "#/components/schemas/ApiResponseUploadCallbackResp"
                 }
               }
             }
@@ -3702,7 +3702,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseMapStringLong"
+                  "$ref": "#/components/schemas/ApiResponseOnlineCountVO"
                 }
               }
             }
@@ -5274,6 +5274,31 @@
           "token"
         ]
       },
+      "ApiResponseUploadCallbackResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UploadCallbackResp"
+          }
+        }
+      },
+      "UploadCallbackResp": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
       "CreateTagRequest": {
         "type": "object",
         "properties": {
@@ -6240,13 +6265,13 @@
       "PageObject": {
         "type": "object",
         "properties": {
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
           "totalElements": {
             "type": "integer",
             "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
           },
           "size": {
             "type": "integer",
@@ -6296,11 +6321,11 @@
           "paged": {
             "type": "boolean"
           },
-          "pageNumber": {
+          "pageSize": {
             "type": "integer",
             "format": "int32"
           },
-          "pageSize": {
+          "pageNumber": {
             "type": "integer",
             "format": "int32"
           },
@@ -7022,7 +7047,7 @@
           }
         }
       },
-      "ApiResponseMapStringLong": {
+      "ApiResponseOnlineCountVO": {
         "type": "object",
         "properties": {
           "success": {
@@ -7035,11 +7060,24 @@
             "type": "string"
           },
           "data": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
-            }
+            "$ref": "#/components/schemas/OnlineCountVO"
+          }
+        }
+      },
+      "OnlineCountVO": {
+        "type": "object",
+        "properties": {
+          "onlineCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "adminOnlineCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pealOnlineCount": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -7613,6 +7651,10 @@
             "format": "int64"
           },
           "pendingModerations": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "peakOnline": {
             "type": "integer",
             "format": "int64"
           }

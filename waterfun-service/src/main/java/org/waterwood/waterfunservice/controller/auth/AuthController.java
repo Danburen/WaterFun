@@ -26,7 +26,7 @@ import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
-import org.waterwood.waterfunservice.service.AuditLogService;
+import org.waterwood.waterfunservice.service.log.AuditLogService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.auth.impl.AuthCoreServiceImpl;
 import org.waterwood.waterfunservicecore.services.auth.impl.CaptchaServiceImpl;

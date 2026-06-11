@@ -10,6 +10,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
+import org.waterwood.waterfunservicecore.entity.Priority;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
@@ -58,7 +59,7 @@ public class Inbox {
 
     @ColumnDefault("'3'")
     @Column(name = "priority", columnDefinition = "tinyint UNSIGNED")
-    private NoticePriority priority = NoticePriority.MEDIUM;
+    private Priority priority = Priority.MEDIUM;
 
     @ColumnDefault("0")
     @Column(name = "is_aggregated")

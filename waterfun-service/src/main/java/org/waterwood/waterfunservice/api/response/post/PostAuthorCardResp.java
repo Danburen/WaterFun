@@ -38,4 +38,5 @@ public class PostAuthorCardResp {
 
     private String slug;
     private Instant publishedAt;
+    private Instant updatedAt;
 }

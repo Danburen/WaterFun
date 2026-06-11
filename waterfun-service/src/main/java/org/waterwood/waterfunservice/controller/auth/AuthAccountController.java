@@ -16,7 +16,7 @@ import org.waterwood.waterfunservice.api.request.ResetPasswordDto;
 import org.waterwood.waterfunservice.api.request.SetPasswordDto;
 import org.waterwood.waterfunservice.api.request.EmailBindActivateDto;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
-import org.waterwood.waterfunservice.service.AuditLogService;
+import org.waterwood.waterfunservice.service.log.AuditLogService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
 import org.waterwood.waterfunservice.service.account.AccountService;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;

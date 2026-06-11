@@ -64,6 +64,7 @@ const activeTab = computed(() => {
   if (path.includes('/profile/info')) return 'profile';
   if (path.includes('/profile/account')) return 'security';
   if (path.includes('/profile/notifications')) return 'notification';
+  if (path.includes('/profile/posts')) return 'posts';
   return 'profile';
 });
 
@@ -73,7 +74,8 @@ const handleTabChange = (tabId: string) => {
   const map: Record<string, string> = {
     profile: '/profile/info',
     security: '/profile/account',
-    notification: '/profile/notifications'
+    notification: '/profile/notifications',
+    posts: '/profile/posts'
   }
   router.push(map[tabId] || '/profile/info');
   console.log('切换到标签:', tabId, map[tabId], router.currentRoute.value.path);

@@ -10,5 +10,12 @@ import java.util.Set;
 public interface UploadBizStrategy<R extends UploadPolicy> {
     Set<String> getTargetBizTypeCodes();
     List<PresignedResp> handle(R request);
-    void handleCallback(CloudPutCallbackReq request, BizUploadPayload payload);
+
+    /**
+     * Handle resource callback and return the resource uuid
+     * @param request {@link CloudPutCallbackReq} callback request from cloud file service
+     * @param payload {@link BizUploadPayload} upload payload which contains the biz target id and biz type.
+     * @return {@link String} uuid string of the processed resource.
+     */
+    String handleCallback(CloudPutCallbackReq request, BizUploadPayload payload);
 }

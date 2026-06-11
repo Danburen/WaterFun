@@ -1,4 +1,4 @@
-import {ISOString} from "~/types";
+import type {ISOString} from "./types/api/response";
 import {dayjs} from "element-plus";
 
 export const formatDate = (dateObj: any) => {

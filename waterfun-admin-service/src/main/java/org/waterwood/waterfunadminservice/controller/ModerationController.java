@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
@@ -12,17 +13,18 @@ import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.VO.BatchResult;
+import org.waterwood.waterfunadminservice.api.request.ModerationBaseQuery;
+import org.waterwood.waterfunadminservice.api.request.AuditResponse;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRejectRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.ModerateRejectRequest;
-import org.waterwood.waterfunadminservice.api.response.ModerateTaskResponse;
+import org.waterwood.waterfunadminservice.api.response.AuditTaskRes;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
 import org.waterwood.waterfunadminservice.service.ModerationService;
-import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
+import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
+import org.waterwood.waterfunservicecore.entity.audit.*;
 import org.waterwood.common.io.ResourceType;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
-import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
-import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.spec.AuditTaskResourceSpec;
 import org.waterwood.waterfunservicecore.entity.spec.AuditTaskSpec;
 
@@ -37,14 +39,32 @@ public class ModerationController {
     private final ModerationService moderationService;
     private final MessageSource messageSource;
 
+    @GetMapping("/list/posts")
+    public ApiResponse<Page<AuditResponse<PostAuditPayload>>> listPosts(
+           ModerationBaseQuery query,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return ApiResponse.success(
+                moderationService.listPendingPostTasks(
+                        query,
+                        pageable
+                )
+        );
+    }
+
     @GetMapping("/list")
-    public ApiResponse<Page<ModerateTaskResponse>> list(@RequestParam(required = false) TargetType taskType,
-                                                        @RequestParam(required = false) Long submitterId,
-                                                        @RequestParam(required = false) Instant submitAtStart,
-                                                        @RequestParam(required = false) Instant submitAtEnd,
-                                                        @PageableDefault Pageable pageable){
-        Specification<AuditTask> spec = AuditTaskSpec.ofPending(taskType, submitterId, submitAtStart, submitAtEnd);
-        return ApiResponse.success(moderationService.listTasksWithPayload(spec, pageable));
+    public ApiResponse<Page<AuditTaskRes>> list(
+            @RequestParam(required = false) TargetType taskType,
+            @RequestParam(required = false) Long submitterId,
+            @RequestParam(required = false) Instant submitAtStart,
+            @RequestParam(required = false) Instant submitAtEnd,
+            @RequestParam(required = true)  AuditContentFormat format,
+            @PageableDefault Pageable pageable){
+        Specification<AuditTask> spec = AuditTaskSpec.ofPending(taskType, format, submitterId, submitAtStart, submitAtEnd);
+        return ApiResponse.success(
+                moderationService.listTasksWithPayload(spec, pageable)
+        );
     }
 
     @GetMapping("/resources/list")
@@ -69,7 +89,7 @@ public class ModerationController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<ModerateTaskResponse> getTask(@PathVariable Long id){
+    public ApiResponse<AuditTaskRes> getTask(@PathVariable Long id){
         return ApiResponse.success(
                 moderationService.getTask(id)
         );

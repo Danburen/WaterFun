@@ -36,13 +36,6 @@ public interface PostService {
      */
     void deletePost(Long id);
 
-    /**
-     * Get post entity by id
-     * @param id post id
-     * @return post entity
-     */
-    Post getPostById(Long id);
-
     Page<PostCardResp> listCardPosts(Specification<Post> spec, Pageable pageable);
 
     Page<PostAuthorCardResp> listAuthorCardPosts(Specification<Post> spec, Pageable pageable);
@@ -52,7 +45,7 @@ public interface PostService {
      * @param id target id
      * @return post detail resp
      */
-    PostDetailResp getPostDetail(Long id);
+    PostDetailResp getPublicPostDetail(Long id);
 
     PostAuthorDetailResp getSelfPostDetail(Long id);
 
@@ -132,13 +125,42 @@ public interface PostService {
 
     /**
      * Draft a new post and publish directly, which means the post will be created and published immediately.
+     *
      * @param req {@link PostSaveReq}
+     * @return created post id
      */
-    void publishNewPost(@Valid PostSaveReq req);
+    Long publishNewPost(PostSaveReq req);
 
     /**
      * Draft a new post and temp-save it
+     *
      * @param req {@link  PostSaveReq}
+     * @return created post id
      */
-    void saveNewPost(@Valid PostSaveReq req);
+    Long saveNewPost(PostSaveReq req);
+
+    /**
+     * Preview a content and only allow those resource associated with user
+     * @param content raw content
+     * @return rendered content
+     */
+    String contentPreview(String content);
+
+    /**
+     * Get current user's post stats (counts by status + total likes)
+     * @return stats response
+     */
+    MyPostsStatsResp getMyPostStats();
+
+    /**
+     * Batch delete current user's posts
+     * @param ids list of post IDs to delete
+     */
+    void batchDelete(List<Long> ids);
+
+    /**
+     * Batch submit drafts for review
+     * @param ids list of draft post IDs to submit
+     */
+    void batchPublish(List<Long> ids);
 }

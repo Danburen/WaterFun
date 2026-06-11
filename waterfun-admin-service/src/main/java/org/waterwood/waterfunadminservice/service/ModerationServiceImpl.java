@@ -17,10 +17,12 @@ import org.waterwood.common.io.FileProbeResult;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.JsonUtil;
 import org.waterwood.utils.StringUtil;
+import org.waterwood.waterfunadminservice.api.request.AuditResponse;
+import org.waterwood.waterfunadminservice.api.request.ModerationBaseQuery;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRejectRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.ModerateRejectRequest;
-import org.waterwood.waterfunadminservice.api.response.ModerateTaskResponse;
+import org.waterwood.waterfunadminservice.api.response.AuditTaskRes;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationTaskPayloadRes;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.AuditTaskMapper;
@@ -30,13 +32,11 @@ import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
 import org.waterwood.waterfunservicecore.api.moderation.AuditPayload;
 import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
-import org.waterwood.waterfunservicecore.entity.audit.TargetType;
+import org.waterwood.waterfunservicecore.entity.audit.*;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
-import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
-import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
+import org.waterwood.waterfunservicecore.entity.spec.AuditTaskSpec;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.notfound.AuditTaskNotFoundException;
 import org.waterwood.waterfunservicecore.exception.notfound.AuditTaskResourceNotFoundException;
@@ -52,7 +52,6 @@ import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -71,18 +70,14 @@ public class ModerationServiceImpl implements ModerationService {
     private final UserRepository userRepository;
     private final MessageSource messageSource;
 
-    @Override
-    public Page<AuditTask> listTasks(Specification<AuditTask> spec, Pageable pageable) {
-        return auditTaskRepository.findAll(spec, pageable);
-    }
 
     @Override
-    public Page<ModerateTaskResponse> listTasksWithPayload(Specification<AuditTask> spec, Pageable pageable) {
-        Page<AuditTask> tasks = listTasks(spec, pageable);
+    public Page<AuditTaskRes> listTasksWithPayload(Specification<AuditTask> spec, Pageable pageable) {
+        Page<AuditTask> tasks = auditTaskRepository.findAll(spec, pageable);
         List<Long> taskIds = tasks.getContent().stream().map(AuditTask::getId).toList();
         Map<Long, List<AuditResource>> taskAndResources = loadTaskResources(taskIds);
         return tasks.map(task -> {
-            ModerateTaskResponse resp = auditTaskMapper.toModerateTaskResponse(task);
+            AuditTaskRes resp = auditTaskMapper.toModerateTaskResponse(task);
             List<AuditResource> auditResources = taskAndResources.getOrDefault(task.getId(), Collections.emptyList());
             resp.setPayload(buildPayload(task, auditResources));
             return resp;
@@ -251,16 +246,41 @@ public class ModerationServiceImpl implements ModerationService {
     }
 
     @Override
-    public ModerateTaskResponse getTask(Long id) {
+    public AuditTaskRes getTask(Long id) {
         return auditTaskRepository.findById(id)
                 .map(task -> {
-                    ModerateTaskResponse resp = auditTaskMapper.toModerateTaskResponse(task);
+                    AuditTaskRes resp = auditTaskMapper.toModerateTaskResponse(task);
                     List<AuditResource> auditResources = auditTaskResourceRepository
                             .findAllByTaskId(task.getId());
                     resp.setPayload(buildPayload(task, auditResources));
                     return resp;
                 })
                 .orElseThrow(AuditTaskNotFoundException::new);
+    }
+
+    @Override
+    public Page<AuditResponse<PostAuditPayload>> listPendingPostTasks(ModerationBaseQuery query, Pageable pageable) {
+        return auditTaskRepository.findAll(
+                        AuditTaskSpec.of(
+                                query.triggerType(),
+                                query.priority(),
+                                query.status(),
+                                query.submitterUid(),
+                                query.submitAtStart(),
+                                query.submitAtEnd(),
+                                TargetType.POST
+
+                        ),
+                        pageable
+                )
+                .map(task -> {
+                    AuditResponse<PostAuditPayload> resp = new AuditResponse<>();
+                    auditTaskMapper.toModerateTaskResponse(task, resp);
+                    List<AuditResource> auditResources = auditTaskResourceRepository
+                            .findAllByTaskId(task.getId());
+                    resp.setPayload((PostAuditPayload) buildPayload(task, auditResources).getPayload());
+                    return resp;
+                });
     }
 
     private void aggregateTaskStatus(AuditTask task, AuditResource lastUpdated) {
@@ -333,7 +353,7 @@ public class ModerationServiceImpl implements ModerationService {
                     ModerationTaskPayloadRes.PayloadType.PLAIN_TEXT,
                     Collections.emptyList(),
                     renderedContent,
-                    task.getContentFormat(),
+                    task.getFormat(),
                     null
             );
         }
@@ -344,7 +364,7 @@ public class ModerationServiceImpl implements ModerationService {
                     ModerationTaskPayloadRes.PayloadType.SINGLE_RESOURCE,
                     List.of(single),
                     renderedContent,
-                    task.getContentFormat(),
+                    task.getFormat(),
                     null
             );
         }
@@ -355,7 +375,7 @@ public class ModerationServiceImpl implements ModerationService {
                 ModerationTaskPayloadRes.PayloadType.RICH_TEXT,
                 items,
                 renderedContent,
-                task.getContentFormat(),
+                task.getFormat(),
                 getPayload(task.getPayload(), task.getTargetType())
 
         );

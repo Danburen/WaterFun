@@ -8,6 +8,7 @@ import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
 import org.waterwood.waterfunservice.service.upload.UploadStrategyFactory;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
+import org.waterwood.waterfunservicecore.api.resp.UploadCallbackResp;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.BanCheck;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
@@ -30,9 +31,10 @@ public class UploadController {
     }
 
     @PostMapping("/callback")
-    public ApiResponse<Void> uploadCallback(@RequestBody @Valid CloudPutCallbackReq request) {
+    public ApiResponse<UploadCallbackResp> uploadCallback(@RequestBody @Valid CloudPutCallbackReq request) {
         BizUploadPayload payload = cloudFileService.parseToken(request.getToken());
-        uploadStrategyFactory.getStrategy(payload).handleCallback(request, payload);
-        return ApiResponse.success();
+        return ApiResponse.success(
+                new UploadCallbackResp(uploadStrategyFactory.getStrategy(payload).handleCallback(request, payload))
+        );
     }
 }

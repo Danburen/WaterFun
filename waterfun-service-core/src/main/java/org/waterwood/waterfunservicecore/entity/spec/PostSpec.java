@@ -37,9 +37,12 @@ public final class PostSpec {
         };
     }
 
-    public static Specification<Post> ofSelf(PostStatus status, PostVisibility visibility, Integer categoryId, List<Integer> tagIds){
+    public static Specification<Post> ofSelf(String title, PostStatus status, PostVisibility visibility, Integer categoryId, List<Integer> tagIds){
         return (root, query, criteriaBuilder) -> {
             List<Predicate> preds = new ArrayList<>();
+            if (StringUtil.isNotBlank(title)) {
+                preds.add(criteriaBuilder.like(root.get("title"), "%" + title + "%"));
+            }
             if (status != null) {
                 preds.add(criteriaBuilder.equal(root.get("status"), status));
             }

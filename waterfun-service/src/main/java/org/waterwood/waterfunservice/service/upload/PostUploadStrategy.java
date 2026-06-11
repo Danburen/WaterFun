@@ -40,7 +40,7 @@ public class PostUploadStrategy implements UploadBizStrategy<UserUploadPolicyReq
     }
 
     @Override
-    public void handleCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
+    public String handleCallback(CloudPutCallbackReq request, BizUploadPayload payload) {
         UserUploadContext<Long> ctx = payload.toContext(UserBizType.class, Long.class, UserUploadContext::new);
         UserBizType type = ctx.getBizType();
         if (type == UserBizType.POST_CONTENT_IMAGE || type == UserBizType.POST_COVERAGE_IMAGE) {
@@ -48,5 +48,6 @@ public class PostUploadStrategy implements UploadBizStrategy<UserUploadPolicyReq
         } else {
             throw new IllegalStateException("Unexpected biz type for PostUploadStrategy: " + type);
         }
+        return payload.getResourceUuid();
     }
 }
