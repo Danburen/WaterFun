@@ -3,27 +3,29 @@ import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response"
 import type { UserBrief } from "~/api/postApi"
 
 export interface CommentResponse {
-  id: number
-  postId: number
-  parentId: number
-  rootId: number
+  id: string
+  postId: string
+  parentId: string
+  rootId: string
   author: UserBrief
   content: string
   likeCount: number
   replyCount: number
   createdAt: string
   replyToDisplayName: string
+  isPostAuthor?: boolean
+  isLiked?: boolean
 }
 
-export interface CursorPageComment<T, C = string> {
+export interface CursorPageComment<T, C = number> {
   list: T[]
   nextCursor: C | null
   hasNext: boolean
 }
 
 export interface CreateCommentReq {
-  postId: number
-  parentId?: number
+  postId: number | bigint
+  parentId?: number | bigint
   content: string
 }
 
@@ -32,7 +34,7 @@ export const postComment = (data: CreateCommentReq): PromiseResBody<void> => {
 }
 
 export const listComments = (params: {
-  postId: number
+  postId: number | bigint
   cursor?: string
   limit?: number
   includeRootId?: number
@@ -40,22 +42,30 @@ export const listComments = (params: {
   return request.get('/comments/list', { params })
 }
 
-export const listReplies = (rootId: number, params: {
+export const listReplies = (rootId: number | bigint, params: {
   cursor?: number
   limit?: number
   includeRootId?: number
-}): PromiseResBody<CursorPageComment<CommentResponse, number>> => {
+}): PromiseResBody<CursorPageComment<CommentResponse>> => {
   return request.get(`/comments/${rootId}/replies`, { params })
 }
 
-export const getComment = (commentId: number): PromiseResBody<CommentResponse> => {
+export const getComment = (commentId: string): PromiseResBody<CommentResponse> => {
   return request.get(`/comments/${commentId}`)
 }
 
-export const likeComment = (id: number): PromiseResBody<void> => {
+export const likeComment = (id: string): PromiseResBody<void> => {
   return request.post(`/comments/${id}/like`)
 }
 
-export const deleteComment = (id: number): PromiseResBody<void> => {
+export const deleteComment = (id: string): PromiseResBody<void> => {
   return request.delete(`/comments/${id}`)
+}
+
+export const reportComment = (id: string, data: { type: string; reason?: string; reasonValid?: boolean }): PromiseResBody<{ taskId: string }> => {
+  return request.post(`/comments/${id}/report`, data)
+}
+
+export const cancelReportComment = (id: string): PromiseResBody<void> => {
+  return request.post(`/comments/${id}/report/cancel`)
 }

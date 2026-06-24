@@ -96,7 +96,7 @@ public class AccountServiceImpl implements AccountService {
         verificationService.verifyAuthorizedCodeWithChannel(
                 verifyCodeKey,
                 dto.getVerify(),
-                getTargetOfChannel(dto.getVerify().getChannel()),
+                dto.getEmail(),
                 VerifyScene.ACTIVATE,
                 VerifyChannel.EMAIL
         );
@@ -108,13 +108,13 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public CodeResult changeEmail(String verifyCodeKey, EmailChangeDto dto) {
         long userUid = UserCtxHolder.getUserUid();
-        // Check scene and verify code
-        VerifyChannel channel = dto.getVerify().getChannel();
-        verificationService.verifyAuthorizedCode(
+        // Verify identity via SMS (phone is primary auth)
+        verificationService.verifyAuthorizedCodeWithChannel(
                 verifyCodeKey,
                 dto.getVerify(),
-                getTargetOfChannel(channel),
-                VerifyScene.CHANGE_EMAIL
+                getTargetOfChannel(VerifyChannel.SMS),
+                VerifyScene.CHANGE_EMAIL,
+                VerifyChannel.SMS
         );
         // TODO: ADD MOVE VERIFICATION FOR EMAIL CHANGE AND AUDIT LOG
         return verificationService.sendAuthenticationCode(
@@ -151,7 +151,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public CodeResult changePhone(String channelVerifyCodeKey, PhoneChangeActivateDto dto) {
-        long userUid = UserCtxHolder.getUserUid();
         verificationService.verifyAuthorizedCodeWithChannel(
                 channelVerifyCodeKey,
                 dto.getVerify(),
@@ -213,9 +212,9 @@ public class AccountServiceImpl implements AccountService {
 
     private @NotNull String getTargetOfChannel(VerifyChannel channel) {
         long userUid = UserCtxHolder.getUserUid();
-        EncryptionDataKey aesKey = encryptedKeyService.getAesKey();
         UserDatum ud = userDatumRepo.findUserDatumByUserUid(userUid)
                 .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
+        EncryptionDataKey aesKey = encryptedKeyService.getKeyById(ud.getEncryptionKeyId());
         String target;
         if(channel == VerifyChannel.EMAIL){
             target = EncryptionHelper.decryptField(ud.getEmailEncrypted(), aesKey);

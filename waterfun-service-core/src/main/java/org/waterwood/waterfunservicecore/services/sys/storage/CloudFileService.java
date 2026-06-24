@@ -158,14 +158,12 @@ public interface CloudFileService {
      * if is different throw
      *
      * @param res            resource entity must not be null
-     * @param root
+     * @param root           cloud file root key, used for detect and assert the resource
      * @param resourceStatus resource status to be asserted and detect. when is pass the check, it will set up to the resource
      * @param resourceType   available resource type
      * @throws org.waterwood.waterfunservicecore.exception.ForbiddenException if the uploader of resource is
      *                                                                        different from the user in upload policy payload, which means the resource is not belong to the upload
      *                                                                        request, and may be a malicious request.
      */
-    void setAndValidResourceForCallback(@NotNull Resource res, CloudFSRoot root, ResourceStatus resourceStatus, ResourceType... resourceType);
-
-
+    void setAndValidResourceForCallback(Resource res, CloudFSRoot root, ResourceStatus resourceStatus, ResourceType... resourceType);
 }

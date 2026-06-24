@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.waterfunservice.api.UserUploadContext;
 import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
+import org.waterwood.waterfunservice.api.request.PublicPostListReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
@@ -38,16 +39,20 @@ public interface PostService {
 
     Page<PostCardResp> listCardPosts(Specification<Post> spec, Pageable pageable);
 
+    Page<PostCardResp> listPublicCardPosts(PublicPostListReq req);
+
     Page<PostAuthorCardResp> listAuthorCardPosts(Specification<Post> spec, Pageable pageable);
 
     /**
-     * Get a post public detail
-     * @param id target id
+     * Get post detail. If the current user is the author,
+     * returns extra fields (status, visibility) and does NOT increment view count.
+     * If the current user is NOT the author, the post must be PUBLIC + PUBLISHED,
+     * and the view count is incremented.
+     *
+     * @param id target post id
      * @return post detail resp
      */
-    PostDetailResp getPublicPostDetail(Long id);
-
-    PostAuthorDetailResp getSelfPostDetail(Long id);
+    PostDetailResp getPostDetail(Long id);
 
     /**
      * Draft a new post and return the post id

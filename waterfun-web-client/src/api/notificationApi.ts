@@ -2,7 +2,7 @@ import request from "../utils/axiosRequest";
 import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 
 export interface InboxNotificationRes {
-  id: number;
+  id: string;
   title: string;
   noticeType: number;
   content: NotificationContent;
@@ -33,7 +33,7 @@ export interface ListNotificationParams {
 }
 
 export interface BatchMarkReadReq {
-  ids: number[];
+  ids: (number | bigint)[];
 }
 
 export interface BatchResult {
@@ -53,7 +53,7 @@ export const getUnreadCount = (): PromiseResBody<number> => {
   return request.get("/notifications/unreadCount");
 };
 
-export const markNotificationRead = (id: number): PromiseResBody<void> => {
+export const markNotificationRead = (id: string): PromiseResBody<void> => {
   return request.post(`/notifications/read/${id}`);
 };
 
@@ -67,6 +67,6 @@ export const batchMarkNotificationsRead = (
   return request.post("/notifications/batchMarkRead", data);
 };
 
-export const deleteNotification = (id: number): PromiseResBody<void> => {
+export const deleteNotification = (id: string): PromiseResBody<void> => {
   return request.delete(`/notifications/${id}`);
 };

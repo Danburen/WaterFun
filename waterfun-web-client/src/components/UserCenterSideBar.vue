@@ -3,7 +3,7 @@
     <!-- 用户信息区域 -->
     <div class="user-info">
       <div class="avatar-wrapper">
-        <el-avatar :size="80" :src="avatar || '/waterfun-web-client/icons/default-avatar.png'">
+        <el-avatar :size="80" :src="avatar">
           {{ userProfile.nickname ? userProfile.nickname[0] : '用' }}
         </el-avatar>
       </div>
@@ -17,12 +17,11 @@
       <li
         v-for="item in navItems"
         :key="item.id"
-        :class="{ 'nav-item': true, 'active': activeTab === item.id, 'disabled': item.disabled }"
+        :class="{ 'nav-item': true, 'active': activeTab === item.id }"
         @click="handleNavClick(item)"
       >
         <el-icon class="nav-icon"><component :is="item.icon" /></el-icon>
         <span class="nav-text">{{ item.label }}</span>
-        <el-badge v-if="item.badge" :value="item.badge" class="nav-badge" />
       </li>
     </ul>
   </div>
@@ -30,19 +29,13 @@
 
 <script setup lang="ts">
 import { ref, shallowRef } from 'vue';
-import { formatDate } from '~/utils/date';
+import { useRouter } from 'vue-router';
 import {
   User,
   Lock,
   Bell,
   Document,
-  Check,
-  Star,
-  DataAnalysis,
-  Setting,
-  Coin,
-  Ticket,
-  ShoppingCart
+  Headset
 // @ts-ignore
 } from '@element-plus/icons-vue';
 
@@ -63,6 +56,7 @@ const props = defineProps({
   }
 });
 
+const router = useRouter();
 const userProfileStore = useUserProfileStore();
 const userInfoStore = useUserInfoStore();
 
@@ -74,23 +68,18 @@ const avatar = ref('');
 
 // Navigation items
 const navItems = shallowRef([
-  { id: 'profile', label: '个人资料', icon: User, disabled: false },
-  { id: 'security', label: '账号安全', icon: Lock, disabled: false },
-  { id: 'notification', label: '通知与隐私', icon: Bell, disabled: false },
-  { id: 'posts', label: '我的帖子', icon: Document, disabled: false },
-  { id: 'notes', label: '个人笔记', icon: Document, disabled: true },
-  { id: 'solutions', label: '我的解题', icon: Check, disabled: true },
-  { id: 'creator', label: '创作激励', icon: Star, disabled: true, badge: 'Beta' },
-  { id: 'analysis', label: '进展分析', icon: DataAnalysis, disabled: true },
-  { id: 'settings', label: '进度管理', icon: Setting, disabled: true },
-  { id: 'points', label: '积分仓', icon: Coin, disabled: true },
-  { id: 'coupons', label: '优惠券', icon: Ticket, disabled: true },
-  { id: 'orders', label: '订单', icon: ShoppingCart, disabled: true }
+  { id: 'profile', label: '个人资料', icon: User },
+  { id: 'security', label: '账号安全', icon: Lock },
+  { id: 'notification', label: '通知与隐私', icon: Bell },
+  { id: 'posts', label: '我的帖子', icon: Document },
+  { id: 'customer-service', label: '客服中心', icon: Headset }
 ]);
 
 // Handle navigation click
-const handleNavClick = (item: { id: string; disabled: boolean }) => {
-  if (!item.disabled) {
+const handleNavClick = (item: { id: string }) => {
+  if (item.id === 'customer-service') {
+    router.push('/customer-service');
+  } else {
     emit('tab-change', item.id);
   }
 };
@@ -172,22 +161,8 @@ onMounted(async () => {
   color: #1890ff;
 }
 
-.nav-item.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.nav-item.disabled:hover {
-  background-color: transparent;
-  color: #666;
-}
-
 .nav-icon {
   margin-right: 12px;
   font-size: 18px;
-}
-
-.nav-badge {
-  margin-left: auto;
 }
 </style>

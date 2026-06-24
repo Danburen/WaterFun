@@ -104,6 +104,8 @@ const getIconClass = (icon?: string) => {
     'tags': 'fa-solid fa-tags',
     'folder-tree': 'fa-solid fa-folder-tree',
     'flag': 'fa-solid fa-flag',
+    'image': 'fa-solid fa-image',
+    'comment': 'fa-solid fa-comment',
   }
   return map[icon || ''] || 'fa-solid fa-circle'
 }

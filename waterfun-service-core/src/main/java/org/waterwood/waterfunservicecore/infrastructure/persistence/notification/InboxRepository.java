@@ -58,5 +58,7 @@ public interface InboxRepository extends JpaRepository<Inbox, Long> {
 
     List<Inbox> findByUserUidAndNoticeTypeAndBusinessTypeAndTargetIdOrderByCreatedAtDesc(Long userUid, NoticeType noticeType, BusinessType businessType, @Size(max = 64) String targetId);
 
+    List<Inbox> findByBusinessTypeAndTargetIdOrderByCreatedAtDesc(BusinessType businessType, @Size(max = 64) String targetId);
+
     Integer countByIsReadAndUserUidAndIsDeleted(Boolean isRead, Long userUid, Boolean isDeleted);
 }

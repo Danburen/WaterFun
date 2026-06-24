@@ -21,7 +21,7 @@ const currentCategoryId = ref<number>(0);
 const categoryOptions = ref<OptionResItem<number>[]>([]);
 const userOptions = ref<OptionResItem<string>[]>([]);
 
-const searchForm = ref<{ name: string; slug: string; parentId: string | null; creatorId: string | null }>({ name: "", slug: "", parentId: null, creatorId: null });
+const searchForm = ref<{ name: string; slug: string; parentId: number | null; creatorId: string | null }>({ name: "", slug: "", parentId: null, creatorId: null });
 const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
 
 const fetchData = async () => {

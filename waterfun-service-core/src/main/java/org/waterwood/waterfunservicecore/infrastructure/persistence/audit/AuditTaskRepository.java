@@ -5,15 +5,17 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
+import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface AuditTaskRepository extends JpaRepository<AuditTask, Long>, JpaSpecificationExecutor<AuditTask> {
@@ -24,12 +26,14 @@ public interface AuditTaskRepository extends JpaRepository<AuditTask, Long>, Jpa
 
     Optional<AuditTask> findByTargetIdAndTargetTypeAndStatus(String targetId, TargetType targetType, AuditStatus status);
 
+    Optional<AuditTask> findByTargetIdAndTargetTypeAndSubmitterUidAndStatus(String targetId, TargetType targetType, Long submitterUid, AuditStatus status);
+
     @Query("UPDATE AuditTask a SET a.status = :status, a.rejectType = :type, a.rejectReason = :reason, a.auditor = :auditor," +
             "a.auditAt = :auditAt WHERE a.id IN :ids AND a.status = :oldStatus")
     @Modifying
     List<AuditTask> updateStatusAndRejectTypeAndRejectReasonAndAuditorAndAuditAtByIdInAndStatus(
             @Param("status") AuditStatus status,
-            @Param("type") AuditRejectType rejectType,
+            @Param("type") AuditType rejectType,
             @Param("reason") String reason,
             @Param("auditor") User auditor,
             @Param("auditAt") Instant auditAt,
@@ -49,4 +53,12 @@ public interface AuditTaskRepository extends JpaRepository<AuditTask, Long>, Jpa
     );
 
     Optional<AuditTask> findByIdAndStatus(Long id, AuditStatus status);
+
+    long countByStatusAndTargetType(AuditStatus status, TargetType targetType);
+
+    long countByStatusAndAuditAtAfter(AuditStatus status, Instant after);
+
+    long countByStatusAndTargetTypeAndAuditAtAfter(AuditStatus status, TargetType targetType, Instant after);
+
+    long countBySubmitterUidAndStatus(Long submitterUid, AuditStatus status);
 }

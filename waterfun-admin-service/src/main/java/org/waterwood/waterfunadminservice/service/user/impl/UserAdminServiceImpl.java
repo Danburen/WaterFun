@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
+import org.waterwood.common.CloudFSRoot;
+import org.waterwood.waterfunadminservice.api.response.user.RiskLevel;
+import org.waterwood.waterfunadminservice.api.response.user.UserAdminBrief;
 import org.waterwood.waterfunadminservice.infrastructure.exception.BuiltInResourceProtectedException;
 import org.waterwood.waterfunadminservice.infrastructure.exception.PermissionReferenceInvalidException;
 import org.waterwood.waterfunadminservice.infrastructure.exception.RoleReferenceInvalidException;
@@ -27,17 +30,25 @@ import org.waterwood.waterfunadminservice.infrastructure.mapper.UserCounterMappe
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserProfileMapper;
 import org.waterwood.waterfunservicecore.api.resp.AccountResp;
+import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
+import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunservicecore.entity.user.*;
+import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
+import org.waterwood.waterfunservicecore.exception.reference.UserReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.*;
 import org.waterwood.waterfunadminservice.service.user.UserAdminService;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
+import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.*;
 
 import java.time.Instant;
@@ -75,6 +86,10 @@ public class UserAdminServiceImpl implements UserAdminService {
     private final UserProfileRepository userProfileRepository;
     private final UserCounterRepository userCounterRepository;
     private final UserFollowerRepository userFollowerRepository;
+    private final UserBriefService userBriefService;
+    private final PostRepository postRepository;
+    private final AuditTaskRepository auditTaskRepository;
+    private final CloudFileService cloudFileService;
 
     @Override
     public User getUserById(long id) {
@@ -367,6 +382,64 @@ public class UserAdminServiceImpl implements UserAdminService {
         // TODO: add audit log
         int deleted = userRepository.deleteUserByUidIn(userUids);
         return BatchResult.of(userUids.size(), deleted);
+    }
+
+    @Override
+    public UserAdminBrief getUserAdminBrief(Long uid) {
+        User u = userRepository.findById(uid).orElseThrow(
+                () -> new UserReferenceInvalidException(uid)
+        );
+        Instant userCreatedTime = userRepository.getUserCreatedAtByUid(uid);
+        long postCount = postRepository.countByAuthorUidAndIsDeleted(uid, false);
+        long rejectedCount = auditTaskRepository.countBySubmitterUidAndStatus(uid, AuditStatus.REJECTED);
+        UserCounter uc = userCounterRepository.findByUserUid(uid).orElseThrow(
+                () -> new ServiceException("UserCounter not found for user " + uid)
+        );
+        String avatarUrlKey = u.getAvatarResource().getResourceKey();
+        CloudResPresignedUrlResp avatarUrl = avatarUrlKey == null ? null : cloudFileService.getReadUrlCached(
+                CloudFSRoot.UPLOADS,
+                u.getAvatarResource().getResourceKey(),
+                uid,
+                TargetType.USER_AVATAR
+        );
+        RiskLevel riskLevel = RiskLevel.calculate(uc.getSubmitCnt(), uc.getRejectCnt(), uc.getReportCnt(), rejectedCount);
+        return new UserAdminBrief(
+                u.getUid(),u.getDisplayName(), avatarUrl,
+                u.getLevel(), u.getUserType(),
+                userCreatedTime, postCount, riskLevel
+        );
+    }
+
+    @Override
+    public Map<Long, UserAdminBrief> batchGetUserAdminBrief(List<Long> userUids) {
+        List<User> users = userRepository.findAllByUidIn(userUids);
+        Map<Long, CloudResPresignedUrlResp> userAvatarUrls = cloudFileService.batchGetReadPublicUrlCached(
+                CloudFSRoot.UPLOADS,
+                users.stream().collect(Collectors.toMap(
+                        User::getUid,
+                        u -> u.getAvatarResource().getResourceKey()
+                )),
+                TargetType.USER_AVATAR);
+        Map<Long, UserCounter> userCounterMap = userCounterRepository.findAllByUserUidIn((userUids)).stream()
+                .collect(Collectors.toMap(c-> c.getUser().getUid(), c -> c));
+        Map<Long, RiskLevel> userRiskLevelMap = userCounterMap.values().stream().collect(Collectors.toMap(
+                u -> u.getUser().getUid(),
+                uc -> {
+                    return RiskLevel.calculate(uc.getSubmitCnt(), uc.getRejectCnt(), uc.getReportCnt(), uc.getRejectCnt());
+                }
+        ));
+        return users.stream().map(u -> {
+            UserCounter counter = userCounterMap.get(u.getUid());
+            RiskLevel riskLevel = userRiskLevelMap.get(u.getUid());
+            CloudResPresignedUrlResp avatarUrl = userAvatarUrls.get(u.getUid());
+            return new UserAdminBrief(
+                    u.getUid(), u.getNickname() == null ? u.getUsername() : u.getNickname(), avatarUrl,
+                    u.getLevel(), u.getUserType(), u.getCreatedAt(), counter != null ? counter.getPostCnt() : 0,
+                    riskLevel != null ? riskLevel : RiskLevel.LOW
+            );
+        }).collect(
+                Collectors.toMap(UserAdminBrief::getUid, b -> b)
+        );
     }
 
     @Transactional

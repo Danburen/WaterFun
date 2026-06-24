@@ -73,10 +73,11 @@ if (props.visible) {
 
 <template>
   <el-dialog
-    v-model="visible"
+    :model-value="visible"
     title="图像验证码验证"
     width="400px"
     @close="handleClose"
+    @update:model-value="(val: boolean) => emit('update:visible', val)"
   >
     <div class="captcha-container">
       <div class="captcha-image-wrapper">

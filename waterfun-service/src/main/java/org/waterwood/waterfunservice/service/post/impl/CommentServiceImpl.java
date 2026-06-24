@@ -15,12 +15,16 @@ import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.post.*;
 import org.waterwood.waterfunservicecore.exception.CommentAlreadyDeletedOrNotFoundException;
 import org.waterwood.waterfunservicecore.exception.notfound.CommentNotFoundException;
+import org.waterwood.waterfunservicecore.exception.reference.PostReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentLikeRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentRepository;
+import org.waterwood.api.BaseResponseCode;
+import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
 import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
+import org.waterwood.waterfunservicecore.infrastructure.utils.IdGenerator;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
@@ -50,23 +54,31 @@ public class CommentServiceImpl implements CommentService {
     public void create(CreateCommentReq req) {
         Comment parent = null;
         Comment comment = new Comment();
+        comment.setId(IdGenerator.nextCommentId());
         Long postId = req.getPostId();
+        Post p = postRepository.findById(postId).orElseThrow(
+                () -> new PostReferenceInvalidException(postId)
+        );
+        // Allow interaction if: publicly visible AND has been published at least once
+        if (p.getVisibility() != PostVisibility.PUBLIC || p.getPublishedAt() == null) {
+            throw new CommentNotFoundException();
+        }
         comment.setPost(postRepository.getReferenceById(postId));
 
         if(req.getParentId() != null){
-            parent = commentRepository.findByPostIdAndParentIdAndStatus(
+            parent = commentRepository.findByPostIdAndIdAndStatus(
                     postId, req.getParentId(), CommentStatus.NORMAL
             ).orElseThrow(CommentAlreadyDeletedOrNotFoundException::new);
-
-            commentRepository.increaseReplyCountById(req.getParentId());
             if(parent.getRoot() != null){
                 comment.setRoot(commentRepository.getReferenceById(parent.getRoot().getId()));
+            } else {
+                comment.setRoot(parent);
             }
-        } else {
-            postRepository.increaseCommentCountById(postId, 1);
+            comment.setParent(parent);
+            commentRepository.increaseReplyCountById(req.getParentId());
         }
+        postRepository.increaseCommentCountById(postId, 1);
 
-        comment.setParent(parent);
         Long authorUid = UserCtxHolder.getUserUid();
         comment.setAuthor(userRepository.getReferenceById(authorUid));
         comment.setContent(req.getContent());
@@ -162,7 +174,7 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> list = commentRepository.findRootComments(
                 postId,
                 c.getId(),
-                c.getIsTop(),
+                c.getIsPined(),
                 c.getLikeCount(),
                 c.getId(),
                 PageRequest.of(0, limit + 1)
@@ -178,7 +190,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         CursorPage<Comment, String> page = CursorPage.of(list, limit, comment ->
-                new RootCommentCursor(comment.getIsTop(), comment.getLikeCount(), comment.getId()).encode()
+                new RootCommentCursor(comment.getIsPined(), comment.getLikeCount(), comment.getId()).encode()
         );
 
 
@@ -199,7 +211,9 @@ public class CommentServiceImpl implements CommentService {
                 comment.getLikeCount(),
                 comment.getReplyCount(),
                 comment.getCreatedAt(),
-                null // first level comment won't have its parent replier
+                null, // first level comment won't have its parent replier
+                commentLikeRepository.existsById(new CommentLikeId(comment.getId(), UserCtxHolder.getUserUid())),
+                comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid())
         ));
     }
 
@@ -265,7 +279,9 @@ public class CommentServiceImpl implements CommentService {
                     comment.getLikeCount(),
                     comment.getReplyCount(),
                     comment.getCreatedAt(),
-                    isDirectReplyToRoot ? null : parentAuthorNameMap.get(parentId)
+                    isDirectReplyToRoot ? null : parentAuthorNameMap.get(parentId),
+                    commentLikeRepository.existsById(new CommentLikeId(comment.getId(), UserCtxHolder.getUserUid())),
+                    comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid())
             );
         });
     }
@@ -285,7 +301,9 @@ public class CommentServiceImpl implements CommentService {
                             comment.getLikeCount(),
                             comment.getReplyCount(),
                             comment.getCreatedAt(),
-                            null // single comment won't show replacer display name
+                            null, // single comment won't show replacer display name,
+                            commentLikeRepository.existsById(new CommentLikeId(comment.getId(), UserCtxHolder.getUserUid())),
+                            comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid())
                     );
                 })
                 .orElseThrow(CommentNotFoundException::new);

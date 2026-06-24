@@ -17,7 +17,7 @@ export const useTagStore = defineStore('tagStore', ()=>{
             const index = tags.value.findIndex((currentTag) => currentTag.name === tag.name)
             if (index !== -1) {
                 // Keep tag unique by name; refresh latest route params/meta in-place.
-                tags.value[index] = tag
+                tags.value.splice(index, 1, tag)
             }
         }
     }

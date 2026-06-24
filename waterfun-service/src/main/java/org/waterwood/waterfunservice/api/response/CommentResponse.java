@@ -3,6 +3,7 @@ package org.waterwood.waterfunservice.api.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.time.Instant;
 
@@ -23,4 +24,8 @@ public class CommentResponse {
     private final Long replyCount;
     private final Instant createdAt;
     private final String replyToDisplayName;
+
+    private Boolean isPostAuthor;
+
+    private Boolean isLiked;
 }

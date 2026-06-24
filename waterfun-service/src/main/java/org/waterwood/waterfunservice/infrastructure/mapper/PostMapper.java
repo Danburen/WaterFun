@@ -36,9 +36,7 @@ public interface PostMapper {
 
     PostAuthorCardResp toPostAuthorCardResp(Post p);
 
-    PostDetailResp toPostDetailResp(Object post);
-
-    PostAuthorDetailResp toPostAuthorDetailResp(Post post);
+    PostDetailResp toPostDetailResp(Post post);
 
     @Mapping(target = "editedTagIds", ignore = true)
     @Mapping(target = "editedCategoryId", ignore = true)

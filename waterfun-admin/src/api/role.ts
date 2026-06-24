@@ -84,7 +84,7 @@ export interface AssignedUserRes {
     expiresAt: ISOString;
 }
 
-export type PermissionType = "MENU" | "BUTTON" | "API" | "DATA" | "OTHER";
+export type PermissionType = "API" | "MENU" | "BUTTON" | "DATA" | "BAM";
 
 export interface PermissionResp {
     id: number;
@@ -93,22 +93,25 @@ export interface PermissionResp {
     description: string;
     type: PermissionType;
     resource: string;
+    isSystem: boolean;
     parentId: number | null;
     createdAt: ISOString;
 }
 
-export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED" | "DELETED";
+export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
+
+export type UserType = "COMMON" | "ADMIN" | "BOT" | "MODERATOR" | "VIP";
 
 export interface UserInfoARes {
     uid: string;
     username: string;
-    userType: number;
+    userType: UserType;
     accountStatus: AccountStatus;
     statusChangedAt: ISOString;
     updatedAt: ISOString;
     createdAt: ISOString;
-    nickname: string;
-    avatarUrl: string;
+    nickname: string | null;
+    avatar: string | null;
     lastActiveAt: ISOString;
 }
 

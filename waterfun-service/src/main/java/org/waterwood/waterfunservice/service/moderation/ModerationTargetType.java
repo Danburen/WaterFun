@@ -16,6 +16,11 @@ public enum ModerationTargetType {
             "notification.audit.post.approve",
              "notification.audit.post.reject_args",
              Set.of(TargetType.POST, TargetType.POST_CONTENT_IMAGE, TargetType.POST_COVERAGE_IMAGE)
+    ),
+    TICKET("notification.audit.ticket.title",
+            "notification.audit.ticket.approve",
+            "notification.audit.ticket.reject_args",
+            Set.of(TargetType.DEFAULT)
     ),;
     private final String title;
     private final String approve;

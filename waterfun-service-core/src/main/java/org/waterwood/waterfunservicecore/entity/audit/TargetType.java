@@ -2,47 +2,32 @@ package org.waterwood.waterfunservicecore.entity.audit;
 
 import lombok.Getter;
 import org.waterwood.common.io.FileExtension;
+import org.waterwood.common.io.ResourceType;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
 @Getter
 public enum TargetType {
-    UNKNOWN(0, Set.of()),
-    USER_AVATAR(1,
-            Set.of(FileExtension.JPG,
-                    FileExtension.JPEG,
-                    FileExtension.PNG,
-                    FileExtension.WEBP)
-    ),
+    DEFAULT(0, Set.of()),
+    USER_AVATAR(1,ResourceType.IMAGE.getAllowExtensions()),
     POST(2, Set.of()),
-    POST_COVERAGE_IMAGE(3,
-            Set.of(FileExtension.JPG,
-                    FileExtension.JPEG,
-                    FileExtension.PNG,
-                    FileExtension.WEBP
-            )),
-    POST_CONTENT_IMAGE(4,
-            Set.of(FileExtension.JPG,
-                    FileExtension.JPEG,
-                    FileExtension.PNG,
-                    FileExtension.WEBP
-            )
-    ),
-    BANNER_IMAGE(5,
-            Set.of(FileExtension.JPG,
-                    FileExtension.JPEG,
-                    FileExtension.PNG,
-                    FileExtension.WEBP
-            )
-    );
+    POST_COVERAGE_IMAGE(3,ResourceType.IMAGE.getAllowExtensions()),
+    POST_CONTENT_IMAGE(4, ResourceType.IMAGE.getAllowExtensions()),
+    BANNER_IMAGE(5, ResourceType.IMAGE.getAllowExtensions()),
+    COMMENT(6, Set.of()),
+    USER_REPORT_ATTACHMENT(7, ResourceType.IMAGE.getAllowExtensions()),
+    MODERATION_IMAGE(8, ResourceType.IMAGE.getAllowExtensions()),
+    USER(9, Set.of()),;
 
     private final short code;
     private final Set<FileExtension> allowedExts;
 
-    TargetType(final int code, Set<FileExtension> allowedExts) {
+    TargetType(final int code, Collection<FileExtension> allowedExts) {
         this.code = (short) code;
-        this.allowedExts = allowedExts;
+        this.allowedExts = new HashSet<>(allowedExts);
     }
 
     public static TargetType fromCode(int code) {
@@ -51,7 +36,7 @@ public enum TargetType {
                 return values()[i];
             }
         }
-        return UNKNOWN;
+        return DEFAULT;
     }
 
     public String toLowerCase() {

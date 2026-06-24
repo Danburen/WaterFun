@@ -1,7 +1,5 @@
 package org.waterwood.common;
 
-import java.io.Serializable;
-
 public final class KeyConstants {
     public static final String JTI = "jti";
     public static final String REFRESH = "ref";
@@ -28,7 +26,4 @@ public final class KeyConstants {
     public static final String POST = "post";
     public static final String COVERAGE = "coverage";
 
-    public static final String LAST_ACTIVE = "last_active";
-    public static final String BUFFER = "buffer";
-    public static final String ONLINE = "online";
 }

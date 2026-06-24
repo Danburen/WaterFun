@@ -32,7 +32,7 @@ public class UserBriefServiceImpl implements UserBriefService {
             );
         }
         Map<Long, CloudResPresignedUrlResp> avatarPresignedUrlMap = cloudFileService.batchGetReadPublicUrlCached(
-                CloudFSRoot.USER,
+                CloudFSRoot.UPLOADS,
                 userAvatarResourceKey,
                 TargetType.USER_AVATAR
         );
@@ -62,7 +62,7 @@ public class UserBriefServiceImpl implements UserBriefService {
     public UserBrief getUserBrief(long userUid) {
         UserBriefDO userBriefDO = userQueryService.queryForSingalUserBriefDO(userUid);
         CloudResPresignedUrlResp avatarPresignedUrl = cloudFileService.getReadUrlCached(
-                CloudFSRoot.USER,
+                CloudFSRoot.UPLOADS,
                 userBriefDO.getAvatarResourceKey(),
                 userUid,
                 TargetType.USER_AVATAR

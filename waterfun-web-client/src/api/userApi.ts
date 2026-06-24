@@ -10,7 +10,7 @@ import type { UserBrief } from "~/api/postApi";
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export interface UserInfoResponse {
-    uid: number;
+    uid: string;
     username: string;
     nickname: string;
     avatar: CloudResourceUrlResp;
@@ -19,12 +19,20 @@ export interface UserInfoResponse {
     passwordHash: boolean;
 }
 
-export interface UserProfileDto{
+export interface UserProfileDto {
     avatar?: CloudResourceUrlResp;
     nickname?: string;
     bio: string;
     gender: string;
     birthday: string; // ISO 8601 格式日期字符串
+    residence: string;
+}
+
+/** 符合 OpenAPI UpdateUserProfileRequest 规范 */
+export interface UpdateProfileRequest {
+    bio: string;
+    gender: string;
+    birthday: string;
     residence: string;
 }
 
@@ -59,8 +67,13 @@ export const getUserProfile = (): PromiseResBody<UserProfileDto> => {
     return request.get(`/user/profile`, {})
 }
 
-export const updateUserProfile = (data: Partial<UserProfileDto>): PromiseResBody<null> => {
+export const updateUserProfile = (data: Partial<UpdateProfileRequest>): PromiseResBody<null> => {
     return request.put(`/user/updateProfile`, data)
+}
+
+/** 更新昵称（如果后端有独立端点） */
+export const updateUserNickname = (nickname: string): PromiseResBody<null> => {
+    return request.put(`/user/userInfo`, { nickname })
 }
 
 export const getAvatarUploadPolicy = (suffix: string): PromiseResBody<PresignedResp[]> => {
@@ -94,7 +107,7 @@ export const getPermissions = (): PromiseResBody<string[]> => {
     return request.get(`/user/permissions`);
 }
 
-export const followUser = (uid: number): PromiseResBody<void> => {
+export const followUser = (uid: string): PromiseResBody<void> => {
     return request.post(`/user/${uid}/follow`);
 }
 
@@ -109,10 +122,10 @@ export interface PageUserBrief {
     empty: boolean
 }
 
-export const getFollowings = (uid: number, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
+export const getFollowings = (uid: string, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
     return request.get(`/user/${uid}/followings`, { params: { page, size } });
 }
 
-export const getFollowers = (uid: number, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
+export const getFollowers = (uid: string, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
     return request.get(`/user/${uid}/followers`, { params: { page, size } });
 }

@@ -77,10 +77,16 @@ onMounted(async () => { await Promise.all([fetchOptions(), fetchDetail()]); });
         <td class="value">{{ postDetail.visibility ? (visibilityLabelMap[postDetail.visibility] || '无') : '无' }}</td>
       </tr>
       <tr>
+        <td class="label">帖子类型</td>
+        <td class="value">{{ ({ COMMON: '普通帖子', NOTICE: '公告' })[postDetail.type || ''] || '无' }}</td>
+        <td class="label">置顶</td>
+        <td class="value">{{ postDetail.isPinned ? '是' : '否' }}</td>
+      </tr>
+      <tr>
         <td class="label">分类</td>
         <td class="value">{{ postDetail.categoryId != null ? `${postDetail.categoryId} (${categoryNameMap.get(Number(postDetail.categoryId)) || '无'})` : '无' }}</td>
         <td class="label">作者</td>
-        <td class="value">{{ postDetail.authorId ? `${postDetail.authorId} (${userNameMap.get(postDetail.authorId) || '无'})` : '无' }}</td>
+        <td class="value">{{ postDetail.authorId ? `${postDetail.authorId} (${userNameMap.get(String(postDetail.authorId)) || '无'})` : '无' }}</td>
       </tr>
       <tr>
         <td class="label">标签</td>

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -16,22 +17,30 @@ import org.waterwood.common.io.FileMeta;
 import org.waterwood.common.io.FileProbeResult;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.JsonUtil;
-import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunadminservice.api.request.AuditResponse;
 import org.waterwood.waterfunadminservice.api.request.ModerationBaseQuery;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRejectRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.ModerateRejectRequest;
-import org.waterwood.waterfunadminservice.api.response.AuditTaskRes;
+import org.waterwood.waterfunadminservice.api.response.ModerationStatsResp;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
-import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationTaskPayloadRes;
+import org.waterwood.waterfunadminservice.api.response.content.audit.SourceContext;
+import org.waterwood.waterfunadminservice.api.response.content.audit.UserAuditStats;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.AuditTaskMapper;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.AuditTaskResourceMapper;
+import org.waterwood.waterfunadminservice.service.content.PostService;
+import org.waterwood.waterfunadminservice.service.user.UserAdminService;
 import org.waterwood.waterfunservicecore.api.message.ModerationBatchMessage;
 import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
 import org.waterwood.waterfunservicecore.api.moderation.AuditPayload;
+import org.waterwood.waterfunservicecore.api.moderation.ImageAuditPayload;
 import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
+import org.waterwood.waterfunservicecore.api.moderation.ReplyPayload;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
+import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
+import org.waterwood.waterfunadminservice.api.response.user.UserAdminBrief;
+import org.waterwood.waterfunservicecore.services.user.UserBriefService;
 import org.waterwood.waterfunservicecore.entity.audit.*;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
@@ -51,6 +60,8 @@ import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,21 +79,12 @@ public class ModerationServiceImpl implements ModerationService {
     private final AuditTaskResourceMapper auditTaskResourceMapper;
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
+    private final UserBriefService userBriefService;
+    private final PostRepository postRepository;
     private final MessageSource messageSource;
+    private final UserAdminService userAdminService;
+    private final PostService postService;
 
-
-    @Override
-    public Page<AuditTaskRes> listTasksWithPayload(Specification<AuditTask> spec, Pageable pageable) {
-        Page<AuditTask> tasks = auditTaskRepository.findAll(spec, pageable);
-        List<Long> taskIds = tasks.getContent().stream().map(AuditTask::getId).toList();
-        Map<Long, List<AuditResource>> taskAndResources = loadTaskResources(taskIds);
-        return tasks.map(task -> {
-            AuditTaskRes resp = auditTaskMapper.toModerateTaskResponse(task);
-            List<AuditResource> auditResources = taskAndResources.getOrDefault(task.getId(), Collections.emptyList());
-            resp.setPayload(buildPayload(task, auditResources));
-            return resp;
-        });
-    }
 
     @Override
     public List<ModerationResourceRes> listTaskResources(Long taskId) {
@@ -92,13 +94,6 @@ public class ModerationServiceImpl implements ModerationService {
         List<AuditResource> auditResources = auditTaskResourceRepository
                 .findAllByTaskId(taskId);
         return auditResources.stream().map(this::toModerationResourceRes).toList();
-    }
-
-    @Override
-    public Page<ModerationResourceRes> listResourcesWithPayload(Specification<AuditResource> spec, Pageable pageable) {
-        return auditTaskResourceRepository
-                .findAll(spec, pageable)
-                .map(this::toModerationResourceRes);
     }
 
     @Override
@@ -120,7 +115,7 @@ public class ModerationServiceImpl implements ModerationService {
             User u = userRepository.getReferenceById(UserCtxHolder.getUserUid());
             auditTaskResourceRepository.updateStatusAndRejectTypeAndAuditorAndAuditAtByTaskIdIn(
                     AuditStatus.APPROVED,
-                    AuditRejectType.CASCADE,
+                    AuditType.CASCADE,
                     u,
                     Instant.now(),
                     availableTaskIds
@@ -150,7 +145,7 @@ public class ModerationServiceImpl implements ModerationService {
             User u = userRepository.getReferenceById(UserCtxHolder.getUserUid());
             auditTaskResourceRepository.updateStatusAndRejectTypeAndAuditorAndAuditAtByTaskIdIn(
                     AuditStatus.REJECTED,
-                    AuditRejectType.CASCADE,
+                    AuditType.CASCADE,
                     u,
                     Instant.now(),
                     availableTaskIds
@@ -193,13 +188,14 @@ public class ModerationServiceImpl implements ModerationService {
     }
 
     @Override
+    @Transactional
     public void reject(Long id, ModerateRejectRequest req) {
         AuditTask task = auditTaskRepository.findByIdAndStatus(id, AuditStatus.PENDING)
                 .orElseThrow(AuditTaskNotFoundException::new);
         User auditor = userRepository.getReferenceById(UserCtxHolder.getUserUid());
         auditTaskResourceRepository.updateStatusAndRejectTypeAndAuditorAndAuditAtByTaskIdAndStatus(
                 AuditStatus.REJECTED,
-                AuditRejectType.CASCADE,
+                AuditType.CASCADE,
                 auditor,
                 Instant.now(),
                 task.getId(),
@@ -246,48 +242,181 @@ public class ModerationServiceImpl implements ModerationService {
     }
 
     @Override
-    public AuditTaskRes getTask(Long id) {
+    public Page<AuditResponse<PostAuditPayload>> listPendingPostTasks(ModerationBaseQuery query, Pageable pageable) {
+        return listTasksWithPayload(query, pageable, TargetType.POST, null, PostAuditPayload.class);
+    }
+
+    @Override
+    public Page<AuditResponse<ImageAuditPayload>> listPendingImageTasks(ModerationBaseQuery query, Pageable pageable) {
+        List<AuditResponse<ImageAuditPayload>> res = listTasksWithPayload(query, pageable, null, AuditContentFormat.IMAGE, ImageAuditPayload.class).getContent();
+        Map<String, CloudResPresignedUrlResp> urlUuidRespMap = cloudFileService.batchGetReadPublicUrlCached(
+                CloudFSRoot.UPLOADS,
+                res.stream().collect(
+                        Collectors.toMap(
+                                r -> r.getPayload().getUuid(),
+                                r -> r.getPayload().getResourceKey()
+                        )
+                ),
+                TargetType.MODERATION_IMAGE
+        );
+        return new PageImpl<>(res, pageable, res.size()).map(r -> {;
+            r.getPayload().setPresignedUrl(
+                    urlUuidRespMap.get(r.getPayload().getUuid())
+            );
+            return r;
+        });
+    }
+
+    @Override
+    public Page<AuditResponse<ReplyPayload>> listPendingTextTasks(ModerationBaseQuery query, Pageable pageable) {
+        return listTasksWithPayload(query, pageable, null, AuditContentFormat.TXT, ReplyPayload.class);
+    }
+
+    @Override
+    public AuditResponse<PostAuditPayload> getPostTask(Long id) {
+        return getTask(id, PostAuditPayload.class);
+    }
+
+    @Override
+    public AuditResponse<ImageAuditPayload> getImageTask(Long id) {
+        return getTask(id, ImageAuditPayload.class);
+    }
+
+    @Override
+    public AuditResponse<ReplyPayload> getTextTask(Long id) {
+        return getTask(id, ReplyPayload.class);
+    }
+
+    @Override
+    public ModerationStatsResp getModerationStats(TargetType targetType) {
+        Instant todayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
+        long pending;
+        long todayApproved;
+        long todayRejected;
+        if (targetType != null) {
+            pending = auditTaskRepository.countByStatusAndTargetType(AuditStatus.PENDING, targetType);
+            todayApproved = auditTaskRepository.countByStatusAndTargetTypeAndAuditAtAfter(
+                    AuditStatus.APPROVED, targetType, todayStart);
+            todayRejected = auditTaskRepository.countByStatusAndTargetTypeAndAuditAtAfter(
+                    AuditStatus.REJECTED, targetType, todayStart);
+        } else {
+            pending = auditTaskRepository.countByStatus(AuditStatus.PENDING);
+            todayApproved = auditTaskRepository.countByStatusAndAuditAtAfter(AuditStatus.APPROVED, todayStart);
+            todayRejected = auditTaskRepository.countByStatusAndAuditAtAfter(AuditStatus.REJECTED, todayStart);
+        }
+        return new ModerationStatsResp(pending, todayApproved, todayRejected);
+    }
+
+    @Override
+    public UserAuditStats getUserAuditStats(Long userId) {
+        int passed = (int) auditTaskRepository.countBySubmitterUidAndStatus(userId, AuditStatus.APPROVED);
+        int rejected = (int) auditTaskRepository.countBySubmitterUidAndStatus(userId, AuditStatus.REJECTED);
+        int total = passed + rejected;
+        double passRate = total > 0 ? (double) passed / total * 100 : 0;
+        return new UserAuditStats(passed, rejected, passRate);
+    }
+
+    private <T extends AuditPayload> Page<AuditResponse<T>> listTasksWithPayload(
+            ModerationBaseQuery query, Pageable pageable,
+            TargetType targetType, AuditContentFormat format,
+            Class<T> type
+    ) {
+        Specification<AuditTask> spec = AuditTaskSpec.of(
+                query.triggerType(), query.priority(), query.status(),
+                query.submitterUid(), query.submitAtStart(), query.submitAtEnd(),
+                targetType, format
+        );
+        List<AuditTask> res = auditTaskRepository.findAll(spec, pageable).getContent();
+        Map<Long, UserBrief> userBriefMap = userBriefService.queryForMapUserIdBriefMap(
+                res.stream().map(task -> task.getSubmitter().getUid()).toList()
+        );
+        Map<Long, UserAdminBrief> userAdminBriefMap = userAdminService.batchGetUserAdminBrief(
+                res.stream().map(task -> task.getSubmitter().getUid()).toList()
+        );
+        Map<Long, List<AuditResource>> taskIdAuditResListMap = auditTaskResourceRepository.findAllByTaskIdIn(
+                res.stream().map(AuditTask::getId).toList()
+        ).stream().collect(Collectors.groupingBy(t -> t.getTask().getId()));
+        return res.stream().map(task -> {
+            AuditResponse<T> resp = new AuditResponse<>();
+            auditTaskMapper.toModerateTaskResponse(task, resp);
+            resp.setPayload(parsePayload(task, type));
+            resp.setLinkedResources(taskIdAuditResListMap.getOrDefault(task.getId(), List.of()).stream()
+                    .map(this::toModerationResourceRes).toList());
+            resp.setSubmitter(userAdminBriefMap.get(task.getSubmitter().getUid()));
+            resp.setAuditor(userBriefMap.getOrDefault(
+                    task.getAuditor() != null ? task.getAuditor().getUid() : null,
+                    null
+            ));
+            resp.setSourceContext(resolveSourceContext(task, type));
+            return resp;
+        }).collect(Collectors.collectingAndThen(Collectors.toList(),
+                list -> new PageImpl<>(list, pageable, pageable.getPageSize())));
+    }
+
+    private <T extends AuditPayload> AuditResponse<T> getTask(Long id, Class<T> type) {
         return auditTaskRepository.findById(id)
                 .map(task -> {
-                    AuditTaskRes resp = auditTaskMapper.toModerateTaskResponse(task);
+                    AuditResponse<T> resp = new AuditResponse<>();
+                    auditTaskMapper.toModerateTaskResponse(task, resp);
                     List<AuditResource> auditResources = auditTaskResourceRepository
                             .findAllByTaskId(task.getId());
-                    resp.setPayload(buildPayload(task, auditResources));
+                    resp.setPayload(parsePayload(task, type));
+                    resp.setLinkedResources(auditResources.stream()
+                            .map(this::toModerationResourceRes).toList());
+                    resp.setSubmitter(userAdminService.getUserAdminBrief(task.getSubmitter().getUid()));
+                    resp.setAuditor(task.getAuditor() != null ?
+                            userBriefService.getUserBrief(task.getAuditor().getUid()) : null);
+                    resp.setSourceContext(resolveSourceContext(task, type));
                     return resp;
                 })
                 .orElseThrow(AuditTaskNotFoundException::new);
     }
 
-    @Override
-    public Page<AuditResponse<PostAuditPayload>> listPendingPostTasks(ModerationBaseQuery query, Pageable pageable) {
-        return auditTaskRepository.findAll(
-                        AuditTaskSpec.of(
-                                query.triggerType(),
-                                query.priority(),
-                                query.status(),
-                                query.submitterUid(),
-                                query.submitAtStart(),
-                                query.submitAtEnd(),
-                                TargetType.POST
+    private <T extends AuditPayload> SourceContext resolveSourceContext(AuditTask task, Class<T> type) {
+        if (type == ReplyPayload.class) {
+            ReplyPayload payload = JsonUtil.fromJson(task.getPayload(), ReplyPayload.class);
+            if (payload != null && payload.getPostId() != null) {
+                return postRepository.findPostAuthorIdTitleDOById(payload.getPostId())
+                        .map(do_ -> new SourceContext(
+                                postService.getPostBrief(payload.getPostId())
+                        ))
+                        .orElse(null);
+            }
+        }
+        if (type == ImageAuditPayload.class) {
+            return auditTaskResourceRepository
+                    .findTaskByResourceUuidAndTaskTargetType(task.getTargetId(), TargetType.POST)
+                    .stream().findFirst()
+                    .map(postTask -> {
+                        Long postId = Long.valueOf(postTask.getTargetId());
+                        return postRepository.findPostAuthorIdTitleDOById(postId)
+                                .map(do_ -> {
+                                    return new SourceContext(postService.getPostBrief(postId));
+                                })
+                                .orElse(null);
+                    })
+                    .orElse(null);
+        }
+        return null;
+    }
 
-                        ),
-                        pageable
-                )
-                .map(task -> {
-                    AuditResponse<PostAuditPayload> resp = new AuditResponse<>();
-                    auditTaskMapper.toModerateTaskResponse(task, resp);
-                    List<AuditResource> auditResources = auditTaskResourceRepository
-                            .findAllByTaskId(task.getId());
-                    resp.setPayload((PostAuditPayload) buildPayload(task, auditResources).getPayload());
-                    return resp;
-                });
+    private <T extends AuditPayload> T parsePayload(AuditTask task, Class<T> type) {
+        AuditPayload payload = getPayload(task.getPayload(), task.getTargetType(), task.getFormat());
+        if (payload == null || !type.isInstance(payload)) {
+            throw new IllegalArgumentException(
+                    "Task " + task.getId() + " is not of type " + type.getSimpleName()
+                            + " (targetType=" + task.getTargetType()
+                            + ", format=" + task.getFormat() + ")"
+            );
+        }
+        return type.cast(payload);
     }
 
     private void aggregateTaskStatus(AuditTask task, AuditResource lastUpdated) {
         long rejectedCount = auditTaskResourceRepository.countByTask_IdAndStatus(task.getId(), AuditStatus.REJECTED);
         long pendingCount = auditTaskResourceRepository.countByTask_IdAndStatus(task.getId(), AuditStatus.PENDING);
         AuditStatus prev = task.getStatus();
-        if(task.getContent() == null){ // single resource
+        if (task.getFormat() != AuditContentFormat.RICH) {
             if (rejectedCount > 0) {
                 task.setStatus(AuditStatus.REJECTED);
                 task.setRejectType(lastUpdated.getRejectType());
@@ -321,86 +450,36 @@ public class ModerationServiceImpl implements ModerationService {
         return grouped;
     }
 
-    private ModerationTaskPayloadRes buildPayload(AuditTask task, List<AuditResource> auditResources) {
-        String renderedContent;
-        if(task.getContent() == null){
-            renderedContent = "";
-        } else {
-            List<String> resourceUuidsInContent = StringUtil.extraResPlaceholders(task.getContent()).stream().toList();
-            Map<String, String> uuidCosKeyMap = resourceRepository
-                    .findByUuidInAndStatus(resourceUuidsInContent, ResourceStatus.ACTIVE)
-                    .stream()
-                    .collect(Collectors.toMap(
-                            Resource::getUuid,      // key: UUID
-                            Resource::getResourceKey // value: COS Key
-                    ));
-            Map<String, CloudResPresignedUrlResp> resUuidPresignedUrlMap = cloudFileService.batchGetReadPublicUrlCached(
-                    CloudFSRoot.UPLOADS,
-                    uuidCosKeyMap,
-                    TargetType.POST
-            );
-            renderedContent = StringUtil.replaceResPlaceholders(
-                    task.getContent(),
-                        resUuidPresignedUrlMap.entrySet().stream()
-                    .filter(e -> e.getValue() != null && e.getValue().getUrl() != null)
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            e -> e.getValue().getUrl()
-                    )));
-        }
-        if(CollectionUtil.isEmpty(auditResources)) {
-            return new ModerationTaskPayloadRes(
-                    ModerationTaskPayloadRes.PayloadType.PLAIN_TEXT,
-                    Collections.emptyList(),
-                    renderedContent,
-                    task.getFormat(),
-                    null
-            );
-        }
-
-        if (auditResources.size() == 1) {
-            ModerationResourceRes single = toModerationResourceRes(auditResources.getFirst());
-            return new ModerationTaskPayloadRes(
-                    ModerationTaskPayloadRes.PayloadType.SINGLE_RESOURCE,
-                    List.of(single),
-                    renderedContent,
-                    task.getFormat(),
-                    null
-            );
-        }
-
-        List<ModerationResourceRes> items = auditResources.stream()
-                .map(this::toModerationResourceRes).toList();
-        return new ModerationTaskPayloadRes(
-                ModerationTaskPayloadRes.PayloadType.RICH_TEXT,
-                items,
-                renderedContent,
-                task.getFormat(),
-                getPayload(task.getPayload(), task.getTargetType())
-
-        );
-    }
-
-    private AuditPayload getPayload(String json, TargetType targetType) {
+    private AuditPayload getPayload(String json, TargetType targetType, AuditContentFormat format) {
         return switch (targetType) {
             case POST -> {
                 PostAuditPayload payload = JsonUtil.fromJson(json, PostAuditPayload.class);
-                Resource coverageRes = resourceRepository.findByUuidAndStatusNot(
-                        payload.getCoverageResUuid(), ResourceStatus.DELETED
-                ).orElse(null);
-                if(coverageRes != null) {
-                    payload.setCoverResPresignedUrl(cloudFileService.getReadUrlCached(
-                                    getCloudFSRootByTargetType(targetType),
-                                    coverageRes.getResourceKey(),
-                                    payload.getCoverageResUuid(),
-                                    targetType
-                    ));
-                }else {
-                    payload.setCoverResPresignedUrl(null);
+                if (payload != null && payload.getCoverageResUuid() != null) {
+                    Resource coverageRes = resourceRepository.findByUuidAndStatusNot(
+                            payload.getCoverageResUuid(), ResourceStatus.DELETED
+                    ).orElse(null);
+                    if (coverageRes != null) {
+                        payload.setCoverResPresignedUrl(cloudFileService.getReadUrlCached(
+                                getCloudFSRootByTargetType(targetType),
+                                coverageRes.getResourceKey(),
+                                payload.getCoverageResUuid(),
+                                targetType
+                        ));
+                    } else {
+                        payload.setCoverResPresignedUrl(null);
+                    }
                 }
                 yield payload;
             }
-            default -> null;
+            case POST_CONTENT_IMAGE, POST_COVERAGE_IMAGE, BANNER_IMAGE, USER_AVATAR -> {
+                yield json != null ? JsonUtil.fromJson(json, ImageAuditPayload.class) : null;
+            }
+            default -> {
+                if (format == AuditContentFormat.TXT) {
+                    yield json != null ? JsonUtil.fromJson(json, ReplyPayload.class) : null;
+                }
+                yield null;
+            }
         };
     }
 
@@ -474,8 +553,7 @@ public class ModerationServiceImpl implements ModerationService {
 
     private CloudFSRoot getCloudFSRootByTargetType(TargetType targetType) {
         return switch (targetType) {
-            case USER_AVATAR -> CloudFSRoot.USER;
-            case POST, POST_CONTENT_IMAGE, POST_COVERAGE_IMAGE -> CloudFSRoot.UPLOADS;
+            case USER_AVATAR, POST, POST_CONTENT_IMAGE, POST_COVERAGE_IMAGE -> CloudFSRoot.UPLOADS;
             default -> throw new IllegalArgumentException("Unsupported target type: " + targetType);
         };
     }

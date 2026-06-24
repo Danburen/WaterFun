@@ -31,7 +31,6 @@ public class RabbitConfig {
 
     @Bean
     public MessageConverter jsonMessageConverter() {
-        // Prefer JSON payloads to avoid Java native serialization attack surface.
         return new JacksonJsonMessageConverter();
     }
 
@@ -74,5 +73,20 @@ public class RabbitConfig {
                 .to(moderationExchange())
                 .with(RabbitConstants.ROUTE_MODERATION_BATCH_RESULT);
     }
-}
 
+    @Bean
+    public Queue ticketNotificationQueue() {
+        return QueueBuilder.durable(RabbitConstants.QUEUE_TICKET_NOTIFICATION)
+                .quorum()
+                .withArgument("x-delivery-limit", 3)
+                .build();
+    }
+
+    @Bean
+    public Binding ticketResultBinding() {
+        return BindingBuilder
+                .bind(ticketNotificationQueue())
+                .to(moderationExchange())
+                .with(RabbitConstants.ROUTE_TICKET_RESULT);
+    }
+}

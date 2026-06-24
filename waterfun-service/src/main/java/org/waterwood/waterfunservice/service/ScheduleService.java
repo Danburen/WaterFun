@@ -65,4 +65,6 @@ public class ScheduleService {
     public void flushActivityLogs() {
         userActivityLogService.flushBatch();
     }
+
+
 }

@@ -2,9 +2,10 @@
 *.iml
 
 *.env
-!*.env.example
 *.key
-!*.key.example
+# deploy/ 目录 - 安全配置上 git，敏感文件单独排除
+deploy/config/common-dev-secrets.yml
+deploy/docker/docker-compose.prod.yml
 
 node_modules
 pnpm-lock.yaml
@@ -19,10 +20,6 @@ application-*.yml
 application-*.properties
 docker-compose.yml
 
-common.yml
-!*.example.*
-deploy
-
 .gradle
 .vscode
 /sqls/
@@ -31,3 +28,11 @@ deploy
 *.jar
 *.class
 /waterfun-common-lib/build/
+
+.omo
+
+# Docker dev data (bind mounts)
+.data/
+
+# ip2region xdb data files (downloaded by setup-ip2region scripts)
+deploy/utils/*.xdb

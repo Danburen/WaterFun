@@ -3,7 +3,7 @@ import { ref, reactive, watch } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { validateVerifyCode } from '~/utils/validator'
 import { activateEmail, activatePhone } from '~/api/accountApi'
-import { sendAuthenticationCode } from '~/api/authApi'
+import { sendCode } from '~/api/authApi'
 import type { SecurityVerifyCodeDto, SecurityVerifyScene } from '~/api/authApi'
 
 const props = defineProps<{
@@ -35,18 +35,17 @@ const rules = reactive<FormRules<typeof form>>({
   verifyCode: [{ validator: validateVerifyCode(false), trigger: 'blur' }],
 })
 
-const sendCode = async () => {
+const sendActivateCode = async () => {
   sendingCode.value = true
   try {
     const { generateFingerprint } = await import('@waterfun/web-core/src/fingerprint')
     
     const channel = isEmail.value ? 'email' : 'sms'
-    const scene =  'activate'
-    await sendAuthenticationCode({
+    await sendCode({
+      target: props.target,
       channel: channel,
-      scene: scene as SecurityVerifyScene,
+      scene: 'activate' as SecurityVerifyScene,
       deviceFp: await generateFingerprint(),
-      [isEmail.value ? 'email' : 'phoneNumber']: props.target
     })
     ElMessage.success('验证码发送成功')
   } catch (error: any) {
@@ -129,7 +128,7 @@ const handleClose = () => {
           />
           <el-button
             type="primary"
-            @click="sendCode"
+            @click="sendActivateCode"
             :loading="sendingCode"
           >
             {{ sendingCode ? '发送中...' : '获取验证码' }}

@@ -4,7 +4,6 @@ import type {
   PostCardResp,
   PostAuthorCardResp,
   PostDetailResp,
-  PostAuthorDetailResp,
   PostDraftResp,
   PostSaveReq,
   OptionVOLong,
@@ -14,13 +13,14 @@ import type {
   MyPostsStatsResp,
   PageResult
 } from '~/api/postApi'
+import { batchPublishPosts, batchDeletePosts } from '~/api/postApi'
 
 interface PostState {
   myPostStats: MyPostsStatsResp | null
   posts: PostCardResp[]
   myPosts: PostAuthorCardResp[]
   currentPost: PostDetailResp | null
-  currentMyPost: PostAuthorDetailResp | null
+  currentMyPost: PostDetailResp | null
   editDraft: PostDraftResp | null
   categories: OptionVOLong[]
   tags: TagResponse[]
@@ -98,7 +98,7 @@ export const usePostStore = defineStore('post', {
       }
     },
 
-    async fetchPostDetail(id: number): Promise<void> {
+    async fetchPostDetail(id: string): Promise<void> {
       try {
         const res = await postApi.fetchPostDetail(id)
         this.currentPost = res.data as unknown as PostDetailResp
@@ -108,7 +108,7 @@ export const usePostStore = defineStore('post', {
       }
     },
 
-    async deletePost(id: number): Promise<void> {
+    async deletePost(id: string): Promise<void> {
       try {
         await postApi.deletePost(id)
       } catch (err) {
@@ -141,27 +141,27 @@ export const usePostStore = defineStore('post', {
       }
     },
 
-    async fetchMyPostDetail(id: number): Promise<void> {
+    async fetchMyPostDetail(id: string): Promise<void> {
       try {
         const res = await postApi.fetchMyPostDetail(id)
-        this.currentMyPost = res.data as unknown as PostAuthorDetailResp
+        this.currentMyPost = res.data as unknown as PostDetailResp
       } catch (err) {
         console.error('获取我的帖子详情失败:', err)
         throw err
       }
     },
 
-    async createDraft(): Promise<number> {
+    async createDraft(): Promise<string> {
       try {
         const res = await postApi.createDraft()
-        return res.data as unknown as number
+        return String(res.data as unknown)
       } catch (err) {
         console.error('创建草稿失败:', err)
         throw err
       }
     },
 
-    async fetchEditDraft(id: number): Promise<void> {
+    async fetchEditDraft(id: string): Promise<void> {
       try {
         const res = await postApi.fetchEditDraft(id)
         this.editDraft = res.data as unknown as PostDraftResp
@@ -171,7 +171,7 @@ export const usePostStore = defineStore('post', {
       }
     },
 
-    async publishPost(id: number, data: PostSaveReq): Promise<void> {
+    async publishPost(id: string, data: PostSaveReq): Promise<void> {
       try {
         await postApi.publishPost(id, data)
       } catch (err) {
@@ -180,7 +180,7 @@ export const usePostStore = defineStore('post', {
       }
     },
 
-    async tempSavePost(id: number, data: PostSaveReq): Promise<void> {
+    async tempSavePost(id: string, data: PostSaveReq): Promise<void> {
       try {
         await postApi.tempSavePost(id, data)
       } catch (err) {
@@ -235,6 +235,24 @@ export const usePostStore = defineStore('post', {
         this.tags = res.data as unknown as TagResponse[]
       } catch (err) {
         console.error('获取标签列表失败:', err)
+        throw err
+      }
+    },
+
+    async batchPublishPosts(ids: (number | bigint)[]): Promise<void> {
+      try {
+        await batchPublishPosts(ids)
+      } catch (err) {
+        console.error('批量发布帖子失败:', err)
+        throw err
+      }
+    },
+
+    async batchDeletePosts(ids: (number | bigint)[]): Promise<void> {
+      try {
+        await batchDeletePosts(ids)
+      } catch (err) {
+        console.error('批量删除帖子失败:', err)
         throw err
       }
     },

@@ -10,12 +10,12 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class IdOptionVOPackagedDO<ID extends Serializable> {
+public class IdOptionVOPackagedDO<ID extends Serializable, OID extends Serializable>{
     private ID id;
-    private OptionVO<ID> optionVo;
+    private OptionVO<OID> optionVo;
 
-    public IdOptionVOPackagedDO(ID id, String slug, String name, Boolean disabled) {
+    public IdOptionVOPackagedDO(ID id, OID optionID, String slug, String name, Boolean disabled) {
         this.id = id;
-        this.optionVo = new OptionVO<>(id, slug, name, disabled);
+        this.optionVo = new OptionVO<>(optionID, slug, name, disabled);
     }
 }

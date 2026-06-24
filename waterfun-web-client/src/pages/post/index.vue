@@ -8,11 +8,11 @@ const { posts, pagination, loading, categories } = storeToRefs(postStore)
 const router = useRouter()
 const route = useRoute()
 
-const selectedTab = ref<number | ''>('')
+const selectedTab = ref<string>('')
 
 const searchParams = reactive({
-  categoryId: undefined as number | undefined,
-  tagIds: undefined as number[] | undefined,
+  categoryId: undefined as string | undefined,
+  tagIds: undefined as string[] | undefined,
   page: 1,
   size: 10
 })
@@ -31,7 +31,7 @@ const fetchPosts = async () => {
   } catch { /* ignore */ }
 }
 
-const handleTabChange = (tab: number | '') => {
+const handleTabChange = (tab: string) => {
   selectedTab.value = tab
   const cat = categories.value.find(c => c.id === tab)
   searchParams.categoryId = cat ? cat.id : undefined
@@ -44,15 +44,14 @@ const handlePageChange = (page: number) => {
   fetchPosts()
 }
 
-const goToDetail = (id: number) => router.push(`/post/${id}`)
+const goToDetail = (id: string) => router.push(`/post/${id}`)
 const goToCreate = () => router.push('/post/create')
-const goToUser = (uid: number) => router.push(`/User/${uid}`)
 
 onMounted(() => {
   if (route.query.category) {
-    const catId = parseInt(route.query.category as string)
-    selectedTab.value = isNaN(catId) ? '' : catId
-    searchParams.categoryId = isNaN(catId) ? undefined : catId
+    const catId = String(route.query.category)
+    selectedTab.value = catId || ''
+    searchParams.categoryId = catId || undefined
   }
   if (route.query.page) {
     searchParams.page = Math.max(1, parseInt(route.query.page as string))
@@ -109,13 +108,7 @@ onMounted(() => {
                   @click="goToDetail(post.id)"
                 >
                   <div class="wf-flex-center wf-gap-sm wf-mb-sm wf-flex-wrap">
-                    <span v-if="post.type === 'NOTICE'" class="wf-tag wf-tag-warning" style="font-size:11px">{{ $t('post.announcement') }}</span>
-                    <span v-if="post.isPinned" class="wf-tag wf-tag-danger" style="font-size:11px">{{ $t('post.pinned') }}</span>
                     <span v-if="post.category" class="wf-tag wf-tag-primary">{{ post.category.name }}</span>
-                    <span v-if="post.userBrief" class="post-author" @click.stop="goToUser(post.userBrief.uid)">
-                      <img :src="post.userBrief.avatar?.url || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" class="author-avatar">
-                      {{ post.userBrief.displayName }}
-                    </span>
                     <span class="wf-text-xs wf-text-muted">{{ post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : '' }}</span>
                   </div>
                   <h3 class="post-title">{{ post.title }}</h3>

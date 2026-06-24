@@ -4,7 +4,7 @@ import type { Page } from "~/types/api"
 import type { UserBrief } from "~/api/dashboard"
 
 export interface OnlineUserVO {
-  uid: number
+  uid: string
   userBrief: UserBrief
   lastActive: string
   sessionId: string
@@ -12,9 +12,9 @@ export interface OnlineUserVO {
 }
 
 export interface OnlineCountVO {
-  onlineCount: number
-  adminOnlineCount: number
-  pealOnlineCount: number
+  onlineCount: string
+  adminOnlineCount: string
+  pealOnlineCount: string
 }
 
 export interface ListOnlineUsersParams {

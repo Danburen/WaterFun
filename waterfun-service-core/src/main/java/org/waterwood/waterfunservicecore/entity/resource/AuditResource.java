@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.user.User;
@@ -57,15 +57,12 @@ public class AuditResource {
     private User auditor;
 
     @Column(name = "reject_type", columnDefinition = "tinyint UNSIGNED")
-    private AuditRejectType rejectType;
+    private AuditType rejectType;
 
     @Size(max = 255)
     @Column(name = "reject_reason")
     private String rejectReason;
 
-    @Size(max = 255)
-    @Column(name = "suspect_reason")
-    private String suspect_reason;
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "created_at", nullable = false)

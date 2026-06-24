@@ -28,13 +28,10 @@ public class PostAuditPayload implements AuditPayload{
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private CloudResPresignedUrlResp coverResPresignedUrl;
 
+    private final AuditContentFormat format = AuditContentFormat.RICH;
+
     @Override
     public String toJson() {
         return JsonUtil.toJson(this);
-    }
-
-    @Override
-    public AuditContentFormat getFormat() {
-        return AuditContentFormat.RICH;
     }
 }

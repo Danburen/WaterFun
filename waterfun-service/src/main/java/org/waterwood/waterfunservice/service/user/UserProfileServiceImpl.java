@@ -16,6 +16,7 @@ import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
+import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.exception.io.IllegalUploadCountException;
 import org.waterwood.waterfunservicecore.exception.io.UnsupportedFileExtension;
 import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
@@ -70,7 +71,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         ));
 
         return List.of(cloudFileService.buildPutPolicyWithPayload(
-                CloudFSRoot.USER,
+                CloudFSRoot.UPLOADS,
                 cosPath,
                 payload)
         );
@@ -87,16 +88,21 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid));
         cloudFileService.setAndValidResourceForCallback(
                 newRes,
-                CloudFSRoot.USER,
+                CloudFSRoot.UPLOADS,
                 ResourceStatus.ACTIVE,
                 ResourceType.IMAGE
         );
         resourceRepository.save(newRes);
         // Update old resource status to orphan if exists
-        String newResourceUuid = contentAuditService
-                .getLinkedResourcesUuids(bizId, TargetType.USER_AVATAR).getFirst();
-        if (newResourceUuid != null) {
-            resourceRepository.updateStatusTo(ResourceStatus.ORPHAN, newResourceUuid);
+        List<String> uuidList = contentAuditService
+                .getLinkedResourcesUuids(
+                        userRepository.getUserAvatarByUid(bizId),
+                        TargetType.USER_AVATAR
+                );
+        if (uuidList.size() == 1) {
+            resourceRepository.updateStatusTo(ResourceStatus.ORPHAN, uuidList.getFirst());
+        } else if (uuidList.size() > 1) {
+            throw new ServiceException("Multiple avatar resources linked to user avatar" + bizId);
         }
         // Submit audit task
         AuditPayload payload = new ImageAuditPayload(newRes);

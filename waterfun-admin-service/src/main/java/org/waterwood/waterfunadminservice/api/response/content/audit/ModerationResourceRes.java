@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.waterwood.common.io.FileProbeResult;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 
 import java.time.Instant;
@@ -19,9 +19,10 @@ public class ModerationResourceRes {
     private AuditStatus status;
     private Instant auditAt;
     private Long auditorId;
-    private AuditRejectType rejectType;
+    private AuditType rejectType;
     private String rejectReason;
     private FileProbeResult fileProbeResult;
     private CloudResPresignedUrlResp presignedUrl;
+    private String resourceKey;
 }
 

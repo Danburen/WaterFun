@@ -7,8 +7,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.BaseResponseCode;
@@ -18,17 +16,15 @@ import org.waterwood.waterfunadminservice.api.request.AuditResponse;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRejectRequest;
 import org.waterwood.waterfunadminservice.api.request.content.audit.ModerateRejectRequest;
-import org.waterwood.waterfunadminservice.api.response.AuditTaskRes;
+import org.waterwood.waterfunadminservice.api.response.ModerationStatsResp;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
+import org.waterwood.waterfunadminservice.api.response.content.audit.UserAuditStats;
 import org.waterwood.waterfunadminservice.service.ModerationService;
+import org.waterwood.waterfunservicecore.api.moderation.ImageAuditPayload;
 import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
-import org.waterwood.waterfunservicecore.entity.audit.*;
-import org.waterwood.common.io.ResourceType;
-import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
-import org.waterwood.waterfunservicecore.entity.spec.AuditTaskResourceSpec;
-import org.waterwood.waterfunservicecore.entity.spec.AuditTaskSpec;
+import org.waterwood.waterfunservicecore.api.moderation.ReplyPayload;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 
-import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -46,76 +42,68 @@ public class ModerationController {
             @RequestParam(defaultValue = "5") int size){
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.success(
-                moderationService.listPendingPostTasks(
-                        query,
-                        pageable
-                )
+                moderationService.listPendingPostTasks(query, pageable)
         );
     }
 
-    @GetMapping("/list")
-    public ApiResponse<Page<AuditTaskRes>> list(
-            @RequestParam(required = false) TargetType taskType,
-            @RequestParam(required = false) Long submitterId,
-            @RequestParam(required = false) Instant submitAtStart,
-            @RequestParam(required = false) Instant submitAtEnd,
-            @RequestParam(required = true)  AuditContentFormat format,
-            @PageableDefault Pageable pageable){
-        Specification<AuditTask> spec = AuditTaskSpec.ofPending(taskType, format, submitterId, submitAtStart, submitAtEnd);
+    @GetMapping("/list/images")
+    public ApiResponse<Page<AuditResponse<ImageAuditPayload>>> listImages(
+            ModerationBaseQuery query,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.success(
-                moderationService.listTasksWithPayload(spec, pageable)
+                moderationService.listPendingImageTasks(query, pageable)
         );
     }
 
-    @GetMapping("/resources/list")
-    public ApiResponse<Page<ModerationResourceRes>> listResources(
-            @RequestParam(required = false) Long taskId,
-            @RequestParam(required = false) AuditStatus status,
-            @RequestParam(required = false) ResourceType resourceType,
-            @RequestParam(required = false) Long auditorId,
-            @RequestParam(required = false) Instant auditAtStart,
-            @RequestParam(required = false) Instant auditAtEnd,
-            @PageableDefault Pageable pageable
-    ) {
-        Specification<AuditResource> spec = AuditTaskResourceSpec.of(
-                taskId,
-                status,
-                resourceType,
-                auditorId,
-                auditAtStart,
-                auditAtEnd
-        );
-        return ApiResponse.success(moderationService.listResourcesWithPayload(spec, pageable));
-    }
-
-    @GetMapping("/{id}")
-    public ApiResponse<AuditTaskRes> getTask(@PathVariable Long id){
+    @GetMapping("/list/texts")
+    public ApiResponse<Page<AuditResponse<ReplyPayload>>> listTexts(
+            ModerationBaseQuery query,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.success(
-                moderationService.getTask(id)
+                moderationService.listPendingTextTasks(query, pageable)
         );
     }
 
-    @GetMapping("/{id}/resources")
-    public ApiResponse<List<ModerationResourceRes>> listResourcesByTask(@PathVariable Long id) {
-        return ApiResponse.success(moderationService.listTaskResources(id));
+    @GetMapping("/posts/{id}")
+    public ApiResponse<AuditResponse<PostAuditPayload>> getPost(@PathVariable Long id){
+        return ApiResponse.success(moderationService.getPostTask(id));
     }
 
-    @GetMapping("/{taskId}/resources/{resourceUuid}")
-    public ApiResponse<ModerationResourceRes> getResource(@PathVariable Long taskId, @PathVariable String resourceUuid) {
-        return ApiResponse.success(moderationService.getTaskResource(taskId, resourceUuid));
+    @GetMapping("/images/{id}")
+    public ApiResponse<AuditResponse<ImageAuditPayload>> getImage(@PathVariable Long id){
+        return ApiResponse.success(moderationService.getImageTask(id));
     }
 
-    @PostMapping("/{taskId}/resources/{resourceUuid}/approve")
-    public ApiResponse<Void> approveResource(@PathVariable Long taskId, @PathVariable String resourceUuid) {
-        moderationService.approveResource(taskId, resourceUuid);
-        return ApiResponse.success();
+    @GetMapping("/texts/{id}")
+    public ApiResponse<AuditResponse<ReplyPayload>> getText(@PathVariable Long id){
+        return ApiResponse.success(moderationService.getTextTask(id));
     }
 
-    @PostMapping("/{taskId}/resources/{resourceUuid}/reject")
-    public ApiResponse<Void> rejectResource(@PathVariable Long taskId, @PathVariable String resourceUuid, @RequestBody @Valid ModerateRejectRequest req) {
-        moderationService.rejectResource(taskId, resourceUuid, req);
-        return ApiResponse.success();
-    }
+//    @GetMapping("/{id}/resources")
+//    public ApiResponse<List<ModerationResourceRes>> listResourcesByTask(@PathVariable Long id) {
+//        return ApiResponse.success(moderationService.listTaskResources(id));
+//    }
+//
+//    @GetMapping("/{taskId}/resources/{resourceUuid}")
+//    public ApiResponse<ModerationResourceRes> getResource(@PathVariable Long taskId, @PathVariable String resourceUuid) {
+//        return ApiResponse.success(moderationService.getTaskResource(taskId, resourceUuid));
+//    }
+//
+//    @PostMapping("/{taskId}/resources/{resourceUuid}/approve")
+//    public ApiResponse<Void> approveResource(@PathVariable Long taskId, @PathVariable String resourceUuid) {
+//        moderationService.approveResource(taskId, resourceUuid);
+//        return ApiResponse.success();
+//    }
+//
+//    @PostMapping("/{taskId}/resources/{resourceUuid}/reject")
+//    public ApiResponse<Void> rejectResource(@PathVariable Long taskId, @PathVariable String resourceUuid, @RequestBody @Valid ModerateRejectRequest req) {
+//        moderationService.rejectResource(taskId, resourceUuid, req);
+//        return ApiResponse.success();
+//    }
 
     @PostMapping("/approve")
     public ApiResponse<BatchResult> approveAll(@RequestBody @Valid BatchModerateRequest req){
@@ -155,5 +143,16 @@ public class ModerationController {
     public ApiResponse<BatchResult> reject(@PathVariable Long id, @RequestBody @Valid ModerateRejectRequest req){
         moderationService.reject(id, req);
         return ApiResponse.success();
+    }
+
+    @GetMapping("/stats")
+    public ApiResponse<ModerationStatsResp> getStats(
+            @RequestParam(required = false) TargetType targetType) {
+        return ApiResponse.success(moderationService.getModerationStats(targetType));
+    }
+
+    @GetMapping("/user-audit-stats")
+    public ApiResponse<UserAuditStats> getUserAuditStats(@RequestParam Long userId) {
+        return ApiResponse.success(moderationService.getUserAuditStats(userId));
     }
 }

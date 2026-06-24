@@ -65,7 +65,7 @@ public class Post {
 
     @ColumnDefault("'0'")
     @Column(name = "view_count", columnDefinition = "int UNSIGNED")
-    private Long viewCount;
+    private Long viewCount = 0L;
 
     @ColumnDefault("'0'")
     @Column(name = "like_count", columnDefinition = "int UNSIGNED")

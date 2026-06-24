@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的帖子 - WaterFun</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --gray: #9ca3af;
+            --gray-light: #f9fafb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== Header ========== */
+        .header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .nav a {
+            padding: 8px 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-spacer { flex: 1; }
+
+        .search-box {
+            position: relative;
+            width: 320px;
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 42px 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box input::placeholder { color: var(--text-muted); }
+
+        .search-box button {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .search-box button:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .icon-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 10px 4px 4px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 4px;
+        }
+
+        .user-menu:hover { background: var(--border-light); }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* ========== Main ========== */
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ========== Page Header ========== */
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .page-breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .page-breadcrumb a:hover { color: var(--primary); }
+
+        .page-breadcrumb i { font-size: 10px; }
+
+        .page-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* ========== Stats Bar ========== */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+        .stat-icon.green { background: var(--success-light); color: var(--success); }
+        .stat-icon.orange { background: var(--warning-light); color: var(--warning); }
+        .stat-icon.red { background: var(--danger-light); color: var(--danger); }
+
+        .stat-info { flex: 1; }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ========== Content Card ========== */
+        .content-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        /* ========== Tabs ========== */
+        .tabs-bar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 24px 0;
+            border-bottom: 1px solid var(--border-light);
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .tabs-bar::-webkit-scrollbar { display: none; }
+
+        .tab-item {
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-item:hover { color: var(--primary); }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-count {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 1px 7px;
+            border-radius: 10px;
+            background: var(--border-light);
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .tab-item.active .tab-count {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* ========== Toolbar ========== */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border-light);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-posts {
+            position: relative;
+        }
+
+        .search-posts input {
+            width: 240px;
+            padding: 8px 36px 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            background: var(--bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-posts input:focus {
+            border-color: var(--primary);
+            background: var(--bg-white);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-posts input::placeholder { color: var(--text-muted); }
+
+        .search-posts i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .filter-select {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: var(--bg-white);
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-select:focus { border-color: var(--primary); }
+
+        .batch-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .batch-actions .btn-sm {
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .batch-actions .btn-sm:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .batch-actions .btn-sm.danger:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        /* ========== Post List ========== */
+        .post-list {
+            padding: 0;
+        }
+
+        .post-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s ease;
+            position: relative;
+        }
+
+        .post-item:last-child { border-bottom: none; }
+
+        .post-item:hover { background: var(--bg); }
+
+        .post-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            accent-color: var(--primary);
+        }
+
+        .post-checkbox:checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .post-content { flex: 1; min-width: 0; }
+
+        .post-title-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .post-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .post-title:hover { color: var(--primary); }
+
+        .post-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .post-status.published {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .post-status.draft {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .post-status.pending {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .post-status.rejected {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .post-status i { font-size: 10px; }
+
+        .post-excerpt {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .post-meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .post-meta-item i { font-size: 11px; }
+
+        .post-meta-item .category-tag {
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--border-light);
+            color: var(--text-secondary);
+        }
+
+        .post-stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .post-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .post-stat i { font-size: 13px; }
+
+        .post-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .post-item:hover .post-actions { opacity: 1; }
+
+        .post-action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .post-action-btn:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .post-action-btn.danger:hover {
+            color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        /* ========== Empty State ========== */
+        .empty-state {
+            padding: 60px 24px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--border-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+            color: var(--text-muted);
+        }
+
+        .empty-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .empty-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* ========== Pagination ========== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .page-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ========== Toast ========== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+
+        /* ========== Footer ========== */
+        .footer {
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            padding: 32px 24px;
+            margin-top: 20px;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover { color: var(--primary); }
+
+        .footer-copyright {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .header-inner { padding: 0 16px; gap: 12px; }
+            .nav { display: none; }
+            .search-box { width: 160px; }
+            .user-name { display: none; }
+            .main { padding: 16px; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .page-title-row { flex-direction: column; align-items: flex-start; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-right { justify-content: flex-end; }
+            .post-item { padding: 16px; }
+            .post-actions { opacity: 1; }
+            .post-stats { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">WF</div>
+                <span class="logo-text">WaterFun</span>
+            </a>
+            <nav class="nav">
+                <a href="#">首页</a>
+                <a href="#">社区</a>
+                <a href="#">游乐场</a>
+                <a href="#">聊天室</a>
+                <a href="#">关于</a>
+            </nav>
+            <div class="header-spacer"></div>
+            <div class="search-box">
+                <input type="text" placeholder="请输入搜索内容">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                <button class="icon-btn"><i class="far fa-envelope"></i></button>
+                <div class="user-menu">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hatcher" alt="avatar" class="user-avatar">
+                    <span class="user-name">Hatcher</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Breadcrumb -->
+        <div class="page-header">
+            <div class="page-breadcrumb">
+                <a href="#"><i class="fas fa-home"></i> 首页</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="#">个人中心</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>我的帖子</span>
+            </div>
+            <div class="page-title-row">
+                <h1 class="page-title">我的帖子</h1>
+                <a href="#" class="btn btn-primary"><i class="fas fa-plus"></i> 发布新帖</a>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-file-alt"></i></div>
+                <div class="stat-info">
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">全部帖子</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">已发布</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="fas fa-edit"></i></div>
+                <div class="stat-info">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">草稿箱</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red"><i class="fas fa-heart"></i></div>
+                <div class="stat-info">
+                    <div class="stat-value">1.2k</div>
+                    <div class="stat-label">获赞总数</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Card -->
+        <div class="content-card">
+            <!-- Tabs -->
+            <div class="tabs-bar">
+                <button class="tab-item active" data-tab="all">
+                    全部 <span class="tab-count">24</span>
+                </button>
+                <button class="tab-item" data-tab="published">
+                    已发布 <span class="tab-count">18</span>
+                </button>
+                <button class="tab-item" data-tab="draft">
+                    草稿箱 <span class="tab-count">4</span>
+                </button>
+                <button class="tab-item" data-tab="pending">
+                    审核中 <span class="tab-count">1</span>
+                </button>
+                <button class="tab-item" data-tab="rejected">
+                    未通过 <span class="tab-count">1</span>
+                </button>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <div class="search-posts">
+                        <input type="text" placeholder="搜索帖子标题...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <select class="filter-select">
+                        <option value="newest">最新发布</option>
+                        <option value="oldest">最早发布</option>
+                        <option value="most-viewed">最多浏览</option>
+                        <option value="most-liked">最多点赞</option>
+                    </select>
+                </div>
+                <div class="toolbar-right batch-actions">
+                    <button class="btn-sm" id="selectAllBtn"><i class="far fa-square"></i> 全选</button>
+                    <button class="btn-sm" id="batchPublish" style="display:none;"><i class="fas fa-upload"></i> 批量发布</button>
+                    <button class="btn-sm danger" id="batchDelete" style="display:none;"><i class="far fa-trash-alt"></i> 批量删除</button>
+                </div>
+            </div>
+
+            <!-- Post List -->
+            <div class="post-list" id="postList">
+                <!-- Post 1 -->
+                <div class="post-item" data-status="published">
+                    <input type="checkbox" class="post-checkbox">
+                    <div class="post-content">
+                        <div class="post-title-row">
+                            <a href="#" class="post-title">深入理解 React 18 的并发特性与 Suspense 最佳实践</a>
+                            <span class="post-status published"><i class="fas fa-check-circle"></i> 已发布</span>
+                        </div>
+                        <div class="post-excerpt">React 18 引入了并发渲染机制，让应用能够更好地处理大量更新。本文将从底层原理出发，结合实际案例，详细讲解如何使用 useTransition、useDeferredValue 等新 Hook...</div>
+                        <div class="post-meta-row">
+                            <span class="post-meta-item"><i class="far fa-folder"></i> <span class="category-tag">技术交流</span></span>
+                            <span class="post-meta-item"><i class="far fa-clock"></i> 2026-06-05 14:30</span>
+                            <span class="post-meta-item"><i class="far fa-edit"></i> 最后编辑于 10分钟前</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <span class="post-stat"><i class="far fa-eye"></i> 3.4k</span>
+                        <span class="post-stat"><i class="far fa-thumbs-up"></i> 342</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 89</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" title="编辑"><i class="fas fa-pen"></i></button>
+                        <button class="post-action-btn" title="分享"><i class="fas fa-share-alt"></i></button>
+                        <button class="post-action-btn danger" title="删除"><i class="far fa-trash-alt"></i></button>
+                    </div>
+                </div>
+
+                <!-- Post 2 -->
+                <div class="post-item" data-status="published">
+                    <input type="checkbox" class="post-checkbox">
+                    <div class="post-content">
+                        <div class="post-title-row">
+                            <a href="#" class="post-title">TypeScript 5.0 新特性一览：从装饰器到 const 类型参数</a>
+                            <span class="post-status published"><i class="fas fa-check-circle"></i> 已发布</span>
+                        </div>
+                        <div class="post-excerpt">TypeScript 5.0 带来了许多令人兴奋的新特性，包括标准化的装饰器、const 类型参数、更智能的类型推断等。本文将逐一介绍这些新特性，并给出实际使用示例...</div>
+                        <div class="post-meta-row">
+                            <span class="post-meta-item"><i class="far fa-folder"></i> <span class="category-tag">技术交流</span></span>
+                            <span class="post-meta-item"><i class="far fa-clock"></i> 2026-06-03 09:15</span>
+                            <span class="post-meta-item"><i class="far fa-edit"></i> 最后编辑于 2天前</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <span class="post-stat"><i class="far fa-eye"></i> 2.1k</span>
+                        <span class="post-stat"><i class="far fa-thumbs-up"></i> 189</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 45</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" title="编辑"><i class="fas fa-pen"></i></button>
+                        <button class="post-action-btn" title="分享"><i class="fas fa-share-alt"></i></button>
+                        <button class="post-action-btn danger" title="删除"><i class="far fa-trash-alt"></i></button>
+                    </div>
+                </div>
+
+                <!-- Post 3 -->
+                <div class="post-item" data-status="published">
+                    <input type="checkbox" class="post-checkbox">
+                    <div class="post-content">
+                        <div class="post-title-row">
+                            <a href="#" class="post-title">2026 年前端性能优化实战指南：从首屏加载到运行时性能</a>
+                            <span class="post-status published"><i class="fas fa-check-circle"></i> 已发布</span>
+                        </div>
+                        <div class="post-excerpt">性能优化是前端开发中永恒的话题。本文将从实际项目出发，分享从首屏加载优化到运行时性能提升的全方位实战经验，涵盖代码分割、懒加载、缓存策略等多个维度...</div>
+                        <div class="post-meta-row">
+                            <span class="post-meta-item"><i class="far fa-folder"></i> <span class="category-tag">资源推荐</span></span>
+                            <span class="post-meta-item"><i class="far fa-clock"></i> 2026-05-28 16:45</span>
+                            <span class="post-meta-item"><i class="far fa-edit"></i> 最后编辑于 1周前</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <span class="post-stat"><i class="far fa-eye"></i> 5.6k</span>
+                        <span class="post-stat"><i class="far fa-thumbs-up"></i> 512</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 134</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" title="编辑"><i class="fas fa-pen"></i></button>
+                        <button class="post-action-btn" title="分享"><i class="fas fa-share-alt"></i></button>
+                        <button class="post-action-btn danger" title="删除"><i class="far fa-trash-alt"></i></button>
+                    </div>
+                </div>
+
+                <!-- Post 4 -->
+                <div class="post-item" data-status="draft">
+                    <input type="checkbox" class="post-checkbox">
+                    <div class="post-content">
+                        <div class="post-title-row">
+                            <a href="#" class="post-title">Next.js 14 App Router 迁移经验分享（草稿）</a>
+                            <span class="post-status draft"><i class="fas fa-pen"></i> 草稿</span>
+                        </div>
+                        <div class="post-excerpt">最近将一个大型项目从 Pages Router 迁移到了 App Router，踩了不少坑，也积累了很多经验。这篇文章将详细记录迁移过程中的关键步骤和注意事项...</div>
+                        <div class="post-meta-row">
+                            <span class="post-meta-item"><i class="far fa-folder"></i> <span class="category-tag">技术交流</span></span>
+                            <span class="post-meta-item"><i class="far fa-clock"></i> 2026-06-08 11:20</span>
+                            <span class="post-meta-item"><i class="far fa-edit"></i> 最后编辑于 2小时前</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <span class="post-stat">—</span>
+                        <span class="post-stat">—</span>
+                        <span class="post-stat">—</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" title="编辑"><i class="fas fa-pen"></i></button>
+                        <button class="post-action-btn" title="发布"><i class="fas fa-upload"></i></button>
+                        <button class="post-action-btn danger" title="删除"><i class="far fa-trash-alt"></i></button>
+                    </div>
+                </div>
+
+                <!-- Post 5 -->
+                <div class="post-item" data-status="draft">
+                    <input type="checkbox" class="post-checkbox">
+                    <div class="post-content">
+                        <div class="post-title-row">
+                            <a href="#" class="post-title">Tailwind CSS 最佳实践与组件库搭建指南（草稿）</a>
+                            <span class="post-status draft"><i class="fas fa-pen"></i> 草稿</span>
+                        </div>
+                        <div class="post-excerpt">Tailwind CSS 已经成为现代前端开发的首选工具类框架。本文将分享如何在团队项目中规范化使用 Tailwind，以及如何基于 Tailwind 搭建一套可复用的组件库...</div>
+                        <div class="post-meta-row">
+                            <span class="post-meta-item"><i class="far fa-folder"></i> <span class="category-tag">资源推荐</span></span>
+                            <span class="post-meta-item"><i class="far fa-clock"></i> 2026-06-07 20:00</span>
+                            <span class="post-meta-item"><i class="far fa-edit"></i> 最后编辑于 1天前</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <span class="post-stat">—</span>
+                        <span class="post-stat">—</span>
+                        <span class="post-stat">—</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" title="编辑"><i class="fas fa-pen"></i></button>
+                        <button class="post-action-btn" title="发布"><i class="fas fa-upload"></i></button>
+                        <button class="post-action-btn danger" title="删除"><i class="far fa-trash-alt"></i></button>
+                    </div>
+                </div>
+
+                <!-- Post 6 -->
+                <div class="post-item" data-status="pending">
+                    <input type="checkbox" class="post-checkbox">
+                    <div class="post-content">
+                        <div class="post-title-row">
+                            <a href="#" class="post-title">Vue 3.4 组合式 API 进阶：从 reactive 到 ref 的最佳实践</a>
+                            <span class="post-status pending"><i class="fas fa-hourglass-half"></i> 审核中</span>
+                        </div>
+                        <div class="post-excerpt">Vue 3.4 对响应式系统进行了进一步优化，本文将深入探讨 reactive 和 ref 的使用场景差异，以及在复杂状态管理中的最佳实践方案...</div>
+                        <div class="post-meta-row">
+                            <span class="post-meta-item"><i class="far fa-folder"></i> <span class="category-tag">技术交流</span></span>
+                            <span class="post-meta-item"><i class="far fa-clock"></i> 2026-06-10 10:00</span>
+                            <span class="post-meta-item"><i class="far fa-edit"></i> 最后编辑于 30分钟前</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <span class="post-stat">—</span>
+                        <span class="post-stat">—</span>
+                        <span class="post-stat">—</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" title="编辑"><i class="fas fa-pen"></i></button>
+                        <button class="post-action-btn" title="撤回"><i class="fas fa-undo"></i></button>
+                        <button class="post-action-btn danger" title="删除"><i class="far fa-trash-alt"></i></button>
+                    </div>
+                </div>
+
+                <!-- Post 7 -->
+                <div class="post-item" data-status="rejected">
+                    <input type="checkbox" class="post-checkbox">
+                    <div class="post-content">
+                        <div class="post-title-row">
+                            <a href="#" class="post-title">前端面试题汇总：2026 年高频考点解析</a>
+                            <span class="post-status rejected"><i class="fas fa-times-circle"></i> 未通过</span>
+                        </div>
+                        <div class="post-excerpt">整理了 2026 年前端面试中的高频考点，包括 JavaScript 深入、React/Vue 原理、性能优化、工程化等多个方向的题目和详细解析...</div>
+                        <div class="post-meta-row">
+                            <span class="post-meta-item"><i class="far fa-folder"></i> <span class="category-tag">问答求助</span></span>
+                            <span class="post-meta-item"><i class="far fa-clock"></i> 2026-06-01 08:30</span>
+                            <span class="post-meta-item"><i class="fas fa-exclamation-triangle"></i> 审核未通过：内容包含外部链接</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <span class="post-stat">—</span>
+                        <span class="post-stat">—</span>
+                        <span class="post-stat">—</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" title="编辑"><i class="fas fa-pen"></i></button>
+                        <button class="post-action-btn" title="重新提交"><i class="fas fa-redo"></i></button>
+                        <button class="post-action-btn danger" title="删除"><i class="far fa-trash-alt"></i></button>
+                    </div>
+                </div>
+
+                <!-- Post 8 -->
+                <div class="post-item" data-status="published">
+                    <input type="checkbox" class="post-checkbox">
+                    <div class="post-content">
+                        <div class="post-title-row">
+                            <a href="#" class="post-title">周末去哪儿？分享几个适合程序员的放松好去处</a>
+                            <span class="post-status published"><i class="fas fa-check-circle"></i> 已发布</span>
+                        </div>
+                        <div class="post-excerpt">作为一个常年对着电脑的程序员，周末的放松时间尤为珍贵。这里分享几个我个人常去的放松好去处，包括咖啡馆、书店、户外徒步路线等...</div>
+                        <div class="post-meta-row">
+                            <span class="post-meta-item"><i class="far fa-folder"></i> <span class="category-tag">生活分享</span></span>
+                            <span class="post-meta-item"><i class="far fa-clock"></i> 2026-05-20 19:00</span>
+                            <span class="post-meta-item"><i class="far fa-edit"></i> 最后编辑于 3周前</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <span class="post-stat"><i class="far fa-eye"></i> 890</span>
+                        <span class="post-stat"><i class="far fa-thumbs-up"></i> 67</span>
+                        <span class="post-stat"><i class="far fa-comment"></i> 23</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" title="编辑"><i class="fas fa-pen"></i></button>
+                        <button class="post-action-btn" title="分享"><i class="fas fa-share-alt"></i></button>
+                        <button class="post-action-btn danger" title="删除"><i class="far fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <a href="#" class="page-btn disabled"><i class="fas fa-chevron-left"></i></a>
+                <a href="#" class="page-btn active">1</a>
+                <a href="#" class="page-btn">2</a>
+                <a href="#" class="page-btn">3</a>
+                <span style="color: var(--text-muted);">...</span>
+                <a href="#" class="page-btn">5</a>
+                <a href="#" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="#">关于我们</a>
+                <a href="#">社区规范</a>
+                <a href="#">隐私政策</a>
+                <a href="#">联系我们</a>
+                <a href="#">帮助中心</a>
+            </div>
+            <div class="footer-copyright">© 2026 WaterFun. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">操作成功</span></div>
+
+    <script>
+        // Toast
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimer;
+
+        function showToast(msg, type) {
+            clearTimeout(toastTimer);
+            toastMsg.textContent = msg;
+            toast.className = 'toast ' + (type || '');
+            const icon = toast.querySelector('i');
+            icon.className = type === 'success' ? 'fas fa-check-circle' : type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle';
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const status = tab.dataset.tab;
+                filterPosts(status);
+            });
+        });
+
+        function filterPosts(status) {
+            const items = document.querySelectorAll('.post-item');
+            items.forEach(item => {
+                if (status === 'all' || item.dataset.status === status) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Select all
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const batchPublish = document.getElementById('batchPublish');
+        const batchDelete = document.getElementById('batchDelete');
+        let allSelected = false;
+
+        function updateBatchActions() {
+            const checked = document.querySelectorAll('.post-checkbox:checked');
+            const hasChecked = checked.length > 0;
+            batchDelete.style.display = hasChecked ? 'inline-flex' : 'none';
+            // Only show publish for drafts
+            const hasDraftChecked = Array.from(checked).some(cb => cb.closest('.post-item').dataset.status === 'draft');
+            batchPublish.style.display = hasDraftChecked ? 'inline-flex' : 'none';
+        }
+
+        selectAllBtn.addEventListener('click', () => {
+            allSelected = !allSelected;
+            const visibleItems = document.querySelectorAll('.post-item:not([style*="display: none"])');
+            visibleItems.forEach(item => {
+                item.querySelector('.post-checkbox').checked = allSelected;
+            });
+            selectAllBtn.innerHTML = allSelected ? '<i class="far fa-check-square"></i> 取消全选' : '<i class="far fa-square"></i> 全选';
+            updateBatchActions();
+        });
+
+        document.querySelectorAll('.post-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateBatchActions);
+        });
+
+        batchDelete.addEventListener('click', () => {
+            const checked = document.querySelectorAll('.post-checkbox:checked');
+            if (checked.length === 0) return;
+            if (confirm('确定要删除选中的 ' + checked.length + ' 个帖子吗？此操作不可恢复。')) {
+                checked.forEach(cb => cb.closest('.post-item').remove());
+                showToast('已删除 ' + checked.length + ' 个帖子', 'success');
+                updateBatchActions();
+            }
+        });
+
+        batchPublish.addEventListener('click', () => {
+            const checked = document.querySelectorAll('.post-checkbox:checked');
+            const draftItems = Array.from(checked).filter(cb => cb.closest('.post-item').dataset.status === 'draft');
+            if (draftItems.length === 0) return;
+            draftItems.forEach(cb => {
+                const item = cb.closest('.post-item');
+                item.dataset.status = 'pending';
+                const statusEl = item.querySelector('.post-status');
+                statusEl.className = 'post-status pending';
+                statusEl.innerHTML = '<i class="fas fa-hourglass-half"></i> 审核中';
+                cb.checked = false;
+            });
+            showToast('已提交 ' + draftItems.length + ' 个帖子进行审核', 'success');
+            updateBatchActions();
+        });
+
+        // Individual actions
+        document.querySelectorAll('.post-action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const title = btn.title;
+                if (title === '删除') {
+                    if (confirm('确定要删除这个帖子吗？')) {
+                        btn.closest('.post-item').remove();
+                        showToast('帖子已删除', 'success');
+                    }
+                } else if (title === '发布') {
+                    const item = btn.closest('.post-item');
+                    item.dataset.status = 'pending';
+                    const statusEl = item.querySelector('.post-status');
+                    statusEl.className = 'post-status pending';
+                    statusEl.innerHTML = '<i class="fas fa-hourglass-half"></i> 审核中';
+                    showToast('帖子已提交审核', 'success');
+                } else if (title === '撤回') {
+                    const item = btn.closest('.post-item');
+                    item.dataset.status = 'draft';
+                    const statusEl = item.querySelector('.post-status');
+                    statusEl.className = 'post-status draft';
+                    statusEl.innerHTML = '<i class="fas fa-pen"></i> 草稿';
+                    showToast('帖子已撤回至草稿箱', 'success');
+                } else if (title === '重新提交') {
+                    const item = btn.closest('.post-item');
+                    item.dataset.status = 'pending';
+                    const statusEl = item.querySelector('.post-status');
+                    statusEl.className = 'post-status pending';
+                    statusEl.innerHTML = '<i class="fas fa-hourglass-half"></i> 审核中';
+                    showToast('帖子已重新提交审核', 'success');
+                } else {
+                    showToast(title + '功能开发中...', 'success');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

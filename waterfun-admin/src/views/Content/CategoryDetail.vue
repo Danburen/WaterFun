@@ -68,7 +68,7 @@ onMounted(async () => { await Promise.all([fetchOptions(), fetchDetail()]); });
       </tr>
       <tr>
         <td class="label">创建人</td>
-        <td class="value" colspan="3">{{ categoryDetail.creatorId ? `${categoryDetail.creatorId} (${userNameMap.get(categoryDetail.creatorId) || '无'})` : '无' }}</td>
+        <td class="value" colspan="3">{{ categoryDetail.creatorId ? `${categoryDetail.creatorId} (${userNameMap.get(String(categoryDetail.creatorId)) || '无'})` : '无' }}</td>
       </tr>
       <tr>
         <td class="label">描述</td>

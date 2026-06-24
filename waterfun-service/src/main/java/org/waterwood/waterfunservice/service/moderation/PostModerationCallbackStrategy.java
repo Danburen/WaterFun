@@ -22,6 +22,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepositor
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -86,34 +87,49 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
             p.setSubtitle(p.getEditedSubtitle());
             p.setContent(p.getEditedContent());
             p.setSummary(p.getEditedSummary());
-            List<Tag> editedTags = tagRepository.findAllById(p.getEditedTagIds());
-            List<Tag> oldTags = p.getTags();
-            List<Tag> allTags = Stream.concat(
-                            newTagList.stream(),
-                            editedTags.stream()
-                    )
-                    .collect(Collectors.toMap(
-                            Tag::getId,
-                            tag -> tag,
-                            (existing, replacement) -> existing
-                    ))
-                    .values()
-                    .stream()
-                    .toList();
+            if(p.getEditedNewTags() != null){
+                List<String> newTagNames = p.getEditedNewTags();
+                p.setTags(Stream.concat(
+                                newTagList.stream(),
+                                p.getTags().stream()
+                                        .filter(t -> !newTagNames.contains(t.getName())
+                        )
+                ).toList());
+            }
+            if(p.getEditedTagIds() != null){
+                List<Tag> editedTags = tagRepository.findAllById(p.getEditedTagIds());
+                List<Tag> oldTags = p.getTags();
+                List<Tag> allTags = Stream.concat(
+                                newTagList.stream(),
+                                editedTags.stream()
+                        )
+                        .collect(Collectors.toMap(
+                                Tag::getId,
+                                tag -> tag,
+                                (existing, replacement) -> existing
+                        ))
+                        .values()
+                        .stream()
+                        .toList();
 
-            List<Long> newTagIds = allTags.stream().map(Tag::getId).toList();
-            List<Long> removedTagIds = oldTags.stream().filter(t-> ! editedTags.contains(t)).map(Tag::getId).toList();
+                List<Long> newTagIds = allTags.stream().map(Tag::getId).toList();
+                List<Long> removedTagIds = oldTags.stream().filter(t-> ! editedTags.contains(t)).map(Tag::getId).toList();
 
-            tagRepository.increaseUsageCountInIds(newTagIds, 1);
-            tagRepository.decreaseUsageCountInIds(removedTagIds, 1);
+                tagRepository.increaseUsageCountInIds(newTagIds, 1);
+                tagRepository.decreaseUsageCountInIds(removedTagIds, 1);
+                p.setTags(allTags);
+            }
             categoryRepository.increaseUsageCountById(p.getEditedCategory().getId(), 1);
-            if(!Objects.equals(p.getCategory().getId(), p.getEditedCategory().getId())){
-                categoryRepository.decreaseUsageCountById(p.getCategory().getId(), 1);
+            if(p.getCategory() != null){
+                if(!Objects.equals(p.getCategory().getId(), p.getEditedCategory().getId())){
+                    categoryRepository.decreaseUsageCountById(p.getCategory().getId(), 1);
+                }
             }
             p.setCategory(p.getEditedCategory());
-            p.setTags(allTags);
+
             p.setVersion(p.getVersion() + 1);
             p.setStatus(PostStatus.PUBLISHED);
+            p.setPublishedAt(Instant.now());
             postRepository.save(p);
         } else {
             p.setStatus(PostStatus.REJECTED);

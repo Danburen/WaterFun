@@ -69,8 +69,8 @@ public class Comment {
     private Comment root;
 
     @ColumnDefault("0")
-    @Column(name = "is_top")
-    private Boolean isTop = false;
+    @Column(name = "is_pined")
+    private Boolean isPined = false;
 
     public boolean isDeleted() {
         return status == CommentStatus.DELETED;

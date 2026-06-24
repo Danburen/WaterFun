@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createUser, getUserDetail, updateUserDatum, updateUserInfo, updateUserProfile, type AccountStatus, type Gender } from "~/api/user";
+import { createUser, getUserDetail, updateUserDatum, updateUserInfo, updateUserProfile, type AccountStatus, type Gender, type UserType } from "~/api/user";
 import { ElMessage } from "element-plus";
 import BaseDialog from "~/components/BaseDialog.vue";
 
@@ -10,12 +10,12 @@ const loading = ref(false);
 const submitting = ref(false);
 const visible = computed({ get: () => props.modelValue, set: v => emit("update:modelValue", v) });
 const isCreateMode = computed(() => props.mode === "create");
-const isValidUid = computed(() => props.uid != null && /^\d+$/.test(props.uid));
+const isValidUid = computed(() => props.uid != null && props.uid !== '');
 
 // Create form
 const phone = ref(''); const username = ref(''); const password = ref(''); const createUserType = ref(0);
 // Edit forms
-const editUsername = ref(''); const editNickname = ref(''); const editAvatarUrl = ref(''); const editUserType = ref(0); const editAccountStatus = ref<AccountStatus>('ACTIVE');
+const editUsername = ref(''); const editNickname = ref(''); const editAvatarUrl = ref(''); const editUserType = ref<UserType>('COMMON'); const editAccountStatus = ref<AccountStatus>('ACTIVE');
 const editBio = ref(''); const editGender = ref<Gender>('UNKNOWN'); const editBirthDate = ref(''); const editResidence = ref('');
 const editEmail = ref(''); const editPhone = ref('');
 const datumEmailInit = ref(''); const datumPhoneInit = ref('');
@@ -25,11 +25,12 @@ const phoneErr = ref(''); const usernameErr = ref(''); const passwordErr = ref('
 
 const statusOpts = [['ACTIVE', '正常'], ['SUSPENDED', '已停用'], ['DEACTIVATED', '已注销'], ['DELETED', '已删除']] as const;
 const genderOpts = [['MALE', '男'], ['FEMALE', '女'], ['OTHER', '其他'], ['UNKNOWN', '未知']] as const;
-const userTypeOpts = [[0, '普通用户'], [1, '测试用户'], [2, '管理员'], [3, '系统用户'], [4, '超管']] as const;
+const createUserTypeOpts = [[0, '普通用户'], [1, '测试用户'], [2, '管理员'], [3, '系统用户'], [4, '超管']] as const;
+const userTypeLabel = (t: UserType) => ({ COMMON: '普通用户', ADMIN: '管理员', BOT: '机器人', MODERATOR: '审核员', VIP: 'VIP用户' })[t] ?? '未知';
 
 const resetForms = () => {
   phone.value = ''; username.value = ''; password.value = ''; createUserType.value = 0;
-  editUsername.value = ''; editNickname.value = ''; editAvatarUrl.value = ''; editUserType.value = 0; editAccountStatus.value = 'ACTIVE';
+  editUsername.value = ''; editNickname.value = ''; editAvatarUrl.value = ''; editUserType.value = 'COMMON'; editAccountStatus.value = 'ACTIVE';
   editBio.value = ''; editGender.value = 'UNKNOWN'; editBirthDate.value = ''; editResidence.value = '';
   editEmail.value = ''; editPhone.value = '';
   datumEmailInit.value = ''; datumPhoneInit.value = '';
@@ -40,9 +41,9 @@ const loadUserData = async () => {
   if (!isValidUid.value) return;
   loading.value = true;
   try {
-    const res = await getUserDetail(props.uid as string);
-    editUsername.value = res.data.info.username || ''; editNickname.value = res.data.info.nickname || ''; editAvatarUrl.value = res.data.info.avatarUrl || '';
-    editUserType.value = res.data.info.userType ?? 0; editAccountStatus.value = res.data.info.accountStatus || 'ACTIVE';
+    const res = await getUserDetail(props.uid!);
+    editUsername.value = res.data.info.username || ''; editNickname.value = res.data.info.nickname || ''; editAvatarUrl.value = res.data.info.avatar || '';
+    editUserType.value = res.data.info.userType || 'COMMON'; editAccountStatus.value = res.data.info.accountStatus || 'ACTIVE';
     editBio.value = res.data.profile?.bio || ''; editGender.value = (res.data.profile?.gender as Gender) || 'UNKNOWN'; editBirthDate.value = res.data.profile?.birthDate || ''; editResidence.value = res.data.profile?.residence || '';
     editEmail.value = res.data.maskedData?.emailMasked || ''; editPhone.value = res.data.maskedData?.phoneMasked || '';
     datumEmailInit.value = editEmail.value; datumPhoneInit.value = editPhone.value;
@@ -78,7 +79,7 @@ const handleSave = async () => {
   if (!isValidUid.value) return;
   submitting.value = true;
   try {
-    const uid = props.uid as string;
+    const uid = props.uid!;
     await Promise.all([
       updateUserInfo(uid, { username: editUsername.value, nickname: editNickname.value || undefined, avatarUrl: editAvatarUrl.value || undefined, accountStatus: editAccountStatus.value }),
       updateUserProfile(uid, { bio: editBio.value || undefined, gender: editGender.value, birthDate: editBirthDate.value || undefined, residence: editResidence.value || undefined }),
@@ -110,7 +111,7 @@ const handleSave = async () => {
           <label class="form-label">用户类型</label>
           <div class="form-content">
             <select v-model="createUserType" class="form-select">
-              <option v-for="[val, label] in userTypeOpts" :key="val" :value="val">{{ label }}</option>
+              <option v-for="[val, label] in createUserTypeOpts" :key="val" :value="val">{{ label }}</option>
             </select>
             <div v-if="userTypeErr" class="form-error">{{ userTypeErr }}</div>
           </div>
@@ -129,9 +130,7 @@ const handleSave = async () => {
           <div class="form-field">
             <label class="form-label">用户类型</label>
             <div class="form-content">
-              <select v-model="editUserType" class="form-select" disabled>
-                <option v-for="[val, label] in userTypeOpts" :key="val" :value="val">{{ label }}</option>
-              </select>
+              <span class="form-static-text">{{ userTypeLabel(editUserType) }}</span>
             </div>
           </div>
           <div class="form-field">

@@ -50,4 +50,20 @@ public class UserCounter {
     @Column(name = "collect_cnt", columnDefinition = "int UNSIGNED")
     private Long collectCnt = 0L;
 
+    @ColumnDefault("'0'")
+    @Column(name = "submit_cnt", columnDefinition = "int UNSIGNED")
+    private Long submitCnt = 0L;
+
+    @ColumnDefault("'0'")
+    @Column(name = "reject_cnt", columnDefinition = "int UNSIGNED")
+    private Long rejectCnt = 0L;
+
+    @ColumnDefault("'0'")
+    @Column(name = "report_cnt", columnDefinition = "int UNSIGNED")
+    private Long reportCnt = 0L;
+
+    @ColumnDefault("'0'")
+    @Column(name = "report_hit_cnt", columnDefinition = "int UNSIGNED")
+    private Long reportHitCnt = 0L;
+
 }

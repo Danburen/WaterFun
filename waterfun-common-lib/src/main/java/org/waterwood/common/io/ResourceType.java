@@ -2,7 +2,6 @@ package org.waterwood.common.io;
 
 import lombok.Getter;
 
-import java.io.File;
 import java.util.List;
 
 @Getter
@@ -39,7 +38,11 @@ public enum ResourceType {
         return FileExtension.isAllowed(ext, this);
     }
 
-    public List<String> getAllowExtensions() {
+    public List<String> getAllowExtensionString() {
+        return FileExtension.getAllowExtensionString(this);
+    }
+
+    public List<FileExtension> getAllowExtensions() {
         return FileExtension.getAllowExtensions(this);
     }
 

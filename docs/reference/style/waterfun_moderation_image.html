@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片审核 - WaterFun Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --success-light: #dcfce7;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        /* ========== Sidebar ========== */
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo-text { font-size: 16px; font-weight: 700; }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section { margin-bottom: 8px; }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+        }
+
+        .nav-item:hover { background: var(--sidebar-hover); color: #e2e8f0; }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+
+        .nav-item i { width: 20px; text-align: center; font-size: 15px; }
+
+        .nav-badge {
+            margin-left: auto;
+            padding: 1px 8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-user-info { flex: 1; }
+        .sidebar-user-name { font-size: 14px; font-weight: 600; color: white; }
+        .sidebar-user-role { font-size: 12px; color: #64748b; }
+
+        /* ========== Main Content ========== */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            height: 60px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .top-bar-left { display: flex; align-items: center; gap: 12px; }
+        .page-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .top-bar-right { display: flex; align-items: center; gap: 8px; }
+
+        .top-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .top-btn:hover { background: var(--bg); color: var(--primary); }
+
+        .top-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        .content-area { padding: 24px 28px; flex: 1; }
+
+        /* ========== Queue Info ========== */
+        .queue-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .queue-info-left { display: flex; align-items: center; gap: 20px; }
+
+        .queue-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .queue-stat strong { color: var(--text-primary); font-size: 16px; }
+
+        .queue-info-right { display: flex; align-items: center; gap: 8px; }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* ========== Review Card ========== */
+        .review-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .review-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--bg);
+        }
+
+        .review-meta { display: flex; align-items: center; gap: 16px; }
+
+        .review-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-image { background: #fce7f3; color: #be185d; }
+
+        .review-id {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'SF Mono', monospace;
+        }
+
+        .review-time { font-size: 13px; color: var(--text-muted); }
+
+        .review-status-bar { display: flex; align-items: center; gap: 8px; }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending { background: var(--warning-light); color: #b45309; }
+        .status-passed { background: var(--success-light); color: #15803d; }
+        .status-rejected { background: var(--danger-light); color: #dc2626; }
+
+        .review-body { padding: 24px; }
+
+        /* Author Info */
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .author-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .author-details { flex: 1; }
+
+        .author-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+        .author-meta { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+        .author-risk {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .risk-low { background: var(--success-light); color: #15803d; }
+        .risk-medium { background: var(--warning-light); color: #b45309; }
+        .risk-high { background: var(--danger-light); color: #dc2626; }
+
+        /* ========== Single Review Layout ========== */
+        .single-review-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 24px;
+        }
+
+        .resource-display {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .panel-label i { font-size: 11px; }
+
+        /* Single Image Display */
+        .single-image-review {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 24px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .single-image-container {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 2px solid var(--border);
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .single-image-container img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            display: block;
+            background: var(--bg);
+        }
+
+        .single-image-info { text-align: center; }
+        .single-image-info .file-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .single-image-info .file-meta { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+        /* ========== Source Card ========== */
+        .source-card {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .source-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .source-card-title i { font-size: 11px; }
+
+        .source-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .source-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .source-item:first-child { padding-top: 0; }
+
+        .source-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .source-info { flex: 1; min-width: 0; }
+
+        .source-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .source-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .source-link {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .source-link:hover { text-decoration: underline; }
+
+        /* ========== Action Bar ========== */
+        .review-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: var(--bg);
+            border-top: 1px solid var(--border-light);
+            gap: 12px;
+        }
+
+        .review-actions-left { display: flex; align-items: center; gap: 8px; }
+        .review-actions-right { display: flex; align-items: center; gap: 12px; }
+
+        .action-btn {
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn-pass {
+            background: var(--success);
+            color: white;
+        }
+
+        .action-btn-pass:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .action-btn-reject {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn-reject:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .action-btn-skip {
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .action-btn-skip:hover {
+            background: var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .action-btn-detail {
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .action-btn-detail:hover { color: var(--text-secondary); }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Reject Reason */
+        .reject-reason-wrap {
+            display: none;
+            padding: 16px 24px;
+            background: var(--danger-light);
+            border-top: 1px solid var(--danger-light);
+        }
+
+        .reject-reason-wrap.show { display: block; }
+
+        .reject-reason-wrap label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--danger);
+            margin-bottom: 8px;
+        }
+
+        .reject-reason-wrap textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #fecaca;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+        }
+
+        .reject-reason-wrap textarea:focus {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        /* ========== Toast ========== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: var(--primary); }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 1200px) {
+            .single-review-layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar-logo-text, .nav-section-title, .nav-item span, .sidebar-user-info { display: none; }
+            .main-content { margin-left: 60px; }
+            .content-area { padding: 16px; }
+            .review-actions { flex-direction: column; }
+            .review-actions-left, .review-actions-right { width: 100%; justify-content: center; }
+            .single-review-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-logo">
+                    <div class="sidebar-logo-icon">WF</div>
+                    <span class="sidebar-logo-text">WaterFun</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">概览</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>在线用户</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">内容管理</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>帖子管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-comment"></i>
+                        <span>评论管理</span>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>审核工作台</span>
+                        <span class="nav-badge">28</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">用户</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-user"></i>
+                        <span>用户管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-ban"></i>
+                        <span>封禁记录</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>系统设置</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-history"></i>
+                        <span>操作日志</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="avatar" class="sidebar-user-avatar">
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name">Admin</div>
+                        <div class="sidebar-user-role">超级管理员</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1 class="page-title">图片审核</h1>
+                </div>
+                <div class="top-bar-right">
+                    <button class="top-btn"><i class="fas fa-search"></i></button>
+                    <button class="top-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                    <button class="top-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="queue-info">
+                    <div class="queue-info-left">
+                        <div class="queue-stat"><i class="fas fa-inbox"></i> 待审核 <strong>8</strong></div>
+                        <div class="queue-stat"><i class="fas fa-check-circle"></i> 今日已通过 <strong>156</strong></div>
+                        <div class="queue-stat"><i class="fas fa-times-circle"></i> 今日已拒绝 <strong>23</strong></div>
+                    </div>
+                    <div class="queue-info-right">
+                        <button class="filter-btn active">全部</button>
+                        <button class="filter-btn">高风险</button>
+                        <button class="filter-btn">帖子配图</button>
+                        <button class="filter-btn">评论配图</button>
+                    </div>
+                </div>
+
+                <!-- Image Review Card (Independent) -->
+                <div class="review-card">
+                    <div class="review-card-header">
+                        <div class="review-meta">
+                            <span class="review-type-badge badge-image"><i class="fas fa-image"></i> 图片审核</span>
+                            <span class="review-id">#IMG-20250611-008</span>
+                            <span class="review-time"><i class="far fa-clock"></i> 提交于 14:28</span>
+                        </div>
+                        <div class="review-status-bar">
+                            <span class="status-chip status-pending"><i class="fas fa-hourglass-half"></i> 待审核</span>
+                        </div>
+                    </div>
+
+                    <div class="review-body">
+                        <!-- Author -->
+                        <div class="author-info">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user3" alt="avatar" class="author-avatar">
+                            <div class="author-details">
+                                <div class="author-name">CodeMaster</div>
+                                <div class="author-meta">UID: 10003 · LV.12 · 发帖 567 · 注册 2023-08-20</div>
+                            </div>
+                            <span class="author-risk risk-medium"><i class="fas fa-shield-alt"></i> 中风险</span>
+                        </div>
+
+                        <!-- Single Review Layout: Left=Image, Right=Source -->
+                        <div class="single-review-layout">
+                            <div class="resource-display">
+                                <div class="panel-label"><i class="fas fa-image"></i> 待审核图片</div>
+                                <div class="single-image-review">
+                                    <div class="single-image-container">
+                                        <img src="https://picsum.photos/seed/imgreview/600/400" alt="待审核图片">
+                                    </div>
+                                    <div class="single-image-info">
+                                        <div class="file-name">project_screenshot.png</div>
+                                        <div class="file-meta">1.2 MB · 1920x1080 · 提交于 14:28</div>
+                                    </div>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-muted);">
+                                    <i class="fas fa-info-circle"></i> 独立审核：此图片单独过/不过，不影响关联帖子
+                                </p>
+                            </div>
+
+                            <!-- Source Info -->
+                            <div>
+                                <div class="source-card">
+                                    <div class="source-card-title"><i class="fas fa-link"></i> 来源信息</div>
+                                    <div class="source-item">
+                                        <div class="source-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fas fa-file-alt"></i></div>
+                                        <div class="source-info">
+                                            <div class="source-name">Vue3 性能优化实战指南</div>
+                                            <div class="source-meta">帖子 · 作者：小明 · #POST-20250611-001</div>
+                                        </div>
+                                        <a href="#" class="source-link">查看 <i class="fas fa-external-link-alt" style="font-size: 10px;"></i></a>
+                                    </div>
+                                    <div class="source-item">
+                                        <div class="source-icon" style="background: var(--success-light); color: #15803d;"><i class="fas fa-user"></i></div>
+                                        <div class="source-info">
+                                            <div class="source-name">CodeMaster</div>
+                                            <div class="source-meta">用户 · UID: 10003 · LV.12</div>
+                                        </div>
+                                        <a href="#" class="source-link">查看 <i class="fas fa-external-link-alt" style="font-size: 10px;"></i></a>
+                                    </div>
+                                    <div class="source-item">
+                                        <div class="source-icon" style="background: var(--warning-light); color: #b45309;"><i class="fas fa-clock"></i></div>
+                                        <div class="source-info">
+                                            <div class="source-name">2026-06-11 14:28:33</div>
+                                            <div class="source-meta">上传时间 · 来源：Web端</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="source-card" style="margin-top: 16px;">
+                                    <div class="source-card-title"><i class="fas fa-history"></i> 审核历史</div>
+                                    <div class="source-item">
+                                        <div class="source-icon" style="background: var(--success-light); color: #15803d;"><i class="fas fa-check"></i></div>
+                                        <div class="source-info">
+                                            <div class="source-name">历史通过 23 次</div>
+                                            <div class="source-meta">拒绝 1 次 · 通过率 95.8%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="review-actions">
+                        <div class="review-actions-left">
+                            <button class="action-btn action-btn-detail"><i class="fas fa-search-plus"></i> 放大查看</button>
+                            <button class="action-btn action-btn-detail"><i class="fas fa-user"></i> 用户详情</button>
+                        </div>
+                        <div class="review-actions-right">
+                            <button class="action-btn action-btn-skip"><i class="fas fa-forward"></i> 跳过</button>
+                            <button class="action-btn action-btn-reject" id="imgRejectBtn"><i class="fas fa-times"></i> 不通过</button>
+                            <button class="action-btn action-btn-pass" id="imgPassBtn"><i class="fas fa-check"></i> 通过</button>
+                        </div>
+                    </div>
+
+                    <!-- Reject Reason -->
+                    <div class="reject-reason-wrap" id="imgRejectWrap">
+                        <label><i class="fas fa-exclamation-triangle"></i> 拒绝原因（必填）</label>
+                        <textarea placeholder="请填写拒绝原因..." id="imgRejectReason"></textarea>
+                        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+                            <button class="action-btn action-btn-skip" onclick="hideReject('img')">取消</button>
+                            <button class="action-btn action-btn-reject" onclick="confirmReject('img')">确认拒绝</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">操作成功</span></div>
+
+    <script>
+        // Toast
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimer;
+
+        function showToast(msg, type) {
+            clearTimeout(toastTimer);
+            toastMsg.textContent = msg;
+            toast.className = 'toast ' + (type || 'info');
+            const icon = toast.querySelector('i');
+            if (type === 'success') icon.className = 'fas fa-check-circle';
+            else if (type === 'error') icon.className = 'fas fa-exclamation-circle';
+            else icon.className = 'fas fa-info-circle';
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Reject logic
+        function showReject(prefix) {
+            document.getElementById(prefix + 'RejectWrap').classList.add('show');
+        }
+
+        function hideReject(prefix) {
+            document.getElementById(prefix + 'RejectWrap').classList.remove('show');
+            document.getElementById(prefix + 'RejectReason').value = '';
+        }
+
+        function confirmReject(prefix) {
+            const reason = document.getElementById(prefix + 'RejectReason').value.trim();
+            if (!reason) {
+                showToast('请填写拒绝原因', 'error');
+                return;
+            }
+            hideReject(prefix);
+            showToast('图片审核已拒绝，任务完成', 'success');
+        }
+
+        // Pass
+        document.getElementById('imgPassBtn').addEventListener('click', () => {
+            showToast('图片审核通过，任务完成', 'success');
+        });
+
+        document.getElementById('imgRejectBtn').addEventListener('click', () => showReject('img'));
+    </script>
+
+</body>
+</html>

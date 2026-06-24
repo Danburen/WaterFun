@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MainNavBar from "@/layouts/main/MainNavBar.vue"
-import { ref, computed, onBeforeMount, watch } from 'vue'
+import { ref, computed, onBeforeMount, watch, nextTick, onUnmounted } from 'vue'
 import type { BreadNavItemType, TagNavItemType } from "@/types/ui/tagNav.js"
 import TagNavigation from "@/layouts/main/TagNavigation.vue"
 import AsideNavBar from "@/layouts/main/AsideNavBar.vue"
@@ -13,6 +13,7 @@ const tagStore = useTagStore()
 const activeTags = ref<string>('dashboard')
 const authStore = useAuthStore()
 const router = useRouter()
+let isMounted = false
 
 const tagList = ref<TagNavItemType[]>([])
 const breadList = computed(() => {
@@ -68,12 +69,36 @@ onBeforeMount(() => {
   tagStore.addTag(dashboardTagItem)
 })
 
-router.afterEach((to) => {
-  addNavTags(to)
-  activeTags.value = (to.name as string) || 'dashboard'
+onMounted(() => {
+  isMounted = true
+})
+
+onUnmounted(() => {
+  isMounted = false
+})
+
+// Defer tag updates to after component lifecycle settles
+// to avoid modifying reactive state during component teardown/creation
+let afterEachCleanup: (() => void) | null = null
+router.isReady().then(() => {
+  afterEachCleanup = router.afterEach((to) => {
+    nextTick(() => {
+      if (!isMounted) return
+      addNavTags(to)
+      activeTags.value = (to.name as string) || 'dashboard'
+    })
+  })
+})
+
+onUnmounted(() => {
+  if (afterEachCleanup) {
+    afterEachCleanup()
+    afterEachCleanup = null
+  }
 })
 
 watch(() => tagStore.getTags, (newTags) => {
+  if (!isMounted) return
   tagList.value = newTags
 }, { immediate: true, deep: true })
 </script>
@@ -93,7 +118,7 @@ watch(() => tagStore.getTags, (newTags) => {
         />
       </div>
       <div class="content-area">
-        <RouterView :key="$route.fullPath" />
+        <RouterView />
       </div>
       <div class="content-footer">
         <div class="copyright">CopyRight © WaterFun 2025</div>

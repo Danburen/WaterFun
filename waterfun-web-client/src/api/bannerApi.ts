@@ -2,7 +2,7 @@ import request from "../utils/axiosRequest"
 import type { PromiseResBody, CloudResourceUrlResp } from "@waterfun/web-core/src/types/api/response"
 
 export interface BannerResponse {
-  id: number
+  id: string
   title: string
   subtitle: string
   linkUrl: string

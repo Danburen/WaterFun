@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: waterfun-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            # 2. admin API
+            - id: admin-service
+              uri: ${WATERFUN_ADMIN_SERVICE_URI:http://localhost:8082}
+              predicates:
+                - Path=/api/admin/**
+            # 2. 其他所有 /api/** 都走 user-service
+            - id: user-service
+              uri: ${WATERFUN_USER_SERVICE_URI:http://localhost:8081}
+              predicates:
+                - Path=/api/**
+  config:
+    import:
+      - optional:file:./deploy/config/common.yml
+      - optional:file:./deploy/config/common-dev-secrets.yml
+
+server:
+  port: ${WATERFUN_GATEWAY_PORT:8080}
+
+waterfun:
+  cors:
+    allowed-origins: https://waterfun.top,http://localhost:3000,http://localhost:5173
+  rate-limit:
+    # Simplified auth endpoint throttling (in-memory)
+    auth:
+      enabled: true
+      paths:
+        - /api/auth/login
+        - /api/auth/register
+        - /api/auth/refresh
+      requests: 10
+      window-seconds: 60
+    global:
+      enabled: true
+      get-limit: 1000
+      write-limit: 300
+      window-seconds: 60
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.cloud.gateway: INFO
+

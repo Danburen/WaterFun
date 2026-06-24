@@ -19,6 +19,6 @@ public interface UserFollowerRepository extends JpaRepository<UserFollower, User
     @Query("SELECT uf.id.userUid FROM UserFollower uf " +
             "WHERE uf.id.followerUid = :uid " +
             "ORDER BY uf.createdAt DESC ")
-    Page<Long> findByFollowerUid(long userUid, Pageable pageable);
+    Page<Long> findByFollowerUid(@Param("uid") long uid, Pageable pageable);
 
 }

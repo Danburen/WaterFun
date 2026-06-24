@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.waterwood.waterfunservicecore.entity.user.UserCounter;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserCounterRepository extends JpaRepository<UserCounter, Long> {
@@ -48,4 +50,6 @@ public interface UserCounterRepository extends JpaRepository<UserCounter, Long> 
     @Modifying
     @Query("UPDATE UserCounter uc SET uc.collectCnt = uc.collectCnt + :count WHERE uc.user.uid = :userUid")
     void increaseUserCollectionCount(@Param("userUid") Long userUid, @Param("count") int count);
+
+    List<UserCounter> findAllByUserUidIn(List<Long> attr0);
 }

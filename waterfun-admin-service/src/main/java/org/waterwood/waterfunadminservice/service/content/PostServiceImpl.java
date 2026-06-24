@@ -13,7 +13,9 @@ import org.waterwood.waterfunadminservice.api.request.DeletePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.AssignTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.CreatePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.PutPostReq;
+import org.waterwood.waterfunadminservice.api.response.content.audit.PostBrief;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.PostMapper;
+import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.PostTag;
 import org.waterwood.waterfunservicecore.entity.post.PostTagId;
@@ -24,10 +26,12 @@ import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.exception.notfound.PostNotFoundException;
 import org.waterwood.waterfunservicecore.exception.reference.CategoryReferenceInvalidException;
+import org.waterwood.waterfunservicecore.exception.reference.PostReferenceInvalidException;
 import org.waterwood.waterfunservicecore.exception.reference.UserReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.*;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
-import org.waterwood.waterfunservicecore.infrastructure.utils.ContentIdGenerator;
+import org.waterwood.waterfunservicecore.infrastructure.utils.IdGenerator;
+import org.waterwood.waterfunservicecore.services.user.UserBriefService;
 
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +49,7 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostTagRepository postTagRepository;
     private final ResourceRepository resourceRepository;
+    private final UserBriefService userBriefService;
 
     @Override
     public Page<Post> listPosts(Specification<Post> spec, Pageable pageable) {
@@ -113,7 +118,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public void createPost(CreatePostRequest req) {
         Post p = postMapper.toEntity(req);
-        p.setId(ContentIdGenerator.nextPostId());
+        p.setId(IdGenerator.nextPostId());
         p.setSlug(identifierGenerator.fromSlug(req.getSlug(), req.getTitle(), postRepository));
         User author = userRepository.findById(req.getAuthorId()).orElseThrow(
                 () -> new NotFoundException("User ID: " + req.getAuthorId())
@@ -123,6 +128,14 @@ public class PostServiceImpl implements PostService {
             p.setCategory(c);
             return c;
         }).orElseThrow(() -> new NotFoundException("Category ID: " + req.getCategoryId()));
+
+        if (req.getCoverageUuid() != null) {
+            Resource res = resourceRepository.findByUuidAndStatus(req.getCoverageUuid(), ResourceStatus.ORPHAN)
+                    .orElseThrow(() -> new NotFoundException("Resource UUID: " + req.getCoverageUuid()));
+            res.setStatus(ResourceStatus.ACTIVE);
+            p.setCoverageResource(res);
+        }
+
         postRepository.save(p);
 
         if(CollectionUtil.isNotEmpty(req.getTagIds())) {
@@ -211,5 +224,15 @@ public class PostServiceImpl implements PostService {
              removed = postTagRepository.deleteByPostIdAndTagIdIn(id, req.getTagIds());
         }
         return BatchResult.of(req.getTagIds() == null ? 0 : req.getTagIds().size(), removed);
+    }
+
+    @Override
+    public PostBrief getPostBrief(Long postId) {
+        Long authorUid = postRepository.findAuthorUidById(postId);
+        UserBrief authorUserBrief = userBriefService.getUserBrief(authorUid);
+        Post p = postRepository.findById(postId).orElseThrow(
+                () -> new PostReferenceInvalidException(postId)
+        );
+        return new PostBrief(p.getId(), p.getTitle(), p.getTitle(), authorUserBrief);
     }
 }

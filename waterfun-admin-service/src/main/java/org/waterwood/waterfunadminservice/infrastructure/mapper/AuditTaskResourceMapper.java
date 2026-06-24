@@ -16,5 +16,6 @@ public interface AuditTaskResourceMapper {
     @Mapping(source = "task.id", target = "taskId")
     @Mapping(source = "auditor.uid", target = "auditorId")
     @Mapping(source = "resource.uuid", target = "resourceUuid")
+    @Mapping(source = "resource.resourceKey", target = "resourceKey")
     ModerationResourceRes toModerationResourceRes(AuditResource auditResource);
 }

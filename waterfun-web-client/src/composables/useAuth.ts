@@ -3,6 +3,7 @@ import { useRouter } from "vue-router";
 import { useUserInfoStore } from "~/stores/userInfoStore";
 import { useUserProfileStore } from "~/stores/userProfileStore";
 import { useAuthStore } from "~/stores/authStore";
+import { useUserAccountStore } from "~/stores/userAccountStore";
 import { 
     login,
     register,
@@ -78,7 +79,7 @@ export const useAuth = () => {
     const isLoggedIn = computed(()=>{
         const expireIn = Number(authStore.accessData.expire);
         console.log(userInfoStore.userInfo.uid, expireIn)
-        return userInfoStore.userInfo.uid !== null && (Date.now() < expireIn);
+        return userInfoStore.userInfo.uid !== '' && (Date.now() < expireIn);
     })
 
     return { tryLogin, tryRegister, logout: tryLogout, isLoggedIn }

@@ -7,11 +7,13 @@ import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunadminservice.api.request.user.*;
 import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
 import org.waterwood.waterfunadminservice.api.response.role.AssignedRoleRes;
+import org.waterwood.waterfunadminservice.api.response.user.UserAdminBrief;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.BizException;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserAdminService {
 
@@ -123,4 +125,19 @@ public interface UserAdminService {
      * @return batch result ofPending the operation.
      */
     BatchResult batchDeleteUsers(List<Long> userUids);
+
+    /**
+     * Return a target user admin brief
+     * @param uid target user uid
+     * @return {@link UserAdminBrief} the user admin brief info
+     */
+    UserAdminBrief getUserAdminBrief(Long uid);
+
+    /**
+     * Batch return target user admin briefs
+     *
+     * @param userUids the list ofPending target user uids
+     * @return {@link Map} the map ofPending user admin brief info for all exists
+     */
+    Map<Long, UserAdminBrief> batchGetUserAdminBrief(List<Long> userUids);
 }

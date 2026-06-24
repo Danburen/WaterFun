@@ -69,16 +69,14 @@ const activeTab = computed(() => {
 });
 
 
-// 处理标签切换
 const handleTabChange = (tabId: string) => {
   const map: Record<string, string> = {
     profile: '/profile/info',
     security: '/profile/account',
     notification: '/profile/notifications',
-    posts: '/profile/posts'
+    posts: '/profile/posts',
   }
   router.push(map[tabId] || '/profile/info');
-  console.log('切换到标签:', tabId, map[tabId], router.currentRoute.value.path);
 };
 
 

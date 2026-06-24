@@ -144,10 +144,16 @@ public enum FileExtension {
         return fromMimeType(mimeType).getResourceType();
     }
 
-    public static List<String> getAllowExtensions(ResourceType resourceType) {
+    public static List<String> getAllowExtensionString(ResourceType resourceType) {
         return Arrays.stream(values())
                 .filter(fe -> fe.getResourceType() == resourceType)
                 .map(FileExtension::getExt)
+                .toList();
+    }
+
+    public static List<FileExtension> getAllowExtensions(ResourceType resourceType) {
+        return Arrays.stream(values())
+                .filter(fe -> fe.getResourceType() == resourceType)
                 .toList();
     }
 

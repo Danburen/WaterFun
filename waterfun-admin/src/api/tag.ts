@@ -5,7 +5,7 @@ import request from "~/utils/axiosRequest";
 export type TagOptionVO = OptionResItem<number>;
 
 export interface TagResp {
-  id: number;
+  id: string;
   name: string;
   slug?: string;
   description?: string;
@@ -21,6 +21,8 @@ export interface ListTagParams {
   name?: string;
   slug?: string;
   creatorId?: string;
+  createdStart?: ISOString;
+  createdEnd?: ISOString;
 }
 
 export interface UpdateTagRequest {
@@ -36,7 +38,7 @@ export interface CreateTagRequest {
 }
 
 export interface DeleteTagsRequest {
-  tagIds: number[];
+  tagIds: string[];
 }
 
 export interface BatchResult {
@@ -44,6 +46,9 @@ export interface BatchResult {
   success: number;
   ignored: number;
   failed: number;
+  ignoredIds?: number[];
+  failedIds?: number[];
+  message?: string;
 }
 
 export const listTags = (params: ListTagParams = {}): PromiseResBody<Page<TagResp>> => {
@@ -66,7 +71,7 @@ export const deleteTag = (id: number): PromiseResBody<null> => {
   return request.delete<null>(`/tags/${id}`);
 };
 
-export const deleteTags = (tagIds: number[]): PromiseResBody<BatchResult> => {
+export const deleteTags = (tagIds: string[]): PromiseResBody<BatchResult> => {
   const data: DeleteTagsRequest = { tagIds };
   return request.delete<BatchResult>("/tags", { data });
 };

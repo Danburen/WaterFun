@@ -49,7 +49,7 @@ public final class Snowflake {
             long offset = lastTimestamp - timestamp;
             if (offset <= 5) {  // tolerate tiny rollback only
                 try {
-                    Thread.sleep(offset);
+                    Thread.sleep(offset + 1);
                     timestamp = System.currentTimeMillis();
                     if (timestamp < lastTimestamp) {
                         throw new RuntimeException("Clock moved backwards by " + (lastTimestamp - timestamp) + "ms");

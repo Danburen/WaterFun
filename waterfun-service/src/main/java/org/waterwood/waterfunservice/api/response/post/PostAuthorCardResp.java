@@ -24,6 +24,9 @@ public class PostAuthorCardResp {
     private String subtitle;
     private String summary;
 
+    private String editedTitle;
+    private String editedSummary;
+
     private CloudResPresignedUrlResp coverImage;
     private OptionVO<Long> category;
     private List<OptionVO<Long>> tags;

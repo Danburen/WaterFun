@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.*;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.waterwood.api.VO.OptionVO;
+import org.waterwood.api.VO.ToOptionVO;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
@@ -21,7 +23,7 @@ import java.time.Instant;
         name = "withParent",
         attributeNodes = @NamedAttributeNode("parent")
 )
-public class Category {
+public class Category implements ToOptionVO<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "int UNSIGNED not null")
@@ -77,4 +79,8 @@ public class Category {
     @Column(name = "usage_count", columnDefinition = "int UNSIGNED")
     private Long usageCount = 0L;
 
+    @Override
+    public String getCode() {
+        return this.getSlug();
+    }
 }

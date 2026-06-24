@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.PhoneNumberAlreadyUsedException;
 import org.waterwood.utils.MaskUtil;
 import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.waterfunservicecore.api.resp.AccountResp;
@@ -45,6 +46,7 @@ public class UserDatumCoreServiceImpl implements UserDatumCoreService {
         ud.setEmailEncrypted(EncryptionHelper.encryptField(email, aesKey));
         ud.setEmailHash(newHashed);
         ud.setEmailVerified(verified);
+        ud.setEncryptionKeyId(aesKey.getKeyId());
         return userDatumRepo.save(ud);
     }
 
@@ -59,21 +61,23 @@ public class UserDatumCoreServiceImpl implements UserDatumCoreService {
         }
         // check new phone whether bound by others
         userDatumRepo.findByPhoneHash(newHashed).ifPresent(_ ->{
-            throw new BizException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
+            throw new PhoneNumberAlreadyUsedException();
         });
         // save to the db
         EncryptionDataKey aesKey = encryptedKeyService.getAesKey();
         ud.setPhoneEncrypted(EncryptionHelper.encryptField(phone, aesKey));
         ud.setPhoneHash(newHashed);
         ud.setPhoneVerified(verified);
+        ud.setEncryptionKeyId(aesKey.getKeyId());
         return userDatumRepo.save(ud);
     }
 
     @Override
     public String getRawPhone(long userUid) {
+        UserDatum ud = getUserDatum(userUid);
         return EncryptionHelper.decryptField(
-                getUserDatum(userUid).getPhoneEncrypted(),
-                encryptedKeyService.getAesKey()
+                ud.getPhoneEncrypted(),
+                encryptedKeyService.getKeyById(ud.getEncryptionKeyId())
         );
     }
 
@@ -85,8 +89,8 @@ public class UserDatumCoreServiceImpl implements UserDatumCoreService {
             return null;
         }
         return EncryptionHelper.decryptField(
-                getUserDatum(userUid).getEmailEncrypted(),
-                encryptedKeyService.getAesKey()
+                ud.getEmailEncrypted(),
+                encryptedKeyService.getKeyById(ud.getEncryptionKeyId())
         );
     }
 
@@ -95,7 +99,7 @@ public class UserDatumCoreServiceImpl implements UserDatumCoreService {
     public AccountResp getAccountInfo(long userUid) {
         UserDatum ud = userDatumRepo.findUserDatumByUserUid(userUid)
                 .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
-        EncryptionDataKey aesKey = encryptedKeyService.pickEncryptionKey(0);
+        EncryptionDataKey aesKey = encryptedKeyService.getKeyById(ud.getEncryptionKeyId());
         String realEmail = EncryptionHelper.decryptField(ud.getEmailEncrypted(), aesKey);
         String realPhone = EncryptionHelper.decryptField(ud.getPhoneEncrypted(), aesKey);
         return new AccountResp(

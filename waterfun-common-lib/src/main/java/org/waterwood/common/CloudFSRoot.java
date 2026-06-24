@@ -6,9 +6,7 @@ import lombok.Getter;
 @Getter
 public enum CloudFSRoot {
     UPLOADS("uploads"),
-    SYSTEM("sys"),
-    MODERATION("moderation"),
-    USER("user");
+    SYSTEM("sys");
 
     private final String key;
     CloudFSRoot(String key) {

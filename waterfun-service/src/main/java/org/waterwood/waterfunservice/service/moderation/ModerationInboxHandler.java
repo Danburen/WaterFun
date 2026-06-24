@@ -4,19 +4,23 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Component;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.response.InboxNotificationRes;
 import org.waterwood.waterfunservice.infrastructure.mapper.InboxSystemMapper;
 import org.waterwood.waterfunservice.service.SSEService;
 import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.notification.Inbox;
 import org.waterwood.waterfunservicecore.entity.notification.NoticeType;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.notification.InboxRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPreferenceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,6 +36,8 @@ public class ModerationInboxHandler {
     private final MessageSource messageSource;
     private final SSEService sseService;
     private final InboxSystemMapper inboxSystemMapper;
+    private final UserCounterRepository userCounterRepository;
+    private final UserPreferenceRepository userPreferenceRepository;
 
     @Transactional
     public void handleModeration(ModerationConsumerMessage msg, Long targetUserUid, Object... args) {
@@ -40,7 +46,7 @@ public class ModerationInboxHandler {
         pushInboxToUser(targetUserUid, is);
     }
 
-    private String getRejectText(AuditRejectType type, Locale locale){
+    private String getRejectText(AuditType type, Locale locale){
         String rejectTemplateText = switch (type) {
             case VIOLATION_OF_GUIDELINES -> "reject.reason.violation_of_guidelines";
             case INAPPROPRIATE_CONTENT -> "reject.reason.inappropriate_content";
@@ -80,20 +86,23 @@ public class ModerationInboxHandler {
 
     private Inbox buildInbox(ModerationConsumerMessage msg, Long targetUserUid, Object[] args) {
         ModerationTargetType type = ModerationTargetType.fromTargetType(msg.getTargetType());
-        Locale locale = Locale.of(msg.getUserLocale());
+        String storedUserLocale = userPreferenceRepository.getLocaleByUserUid(msg.getSubmitterId());
+        log.info(storedUserLocale);
+        Locale locale = StringUtil.isBlank(storedUserLocale) ?  Locale.getDefault() : Locale.forLanguageTag(storedUserLocale);
 
         Inbox is = new Inbox();
         is.setNoticeType(NoticeType.SYSTEM);
-        is.setTitle(type.getTitle());
+        is.setTitle(messageSource.getMessage(type.getTitle(), null, locale));
         is.setUser(userRepository.getReferenceById(targetUserUid));
         is.setTargetId(msg.getTargetId());
-
         if (msg.getStatus() == AuditStatus.APPROVED) {
             is.setContent(Map.of("text", messageSource.getMessage(type.getApprove(), args, locale)));
         } else if (msg.getStatus() == AuditStatus.REJECTED) {
+
             String fullMsg = getRejectText(msg.getRejectType(), locale) + " " +
                     (StringUtil.isBlank(msg.getRejectReason()) ? "" : msg.getRejectReason());
-            is.setContent(Map.of("text", messageSource.getMessage(type.getReject(), new Object[]{args, fullMsg}, locale)));
+            log.info(fullMsg);
+            is.setContent(Map.of("text", messageSource.getMessage(type.getReject(), new String[]{fullMsg}, locale)));
         }
         return is;
     }

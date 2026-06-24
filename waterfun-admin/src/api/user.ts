@@ -2,20 +2,21 @@ import type { ISOString, OptionResItem, PromiseResBody } from "@waterfun/web-cor
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
-export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED" | "DELETED";
+export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
 export type Gender = "MALE" | "FEMALE" | "OTHER" | "UNKNOWN";
+export type UserType = "COMMON" | "ADMIN" | "BOT" | "MODERATOR" | "VIP";
 export type Uid = string;
 
 export interface UserAdminDto {
   uid: Uid;
   username: string;
-  userType: number;
+  userType: UserType;
   accountStatus: AccountStatus;
   statusChangedAt: ISOString;
   updatedAt: ISOString;
   createdAt: ISOString;
   nickname: string | null;
-  avatarUrl: string | null;
+  avatar: string | null;
   lastActiveAt: ISOString;
 }
 
@@ -28,14 +29,14 @@ export interface UserProfileDto {
 }
 
 export interface UserCounterDto {
-  level: number;
+  level: string;
   exp: number;
   followerCnt: number;
   followingCnt: number;
   likeCnt: number;
   postCnt: number;
   updatedAt: ISOString;
-  visible: boolean;
+  visible: number;
 }
 
 export interface UserMaskedDataDto {
@@ -47,6 +48,7 @@ export interface UserMaskedDataDto {
 
 export interface UserExpirableOption extends OptionResItem<number> {
   expiresAt: ISOString;
+  expired?: boolean;
 }
 
 export interface AssignedRoleRes {
@@ -150,8 +152,8 @@ export const deleteUser = (uid: Uid | number): PromiseResBody<null> => {
   return request.delete<null>(`/users/${String(uid)}`);
 };
 
-export const deleteUsers = (userUids: Array<Uid | number>): PromiseResBody<BatchResult> => {
-  const data: RemoveUsersReq = { userUids: userUids.map((uid) => String(uid)) };
+export const deleteUsers = (userUids: Uid[]): PromiseResBody<BatchResult> => {
+  const data: RemoveUsersReq = { userUids };
   return request.delete<BatchResult>("/users", { data });
 };
 

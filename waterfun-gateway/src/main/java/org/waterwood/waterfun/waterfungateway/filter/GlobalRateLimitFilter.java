@@ -32,7 +32,7 @@ public class GlobalRateLimitFilter implements GlobalFilter, Ordered {
 
     public GlobalRateLimitFilter(
             @Value("${waterfun.rate-limit.global.enabled:true}") boolean enabled,
-            @Value("${waterfun.rate-limit.global.get-limit:100}") int getLimit,
+            @Value("${waterfun.rate-limit.global.get-limit:1000}") int getLimit,
             @Value("${waterfun.rate-limit.global.write-limit:30}") int writeLimit,
             @Value("${waterfun.rate-limit.global.window-seconds:60}") long windowSeconds) {
         this.enabled = enabled;

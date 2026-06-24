@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useUserInfoStore } from './userInfoStore';
-import { getAvatar, getUserProfile } from '../api/userApi';
+import { getAvatar, getUserProfile, updateUserProfile as apiUpdateProfile } from '../api/userApi';
 import type CacheItem from '@waterfun/web-core/src/cache/types';
 
 interface UserProfile {
@@ -27,7 +27,24 @@ export const useUserProfileStore = defineStore('userProfileStore', () => {
     presignedUrl: '',
   });
 
-  const updateUserProfile = (data: Partial<UserProfile>) => {
+  /** 更新本地 profile 状态（不调接口） */
+  const updateLocalProfile = (data: Partial<UserProfile>) => {
+    userProfile.value = { ...userProfile.value, ...data };
+  };
+
+  /** 更新 profile → 调后端 API + 同步本地状态 */
+  const updateUserProfile = async (data: Partial<UserProfile>) => {
+    const payload: { bio?: string; gender?: string; birthday?: string; residence?: string } = {};
+    if (data.bio !== undefined) payload.bio = data.bio;
+    if (data.gender !== undefined) payload.gender = data.gender;
+    if (data.birthday != null) {
+      payload.birthday = typeof data.birthday === 'object' && 'toISOString' in data.birthday
+        ? data.birthday.toISOString().split('T')[0]
+        : String(data.birthday);
+    }
+    if (data.residence !== undefined) payload.residence = data.residence;
+    await apiUpdateProfile(payload);
+    // sync local after successful API call
     userProfile.value = { ...userProfile.value, ...data };
   };
 
@@ -76,7 +93,7 @@ export const useUserProfileStore = defineStore('userProfileStore', () => {
 
   const fetchAndUpdateUserProfile = async() =>{
     const userProfileRes = await getUserProfile();
-    updateUserProfile({
+    updateLocalProfile({
       bio: userProfileRes.data.bio,
       gender: userProfileRes.data.gender,
       birthday: userProfileRes.data.birthday ? new Date(userProfileRes.data.birthday) : null,
@@ -89,7 +106,7 @@ export const useUserProfileStore = defineStore('userProfileStore', () => {
     }
   }
 
-  return { userProfile, avatarCache, updateUserProfile, updateAvatar, clearUserProfile, getAvatarUrl, fetchAndUpdateUserProfile };
+  return { userProfile, avatarCache, updateUserProfile, updateLocalProfile, updateAvatar, clearUserProfile, getAvatarUrl, fetchAndUpdateUserProfile };
 }, {
   persist: process.client ? {
     storage: localStorage,

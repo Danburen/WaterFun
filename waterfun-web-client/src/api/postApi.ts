@@ -6,15 +6,8 @@ export interface CloudResPresignedUrlResp {
   expireAt: string | null
 }
 
-export interface OptionVOInteger {
-  id: number
-  code: string
-  name: string
-  disabled: boolean
-}
-
 export interface UserBrief {
-  uid: number
+  uid: string
   displayName: string
   avatar: CloudResourceUrlResp
   level: number
@@ -22,39 +15,40 @@ export interface UserBrief {
 }
 
 export interface PostCardResp {
-  id: number
+  id: string
   title: string
   subtitle: string
   summary: string
-  userBrief?: UserBrief
   coverImage: CloudResourceUrlResp | null
-  category: OptionVOInteger | null
-  tags: OptionVOInteger[]
+  category: OptionVOLong | null
+  tags: OptionVOLong[]
   viewCount: number
   likeCount: number
   commentCount: number
   collectCount: number
   slug: string
   publishedAt: string | null
-  type?: 'COMMON' | 'NOTICE'
-  isPinned?: boolean
 }
 
 export interface PostAuthorCardResp extends PostCardResp {
   visibility: 'PUBLIC' | 'PRIVATE' | 'FANS_ONLY'
   status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
+  editStatus: 'NONE' | 'PENDING'
   updatedAt: string | null
+  editedTitle?: string
+  editedContent?: string
+  editedSummary?: string
 }
 
 export interface PostDetailResp {
-  id: number
+  id: string
   title: string
   subtitle: string
   content: string
   summary: string
   coverImage: CloudResourceUrlResp | null
-  category: OptionVOInteger | null
-  tags: OptionVOInteger[]
+  category: OptionVOLong | null
+  tags: OptionVOLong[]
   viewCount: number
   likeCount: number
   commentCount: number
@@ -62,13 +56,14 @@ export interface PostDetailResp {
   slug: string
   publishedAt: string | null
   updatedAt: string | null
-  type?: 'COMMON' | 'NOTICE'
-  isPinned?: boolean
-}
-
-export interface PostAuthorDetailResp extends PostDetailResp {
+  type: 'COMMON' | 'NOTICE'
+  isPinned: boolean
+  userBrief: UserBrief
+  isLiked: boolean
+  isCollected: boolean
   visibility: 'PUBLIC' | 'PRIVATE' | 'FANS_ONLY'
   status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
+  editStatus: 'NONE' | 'PENDING'
 }
 
 export interface PostDraftResp {
@@ -83,7 +78,7 @@ export interface PostDraftResp {
 }
 
 export interface OptionVOLong {
-  id: number
+  id: string
   code: string
   name: string
   disabled: boolean
@@ -96,12 +91,12 @@ export interface PostSaveReq {
   summary?: string
   coverageImgId?: string
   newTags?: string[]
-  tagIds?: number[]
-  categoryId: number
+  tagIds?: (number | bigint)[]
+  categoryId: number | bigint
 }
 
 export interface CategoryResponse {
-  id: number
+  id: string
   name: string
   slug: string
   description: string
@@ -113,7 +108,7 @@ export interface CategoryResponse {
 }
 
 export interface TagResponse {
-  id: number
+  id: string
   name: string
   slug: string
   description: string
@@ -141,9 +136,8 @@ export interface PageResult<T> {
 }
 
 export interface PostListParams {
-  categoryId?: number
-  tagIds?: number[]
-  authorId?: number
+  categoryId?: string
+  tagIds?: string[]
   page?: number
   size?: number
 }
@@ -161,29 +155,38 @@ export interface ContentPreviewReq {
   content: string
 }
 
+export interface CreateReportReq {
+  type: string
+  reason?: string
+  reasonValid?: boolean
+}
+
 export interface MyPostListParams {
+  title?: string
   status?: string
   visibility?: string
-  categoryId?: number
-  tagIds?: number[]
+  categoryId?: string
+  tagIds?: string[]
   page?: number
   size?: number
+  sort?: string
 }
 
 export const fetchPostList = (params: PostListParams): PromiseResBody<PageResult<PostCardResp>> => {
   return request.get('/posts/list', { params })
 }
 
-export const fetchPostDetail = (id: number): PromiseResBody<PostDetailResp> => {
+export const fetchPostDetail = (id: string): PromiseResBody<PostDetailResp> => {
   return request.get(`/posts/${id}`)
 }
 
-export const deletePost = (id: number): PromiseResBody<void> => {
+export const deletePost = (id: string): PromiseResBody<void> => {
   return request.delete(`/posts/${id}`)
 }
 
-export const fetchMyPostDetail = (id: number): PromiseResBody<PostAuthorDetailResp> => {
-  return request.get(`/posts/me/${id}`)
+export const fetchMyPostDetail = (id: string): PromiseResBody<PostDetailResp> => {
+  // Merged into GET /api/posts/{id} — returns full detail including visibility/status/editStatus
+  return request.get(`/posts/${id}`)
 }
 
 export const fetchMyPostStats = (): PromiseResBody<MyPostsStatsResp> => {
@@ -194,23 +197,23 @@ export const fetchMyPostList = (params: MyPostListParams): PromiseResBody<PageRe
   return request.get('/posts/me/list', { params })
 }
 
-export const createDraft = (): PromiseResBody<number> => {
+export const createDraft = (): PromiseResBody<string> => {
   return request.post('/posts/draft')
 }
 
-export const fetchEditDraft = (id: number): PromiseResBody<PostDraftResp> => {
+export const fetchEditDraft = (id: string): PromiseResBody<PostDraftResp> => {
   return request.get(`/posts/${id}/edit`)
 }
 
-export const publishPost = (id: number, data: PostSaveReq): PromiseResBody<void> => {
+export const publishPost = (id: string, data: PostSaveReq): PromiseResBody<void> => {
   return request.post(`/posts/${id}/publish`, data)
 }
 
-export const previewContent = (id: number, content: string): PromiseResBody<string> => {
+export const previewContent = (id: string, content: string): PromiseResBody<string> => {
   return request.post(`/posts/${id}/content/preview`, { content })
 }
 
-export const tempSavePost = (id: number, data: PostSaveReq): PromiseResBody<void> => {
+export const tempSavePost = (id: string, data: PostSaveReq): PromiseResBody<void> => {
   return request.post(`/posts/${id}/temp-save`, data)
 }
 
@@ -222,11 +225,11 @@ export const fetchTags = (): PromiseResBody<TagResponse[]> => {
   return request.get('/post/tags/me')
 }
 
-export const likePost = (id: number): PromiseResBody<void> => {
+export const likePost = (id: string): PromiseResBody<void> => {
   return request.post(`/posts/${id}/like`)
 }
 
-export const collectPost = (id: number): PromiseResBody<void> => {
+export const collectPost = (id: string): PromiseResBody<void> => {
   return request.post(`/posts/${id}/collection`)
 }
 
@@ -242,11 +245,11 @@ export const searchTagOptions = (keyword: string, limit: number = 10): PromiseRe
   return request.get('/post/tags/search/options', { params: { keyword, limit } })
 }
 
-export const getTag = (id: number): PromiseResBody<TagResponse> => {
+export const getTag = (id: string): PromiseResBody<TagResponse> => {
   return request.get(`/post/tags/${id}`)
 }
 
-export const deleteTag = (id: number): PromiseResBody<void> => {
+export const deleteTag = (id: string): PromiseResBody<void> => {
   return request.delete(`/post/tags/${id}`)
 }
 
@@ -264,4 +267,20 @@ export const tempSaveNewPost = (data: PostSaveReq): PromiseResBody<void> => {
 
 export const previewContentAlone = (content: string): PromiseResBody<string> => {
   return request.post('/posts/content/preview', { content })
+}
+
+export const batchPublishPosts = (ids: (number | bigint)[]): PromiseResBody<void> => {
+  return request.post('/posts/me/batch-publish', ids)
+}
+
+export const batchDeletePosts = (ids: (number | bigint)[]): PromiseResBody<void> => {
+  return request.post('/posts/me/batch-delete', ids)
+}
+
+export const reportPost = (id: string, data: CreateReportReq): PromiseResBody<{ taskId: string }> => {
+  return request.post(`/posts/${id}/report`, data)
+}
+
+export const cancelReportPost = (id: string): PromiseResBody<void> => {
+  return request.post(`/posts/${id}/report/cancel`)
 }

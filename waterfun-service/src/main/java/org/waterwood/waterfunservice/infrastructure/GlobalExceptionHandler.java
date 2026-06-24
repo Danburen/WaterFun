@@ -21,6 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.waterwood.api.ErrorResponse;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.exceptions.AuthException;
+import org.waterwood.waterfunservicecore.exception.BanForbiddenException;
 import org.waterwood.waterfunservicecore.exception.BizException;
 
 import java.util.*;
@@ -208,6 +209,17 @@ public class GlobalExceptionHandler {
                 new Date()
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(BanForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleBanForbidden(BanForbiddenException ex){
+        ErrorResponse response = new ErrorResponse(
+                ex.getErrorCode(),
+                msgSrc.getMessage(ex.getMessage(), null, "You are banned and temporarily unable to perform this operation", LOCALE),
+                null,
+                new Date()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
     /**

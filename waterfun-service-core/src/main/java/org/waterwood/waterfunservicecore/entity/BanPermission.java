@@ -2,6 +2,7 @@ package org.waterwood.waterfunservicecore.entity;
 
 import lombok.Getter;
 import org.waterwood.waterfunservicecore.entity.security.BanReasonType;
+import org.waterwood.waterfunservicecore.entity.security.PenaltyType;
 
 @Getter
 public enum BanPermission {
@@ -22,5 +23,13 @@ public enum BanPermission {
         this.name = name;
         this.description = description;
         this.defaultBanReason = defaultBanReason;
+    }
+
+    public PenaltyType getPenaltyType() {
+        try {
+            return PenaltyType.valueOf(this.name());
+        } catch (IllegalArgumentException e) {
+            return PenaltyType.OTHER;
+        }
     }
 }

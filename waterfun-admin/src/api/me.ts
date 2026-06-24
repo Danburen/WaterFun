@@ -2,7 +2,7 @@ import request from "../utils/axiosRequest"
 import type { ISOString, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 
 export interface AdminAvatarResponse {
-    url: string;
+    url?: string;
     expireAt?: ISOString;
 }
 
@@ -10,7 +10,7 @@ export interface AdminUserInfoResponse {
     uid: string;
     username: string;
     nickname: string;
-    avatar?: AdminAvatarResponse;
+    avatar?: AdminAvatarResponse | null;
     accountStatus: 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED';
     createdAt?: ISOString;
     passwordHash: boolean;
@@ -34,3 +34,26 @@ export const getCurrentUserInfo = (): PromiseResBody<AdminUserInfoResponse> => {
 export const updateCurrentUserProfile = (data: UpdateUserProfileRequest): PromiseResBody<null> => {
     return request.put<null>('/me/updateProfile', data);
 }
+
+// ========== User-facing API endpoints (from openapi.json) ==========
+
+export const getUserInfo = (): PromiseResBody<AdminUserInfoResponse> => {
+    return request.get<AdminUserInfoResponse>('/user/userInfo');
+};
+
+export const getUserProfile = (): PromiseResBody<{
+    bio: string | null;
+    gender: 'MALE' | 'FEMALE' | 'UNKNOWN' | 'OTHER' | null;
+    birthday: string | null;
+    residence: string | null;
+}> => {
+    return request.get('/user/profile');
+};
+
+export const getUserPermissions = (): PromiseResBody<string[]> => {
+    return request.get<string[]>('/user/permissions');
+};
+
+export const getUserAvatar = (): PromiseResBody<AdminAvatarResponse> => {
+    return request.get<AdminAvatarResponse>('/user/avatar');
+};

@@ -33,17 +33,24 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
   @Query("""
     SELECT new org.waterwood.api.VO.OptionVO(t.id, t.slug, t.name, false)
     FROM Post p JOIN p.tags t
-    WHERE p.id IN :postIds
+    WHERE p.id = :postId
 """)
-  List<OptionVO<Long>> findTagOptionVOsByPostIdIn(List<Long> postIds);
+  List<OptionVO<Long>> findTagOptionVOsByPostId(@Param("postId") Long postId);
+
+  @Query("""
+    SELECT new org.waterwood.api.VO.OptionVO(t.id, t.slug, t.name, false)
+    FROM Tag t
+    WHERE t.id IN :ids
+""")
+  List<OptionVO<Long>> findTagOptionVosByIdsIn(@Param("ids") List<Long> ids);
 
   @Query("""
         SELECT new org.waterwood.waterfunservicecore.entity.post.IdOptionVOPackagedDO
-            (t.id, t.slug, t.name, false)
+            (p.id, t.id, t.slug, t.name, false)
         FROM Post p JOIN p.tags t
         WHERE p.id IN :postIds
     """)
-  List<IdOptionVOPackagedDO<Long>> findTagDOByPostIdIn(@Param("postIds") List<Long> postIds);
+  List<IdOptionVOPackagedDO<Long, Long>> findTagDOByPostIdIn(@Param("postIds") List<Long> postIds);
 
   List<Tag> findAllByNameIn(Set<String> newTagNames);
 
@@ -76,4 +83,5 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
     WHERE t.id IN :ids
 """)
   void decreaseUsageCountInIds(@Param("ids") List<Long> removedTagIds, @Param("count") int count);
+
 }

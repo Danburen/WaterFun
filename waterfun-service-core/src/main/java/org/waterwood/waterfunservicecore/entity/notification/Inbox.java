@@ -22,7 +22,7 @@ import java.util.Map;
 @Table(name = "inbox")
 public class Inbox {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
 

@@ -6,15 +6,15 @@ import java.util.Base64;
 
 @Value
 public class RootCommentCursor {
-    Boolean isTop;
+    Boolean isPined;
     Long likeCount;
     Long id;
     public static RootCommentCursor first() {
-        return new RootCommentCursor(true, Long.MAX_VALUE, Long.MAX_VALUE);
+        return new RootCommentCursor(false, Long.MAX_VALUE, Long.MAX_VALUE);
     }
 
     public String encode() {
-        String raw = (isTop ? 1 : 0) + ":" + likeCount + ":" + id;
+        String raw = (isPined ? 1 : 0) + ":" + likeCount + ":" + id;
         return Base64.getUrlEncoder().encodeToString(raw.getBytes());
     }
 

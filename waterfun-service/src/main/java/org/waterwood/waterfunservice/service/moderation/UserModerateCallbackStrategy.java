@@ -173,6 +173,7 @@ public class UserModerateCallbackStrategy implements ModerationCallbackStrategy 
                     CloudResOperationType.READ
             );
             redisHelper.del(redisKey);
+//            log.info("del redis key for user avatar" + redisKey);
         } else if(msg.getStatus() == AuditStatus.REJECTED){
             Resource res = auditRes.getResource();
             res.setStatus(ResourceStatus.ORPHAN);

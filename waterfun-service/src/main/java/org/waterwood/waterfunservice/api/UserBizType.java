@@ -8,7 +8,8 @@ import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 public enum UserBizType implements BizType {
     AVATAR("avatar"),
     POST_COVERAGE_IMAGE("post_coverage_image"),
-    POST_CONTENT_IMAGE("post_content_image"),;
+    POST_CONTENT_IMAGE("post_content_image"),
+    REPORT_ATTACHMENT_IMAGE("report_attachment_image"),;
     private final String code;
     UserBizType(String code) {
         this.code = code;

@@ -3,43 +3,44 @@ import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response"
 import type { Page } from "~/types/api"
 
 export interface DashboardOverview {
-  onlineUserCount: number
-  totalUsers: number
-  totalPosts: number
-  todayNewUsers: number
-  todayNewPosts: number
-  todayPv: number
-  pendingModerations: number
+  onlineUserCount: string
+  totalUsers: string
+  totalPosts: string
+  todayNewUsers: string
+  todayNewPosts: string
+  todayPv: string
+  pendingModerations: string
+  peakOnline?: string
 }
 
 export interface TrendPoint {
   date: string
-  dailyPv: number
-  newUsers: number
-  newPosts: number
+  dailyPv: string
+  newUsers: string
+  newPosts: string
 }
 
 export interface UserBrief {
   uid: number
   displayName: string
-  avatar?: { url: string; expireAt?: string }
+  avatar?: { url?: string; expireAt?: string } | null
   level: number
   userType: 'COMMON' | 'ADMIN' | 'BOT' | 'MODERATOR' | 'VIP'
 }
 
 export interface DashboardRecentActivity {
   userBrief: UserBrief
-  lastActiveAt: number
+  lastActiveAt: string
   online: boolean
   actionType: 'UNKNOWN' | 'CREATE' | 'DELETED' | 'UPDATED' | 'INTERACTIVE' | 'REPORT'
-  businessType: 'NONE' | 'POST' | 'COMMENT' | 'USER'
+  businessType: 'NONE' | 'POST' | 'COMMENT' | 'USER' | 'TICKET_REPLY'
   actionTime: string
-  targetId: number
+  targetId: string
   description: string
 }
 
 export interface OnlineUserVO {
-  uid: number
+  uid: string
   userBrief: UserBrief
   lastActive: string
   sessionId: string
@@ -48,11 +49,11 @@ export interface OnlineUserVO {
 
 export interface SiteStatistic {
   statDate: string
-  loginCount: number
-  dailyPv: number
-  newUsers: number
-  newPosts: number
-  peakOnline: number
+  loginCount: string
+  dailyPv: string
+  newUsers: string
+  newPosts: string
+  peakOnline: string
   updatedAt: string
 }
 

@@ -3,7 +3,7 @@ import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import ListPage from "~/components/ListPage.vue";
-import { deleteUser, deleteUsers, getUserList, type AccountStatus, type UserAdminDto } from "~/api/user";
+import { deleteUser, deleteUsers, getUserList, type AccountStatus, type UserAdminDto, type UserType } from "~/api/user";
 import type { PageOptions } from "~/types";
 import UserEditDialog from "./components/UserEditDialog.vue";
 
@@ -21,7 +21,7 @@ const searchForm = ref<{ username: string; nickname: string; accountStatus: "" |
 const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
 
 const statusLabel = (s: AccountStatus) => ({ ACTIVE: '正常', SUSPENDED: '已停用', DEACTIVATED: '已注销', DELETED: '已删除' })[s];
-const userTypeLabel = (t: number) => ({ 0: '普通用户', 1: '测试用户', 2: '管理员', 3: '系统', 4: '超级管理员' })[t] ?? '普通用户';
+const userTypeLabel = (t: UserType) => ({ COMMON: '普通用户', ADMIN: '管理员', BOT: '机器人', MODERATOR: '审核员', VIP: 'VIP用户' })[t] ?? '未知';
 
 const fetchData = async () => {
   loading.value = true;
@@ -49,8 +49,8 @@ const handleReset = () => {
   searchForm.value = { username: "", nickname: "", accountStatus: "" };
   fetchData();
 };
-const gotoDetail = (uid: string) => router.push({ name: "userDetail", params: { uid: String(uid) } });
-const gotoEdit = (uid: string) => { dialogMode.value = "edit"; currentEditUid.value = String(uid); editDialogVisible.value = true; };
+const gotoDetail = (uid: string) => router.push({ name: "userDetail", params: { uid } });
+const gotoEdit = (uid: string) => { dialogMode.value = "edit"; currentEditUid.value = uid; editDialogVisible.value = true; };
 const handleAdd = () => { dialogMode.value = "create"; currentEditUid.value = null; editDialogVisible.value = true; };
 
 const toggleSelect = (uid: string) => {
@@ -157,7 +157,7 @@ onMounted(fetchData);
           <td>{{ row.uid }}</td>
           <td><a class="link" @click="gotoDetail(row.uid)">{{ row.username }}</a></td>
           <td>{{ row.nickname || '无' }}</td>
-          <td><span :class="['badge', row.userType === 2 || row.userType === 4 ? 'badge-red' : row.userType === 1 ? 'badge-yellow' : 'badge-gray']">{{ userTypeLabel(row.userType) }}</span></td>
+          <td><span :class="['badge', row.userType === 'ADMIN' || row.userType === 'MODERATOR' ? 'badge-red' : row.userType === 'VIP' ? 'badge-yellow' : row.userType === 'BOT' ? 'badge-blue' : 'badge-gray']">{{ userTypeLabel(row.userType) }}</span></td>
           <td><span :class="['badge', row.accountStatus === 'ACTIVE' ? 'badge-green' : row.accountStatus === 'SUSPENDED' ? 'badge-yellow' : 'badge-gray']">{{ statusLabel(row.accountStatus) }}</span></td>
           <td>{{ formatISOData(row.createdAt) }}</td>
           <td>
@@ -167,8 +167,8 @@ onMounted(fetchData);
               <div class="dropdown">
                 <button class="action-btn">更多</button>
                 <div class="dropdown-menu">
-                  <a @click="router.push({ name: 'userRoleAssign', params: { uid: String(row.uid) } })">分配角色</a>
-                  <a @click="router.push({ name: 'userPermissionAssign', params: { uid: String(row.uid) } })">分配权限</a>
+                  <a @click="router.push({ name: 'userRoleAssign', params: { uid: row.uid } })">分配角色</a>
+                  <a @click="router.push({ name: 'userPermissionAssign', params: { uid: row.uid } })">分配权限</a>
                 </div>
               </div>
             </div>

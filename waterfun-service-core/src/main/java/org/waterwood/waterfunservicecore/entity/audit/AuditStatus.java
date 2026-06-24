@@ -7,7 +7,8 @@ public enum AuditStatus {
     PENDING(1),
     APPROVED(2),
     REJECTED(3),
-    SUSPECT(4);
+    SUSPECT(4),
+    CANCELED(5),;
 
     private final short code;
     private AuditStatus(int code) {

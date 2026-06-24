@@ -24,7 +24,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -87,7 +87,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -127,7 +127,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -167,7 +167,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -209,7 +209,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -251,7 +251,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -293,7 +293,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -334,7 +334,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -363,7 +363,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -402,7 +402,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -541,7 +541,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -883,6 +883,35 @@
       }
     },
     "/api/admin/posts/{id}": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "getPostById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "post-controller"
@@ -894,7 +923,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -933,7 +962,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -964,7 +993,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1003,7 +1032,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1042,7 +1071,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1191,7 +1220,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -1393,7 +1422,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1422,7 +1451,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1461,7 +1490,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1492,7 +1521,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1521,7 +1550,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1560,7 +1589,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1650,7 +1679,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1692,7 +1721,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -1755,7 +1784,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1795,7 +1824,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1837,7 +1866,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1919,6 +1948,47 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseUploadCallbackResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/tickets/{id}/review": {
+      "post": {
+        "tags": [
+          "ticket-moderation-controller"
+        ],
+        "operationId": "reviewTicket",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketReviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
                 }
               }
             }
@@ -2230,96 +2300,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/moderations/{taskId}/resources/{resourceUuid}/reject": {
-      "post": {
-        "tags": [
-          "moderation-controller"
-        ],
-        "operationId": "rejectResource",
-        "parameters": [
-          {
-            "name": "taskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "resourceUuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ModerateRejectRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/moderations/{taskId}/resources/{resourceUuid}/approve": {
-      "post": {
-        "tags": [
-          "moderation-controller"
-        ],
-        "operationId": "approveResource",
-        "parameters": [
-          {
-            "name": "taskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "resourceUuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -2349,7 +2331,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2392,7 +2374,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2491,6 +2473,26 @@
         }
       }
     },
+    "/api/admin/encryption/rotate": {
+      "post": {
+        "tags": [
+          "encryption-controller"
+        ],
+        "operationId": "rotateKeys",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseKeyRotationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/content/banner": {
       "post": {
         "tags": [
@@ -2579,6 +2581,173 @@
         }
       }
     },
+    "/api/admin/bans": {
+      "get": {
+        "tags": [
+          "ban-controller"
+        ],
+        "operationId": "listBans",
+        "parameters": [
+          {
+            "name": "userUid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nickname",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageBanUserResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ban-controller"
+        ],
+        "operationId": "banUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bans/{userUid}/lift": {
+      "post": {
+        "tags": [
+          "ban-controller"
+        ],
+        "operationId": "liftPenalty",
+        "parameters": [
+          {
+            "name": "userUid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LiftPenaltyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bans/{userUid}/lift-all": {
+      "post": {
+        "tags": [
+          "ban-controller"
+        ],
+        "operationId": "liftAllPenalties",
+        "parameters": [
+          {
+            "name": "userUid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/auth/logout": {
       "post": {
         "tags": [
@@ -2653,7 +2822,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2683,7 +2852,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2795,6 +2964,77 @@
         }
       }
     },
+    "/api/admin/tickets": {
+      "get": {
+        "tags": [
+          "ticket-moderation-controller"
+        ],
+        "operationId": "listTickets",
+        "parameters": [
+          {
+            "name": "ticketTypes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "RESOLVED",
+                "REJECTED"
+              ]
+            }
+          },
+          {
+            "name": "targetId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageTicketResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/tags/options": {
       "get": {
         "tags": [
@@ -2843,7 +3083,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3093,7 +3333,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3122,7 +3362,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3153,7 +3393,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3182,7 +3422,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3213,7 +3453,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3431,7 +3671,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3471,37 +3711,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponsePagePostResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/posts/id": {
-      "get": {
-        "tags": [
-          "post-controller"
-        ],
-        "operationId": "getPostById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePostResponse"
                 }
               }
             }
@@ -3750,28 +3959,20 @@
         }
       }
     },
-    "/api/admin/moderations/{taskId}/resources/{resourceUuid}": {
+    "/api/admin/moderations/user-audit-stats": {
       "get": {
         "tags": [
           "moderation-controller"
         ],
-        "operationId": "getResource",
+        "operationId": "getUserAuditStats",
         "parameters": [
           {
-            "name": "taskId",
-            "in": "path",
+            "name": "userId",
+            "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
-            }
-          },
-          {
-            "name": "resourceUuid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -3781,7 +3982,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseModerationResourceRes"
+                  "$ref": "#/components/schemas/ApiResponseUserAuditStats"
                 }
               }
             }
@@ -3789,19 +3990,19 @@
         }
       }
     },
-    "/api/admin/moderations/{id}": {
+    "/api/admin/moderations/texts/{id}": {
       "get": {
         "tags": [
           "moderation-controller"
         ],
-        "operationId": "getTask",
+        "operationId": "getText",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3812,7 +4013,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseModerateTaskResponse"
+                  "$ref": "#/components/schemas/ApiResponseAuditResponseReplyPayload"
                 }
               }
             }
@@ -3820,192 +4021,31 @@
         }
       }
     },
-    "/api/admin/moderations/{id}/resources": {
+    "/api/admin/moderations/stats": {
       "get": {
         "tags": [
           "moderation-controller"
         ],
-        "operationId": "listResourcesByTask",
+        "operationId": "getStats",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseListModerationResourceRes"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/moderations/resources/list": {
-      "get": {
-        "tags": [
-          "moderation-controller"
-        ],
-        "operationId": "listResources",
-        "parameters": [
-          {
-            "name": "taskId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "status",
+            "name": "targetType",
             "in": "query",
             "required": false,
             "schema": {
               "type": "string",
               "enum": [
-                "PENDING",
-                "APPROVED",
-                "REJECTED",
-                "SUSPECT"
-              ]
-            }
-          },
-          {
-            "name": "resourceType",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "UNKNOWN",
-                "IMAGE",
-                "VIDEO",
-                "AUDIO",
-                "TEXT",
-                "DOCUMENT",
-                "ARCHIVE",
-                "EXECUTABLE",
-                "OTHER"
-              ]
-            }
-          },
-          {
-            "name": "auditorId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "auditAtStart",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "auditAtEnd",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "pageable",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Pageable"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageModerationResourceRes"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/moderations/list": {
-      "get": {
-        "tags": [
-          "moderation-controller"
-        ],
-        "operationId": "list_1",
-        "parameters": [
-          {
-            "name": "taskType",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "UNKNOWN",
+                "DEFAULT",
                 "USER_AVATAR",
                 "POST",
                 "POST_COVERAGE_IMAGE",
                 "POST_CONTENT_IMAGE",
-                "BANNER_IMAGE"
+                "BANNER_IMAGE",
+                "COMMENT",
+                "USER_REPORT_ATTACHMENT",
+                "MODERATION_IMAGE",
+                "USER"
               ]
-            }
-          },
-          {
-            "name": "submitterId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "submitAtStart",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "submitAtEnd",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "pageable",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Pageable"
             }
           }
         ],
@@ -4015,7 +4055,219 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageModerateTaskResponse"
+                  "$ref": "#/components/schemas/ApiResponseModerationStatsResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/posts/{id}": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "getPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuditResponsePostAuditPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/list/texts": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "listTexts",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ModerationBaseQuery"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAuditResponseReplyPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/list/posts": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "listPosts_1",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ModerationBaseQuery"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAuditResponsePostAuditPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/list/images": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "listImages",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ModerationBaseQuery"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAuditResponseImageAuditPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderations/images/{id}": {
+      "get": {
+        "tags": [
+          "moderation-controller"
+        ],
+        "operationId": "getImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuditResponseImageAuditPayload"
                 }
               }
             }
@@ -4253,7 +4505,7 @@
         "tags": [
           "banner-controller"
         ],
-        "operationId": "list_2",
+        "operationId": "list_1",
         "parameters": [
           {
             "name": "title",
@@ -4369,7 +4621,7 @@
         "tags": [
           "category-controller"
         ],
-        "operationId": "list_3",
+        "operationId": "list_2",
         "parameters": [
           {
             "name": "name",
@@ -4401,7 +4653,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -4446,6 +4698,37 @@
         }
       }
     },
+    "/api/admin/bans/status": {
+      "get": {
+        "tags": [
+          "ban-controller"
+        ],
+        "operationId": "getBanStatus",
+        "parameters": [
+          {
+            "name": "userUid",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBanStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/auth/captcha": {
       "get": {
         "tags": [
@@ -4473,7 +4756,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -4514,7 +4797,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -4654,7 +4937,7 @@
         "type": "object",
         "properties": {
           "uid": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "username": {
@@ -4750,7 +5033,7 @@
           "userUids": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -4868,7 +5151,7 @@
             ]
           },
           "authorId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "slug": {
@@ -4877,13 +5160,13 @@
             "minLength": 0
           },
           "categoryId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "tagIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -4909,7 +5192,7 @@
           "tagIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -4966,7 +5249,7 @@
           "ids": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -5075,7 +5358,7 @@
             "type": "string"
           },
           "parentId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "sortOrder": {
@@ -5193,7 +5476,9 @@
           "bizType": {
             "type": "string",
             "enum": [
-              "BANNER_IMAGE"
+              "BANNER_IMAGE",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE"
             ]
           },
           "bizId": {
@@ -5299,6 +5584,74 @@
           }
         }
       },
+      "TicketReviewRequest": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ]
+          },
+          "rejectType": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "INSUFFICIENT_EVIDENCE",
+              "NO_VIOLATION",
+              "DUPLICATE_REPORT",
+              "MALICIOUS_REPORT",
+              "BEYOND_SCOPE",
+              "FALSE_POSITIVE",
+              "APPEAL_ACCEPTED",
+              "OTHER"
+            ]
+          },
+          "auditNote": {
+            "type": "string"
+          },
+          "penaltyType": {
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "BAN_LOGIN",
+              "BAN_POST",
+              "BAN_COMMENT",
+              "BAN_UPLOAD",
+              "BAN_CHAT",
+              "BAN_CREATE",
+              "OTHER"
+            ]
+          },
+          "penaltyDurationHours": {
+            "type": "string",
+            "format": "int64"
+          },
+          "banReasonType": {
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CHEATING",
+              "IMPERSONATION",
+              "PRIVACY",
+              "TROLLING",
+              "OTHER"
+            ]
+          },
+          "replyContent": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
       "CreateTagRequest": {
         "type": "object",
         "properties": {
@@ -5378,7 +5731,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "ip": {
@@ -5489,11 +5842,11 @@
             ]
           },
           "authorId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "categoryId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "slug": {
@@ -5502,7 +5855,7 @@
           "tagIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -5645,7 +5998,7 @@
         "type": "object",
         "properties": {
           "size": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "mimeType": {
@@ -5660,7 +6013,7 @@
         "type": "object",
         "properties": {
           "taskId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "resourceUuid": {
@@ -5672,7 +6025,8 @@
               "PENDING",
               "APPROVED",
               "REJECTED",
-              "SUSPECT"
+              "SUSPECT",
+              "CANCELED"
             ]
           },
           "auditAt": {
@@ -5680,7 +6034,7 @@
             "format": "date-time"
           },
           "auditorId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "rejectType": {
@@ -5703,6 +6057,9 @@
           },
           "presignedUrl": {
             "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "resourceKey": {
+            "type": "string"
           }
         }
       },
@@ -5712,7 +6069,7 @@
           "auditTaskIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -5743,7 +6100,7 @@
           "auditTaskIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -5810,6 +6167,43 @@
           },
           "data": {
             "$ref": "#/components/schemas/AdminUserInfoResponse"
+          }
+        }
+      },
+      "ApiResponseKeyRotationResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/KeyRotationResult"
+          }
+        }
+      },
+      "KeyRotationResult": {
+        "type": "object",
+        "properties": {
+          "newKeyId": {
+            "type": "string"
+          },
+          "processed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "skipped": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "errors": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -5886,7 +6280,7 @@
             "minLength": 0
           },
           "parentId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "sortOrder": {
@@ -5899,6 +6293,80 @@
         },
         "required": [
           "name"
+        ]
+      },
+      "BanUserRequest": {
+        "type": "object",
+        "properties": {
+          "userUid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "penaltyType": {
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "BAN_LOGIN",
+              "BAN_POST",
+              "BAN_COMMENT",
+              "BAN_UPLOAD",
+              "BAN_CHAT",
+              "BAN_CREATE",
+              "OTHER"
+            ]
+          },
+          "banReasonType": {
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CHEATING",
+              "IMPERSONATION",
+              "PRIVACY",
+              "TROLLING",
+              "OTHER"
+            ]
+          },
+          "penaltyDurationHours": {
+            "type": "string",
+            "format": "int64"
+          },
+          "reasonText": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "penaltyType",
+          "userUid"
+        ]
+      },
+      "LiftPenaltyRequest": {
+        "type": "object",
+        "properties": {
+          "userUid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "penaltyType": {
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "BAN_LOGIN",
+              "BAN_POST",
+              "BAN_COMMENT",
+              "BAN_UPLOAD",
+              "BAN_CHAT",
+              "BAN_CREATE",
+              "OTHER"
+            ]
+          }
+        },
+        "required": [
+          "userUid"
         ]
       },
       "LogoutRequestBody": {
@@ -5989,7 +6457,7 @@
             "type": "string"
           },
           "exp": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -6125,7 +6593,7 @@
         "type": "object",
         "properties": {
           "uid": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "username": {
@@ -6266,12 +6734,25 @@
         "type": "object",
         "properties": {
           "totalElements": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "totalPages": {
             "type": "integer",
             "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
           },
           "size": {
             "type": "integer",
@@ -6290,19 +6771,6 @@
           "sort": {
             "$ref": "#/components/schemas/SortObject"
           },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
           "empty": {
             "type": "boolean"
           }
@@ -6311,13 +6779,6 @@
       "PageableObject": {
         "type": "object",
         "properties": {
-          "offset": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
           "paged": {
             "type": "boolean"
           },
@@ -6331,19 +6792,26 @@
           },
           "unpaged": {
             "type": "boolean"
+          },
+          "offset": {
+            "type": "string",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
           }
         }
       },
       "SortObject": {
         "type": "object",
         "properties": {
-          "empty": {
-            "type": "boolean"
-          },
           "sorted": {
             "type": "boolean"
           },
           "unsorted": {
+            "type": "boolean"
+          },
+          "empty": {
             "type": "boolean"
           }
         }
@@ -6389,7 +6857,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "code": {
@@ -6420,6 +6888,140 @@
           }
         }
       },
+      "ActiveRestriction": {
+        "type": "object",
+        "properties": {
+          "permissionCode": {
+            "type": "string"
+          },
+          "permissionName": {
+            "type": "string"
+          },
+          "banReasonType": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "permanent": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageTicketResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "BanStatusResponse": {
+        "type": "object",
+        "properties": {
+          "userUid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "banned": {
+            "type": "boolean"
+          },
+          "restrictions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActiveRestriction"
+            }
+          }
+        }
+      },
+      "UserAdminBrief": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userType": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "ADMIN",
+              "BOT",
+              "MODERATOR",
+              "VIP"
+            ]
+          },
+          "registrationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "postCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "riskLevel": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH"
+            ]
+          }
+        }
+      },
+      "UserBrief": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userType": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "ADMIN",
+              "BOT",
+              "MODERATOR",
+              "VIP"
+            ]
+          }
+        }
+      },
       "ApiResponseTagResponse": {
         "type": "object",
         "properties": {
@@ -6441,7 +7043,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "name": {
@@ -6454,11 +7056,11 @@
             "type": "string"
           },
           "usageCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "creatorId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "createdAt": {
@@ -6513,23 +7115,23 @@
             "format": "date"
           },
           "loginCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "dailyPv": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "newUsers": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "newPosts": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "peakOnline": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "updatedAt": {
@@ -6593,11 +7195,11 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "userId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "username": {
@@ -6789,7 +7391,7 @@
           }
         }
       },
-      "ApiResponsePagePostResponse": {
+      "ApiResponsePostResponse": {
         "type": "object",
         "properties": {
           "success": {
@@ -6802,7 +7404,7 @@
             "type": "string"
           },
           "data": {
-            "$ref": "#/components/schemas/PageObject"
+            "$ref": "#/components/schemas/PostResponse"
           }
         }
       },
@@ -6810,7 +7412,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "title": {
@@ -6826,7 +7428,7 @@
             "type": "string"
           },
           "authorId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "coverImg": {
@@ -6851,30 +7453,30 @@
             ]
           },
           "categoryId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "tagIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
           "viewCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "likeCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "commentCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "collectCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "slug": {
@@ -6904,7 +7506,7 @@
           }
         }
       },
-      "ApiResponsePostResponse": {
+      "ApiResponsePagePostResponse": {
         "type": "object",
         "properties": {
           "success": {
@@ -6917,7 +7519,7 @@
             "type": "string"
           },
           "data": {
-            "$ref": "#/components/schemas/PostResponse"
+            "$ref": "#/components/schemas/PageObject"
           }
         }
       },
@@ -7018,35 +7620,6 @@
           }
         }
       },
-      "UserBrief": {
-        "type": "object",
-        "properties": {
-          "uid": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "avatar": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          },
-          "level": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userType": {
-            "type": "string",
-            "enum": [
-              "COMMON",
-              "ADMIN",
-              "BOT",
-              "MODERATOR",
-              "VIP"
-            ]
-          }
-        }
-      },
       "ApiResponseOnlineCountVO": {
         "type": "object",
         "properties": {
@@ -7068,15 +7641,15 @@
         "type": "object",
         "properties": {
           "onlineCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "adminOnlineCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "pealOnlineCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -7140,15 +7713,15 @@
             "type": "string"
           },
           "total": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "used": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "free": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "usage": {
@@ -7161,15 +7734,15 @@
         "type": "object",
         "properties": {
           "used": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "committed": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "max": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -7184,7 +7757,7 @@
             "type": "string"
           },
           "uptime": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -7216,15 +7789,15 @@
         "type": "object",
         "properties": {
           "total": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "used": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "available": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "usage": {
@@ -7251,15 +7824,15 @@
         "type": "object",
         "properties": {
           "sent": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "received": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "timestamp": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -7268,7 +7841,7 @@
         "type": "object",
         "properties": {
           "used": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -7281,11 +7854,11 @@
             "format": "int32"
           },
           "totalMemory": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "freeMemory": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -7303,7 +7876,7 @@
             "type": "string"
           },
           "uptime": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -7360,7 +7933,7 @@
           }
         }
       },
-      "ApiResponseModerationResourceRes": {
+      "ApiResponseUserAuditStats": {
         "type": "object",
         "properties": {
           "success": {
@@ -7373,99 +7946,461 @@
             "type": "string"
           },
           "data": {
-            "$ref": "#/components/schemas/ModerationResourceRes"
+            "$ref": "#/components/schemas/UserAuditStats"
           }
         }
       },
-      "ApiResponseModerateTaskResponse": {
+      "UserAuditStats": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/ModerateTaskResponse"
-          }
-        }
-      },
-      "AuditPayload": {
-
-      },
-      "ModerateTaskResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
+          "totalPassed": {
             "type": "integer",
+            "format": "int32"
+          },
+          "totalRejected": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "passRate": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ApiResponseAuditResponseReplyPayload": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuditResponseReplyPayload"
+          }
+        }
+      },
+      "AuditResponseReplyPayload": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
             "format": "int64"
           },
           "targetType": {
             "type": "string",
             "enum": [
-              "UNKNOWN",
+              "DEFAULT",
               "USER_AVATAR",
               "POST",
               "POST_COVERAGE_IMAGE",
               "POST_CONTENT_IMAGE",
-              "BANNER_IMAGE"
+              "BANNER_IMAGE",
+              "COMMENT",
+              "USER_REPORT_ATTACHMENT",
+              "MODERATION_IMAGE",
+              "USER"
             ]
           },
-          "targetId": {
+          "triggerType": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "USER_SUBMIT",
+              "SYSTEM_DETECTED",
+              "USER_REPORT",
+              "USER_SUGGESTION",
+              "USER_FEEDBACK",
+              "USER_APPEAL"
+            ]
+          },
+          "triggerSource": {
             "type": "string"
           },
-          "payload": {
-            "$ref": "#/components/schemas/ModerationTaskPayloadRes"
+          "priority": {
+            "type": "string",
+            "enum": [
+              "EMERGENCY",
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
           },
-          "submitterId": {
-            "type": "integer",
-            "format": "int64"
+          "format": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "RICH",
+              "IMAGE",
+              "TXT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "SUSPECT",
+              "CANCELED"
+            ]
+          },
+          "rejectType": {
+            "type": "string",
+            "enum": [
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CASCADE",
+              "OTHER"
+            ]
+          },
+          "rejectReason": {
+            "type": "string"
           },
           "submitAt": {
             "type": "string",
             "format": "date-time"
-          }
-        }
-      },
-      "ModerationTaskPayloadRes": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "SINGLE_RESOURCE",
-              "RICH_TEXT",
-              "PLAIN_TEXT"
-            ]
           },
-          "resources": {
+          "submitter": {
+            "$ref": "#/components/schemas/UserAdminBrief"
+          },
+          "auditor": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ReplyPayload"
+          },
+          "linkedResources": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ModerationResourceRes"
             }
           },
+          "sourceContext": {
+            "$ref": "#/components/schemas/SourceContext"
+          }
+        }
+      },
+      "PostBrief": {
+        "type": "object",
+        "properties": {
+          "postId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "editedTitle": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserBrief"
+          }
+        }
+      },
+      "ReplyPayload": {
+        "type": "object",
+        "properties": {
           "content": {
             "type": "string"
           },
-          "contentFormat": {
+          "postId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "commentId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "replierUid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "format": {
             "type": "string",
             "enum": [
               "DEFAULT",
-              "PLAINTEXT",
-              "HTML",
-              "MARKDOWN"
+              "RICH",
+              "IMAGE",
+              "TXT"
+            ]
+          }
+        }
+      },
+      "SourceContext": {
+        "type": "object",
+        "properties": {
+          "sourcePostBrief": {
+            "$ref": "#/components/schemas/PostBrief"
+          }
+        }
+      },
+      "ApiResponseModerationStatsResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ModerationStatsResp"
+          }
+        }
+      },
+      "ModerationStatsResp": {
+        "type": "object",
+        "properties": {
+          "pending": {
+            "type": "string",
+            "format": "int64"
+          },
+          "todayApproved": {
+            "type": "string",
+            "format": "int64"
+          },
+          "todayRejected": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseAuditResponsePostAuditPayload": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuditResponsePostAuditPayload"
+          }
+        }
+      },
+      "AuditResponsePostAuditPayload": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "USER_AVATAR",
+              "POST",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE",
+              "BANNER_IMAGE",
+              "COMMENT",
+              "USER_REPORT_ATTACHMENT",
+              "MODERATION_IMAGE",
+              "USER"
             ]
           },
-          "meta": {
-            "$ref": "#/components/schemas/AuditPayload"
+          "triggerType": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "USER_SUBMIT",
+              "SYSTEM_DETECTED",
+              "USER_REPORT",
+              "USER_SUGGESTION",
+              "USER_FEEDBACK",
+              "USER_APPEAL"
+            ]
+          },
+          "triggerSource": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "EMERGENCY",
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "RICH",
+              "IMAGE",
+              "TXT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "SUSPECT",
+              "CANCELED"
+            ]
+          },
+          "rejectType": {
+            "type": "string",
+            "enum": [
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CASCADE",
+              "OTHER"
+            ]
+          },
+          "rejectReason": {
+            "type": "string"
+          },
+          "submitAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submitter": {
+            "$ref": "#/components/schemas/UserAdminBrief"
+          },
+          "auditor": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/PostAuditPayload"
+          },
+          "linkedResources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModerationResourceRes"
+            }
+          },
+          "sourceContext": {
+            "$ref": "#/components/schemas/SourceContext"
           }
         }
       },
-      "ApiResponsePageModerationResourceRes": {
+      "PostAuditPayload": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subTitle": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "authorUid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "coverageResUuid": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          "newTagNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "coverResPresignedUrl": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp",
+            "readOnly": true
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "RICH",
+              "IMAGE",
+              "TXT"
+            ]
+          }
+        }
+      },
+      "ModerationBaseQuery": {
+        "type": "object",
+        "properties": {
+          "triggerType": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "USER_SUBMIT",
+              "SYSTEM_DETECTED",
+              "USER_REPORT",
+              "USER_SUGGESTION",
+              "USER_FEEDBACK",
+              "USER_APPEAL"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "EMERGENCY",
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "SUSPECT",
+              "CANCELED"
+            ]
+          },
+          "submitterUid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "submitAtStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submitAtEnd": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageAuditResponseReplyPayload": {
         "type": "object",
         "properties": {
           "success": {
@@ -7482,7 +8417,7 @@
           }
         }
       },
-      "ApiResponsePageModerateTaskResponse": {
+      "ApiResponsePageAuditResponsePostAuditPayload": {
         "type": "object",
         "properties": {
           "success": {
@@ -7496,6 +8431,193 @@
           },
           "data": {
             "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponsePageAuditResponseImageAuditPayload": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "AuditResponseImageAuditPayload": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "USER_AVATAR",
+              "POST",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE",
+              "BANNER_IMAGE",
+              "COMMENT",
+              "USER_REPORT_ATTACHMENT",
+              "MODERATION_IMAGE",
+              "USER"
+            ]
+          },
+          "triggerType": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "USER_SUBMIT",
+              "SYSTEM_DETECTED",
+              "USER_REPORT",
+              "USER_SUGGESTION",
+              "USER_FEEDBACK",
+              "USER_APPEAL"
+            ]
+          },
+          "triggerSource": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "EMERGENCY",
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ]
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "RICH",
+              "IMAGE",
+              "TXT"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "SUSPECT",
+              "CANCELED"
+            ]
+          },
+          "rejectType": {
+            "type": "string",
+            "enum": [
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CASCADE",
+              "OTHER"
+            ]
+          },
+          "rejectReason": {
+            "type": "string"
+          },
+          "submitAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submitter": {
+            "$ref": "#/components/schemas/UserAdminBrief"
+          },
+          "auditor": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ImageAuditPayload"
+          },
+          "linkedResources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModerationResourceRes"
+            }
+          },
+          "sourceContext": {
+            "$ref": "#/components/schemas/SourceContext"
+          }
+        }
+      },
+      "ImageAuditPayload": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "resourceKey": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "fileMeta": {
+            "$ref": "#/components/schemas/FileMeta"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "SYSTEM",
+              "CONTENT_ATTACHED",
+              "USER_UPLOADED"
+            ]
+          },
+          "uploaderId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "expiredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "presignedUrl": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "RICH",
+              "IMAGE",
+              "TXT"
+            ]
+          }
+        }
+      },
+      "ApiResponseAuditResponseImageAuditPayload": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuditResponseImageAuditPayload"
           }
         }
       },
@@ -7527,15 +8649,15 @@
             "format": "date"
           },
           "dailyPv": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "newUsers": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "newPosts": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -7567,7 +8689,7 @@
             "$ref": "#/components/schemas/UserBrief"
           },
           "lastActiveAt": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "online": {
@@ -7590,7 +8712,8 @@
               "NONE",
               "POST",
               "COMMENT",
-              "USER"
+              "USER",
+              "TICKET_REPLY"
             ]
           },
           "actionTime": {
@@ -7598,7 +8721,7 @@
             "format": "date-time"
           },
           "targetId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "description": {
@@ -7627,35 +8750,35 @@
         "type": "object",
         "properties": {
           "onlineUserCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "totalUsers": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "totalPosts": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "todayNewUsers": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "todayNewPosts": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "todayPv": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "pendingModerations": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "peakOnline": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -7681,7 +8804,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "coverageUrl": {
@@ -7783,7 +8906,7 @@
             "type": "string"
           },
           "parentId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "sortOrder": {
@@ -7794,7 +8917,7 @@
             "type": "boolean"
           },
           "creatorId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "updateAt": {
@@ -7824,13 +8947,47 @@
           }
         }
       },
+      "ApiResponsePageBanUserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseBanStatusResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BanStatusResponse"
+          }
+        }
+      },
       "RemoveUsersReq": {
         "type": "object",
         "properties": {
           "userUids": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -7872,7 +9029,7 @@
           "tagIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -7887,7 +9044,7 @@
           "logIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             },
             "maxItems": 1000,
@@ -7916,7 +9073,7 @@
           "userIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -7940,7 +9097,7 @@
           "postIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -7969,7 +9126,7 @@
           "userUids": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -7981,7 +9138,7 @@
           "categoryIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }

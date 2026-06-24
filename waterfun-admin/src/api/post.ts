@@ -4,24 +4,28 @@ import request from "~/utils/axiosRequest";
 
 export type PostStatus = "DRAFT" | "PENDING" | "PUBLISHED" | "REJECTED" | "ARCHIVED";
 export type PostVisibility = "PUBLIC" | "PRIVATE" | "FANS_ONLY";
+export type PostType = "COMMON" | "NOTICE";
 
+/** Matches PostResponse from OpenAPI — response from GET /api/admin/posts/{id} */
 export interface PostResp {
   id: string;
   title: string;
   subtitle?: string;
   content?: string;
   summary?: string;
+  authorId: string;
   coverImg?: string;
   status?: PostStatus;
   visibility?: PostVisibility;
   categoryId?: string;
-  authorId: string;
   tagIds?: string[];
   viewCount?: string;
   likeCount?: string;
   commentCount?: string;
   collectCount?: string;
   slug?: string;
+  type?: PostType;
+  isPinned?: boolean;
   publishedAt?: ISOString;
   createdAt?: ISOString;
   updatedAt?: ISOString;
@@ -38,31 +42,22 @@ export interface ListPostParams {
   slug?: string;
 }
 
-export interface CreatePostRequest {
+/** Matches PutPostReq from OpenAPI — used for both create and update */
+export interface UpsertPostRequest {
   title: string;
   content: string;
   subtitle?: string;
   summary?: string;
-  coverImg?: string;
-  status: PostStatus;
-  visibility: PostVisibility;
-  authorId: string;
-  categoryId: string;
-  slug?: string;
-  tagIds?: string[];
-}
-
-export interface UpdatePostRequest {
-  title: string;
-  content: string;
-  subtitle?: string;
-  summary?: string;
-  coverImg?: string;
+  /** UUID returned from upload callback, not a URL */
+  coverageUuid?: string;
   status?: PostStatus;
   visibility?: PostVisibility;
   authorId?: string;
   categoryId?: string;
   slug?: string;
+  tagIds?: string[];
+  type?: PostType;
+  isPinned?: boolean;
 }
 
 export interface DeletePostRequest {
@@ -70,7 +65,7 @@ export interface DeletePostRequest {
 }
 
 export interface AssignTagsRequest {
-  tagIds?: string[];
+  tagIds: string[];
 }
 
 export interface BatchResult {
@@ -78,6 +73,9 @@ export interface BatchResult {
   success: number;
   ignored: number;
   failed: number;
+  ignoredIds?: number[];
+  failedIds?: number[];
+  message?: string;
 }
 
 export const listPosts = (params: ListPostParams = {}): PromiseResBody<Page<PostResp>> => {
@@ -88,11 +86,11 @@ export const getPostById = (id: string | number): PromiseResBody<PostResp> => {
   return request.get<PostResp>("/posts/id", { params: { id } });
 };
 
-export const createPost = (data: CreatePostRequest): PromiseResBody<null> => {
+export const createPost = (data: UpsertPostRequest): PromiseResBody<null> => {
   return request.post<null>("/posts", data);
 };
 
-export const putPost = (id: string | number, data: UpdatePostRequest): PromiseResBody<null> => {
+export const putPost = (id: string | number, data: UpsertPostRequest): PromiseResBody<null> => {
   return request.put<null>(`/posts/${id}`, data);
 };
 

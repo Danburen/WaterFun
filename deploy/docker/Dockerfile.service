@@ -1,0 +1,31 @@
+# syntax=docker/dockerfile:1
+# WaterFun User Service - Multi-stage Dockerfile
+FROM gradle:8-jdk22 AS build
+WORKDIR /app
+
+# Copy dependency definitions first for layer caching
+COPY settings.gradle build.gradle gradle/ ./
+COPY waterfun-common-lib/ waterfun-common-lib/
+COPY waterfun-service-core/ waterfun-service-core/
+COPY waterfun-service/build.gradle waterfun-service/
+
+# Download dependencies (cache layer)
+RUN gradle :waterfun-service:dependencies --no-daemon 2>/dev/null || true
+
+# Copy source and build
+COPY waterfun-service/ waterfun-service/
+COPY waterfun-service-core/ waterfun-service-core/
+RUN gradle :waterfun-service:build -x test --no-daemon
+
+# Runtime stage
+FROM eclipse-temurin:22-jre
+WORKDIR /app
+
+RUN groupadd -r waterfun && useradd -r -g waterfun waterfun
+
+COPY --from=build --chown=waterfun:waterfun /app/waterfun-service/build/libs/*.jar app.jar
+
+EXPOSE 8081
+
+USER waterfun
+ENTRYPOINT ["java", "-jar", "app.jar"]

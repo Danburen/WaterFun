@@ -3,10 +3,15 @@ import { usePostStore } from '~/stores/postStore'
 import { useCommentStore } from '~/stores/commentStore'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { likePost, collectPost, fetchPostList } from '~/api/postApi'
-import { likeComment } from '~/api/commentApi'
+import { likePost, collectPost, fetchPostList, reportPost } from '~/api/postApi'
+import { likeComment, reportComment } from '~/api/commentApi'
+import type { ReportType } from '~/api/ticketApi'
+import UserBadge from '~/components/UserBadge.vue'
+import EmojiPicker from '~/components/EmojiPicker.vue'
+import ReportDropdown from '~/components/ReportDropdown.vue'
+import { useUserInfoStore } from '~/stores/userInfoStore'
 import MarkdownIt from 'markdown-it'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '~/stores/authStore'
 import type { PostCardResp } from '~/api/postApi'
 
@@ -18,11 +23,12 @@ const hasNextComments = computed(() => commentStore.hasNext)
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const userInfoStore = useUserInfoStore()
 
 const md = new MarkdownIt()
 const renderedContent = computed(() => currentPost.value ? md.render(currentPost.value.content) : '')
 
-const postId = computed(() => Number(route.params.id))
+const postId = computed(() => String(route.params.id))
 const liked = ref(false)
 const collected = ref(false)
 const likeCount = ref(0)
@@ -30,22 +36,42 @@ const collectCount = ref(0)
 const commentCount = ref(0)
 
 const commentText = ref('')
+const commentTextareaRef = ref<HTMLTextAreaElement | null>(null)
 const submitting = ref(false)
 
-const replyTarget = ref<{ commentId: number; displayName: string } | null>(null)
+const replyTarget = ref<{ commentId: string; displayName: string } | null>(null)
 const replyText = ref('')
+const replyTextareaRef = ref<HTMLTextAreaElement | null>(null)
 const replySubmitting = ref(false)
-const expandedReplies = ref<Set<number>>(new Set())
+const expandedReplies = ref<Set<string>>(new Set())
+
+const insertEmoji = (emoji: string, el: HTMLTextAreaElement | null, text: Ref<string>) => {
+  if (!el) {
+    text.value += emoji
+    return
+  }
+  const start = el.selectionStart
+  const end = el.selectionEnd
+  const before = text.value.slice(0, start)
+  const after = text.value.slice(end)
+  text.value = before + emoji + after
+  nextTick(() => {
+    const pos = start + emoji.length
+    el.setSelectionRange(pos, pos)
+    el.focus()
+  })
+}
+
+const onCommentEmoji = (emoji: string) => insertEmoji(emoji, commentTextareaRef.value, commentText)
+const onReplyEmoji = (emoji: string) => insertEmoji(emoji, replyTextareaRef.value, replyText)
 
 const relatedPosts = ref<PostCardResp[]>([])
+const pageLoading = ref(true)
 
 const fetchDetail = async () => {
   try {
     await postStore.fetchPostDetail(postId.value)
     if (currentPost.value) {
-      likeCount.value = currentPost.value.likeCount
-      collectCount.value = currentPost.value.collectCount
-      commentCount.value = currentPost.value.commentCount
       if (currentPost.value.category?.id) {
         const res = await fetchPostList({ categoryId: currentPost.value.category.id, page: 1, size: 5 })
         const data = res.data as any
@@ -53,10 +79,11 @@ const fetchDetail = async () => {
       }
     }
   } catch { /* ignore */ }
+  finally { pageLoading.value = false }
 }
 
 const fetchComments = (reset = false) => {
-  commentStore.fetchComments(postId.value, reset)
+  commentStore.fetchComments(BigInt(postId.value), reset)
 }
 
 const handleLike = async () => {
@@ -82,7 +109,7 @@ const submitComment = async () => {
   if (!authStore.isAccess) { router.push('/login'); return }
   submitting.value = true
   try {
-    await commentStore.addComment({ postId: postId.value, content: commentText.value.trim() })
+    await commentStore.addComment({ postId: BigInt(postId.value), content: commentText.value.trim() })
     commentText.value = ''
     commentCount.value++
     ElMessage.success('评论发布成功！')
@@ -90,7 +117,7 @@ const submitComment = async () => {
   finally { submitting.value = false }
 }
 
-const startReply = (commentId: number, displayName: string) => {
+const startReply = (commentId: string, displayName: string) => {
   if (replyTarget.value?.commentId === commentId) {
     replyTarget.value = null
     replyText.value = ''
@@ -111,8 +138,8 @@ const submitReply = async () => {
   replySubmitting.value = true
   try {
     await commentStore.addComment({
-      postId: postId.value,
-      parentId: replyTarget.value.commentId,
+      postId: BigInt(postId.value),
+      parentId: BigInt(replyTarget.value.commentId),
       content: replyText.value.trim(),
     })
     replyText.value = ''
@@ -123,27 +150,89 @@ const submitReply = async () => {
   finally { replySubmitting.value = false }
 }
 
-const handleLikeComment = async (commentId: number) => {
+const handleLikeComment = async (commentId: string) => {
   if (!authStore.isAccess) { router.push('/login'); return }
   try {
     await likeComment(commentId)
   } catch { /* ignore */ }
 }
 
-const toggleReplies = async (rootId: number) => {
+const toggleReplies = async (rootId: string) => {
   if (expandedReplies.value.has(rootId)) {
     expandedReplies.value.delete(rootId)
     return
   }
   expandedReplies.value.add(rootId)
-  await commentStore.fetchReplies(rootId, true)
+  await commentStore.fetchReplies(BigInt(rootId), true)
 }
 
-const getReplies = (rootId: number) => commentStore.replies[String(rootId)] || []
-const replyHasNext = (rootId: number) => commentStore.replyHasNext[String(rootId)] ?? false
+const getReplies = (rootId: string) => commentStore.replies[rootId] || []
+const replyHasNext = (rootId: string) => commentStore.replyHasNext[rootId] ?? false
 
-const loadMoreReplies = async (rootId: number) => {
-  await commentStore.fetchReplies(rootId, false)
+const loadMoreReplies = async (rootId: string) => {
+  await commentStore.fetchReplies(BigInt(rootId), false)
+}
+
+const reportDialog = ref(false)
+const reportTarget = ref<{ targetType: 'POST' | 'COMMENT' | 'USER'; targetId: string } | null>(null)
+const reportReason = ref('')
+const reportType = ref<ReportType>('VIOLATION_OF_GUIDELINES')
+const reportSubmitting = ref(false)
+const reportReasonExpanded = ref(false)
+
+const reportTypeOptions: { value: ReportType; label: string }[] = [
+  { value: 'VIOLATION_OF_GUIDELINES', label: '违反社区准则' },
+  { value: 'INAPPROPRIATE_CONTENT', label: '内容不当' },
+  { value: 'ADVERTISEMENT', label: '垃圾广告' },
+  { value: 'VIOLENCE', label: '暴力内容' },
+  { value: 'SENSITIVE', label: '敏感内容' },
+  { value: 'CASCADE', label: '刷屏引战' },
+  { value: 'OTHER', label: '其他' },
+]
+
+const openReportDialog = (target: { targetType: 'POST' | 'COMMENT' | 'USER'; targetId: string }) => {
+  if (!authStore.isAccess) { router.push('/login'); return }
+  reportTarget.value = target
+  reportReason.value = ''
+  reportType.value = 'VIOLATION_OF_GUIDELINES'
+  reportDialog.value = true
+  reportReasonExpanded.value = false
+}
+
+const isReportReasonRequired = computed(() => reportType.value === 'OTHER')
+
+const submitReport = async () => {
+  if (!reportTarget.value) return
+  if (isReportReasonRequired.value && !reportReason.value.trim()) {
+    ElMessage.warning('请填写举报原因')
+    return
+  }
+  reportSubmitting.value = true
+  try {
+    const payload: { type: string; reason?: string; reasonValid?: boolean } = { type: reportType.value }
+    if (reportReason.value.trim()) {
+      payload.reason = reportReason.value.trim()
+    }
+    if (reportTarget.value.targetType === 'POST') {
+      await reportPost(reportTarget.value.targetId, payload)
+    } else {
+      await reportComment(reportTarget.value.targetId, payload)
+    }
+    ElMessage.success('举报已提交，我们会尽快处理')
+    reportDialog.value = false
+  } catch (err: any) {
+    ElMessage.error(err?.message || '举报提交失败')
+  } finally {
+    reportSubmitting.value = false
+  }
+}
+
+const postStatusInfo: Record<string, { label: string; cls: string }> = {
+  DRAFT: { label: '草稿', cls: 'status-draft' },
+  PENDING: { label: '审核中', cls: 'status-pending' },
+  PUBLISHED: { label: '已发布', cls: 'status-published' },
+  REJECTED: { label: '未通过', cls: 'status-rejected' },
+  ARCHIVED: { label: '已归档', cls: 'status-archived' },
 }
 
 const formatDateTime = (dateStr: string | null) => {
@@ -171,11 +260,36 @@ const formatCount = (n: number) => {
   return String(n)
 }
 
+const commentSectionRef = ref<HTMLElement | null>(null)
+let commentsLoaded = false
+
 const goBack = () => router.push('/post')
 
 onMounted(() => {
   fetchDetail()
-  fetchComments(true)
+})
+
+watch(currentPost, (post) => {
+  if (!post) return
+  // Sync local UI state from server response (ensures correct default active state)
+  liked.value = post.isLiked ?? false
+  collected.value = post.isCollected ?? false
+  likeCount.value = post.likeCount
+  collectCount.value = post.collectCount
+  commentCount.value = post.commentCount
+  if (commentsLoaded) return
+  nextTick(() => {
+    const el = commentSectionRef.value
+    if (!el) return
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !commentsLoaded) {
+        commentsLoaded = true
+        fetchComments(true)
+        observer.disconnect()
+      }
+    }, { threshold: 0.1 })
+    observer.observe(el)
+  })
 })
 </script>
 
@@ -189,30 +303,49 @@ onMounted(() => {
           <i class="fas fa-chevron-right"></i>
           <a href="/post">社区</a>
           <i class="fas fa-chevron-right"></i>
-          <a v-if="currentPost.category" href="javascript:void(0)">{{ currentPost.category.name }}</a>
+          <a v-if="currentPost.category" :href="'/post?category=' + currentPost.category.id">{{ currentPost.category.name }}</a>
           <i v-if="currentPost.category" class="fas fa-chevron-right"></i>
           <span>帖子详情</span>
+        </div>
+
+        <div v-if="currentPost.editStatus === 'PENDING'" class="edit-pending-banner">
+          <i class="fas fa-clock"></i>
+          <span>你的编辑正在审核，审核通过后所有人可见</span>
         </div>
 
         <article class="post-detail">
           <div class="post-detail-header">
             <div class="post-detail-meta">
               <img
-                src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-                alt="avatar"
+                :src="currentPost.userBrief?.avatar?.url || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
+                :alt="currentPost.userBrief?.displayName || '用户'"
                 class="post-detail-avatar"
               >
               <div class="post-detail-author-info">
-                <div class="post-detail-author-name">
-                  <span v-if="currentPost.type === 'NOTICE'" class="wf-tag wf-tag-warning" style="margin-right:6px;font-size:12px">公告</span>
-                  <span v-if="currentPost.isPinned" class="wf-tag wf-tag-danger" style="margin-right:6px;font-size:12px">置顶</span>
-                </div>
+                <a
+                  v-if="currentPost.userBrief?.uid"
+                  :href="'/User/' + currentPost.userBrief.uid"
+                  class="post-detail-author-name"
+                >{{ currentPost.userBrief?.displayName || '用户' }}</a>
+                <a
+                  v-if="userInfoStore.userInfo.uid && userInfoStore.userInfo.uid === currentPost.userBrief?.uid"
+                  :href="'/post/create?id=' + postId"
+                  class="post-detail-edit-link"
+                ><i class="fas fa-pen"></i> 编辑</a>
                 <div class="post-detail-time">
                   发布于 {{ formatDateTime(currentPost.publishedAt) }}
                   <template v-if="currentPost.updatedAt"> · 最后编辑于 {{ formatDateTime(currentPost.updatedAt) }}</template>
                 </div>
               </div>
-              <span v-if="currentPost.category" class="post-detail-tag">{{ currentPost.category.name }}</span>
+              <div class="post-detail-meta-right">
+                <span v-if="currentPost.isPinned" class="post-detail-pinned"><i class="fas fa-thumbtack"></i> 置顶</span>
+                <span v-if="currentPost.type === 'NOTICE'" class="post-detail-notice"><i class="fas fa-bullhorn"></i> 公告</span>
+                <span
+                  v-if="currentPost.status && currentPost.status !== 'PUBLISHED'"
+                  :class="['post-detail-status', postStatusInfo[currentPost.status]?.cls]"
+                >{{ postStatusInfo[currentPost.status]?.label || currentPost.status }}</span>
+                <span v-if="currentPost.category" class="post-detail-tag">{{ currentPost.category.name }}</span>
+              </div>
             </div>
             <h1 class="post-detail-title">{{ currentPost.title }}</h1>
             <p v-if="currentPost.subtitle" class="post-detail-subtitle">{{ currentPost.subtitle }}</p>
@@ -233,7 +366,7 @@ onMounted(() => {
             <span v-for="tag in currentPost.tags" :key="tag.id" class="post-tag">{{ tag.name }}</span>
           </div>
 
-          <div class="post-actions-bar">
+          <div v-if="currentPost.status === 'PUBLISHED'" class="post-actions-bar">
             <div class="post-actions-left">
               <button :class="['wf-btn-flat', { active: liked }]" @click="handleLike">
                 <i :class="liked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up'"></i>
@@ -249,11 +382,16 @@ onMounted(() => {
             </div>
             <div class="post-actions-right">
               <button class="wf-btn-text"><i class="fas fa-share-alt"></i> 分享</button>
+              <ReportDropdown
+                target-type="POST"
+                :target-id="postId"
+                @report="openReportDialog"
+              />
             </div>
           </div>
         </article>
 
-        <div class="reply-section">
+        <div v-if="currentPost.status === 'PUBLISHED'" ref="commentSectionRef" class="reply-section">
           <div class="reply-header">
             <div class="reply-title">
               <i class="far fa-comments"></i>
@@ -270,15 +408,14 @@ onMounted(() => {
               >
               <div class="reply-input-right">
                 <textarea
+                  ref="commentTextareaRef"
                   v-model="commentText"
                   class="wf-input"
-                  placeholder="写下你的评论...&#10;支持 Markdown 语法"
+                  placeholder="写下你的评论..."
                 ></textarea>
                 <div class="reply-input-footer">
                   <div class="reply-input-tools">
-                    <button class="reply-tool-btn" title="表情"><i class="far fa-smile"></i></button>
-                    <button class="reply-tool-btn" title="图片"><i class="far fa-image"></i></button>
-                    <button class="reply-tool-btn" title="代码"><i class="fas fa-code"></i></button>
+                    <EmojiPicker @select="onCommentEmoji" />
                   </div>
                   <button
                     class="reply-submit-btn"
@@ -302,6 +439,11 @@ onMounted(() => {
               <div class="reply-content">
                 <div class="reply-author-row">
                   <span class="reply-author-name">{{ comment.author?.displayName || '匿名用户' }}</span>
+                  <UserBadge
+                    :is-post-author="comment.isPostAuthor"
+                    :author-uid="comment.author?.uid"
+                    :current-uid="userInfoStore.userInfo.uid"
+                  />
                   <span class="reply-time">{{ timeAgo(comment.createdAt) }}</span>
                 </div>
                 <div class="reply-body">{{ comment.content }}</div>
@@ -320,6 +462,12 @@ onMounted(() => {
                     <i class="far fa-comment-dots"></i>
                     {{ expandedReplies.has(comment.id) ? '收起' : '' }} {{ comment.replyCount }} 条回复
                   </button>
+                  <ReportDropdown
+                    target-type="COMMENT"
+                    :target-id="comment.id"
+                    placement="bottom-start"
+                    @report="openReportDialog"
+                  />
                 </div>
 
                 <div v-if="expandedReplies.has(comment.id)" class="nested-replies">
@@ -332,6 +480,11 @@ onMounted(() => {
                     <div class="nested-content">
                       <div class="nested-author-row">
                         <span class="nested-author-name">{{ reply.author?.displayName || '匿名用户' }}</span>
+                        <UserBadge
+                          :is-post-author="reply.isPostAuthor"
+                          :author-uid="reply.author?.uid"
+                          :current-uid="userInfoStore.userInfo.uid"
+                        />
                         <span class="nested-reply-to" v-if="reply.replyToDisplayName">
                           回复 <span>{{ reply.replyToDisplayName }}</span>
                         </span>
@@ -345,6 +498,12 @@ onMounted(() => {
                         <button class="reply-action-btn" @click="startReply(comment.id, reply.author?.displayName || '匿名用户')">
                           <i class="far fa-comment"></i> 回复
                         </button>
+                        <ReportDropdown
+                          target-type="COMMENT"
+                          :target-id="reply.id"
+                          placement="bottom-start"
+                          @report="openReportDialog"
+                        />
                       </div>
                     </div>
                   </div>
@@ -357,18 +516,24 @@ onMounted(() => {
 
                 <div v-if="replyTarget?.commentId === comment.id" class="reply-form-inline show">
                   <textarea
+                    ref="replyTextareaRef"
                     v-model="replyText"
                     class="wf-input"
                     :placeholder="'回复 ' + replyTarget.displayName + '...'"
                   ></textarea>
                   <div class="reply-form-actions">
-                    <button class="wf-btn-flat wf-btn-flat-sm" @click="cancelReply">取消</button>
-                    <button
-                      class="wf-btn-flat wf-btn-flat-sm"
-                      style="background:var(--wf-primary);color:#fff;border-color:var(--wf-primary)"
-                      :disabled="replySubmitting || !replyText.trim()"
-                      @click="submitReply"
-                    >回复</button>
+                    <div class="reply-input-tools">
+                      <EmojiPicker @select="onReplyEmoji" />
+                    </div>
+                    <div style="display:flex;gap:8px">
+                      <button class="wf-btn-flat wf-btn-flat-sm" @click="cancelReply">取消</button>
+                      <button
+                        class="wf-btn-flat wf-btn-flat-sm"
+                        style="background:var(--wf-primary);color:#fff;border-color:var(--wf-primary)"
+                        :disabled="replySubmitting || !replyText.trim()"
+                        @click="submitReply"
+                      >回复</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -403,8 +568,7 @@ onMounted(() => {
               <div class="related-info">
                 <div class="related-title">{{ post.title }}</div>
                 <div class="related-meta">
-                  {{ post.userBrief?.displayName || '未知' }}
-                  · {{ formatCount(post.viewCount) }} 阅读
+                  {{ formatCount(post.viewCount) }} 阅读
                   · {{ post.commentCount }} 评论
                 </div>
               </div>
@@ -413,14 +577,67 @@ onMounted(() => {
         </div>
       </div>
 
-      <div v-else-if="loading" class="wf-state-wrap">
-        <div class="wf-state-text"><i class="fas fa-spinner fa-pulse"></i> 加载中...</div>
+      <div v-if="pageLoading" class="skeleton-wrap">
+        <div class="skeleton-header">
+          <div class="skeleton-line skeleton-line--short"></div>
+          <div class="skeleton-line skeleton-line--medium"></div>
+        </div>
+        <div class="skeleton-body">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line skeleton-line--short"></div>
+        </div>
       </div>
-      <div v-else class="wf-state-wrap">
+      <div v-else-if="!currentPost" class="wf-state-wrap">
         <div class="wf-state-text wf-state-error">帖子不存在</div>
         <button class="wf-btn wf-btn-primary" @click="goBack">返回社区</button>
       </div>
     </div>
+
+    <!-- Report Dialog - Teleport to body to avoid any stacking context issue -->
+    <Teleport to="body">
+      <div v-if="reportDialog" class="wf-dialog-overlay" @click.self="reportDialog = false">
+        <div class="wf-dialog-panel">
+          <div class="wf-dialog-header">
+            <h2>举报{{ reportTarget?.targetType === 'POST' ? '帖子' : '评论' }}</h2>
+            <button class="wf-dialog-close" @click="reportDialog = false"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="wf-dialog-body">
+            <div class="wf-form-group">
+              <label class="wf-form-label">举报类型 <span class="wf-required">*</span></label>
+              <select v-model="reportType" class="wf-form-control">
+                <option v-for="opt in reportTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
+            </div>
+            <div class="wf-form-group">
+              <div class="wf-form-label-wrap" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                <label class="wf-form-label" style="margin-bottom:0;">举报原因 <span v-if="isReportReasonRequired" class="wf-required">*</span></label>
+                <button type="button" class="wf-btn-collapse" @click="reportReasonExpanded = !reportReasonExpanded" style="background:none;border:1px solid var(--wf-border,#e2e8f0);border-radius:6px;padding:2px 10px;font-size:12px;color:var(--wf-text-muted,#94a3b8);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                  <i :class="reportReasonExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" style="font-size:10px;"></i>
+                  {{ reportReasonExpanded ? '收起' : '展开' }}
+                </button>
+              </div>
+              <div v-show="reportReasonExpanded">
+                <textarea
+                  v-model="reportReason"
+                  class="wf-form-control"
+                  rows="4"
+                  placeholder="请详细描述违规内容..."
+                  maxlength="500"
+                ></textarea>
+                <span class="wf-char-count">{{ reportReason.length }}/500</span>
+              </div>
+            </div>
+          </div>
+          <div class="wf-dialog-footer">
+            <button class="wf-btn-cancel" @click="reportDialog = false">取消</button>
+            <button class="wf-btn-submit" :disabled="reportSubmitting" @click="submitReport">
+              {{ reportSubmitting ? '提交中...' : '提交举报' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -454,7 +671,6 @@ onMounted(() => {
   background: var(--wf-bg-white);
   border: 1px solid var(--wf-border);
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
   margin-bottom: 20px;
 }
@@ -479,12 +695,6 @@ onMounted(() => {
 
 .post-detail-author-info { flex: 1; }
 
-.post-detail-author-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--wf-text-primary);
-}
-
 .post-detail-time {
   font-size: 13px;
   color: var(--wf-text-muted);
@@ -498,6 +708,98 @@ onMounted(() => {
   font-weight: 500;
   background: #dbeafe;
   color: #1d4ed8;
+}
+
+.post-detail-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.post-detail-pinned {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.post-detail-notice {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #fce4ec;
+  color: #c62828;
+}
+
+.post-detail-status {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.post-detail-status.status-draft {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.post-detail-status.status-pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+.post-detail-status.status-published {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.post-detail-status.status-rejected {
+  background: #fce4ec;
+  color: #c62828;
+}
+.post-detail-status.status-archived {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.edit-pending-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+.edit-pending-banner i {
+  font-size: 16px;
+}
+
+.post-detail-author-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--wf-text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.post-detail-author-name:hover {
+  color: var(--wf-primary);
+}
+
+.post-detail-edit-link {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--wf-primary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.post-detail-edit-link:hover {
+  text-decoration: underline;
 }
 
 .post-detail-title {
@@ -581,7 +883,6 @@ onMounted(() => {
   background: var(--wf-bg-white);
   border: 1px solid var(--wf-border);
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
   margin-bottom: 20px;
 }
@@ -855,7 +1156,8 @@ onMounted(() => {
 
 .reply-form-actions {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
 }
 
@@ -964,6 +1266,44 @@ onMounted(() => {
   color: var(--wf-text-muted);
 }
 
+.skeleton-wrap {
+  background: var(--wf-bg-white);
+  border: 1px solid var(--wf-border);
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.skeleton-header {
+  margin-bottom: 24px;
+}
+
+.skeleton-body {
+  margin-bottom: 16px;
+}
+
+.skeleton-line {
+  height: 16px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  margin-bottom: 12px;
+}
+
+.skeleton-line--short {
+  width: 60%;
+}
+
+.skeleton-line--medium {
+  width: 80%;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 @media (max-width: 768px) {
   .main { padding: 16px; }
   .post-detail-header { padding: 20px 20px 0; }
@@ -975,5 +1315,4 @@ onMounted(() => {
   .reply-input-area { padding: 16px 20px; }
   .reply-list { padding: 0 20px; }
   .post-detail-title { font-size: 20px; }
-}
-</style>
+}</style>

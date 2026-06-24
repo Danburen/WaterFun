@@ -41,4 +41,7 @@ public class EncryptionDataKey {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "key_purpose", length = 30)
+    private String keyPurpose;
+
 }

@@ -8,6 +8,7 @@ import org.waterwood.waterfunadminservice.api.request.DeletePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.AssignTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.CreatePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.PutPostReq;
+import org.waterwood.waterfunadminservice.api.response.content.audit.PostBrief;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 
@@ -79,4 +80,11 @@ public interface PostService {
      * @return batch result ofPending the operation
      */
     BatchResult deletePostTags(Long id, AssignTagsRequest req);
+
+    /**
+     * Return a post brief
+     * @param postId target post id
+     * @return {@link PostBrief} post brief
+     */
+    PostBrief getPostBrief(Long postId);
 }

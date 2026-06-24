@@ -124,7 +124,7 @@ const editForm = ref({
   bio: '',
   gender: '',
   avatar: '',
-  birthday: undefined,
+  birthday: undefined as string | Date | undefined,
   residence: [] as string[],
 });
 const locationOptions = provinceAndCityData as any[];
@@ -135,8 +135,33 @@ const userProfile = computed(() => userProfileStore.userProfile);
 const saveChanges = async () => {
   loading.value = true;
   try {
-    const submitForm = { ...editForm.value, residence: editForm.value.residence.join(' ') };
-    userProfileStore.updateUserProfile(submitForm);
+    const residence = Array.isArray(editForm.value.residence)
+      ? editForm.value.residence.join(' ')
+      : editForm.value.residence;
+    const birthday = editForm.value.birthday
+      ? (editForm.value.birthday instanceof Date
+          ? editForm.value.birthday.toISOString().split('T')[0]
+          : editForm.value.birthday)
+      : undefined;
+
+    await userProfileStore.updateUserProfile({
+      bio: editForm.value.bio,
+      gender: editForm.value.gender,
+      birthday: birthday as any,
+      residence,
+    });
+
+    // 如果有昵称变更，单独调用昵称更新
+    if (editForm.value.nickname && editForm.value.nickname !== userInfoStore.userInfo.nickname) {
+      // 尝试更新昵称（如果后端支持）
+      try {
+        await userInfoStore.updateNickname(editForm.value.nickname);
+      } catch {
+        // 昵称更新失败不影响主流程
+        console.warn('昵称更新失败');
+      }
+    }
+
     ElMessage.success(i18n.t('message.success.saveSuccess'));
   } catch (error) {
     ElMessage.error(i18n.t('message.failed.saveFailed'));
@@ -152,9 +177,8 @@ const handleAvatarSubmitted = () => {
 
 const loadUserData = async () => {
   const profile = userProfileStore.userProfile;
-  console.log(profile)
   editForm.value = {
-    nickname: userInfoStore.userInfo.nickname || '',
+    nickname: userInfoStore.userInfo.nickname || userInfoStore.userInfo.username || '',
     bio: profile.bio || '',
     gender: profile.gender || '',
     avatar: await userProfileStore.getAvatarUrl() || '',
@@ -163,12 +187,9 @@ const loadUserData = async () => {
   };
 };
 
-// 确保在客户端渲染时才加载用户数据
-if (process.client) {
-  onMounted(async () => {
-    await loadUserData();
-  });
-}
+onMounted(async () => {
+  await loadUserData();
+});
 </script>
 
 <style scoped>

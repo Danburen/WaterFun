@@ -3,6 +3,7 @@ package org.waterwood.waterfunservicecore.infrastructure.persistence;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -40,6 +41,16 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
       """)
     Optional<Comment> findByPostIdAndParentIdAndStatus(@Param("postId") Long postId,@Param("parentId") Long parentId, @Param("status") CommentStatus status);
 
+    @Query("""
+        SELECT c FROM Comment c
+        WHERE c.post.id = :postId
+        AND c.id = :commentId
+        AND c.status = :status
+        ORDER BY c.likeCount DESC, c.createdAt DESC
+      """)
+    Optional<Comment> findByPostIdAndIdAndStatus(@Param("postId") Long postId,@Param("commentId") Long commentId, @Param("status") CommentStatus status);
+
+    @EntityGraph(attributePaths = {"post.author"})
     Optional<Comment> findByIdAndStatus(Long id, CommentStatus status);
 
     @Modifying
@@ -69,25 +80,27 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<CommentDO> findAuthorUidByIdAndStatus(@Param("id") Long id, @Param("status") CommentStatus status);
 
 
+    @EntityGraph(attributePaths = {"post.author"})
     @Query("""
         SELECT c FROM Comment c
         WHERE c.post.id = :postId
           AND c.root.id IS NULL
           AND c.status = 1
-          AND (:cursor = 0 OR
-               (c.isTop = :isTopCursor AND c.likeCount < :likeCursor) OR
-               (c.isTop = :isTopCursor AND c.likeCount = :likeCursor AND c.id < :idCursor))
-        ORDER BY c.isTop DESC, c.likeCount DESC, c.id DESC
+          AND (:cursor = 0L OR
+               (c.isPined = :isPinedCursor AND c.likeCount < :likeCursor) OR
+               (c.isPined = :isPinedCursor AND c.likeCount = :likeCursor AND c.id < :idCursor))
+        ORDER BY c.isPined DESC, c.likeCount DESC, c.id DESC
         """)
     List<Comment> findRootComments(
             @Param("postId") Long postId,
             @Param("cursor") Long cursor,
-            @Param("isTopCursor") Boolean isTopCursor,
+            @Param("isPinedCursor") Boolean isPinedCursor,
             @Param("likeCursor") Long likeCursor,
             @Param("idCursor") Long idCursor,
             Pageable pageable
     );
 
+    @EntityGraph(attributePaths = {"post.author"})
     @Query("""
         SELECT c FROM Comment c
         WHERE c.root.id = :rootId
@@ -100,4 +113,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             @Param("cursor") Long cursor,
             Pageable pageable
     );
+
 }

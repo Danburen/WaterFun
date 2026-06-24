@@ -117,7 +117,7 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    async markAsRead(id: number): Promise<void> {
+    async markAsRead(id: string): Promise<void> {
       try {
         await notificationApi.markNotificationRead(id)
         for (const key of Object.keys(this.notifications)) {
@@ -185,7 +185,7 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    async deleteNotification(id: number): Promise<void> {
+    async deleteNotification(id: string): Promise<void> {
       try {
         await notificationApi.deleteNotification(id)
         for (const key of Object.keys(this.notifications)) {

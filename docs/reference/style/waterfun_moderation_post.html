@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帖子审核 - WaterFun Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --success-light: #dcfce7;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        /* ========== Sidebar ========== */
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo-text { font-size: 16px; font-weight: 700; }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section { margin-bottom: 8px; }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+        }
+
+        .nav-item:hover { background: var(--sidebar-hover); color: #e2e8f0; }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+
+        .nav-item i { width: 20px; text-align: center; font-size: 15px; }
+
+        .nav-badge {
+            margin-left: auto;
+            padding: 1px 8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-user-info { flex: 1; }
+        .sidebar-user-name { font-size: 14px; font-weight: 600; color: white; }
+        .sidebar-user-role { font-size: 12px; color: #64748b; }
+
+        /* ========== Main Content ========== */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            height: 60px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .top-bar-left { display: flex; align-items: center; gap: 12px; }
+        .page-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .top-bar-right { display: flex; align-items: center; gap: 8px; }
+
+        .top-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .top-btn:hover { background: var(--bg); color: var(--primary); }
+
+        .top-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        .content-area { padding: 24px 28px; flex: 1; }
+
+        /* ========== Queue Info ========== */
+        .queue-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .queue-info-left { display: flex; align-items: center; gap: 20px; }
+
+        .queue-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .queue-stat strong { color: var(--text-primary); font-size: 16px; }
+
+        .queue-info-right { display: flex; align-items: center; gap: 8px; }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* ========== Review Card ========== */
+        .review-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .review-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--bg);
+        }
+
+        .review-meta { display: flex; align-items: center; gap: 16px; }
+
+        .review-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-post { background: var(--primary-light); color: var(--primary); }
+        .badge-comment { background: var(--success-light); color: #15803d; }
+        .badge-avatar { background: var(--warning-light); color: #b45309; }
+        .badge-image { background: #fce7f3; color: #be185d; }
+
+        .review-id {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'SF Mono', monospace;
+        }
+
+        .review-time { font-size: 13px; color: var(--text-muted); }
+
+        .review-status-bar { display: flex; align-items: center; gap: 8px; }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending { background: var(--warning-light); color: #b45309; }
+        .status-passed { background: var(--success-light); color: #15803d; }
+        .status-rejected { background: var(--danger-light); color: #dc2626; }
+        .status-waiting { background: #e0e7ff; color: #4338ca; }
+
+        .review-body { padding: 24px; }
+
+        /* Author Info */
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .author-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .author-details { flex: 1; }
+
+        .author-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+        .author-meta { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+        .author-risk {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .risk-low { background: var(--success-light); color: #15803d; }
+        .risk-medium { background: var(--warning-light); color: #b45309; }
+        .risk-high { background: var(--danger-light); color: #dc2626; }
+
+        /* ========== Post Review (Aggregated) ========== */
+        .post-review-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .post-content-panel { display: flex; flex-direction: column; gap: 16px; }
+
+        .panel-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .panel-label i { font-size: 11px; }
+
+        .post-title-display {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.4;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--primary);
+        }
+
+        .post-content-display {
+            padding: 20px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .post-content-display h1, .post-content-display h2, .post-content-display h3 {
+            color: var(--text-primary);
+            margin: 16px 0 8px 0;
+        }
+
+        .post-content-display h1 { font-size: 22px; }
+        .post-content-display h2 { font-size: 18px; }
+        .post-content-display h3 { font-size: 16px; }
+        .post-content-display p { margin-bottom: 12px; }
+
+        .post-content-display code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+            color: #c7254e;
+        }
+
+        .post-content-display pre {
+            background: #1e293b;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+
+        .post-content-display pre code {
+            background: transparent;
+            color: #e2e8f0;
+            padding: 0;
+        }
+
+        .post-content-display blockquote {
+            margin: 12px 0;
+            padding: 10px 16px;
+            border-left: 4px solid var(--primary);
+            background: var(--primary-light);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+
+        /* Image Panel */
+        .image-panel { display: flex; flex-direction: column; gap: 16px; }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .image-review-item {
+            position: relative;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .image-review-item:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        .image-review-item img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-review-item .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 12px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .image-review-item .image-status {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .image-status-pending { background: var(--warning); }
+        .image-status-passed { background: var(--success); }
+        .image-status-rejected { background: var(--danger); }
+
+        .image-review-item.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* ========== Sub-task List ========== */
+        .sub-task-list {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .sub-task-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sub-task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: var(--bg-white);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .sub-task-item:last-child { margin-bottom: 0; }
+
+        .sub-task-info { display: flex; align-items: center; gap: 10px; }
+
+        .sub-task-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .sub-task-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+        .sub-task-status { font-size: 12px; color: var(--text-muted); }
+
+        /* ========== Single Resource Review (Image / Text / Avatar) ========== */
+        .single-review-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 24px;
+        }
+
+        .resource-display {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Source Info Card */
+        .source-card {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .source-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .source-card-title i { font-size: 11px; }
+
+        .source-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .source-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .source-item:first-child { padding-top: 0; }
+
+        .source-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .source-info { flex: 1; min-width: 0; }
+
+        .source-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .source-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .source-link {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .source-link:hover { text-decoration: underline; }
+
+        /* Single Image Display */
+        .single-image-review {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+        }
+
+        .single-image-container {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 2px solid var(--border);
+            max-width: 100%;
+        }
+
+        .single-image-container img {
+            width: 100%;
+            max-height: 360px;
+            object-fit: contain;
+            display: block;
+            background: var(--bg);
+        }
+
+        .single-image-info { text-align: center; }
+        .single-image-info .file-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .single-image-info .file-meta { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Text Review Box */
+        .text-review-box {
+            padding: 20px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            min-height: 120px;
+            border-left: 4px solid var(--success);
+        }
+
+        .text-review-box .highlight-word {
+            background: var(--warning-light);
+            padding: 1px 3px;
+            border-radius: 3px;
+            color: #b45309;
+            font-weight: 500;
+        }
+
+        /* ========== Action Bar ========== */
+        .review-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: var(--bg);
+            border-top: 1px solid var(--border-light);
+            gap: 12px;
+        }
+
+        .review-actions-left { display: flex; align-items: center; gap: 8px; }
+        .review-actions-right { display: flex; align-items: center; gap: 12px; }
+
+        .action-btn {
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn-pass {
+            background: var(--success);
+            color: white;
+        }
+
+        .action-btn-pass:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .action-btn-reject {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn-reject:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .action-btn-skip {
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .action-btn-skip:hover {
+            background: var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .action-btn-detail {
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .action-btn-detail:hover { color: var(--text-secondary); }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Reject Reason */
+        .reject-reason-wrap {
+            display: none;
+            padding: 16px 24px;
+            background: var(--danger-light);
+            border-top: 1px solid var(--danger-light);
+        }
+
+        .reject-reason-wrap.show { display: block; }
+
+        .reject-reason-wrap label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--danger);
+            margin-bottom: 8px;
+        }
+
+        .reject-reason-wrap textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #fecaca;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+        }
+
+        .reject-reason-wrap textarea:focus {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        /* ========== Empty State ========== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: var(--border);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p { font-size: 14px; color: var(--text-muted); }
+
+        /* ========== Toast ========== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: var(--primary); }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 1200px) {
+            .post-review-layout { grid-template-columns: 1fr; }
+            .single-review-layout { grid-template-columns: 1fr; }
+            .image-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar-logo-text, .nav-section-title, .nav-item span, .sidebar-user-info { display: none; }
+            .main-content { margin-left: 60px; }
+            .content-area { padding: 16px; }
+            .review-actions { flex-direction: column; }
+            .review-actions-left, .review-actions-right { width: 100%; justify-content: center; }
+            .image-grid { grid-template-columns: repeat(2, 1fr); }
+            .post-review-layout { grid-template-columns: 1fr; }
+            .single-review-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-logo">
+                    <div class="sidebar-logo-icon">WF</div>
+                    <span class="sidebar-logo-text">WaterFun</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">概览</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>在线用户</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">内容管理</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>帖子管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-comment"></i>
+                        <span>评论管理</span>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>审核工作台</span>
+                        <span class="nav-badge">28</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">用户</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-user"></i>
+                        <span>用户管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-ban"></i>
+                        <span>封禁记录</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>系统设置</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-history"></i>
+                        <span>操作日志</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="avatar" class="sidebar-user-avatar">
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name">Admin</div>
+                        <div class="sidebar-user-role">超级管理员</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1 class="page-title">帖子审核</h1>
+                </div>
+                <div class="top-bar-right">
+                    <button class="top-btn"><i class="fas fa-search"></i></button>
+                    <button class="top-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                    <button class="top-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="queue-info">
+                    <div class="queue-info-left">
+                        <div class="queue-stat"><i class="fas fa-inbox"></i> 待审核 <strong>12</strong></div>
+                        <div class="queue-stat"><i class="fas fa-check-circle"></i> 今日已通过 <strong>86</strong></div>
+                        <div class="queue-stat"><i class="fas fa-times-circle"></i> 今日已拒绝 <strong>14</strong></div>
+                    </div>
+                    <div class="queue-info-right">
+                        <button class="filter-btn active">全部</button>
+                        <button class="filter-btn">高风险</button>
+                        <button class="filter-btn">仅图片</button>
+                    </div>
+                </div>
+
+                <!-- Post Review Card (Aggregated) -->
+                <div class="review-card">
+                    <div class="review-card-header">
+                        <div class="review-meta">
+                            <span class="review-type-badge badge-post"><i class="fas fa-file-alt"></i> 帖子聚合审核</span>
+                            <span class="review-id">#POST-20250611-001</span>
+                            <span class="review-time"><i class="far fa-clock"></i> 提交于 14:32</span>
+                        </div>
+                        <div class="review-status-bar">
+                            <span class="status-chip status-pending"><i class="fas fa-hourglass-half"></i> 待审核</span>
+                        </div>
+                    </div>
+
+                    <div class="review-body">
+                        <!-- Author -->
+                        <div class="author-info">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" alt="avatar" class="author-avatar">
+                            <div class="author-details">
+                                <div class="author-name">小明</div>
+                                <div class="author-meta">UID: 10001 · LV.8 · 发帖 234 · 注册 2024-03-15</div>
+                            </div>
+                            <span class="author-risk risk-low"><i class="fas fa-shield-alt"></i> 低风险</span>
+                        </div>
+
+                        <!-- Post Content (Left: Text, Right: Images) -->
+                        <div class="post-review-layout">
+                            <div class="post-content-panel">
+                                <div class="panel-label"><i class="fas fa-font"></i> 文本内容</div>
+                                <div class="post-title-display">Vue3 性能优化实战指南</div>
+                                <div class="post-content-display">
+                                    <p>最近在项目中遇到了一些 Vue3 的性能瓶颈，分享一下我的优化经验。</p>
+                                    <h3>1. 使用 shallowRef 替代 ref</h3>
+                                    <p>对于不需要深度响应式的大型对象，使用 <code>shallowRef</code> 可以显著提升性能。</p>
+                                    <pre><code>const state = shallowRef({ count: 0 });
+// 只触发顶层响应式，不递归监听</code></pre>
+                                    <h3>2. 合理使用 computed</h3>
+                                    <p>避免在模板中直接调用复杂计算，使用 <code>computed</code> 缓存结果。</p>
+                                    <blockquote>性能优化是一个持续的过程，需要根据实际场景选择合适的方案。</blockquote>
+                                </div>
+                            </div>
+                            <div class="image-panel">
+                                <div class="panel-label"><i class="fas fa-image"></i> 关联图片 (3张)</div>
+                                <div class="image-grid">
+                                    <div class="image-review-item selected">
+                                        <img src="https://picsum.photos/seed/vue1/400/300" alt="screenshot">
+                                        <div class="image-overlay">
+                                            <span>screenshot_01.png</span>
+                                            <span class="image-status image-status-pending">待审</span>
+                                        </div>
+                                    </div>
+                                    <div class="image-review-item">
+                                        <img src="https://picsum.photos/seed/vue2/400/300" alt="screenshot">
+                                        <div class="image-overlay">
+                                            <span>screenshot_02.png</span>
+                                            <span class="image-status image-status-pending">待审</span>
+                                        </div>
+                                    </div>
+                                    <div class="image-review-item">
+                                        <img src="https://picsum.photos/seed/vue3/400/300" alt="screenshot">
+                                        <div class="image-overlay">
+                                            <span>code_demo.png</span>
+                                            <span class="image-status image-status-pending">待审</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
+                                    <i class="fas fa-info-circle"></i> 帖子聚合审核：文本与图片统一过/不过
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Sub-tasks -->
+                        <div class="sub-task-list">
+                            <div class="sub-task-title"><i class="fas fa-tasks"></i> 审核子任务状态</div>
+                            <div class="sub-task-item">
+                                <div class="sub-task-info">
+                                    <div class="sub-task-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fas fa-font"></i></div>
+                                    <div>
+                                        <div class="sub-task-name">文本内容审核</div>
+                                        <div class="sub-task-status">待审核</div>
+                                    </div>
+                                </div>
+                                <span class="status-chip status-pending">待审核</span>
+                            </div>
+                            <div class="sub-task-item">
+                                <div class="sub-task-info">
+                                    <div class="sub-task-icon" style="background: #fce7f3; color: #be185d;"><i class="fas fa-image"></i></div>
+                                    <div>
+                                        <div class="sub-task-name">图片审核 (3张)</div>
+                                        <div class="sub-task-status">待审核</div>
+                                    </div>
+                                </div>
+                                <span class="status-chip status-pending">待审核</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="review-actions">
+                        <div class="review-actions-left">
+                            <button class="action-btn action-btn-detail"><i class="fas fa-history"></i> 审核历史</button>
+                            <button class="action-btn action-btn-detail"><i class="fas fa-user"></i> 用户详情</button>
+                        </div>
+                        <div class="review-actions-right">
+                            <button class="action-btn action-btn-skip"><i class="fas fa-forward"></i> 跳过</button>
+                            <button class="action-btn action-btn-reject" id="postRejectBtn"><i class="fas fa-times"></i> 不通过</button>
+                            <button class="action-btn action-btn-pass" id="postPassBtn"><i class="fas fa-check"></i> 通过</button>
+                        </div>
+                    </div>
+
+                    <!-- Reject Reason -->
+                    <div class="reject-reason-wrap" id="postRejectWrap">
+                        <label><i class="fas fa-exclamation-triangle"></i> 拒绝原因（必填）</label>
+                        <textarea placeholder="请填写拒绝原因，将反馈给用户..." id="postRejectReason"></textarea>
+                        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+                            <button class="action-btn action-btn-skip" onclick="hideReject('post')">取消</button>
+                            <button class="action-btn action-btn-reject" onclick="confirmReject('post')">确认拒绝</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">操作成功</span></div>
+
+    <script>
+        // Toast
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimer;
+
+        function showToast(msg, type) {
+            clearTimeout(toastTimer);
+            toastMsg.textContent = msg;
+            toast.className = 'toast ' + (type || 'info');
+            const icon = toast.querySelector('i');
+            if (type === 'success') icon.className = 'fas fa-check-circle';
+            else if (type === 'error') icon.className = 'fas fa-exclamation-circle';
+            else icon.className = 'fas fa-info-circle';
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Reject logic
+        function showReject(prefix) {
+            document.getElementById(prefix + 'RejectWrap').classList.add('show');
+        }
+
+        function hideReject(prefix) {
+            document.getElementById(prefix + 'RejectWrap').classList.remove('show');
+            document.getElementById(prefix + 'RejectReason').value = '';
+        }
+
+        function confirmReject(prefix) {
+            const reason = document.getElementById(prefix + 'RejectReason').value.trim();
+            if (!reason) {
+                showToast('请填写拒绝原因', 'error');
+                return;
+            }
+            hideReject(prefix);
+            showToast('已拒绝，进入下一项', 'success');
+        }
+
+        // Pass
+        document.getElementById('postPassBtn').addEventListener('click', () => {
+            showToast('帖子聚合审核通过，子任务全部完成', 'success');
+        });
+
+        document.getElementById('postRejectBtn').addEventListener('click', () => showReject('post'));
+
+        // Image selection
+        document.querySelectorAll('.image-review-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('selected');
+            });
+        });
+    </script>
+
+</body>
+</html>

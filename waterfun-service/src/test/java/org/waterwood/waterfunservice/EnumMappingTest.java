@@ -11,7 +11,7 @@ public class EnumMappingTest {
     @Test
     public void testAllTargetTypeHaveModerationMapping() {
         for (TargetType type : TargetType.values()) {
-            if (type == TargetType.UNKNOWN) continue;
+            if (type == TargetType.DEFAULT) continue;
             ModerationTargetType mt = ModerationTargetType.fromTargetType(type);
             assertNotNull(mt, "TargetType." + type.name() + " missing ModerationTargetType mapping");
         }

@@ -26,13 +26,13 @@ const fetchOnlineStats = async () => {
   } catch { /* ignore */ }
 }
 
-const selectedCategoryId = ref<number | undefined>(
-  route.query.category ? parseInt(route.query.category as string) || undefined : undefined
+const selectedCategoryId = ref<string | undefined>(
+  route.query.category ? String(route.query.category) : undefined
 )
 
-const selectCategory = (id: number | undefined) => {
+const selectCategory = (id: string | undefined) => {
   selectedCategoryId.value = id
-  router.replace({ query: { ...route.query, category: id ? String(id) : undefined, page: '1' } })
+  router.replace({ query: { ...route.query, category: id || undefined, page: '1' } })
   postStore.fetchPostList({ categoryId: id, page: 1, size: 12 })
 }
 
@@ -44,7 +44,7 @@ const currentPage = computed({
   }
 })
 
-const goToDetail = (id: number) => router.push(`/post/${id}`)
+const goToDetail = (id: string) => router.push(`/post/${id}`)
 const goToCreate = () => router.push('/post/create')
 
 onMounted(async () => {

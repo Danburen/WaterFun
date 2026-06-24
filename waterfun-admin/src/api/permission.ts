@@ -6,7 +6,7 @@ import type {
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
-export type PermissionType = "MENU" | "BUTTON" | "API" | "DATA" | "OTHER";
+export type PermissionType = "API" | "MENU" | "BUTTON" | "DATA" | "BAM";
 
 export interface PermissionResp {
   id: number;
@@ -55,7 +55,7 @@ export interface UpdatePermRequest {
   isSystem?: boolean;
 }
 
-export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED" | "DELETED";
+export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
 
 export interface UserInfoARes {
   uid: string;
@@ -64,8 +64,8 @@ export interface UserInfoARes {
   statusChangedAt: ISOString;
   updatedAt: ISOString;
   createdAt: ISOString;
-  nickname: string;
-  avatarUrl: string;
+  nickname: string | null;
+  avatar: string | null;
   lastActiveAt: ISOString;
 }
 

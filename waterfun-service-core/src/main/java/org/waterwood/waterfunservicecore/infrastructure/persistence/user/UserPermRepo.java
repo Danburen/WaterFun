@@ -15,8 +15,11 @@ public interface UserPermRepo extends JpaRepository<UserPermission,Long>, JpaSpe
     Set<UserPermission> findByUserUid(Long userUid);
     Page<UserPermission> findByPermissionId(Integer permissionId, Pageable pageable);
     Optional<UserPermission> findByUserUidAndPermissionId(Long userUid, Integer permissionId);
-    List<UserPermission> findByUserUidAndPermissionIdIn(Long userUid, Set<Integer> permissionIds);
+    List<UserPermission> findByUserUidAndPermissionIdIn(Long userUid, Set<Integer> permissionIds) ;
     List<UserPermission> findByPermissionIdAndUserUidIn(Integer permissionId, List<Long> userUids);
+
+    @Query("SELECT up FROM UserPermission up JOIN FETCH up.permission WHERE up.user.uid IN :userUids AND up.permission.id IN :permIds")
+    List<UserPermission> findByUserUidInAndPermissionIdIn(@Param("userUids") Set<Long> userUids, @Param("permIds") Set<Integer> permIds);
     void deleteByUserUidAndPermissionId(Long userUid, Integer permissionId);
     int deleteByUserUidAndPermissionIdIn(Long userUid, Set<Integer> permissionIds);
     boolean existsByUserUidAndPermissionId(Long userUid, Integer permissionId);
@@ -39,6 +42,19 @@ public interface UserPermRepo extends JpaRepository<UserPermission,Long>, JpaSpe
                                        @Param("username") String username,
                                        @Param("nickname") String nickname,
                                        Pageable pageable);
+
+    @Query("SELECT up FROM UserPermission up " +
+            "WHERE up.permission.id IN :permIds " +
+            "  AND (:userUid IS NULL OR up.user.uid = :userUid) " +
+            "  AND (:username IS NULL OR up.user.username LIKE %:username%) " +
+            "  AND (:nickname IS NULL OR up.user.nickname LIKE %:nickname%) " +
+            "ORDER BY up.createdAt DESC")
+    @EntityGraph(attributePaths = {"user", "permission"})
+    Page<UserPermission> listPermUsersByPermIds(@Param("permIds") Set<Integer> permIds,
+                                                 @Param("userUid") Long userUid,
+                                                 @Param("username") String username,
+                                                 @Param("nickname") String nickname,
+                                                 Pageable pageable);
 
     @Query("SELECT up FROM UserPermission up " +
             "WHERE up.user.uid = :userUid " +

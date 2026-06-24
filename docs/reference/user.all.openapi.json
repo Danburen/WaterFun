@@ -170,6 +170,134 @@
         }
       }
     },
+    "/api/tickets": {
+      "get": {
+        "tags": [
+          "ticket-controller"
+        ],
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "ticketType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CONTENT_REPORT",
+                "ACCOUNT_APPEAL",
+                "FEATURE_FEEDBACK",
+                "SUGGESTION"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "RESOLVED",
+                "REJECTED"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserTicketListResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ticket-controller"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserReportReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseReportResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tickets/{id}/cancel": {
+      "post": {
+        "tags": [
+          "ticket-controller"
+        ],
+        "operationId": "cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/posts/{id}/temp-save": {
       "post": {
         "tags": [
@@ -200,6 +328,78 @@
           },
           "required": true
         },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/report": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "reportPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReportReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseReportResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/report/cancel": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "cancelReportPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -270,7 +470,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -345,7 +545,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -440,7 +640,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "integer",
+                  "type": "string",
                   "format": "int64"
                 }
               }
@@ -474,7 +674,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "type": "integer",
+                  "type": "string",
                   "format": "int64"
                 }
               }
@@ -560,7 +760,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -659,6 +859,78 @@
         }
       }
     },
+    "/api/comments/{id}/report": {
+      "post": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "reportComment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReportReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseReportResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comments/{id}/report/cancel": {
+      "post": {
+        "tags": [
+          "comment-controller"
+        ],
+        "operationId": "cancelReportComment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/comments/{id}/like": {
       "post": {
         "tags": [
@@ -671,7 +943,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1176,6 +1448,57 @@
         }
       }
     },
+    "/api/tickets/{id}": {
+      "get": {
+        "tags": [
+          "ticket-controller"
+        ],
+        "operationId": "detail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserTicketDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tickets/stats": {
+      "get": {
+        "tags": [
+          "ticket-controller"
+        ],
+        "operationId": "stats",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTicketStatsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/resource/legal/{type}/{lang}/{fileName}": {
       "get": {
         "tags": [
@@ -1222,50 +1545,19 @@
         }
       }
     },
-    "/api/posts/{id}/edit": {
+    "/api/posts/{id}": {
       "get": {
         "tags": [
           "post-controller"
         ],
-        "operationId": "getEditPostDraft",
+        "operationId": "getPostDetail",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePostDraftResp"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/posts/{id}/detail": {
-      "get": {
-        "tags": [
-          "post-controller"
-        ],
-        "operationId": "getPostDetailPublic",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1282,21 +1574,19 @@
             }
           }
         }
-      }
-    },
-    "/api/posts/me/{id}": {
-      "get": {
+      },
+      "delete": {
         "tags": [
           "post-controller"
         ],
-        "operationId": "getMyPostDetail",
+        "operationId": "deletePost",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1307,7 +1597,38 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePostAuthorDetailResp"
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/edit": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "getEditPostDraft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostDraftResp"
                 }
               }
             }
@@ -1451,45 +1772,11 @@
         "operationId": "listPublicPosts",
         "parameters": [
           {
-            "name": "categoryId",
+            "name": "req",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "tagIds",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "format": "int32"
-              }
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1,
-              "exclusiveMinimum": 0
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
+              "$ref": "#/components/schemas/PublicPostListReq"
             }
           }
         ],
@@ -1519,7 +1806,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1548,7 +1835,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -1874,14 +2161,14 @@
         "tags": [
           "notification-controller"
         ],
-        "operationId": "list",
+        "operationId": "list_1",
         "parameters": [
           {
             "name": "cursor",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -1983,7 +2270,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -1992,7 +2279,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2011,7 +2298,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2042,7 +2329,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2169,37 +2456,6 @@
         }
       }
     },
-    "/api/posts/{id}": {
-      "delete": {
-        "tags": [
-          "post-controller"
-        ],
-        "operationId": "deletePost",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/notifications/{id}": {
       "delete": {
         "tags": [
@@ -2212,7 +2468,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2243,7 +2499,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2275,7 +2531,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2305,7 +2561,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2335,7 +2591,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2365,7 +2621,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2395,7 +2651,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2425,7 +2681,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2455,7 +2711,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -2487,7 +2743,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2537,7 +2793,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2587,7 +2843,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2637,7 +2893,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2687,7 +2943,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2737,7 +2993,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2787,7 +3043,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2839,7 +3095,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2889,7 +3145,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2939,7 +3195,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -2989,7 +3245,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3039,7 +3295,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3089,7 +3345,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3139,7 +3395,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3192,7 +3448,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3223,7 +3479,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3254,7 +3510,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3285,7 +3541,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3316,7 +3572,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3347,7 +3603,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3378,7 +3634,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3410,7 +3666,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3440,7 +3696,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3470,7 +3726,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3500,7 +3756,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3530,7 +3786,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3560,7 +3816,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3590,7 +3846,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3622,7 +3878,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3652,7 +3908,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3682,7 +3938,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3712,7 +3968,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3742,7 +3998,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3772,7 +4028,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3802,7 +4058,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3826,14 +4082,15 @@
         "tags": [
           "comment-controller"
         ],
-        "operationId": "listComments",
+        "summary": "List root comments of a post with cursor pagination",
+        "operationId": "listPostComments",
         "parameters": [
           {
             "name": "postId",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3860,7 +4117,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3882,14 +4139,15 @@
         "tags": [
           "comment-controller"
         ],
-        "operationId": "listComments_2",
+        "summary": "List root comments of a post with cursor pagination",
+        "operationId": "listPostComments_2",
         "parameters": [
           {
             "name": "postId",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3916,7 +4174,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3938,14 +4196,15 @@
         "tags": [
           "comment-controller"
         ],
-        "operationId": "listComments_1",
+        "summary": "List root comments of a post with cursor pagination",
+        "operationId": "listPostComments_1",
         "parameters": [
           {
             "name": "postId",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -3972,7 +4231,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -3994,14 +4253,15 @@
         "tags": [
           "comment-controller"
         ],
-        "operationId": "listComments_3",
+        "summary": "List root comments of a post with cursor pagination",
+        "operationId": "listPostComments_3",
         "parameters": [
           {
             "name": "postId",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -4028,7 +4288,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -4050,14 +4310,15 @@
         "tags": [
           "comment-controller"
         ],
-        "operationId": "listComments_6",
+        "summary": "List root comments of a post with cursor pagination",
+        "operationId": "listPostComments_6",
         "parameters": [
           {
             "name": "postId",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -4084,7 +4345,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -4106,14 +4367,15 @@
         "tags": [
           "comment-controller"
         ],
-        "operationId": "listComments_5",
+        "summary": "List root comments of a post with cursor pagination",
+        "operationId": "listPostComments_5",
         "parameters": [
           {
             "name": "postId",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -4140,7 +4402,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -4162,14 +4424,15 @@
         "tags": [
           "comment-controller"
         ],
-        "operationId": "listComments_4",
+        "summary": "List root comments of a post with cursor pagination",
+        "operationId": "listPostComments_4",
         "parameters": [
           {
             "name": "postId",
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           },
@@ -4196,7 +4459,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -4333,7 +4596,8 @@
             "enum": [
               "AVATAR",
               "POST_COVERAGE_IMAGE",
-              "POST_CONTENT_IMAGE"
+              "POST_CONTENT_IMAGE",
+              "REPORT_ATTACHMENT_IMAGE"
             ]
           },
           "bizId": {
@@ -4437,6 +4701,107 @@
           }
         }
       },
+      "CreateUserReportReq": {
+        "type": "object",
+        "properties": {
+          "ticketType": {
+            "type": "string",
+            "enum": [
+              "CONTENT_REPORT",
+              "ACCOUNT_APPEAL",
+              "FEATURE_FEEDBACK",
+              "SUGGESTION"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CASCADE",
+              "OTHER"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "USER_AVATAR",
+              "POST",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE",
+              "BANNER_IMAGE",
+              "COMMENT",
+              "USER_REPORT_ATTACHMENT",
+              "MODERATION_IMAGE",
+              "USER"
+            ]
+          },
+          "resourceUuids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "penaltyType": {
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "BAN_LOGIN",
+              "BAN_POST",
+              "BAN_COMMENT",
+              "BAN_UPLOAD",
+              "BAN_CHAT",
+              "BAN_CREATE",
+              "OTHER"
+            ]
+          },
+          "targetValidForReport": {
+            "type": "boolean"
+          },
+          "reasonValid": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ticketType"
+        ]
+      },
+      "ApiResponseReportResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportResponse"
+          }
+        }
+      },
+      "ReportResponse": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      },
       "PostSaveReq": {
         "type": "object",
         "properties": {
@@ -4474,13 +4839,13 @@
           "tagIds": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             },
             "uniqueItems": true
           },
           "categoryId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         },
@@ -4488,6 +4853,32 @@
           "categoryId",
           "content",
           "title"
+        ]
+      },
+      "CreateReportReq": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CASCADE",
+              "OTHER"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "reasonValid": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type"
         ]
       },
       "ContentPreviewReq": {
@@ -4532,7 +4923,7 @@
             "type": "string"
           },
           "data": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -4543,7 +4934,7 @@
           "ids": {
             "type": "array",
             "items": {
-              "type": "integer",
+              "type": "string",
               "format": "int64"
             }
           }
@@ -4591,11 +4982,11 @@
         "type": "object",
         "properties": {
           "postId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "parentId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "content": {
@@ -4748,7 +5139,7 @@
             "type": "string"
           },
           "exp": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -5058,6 +5449,531 @@
           }
         }
       },
+      "ApiResponsePageUserTicketListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "PageObject": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "string",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserTicketListResponse"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "string",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "unpaged": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "empty": {
+            "type": "boolean"
+          },
+          "sorted": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserTicketListResponse": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "ticketType": {
+            "type": "string",
+            "enum": [
+              "CONTENT_REPORT",
+              "ACCOUNT_APPEAL",
+              "FEATURE_FEEDBACK",
+              "SUGGESTION"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RESOLVED",
+              "REJECTED"
+            ]
+          },
+          "content": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "USER_AVATAR",
+              "POST",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE",
+              "BANNER_IMAGE",
+              "COMMENT",
+              "USER_REPORT_ATTACHMENT",
+              "MODERATION_IMAGE",
+              "USER"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "auditAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "auditNote": {
+            "type": "string"
+          },
+          "rejectType": {
+            "type": "string"
+          },
+          "evidenceCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiResponseUserTicketDetailResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserTicketDetailResponse"
+          }
+        }
+      },
+      "EvidenceItem": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "expireAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReplyItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64"
+          },
+          "content": {
+            "type": "string"
+          },
+          "senderName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Timeline": {
+        "type": "object",
+        "properties": {
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "UserTicketDetailResponse": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "ticketType": {
+            "type": "string",
+            "enum": [
+              "CONTENT_REPORT",
+              "ACCOUNT_APPEAL",
+              "FEATURE_FEEDBACK",
+              "SUGGESTION"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RESOLVED",
+              "REJECTED"
+            ]
+          },
+          "content": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "USER_AVATAR",
+              "POST",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE",
+              "BANNER_IMAGE",
+              "COMMENT",
+              "USER_REPORT_ATTACHMENT",
+              "MODERATION_IMAGE",
+              "USER"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "auditAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "auditNote": {
+            "type": "string"
+          },
+          "rejectType": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvidenceItem"
+            }
+          },
+          "timeline": {
+            "$ref": "#/components/schemas/Timeline"
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReplyItem"
+            }
+          }
+        }
+      },
+      "ApiResponseTicketStatsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TicketStatsResponse"
+          }
+        }
+      },
+      "TicketStatsResponse": {
+        "type": "object",
+        "properties": {
+          "reportCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "appealCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "feedbackCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "suggestionCount": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponsePostDetailResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PostDetailResp"
+          }
+        }
+      },
+      "OptionVOLong": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PostDetailResp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "coverImage": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "category": {
+            "$ref": "#/components/schemas/OptionVOLong"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionVOLong"
+            }
+          },
+          "viewCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "collectCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "NOTICE"
+            ]
+          },
+          "isPinned": {
+            "type": "boolean"
+          },
+          "userBrief": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "isLiked": {
+            "type": "boolean"
+          },
+          "isCollected": {
+            "type": "boolean"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "FANS_ONLY"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "editStatus": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "PENDING"
+            ]
+          }
+        }
+      },
+      "UserBrief": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userType": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "ADMIN",
+              "BOT",
+              "MODERATOR",
+              "VIP"
+            ]
+          }
+        }
+      },
       "ApiResponsePostDraftResp": {
         "type": "object",
         "properties": {
@@ -5072,24 +5988,6 @@
           },
           "data": {
             "$ref": "#/components/schemas/PostDraftResp"
-          }
-        }
-      },
-      "OptionVOLong": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "disabled": {
-            "type": "boolean"
           }
         }
       },
@@ -5132,188 +6030,6 @@
           }
         }
       },
-      "ApiResponsePostDetailResp": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/PostDetailResp"
-          }
-        }
-      },
-      "PostDetailResp": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "subtitle": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "coverImage": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          },
-          "category": {
-            "$ref": "#/components/schemas/OptionVOLong"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OptionVOLong"
-            }
-          },
-          "viewCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "likeCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "commentCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "collectCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "publishedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "COMMON",
-              "NOTICE"
-            ]
-          },
-          "isPinned": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ApiResponsePostAuthorDetailResp": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/PostAuthorDetailResp"
-          }
-        }
-      },
-      "PostAuthorDetailResp": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "subtitle": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "coverImage": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          },
-          "category": {
-            "$ref": "#/components/schemas/OptionVOLong"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OptionVOLong"
-            }
-          },
-          "viewCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "likeCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "commentCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "collectCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "visibility": {
-            "type": "string",
-            "enum": [
-              "PUBLIC",
-              "PRIVATE",
-              "FANS_ONLY"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "DRAFT",
-              "PENDING",
-              "PUBLISHED",
-              "REJECTED",
-              "ARCHIVED"
-            ]
-          },
-          "slug": {
-            "type": "string"
-          },
-          "publishedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
       "ApiResponseMyPostsStatsResp": {
         "type": "object",
         "properties": {
@@ -5335,27 +6051,27 @@
         "type": "object",
         "properties": {
           "totalCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "publishedCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "draftCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "pendingCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "rejectedCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "totalLikeCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -5373,168 +6089,31 @@
             "type": "string"
           },
           "data": {
-            "$ref": "#/components/schemas/PagePostAuthorCardResp"
+            "$ref": "#/components/schemas/PageObject"
           }
         }
       },
-      "PagePostAuthorCardResp": {
+      "PublicPostListReq": {
         "type": "object",
         "properties": {
-          "totalElements": {
+          "categoryId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32"
           },
-          "totalPages": {
+          "tagIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "page": {
             "type": "integer",
             "format": "int32"
           },
           "size": {
             "type": "integer",
             "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PostAuthorCardResp"
-            }
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
-          "empty": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PageableObject": {
-        "type": "object",
-        "properties": {
-          "offset": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "paged": {
-            "type": "boolean"
-          },
-          "unpaged": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PostAuthorCardResp": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "subtitle": {
-            "type": "string"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "coverImage": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          },
-          "category": {
-            "$ref": "#/components/schemas/OptionVOLong"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OptionVOLong"
-            }
-          },
-          "viewCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "likeCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "commentCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "collectCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "visibility": {
-            "type": "string",
-            "enum": [
-              "PUBLIC",
-              "PRIVATE",
-              "FANS_ONLY"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "DRAFT",
-              "PENDING",
-              "PUBLISHED",
-              "REJECTED",
-              "ARCHIVED"
-            ]
-          },
-          "slug": {
-            "type": "string"
-          },
-          "publishedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "SortObject": {
-        "type": "object",
-        "properties": {
-          "empty": {
-            "type": "boolean"
-          },
-          "sorted": {
-            "type": "boolean"
-          },
-          "unsorted": {
-            "type": "boolean"
           }
         }
       },
@@ -5551,148 +6130,7 @@
             "type": "string"
           },
           "data": {
-            "$ref": "#/components/schemas/PagePostCardResp"
-          }
-        }
-      },
-      "PagePostCardResp": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PostCardResp"
-            }
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
-          "empty": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PostCardResp": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "title": {
-            "type": "string"
-          },
-          "subtitle": {
-            "type": "string"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "userBrief": {
-            "$ref": "#/components/schemas/UserBrief"
-          },
-          "coverImage": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          },
-          "category": {
-            "$ref": "#/components/schemas/OptionVOLong"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OptionVOLong"
-            }
-          },
-          "viewCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "likeCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "commentCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "collectCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "publishedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "COMMON",
-              "NOTICE"
-            ]
-          },
-          "isPinned": {
-            "type": "boolean"
-          }
-        }
-      },
-      "UserBrief": {
-        "type": "object",
-        "properties": {
-          "uid": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "avatar": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          },
-          "level": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userType": {
-            "type": "string",
-            "enum": [
-              "COMMON",
-              "ADMIN",
-              "BOT",
-              "MODERATOR",
-              "VIP"
-            ]
+            "$ref": "#/components/schemas/PageObject"
           }
         }
       },
@@ -5717,7 +6155,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "name": {
@@ -5730,7 +6168,7 @@
             "type": "string"
           },
           "usageCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "createdAt": {
@@ -5792,53 +6230,7 @@
             "type": "string"
           },
           "data": {
-            "$ref": "#/components/schemas/PageTagResponse"
-          }
-        }
-      },
-      "PageTagResponse": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TagResponse"
-            }
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
-          "empty": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/PageObject"
           }
         }
       },
@@ -5863,15 +6255,15 @@
         "type": "object",
         "properties": {
           "onlineCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "todayNewUsers": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "todayPeakOnline": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -5898,7 +6290,7 @@
         "type": "object",
         "properties": {
           "timeout": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -5930,7 +6322,7 @@
             }
           },
           "nextCursor": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "hasNext": {
@@ -5942,7 +6334,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "title": {
@@ -5993,15 +6385,15 @@
         "type": "object",
         "properties": {
           "used": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "committed": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "max": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -6016,7 +6408,7 @@
             "type": "string"
           },
           "uptime": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -6048,7 +6440,7 @@
         "type": "object",
         "properties": {
           "used": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -6061,11 +6453,11 @@
             "format": "int32"
           },
           "totalMemory": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "freeMemory": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -6100,19 +6492,19 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "postId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "parentId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "rootId": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "author": {
@@ -6122,11 +6514,11 @@
             "type": "string"
           },
           "likeCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "replyCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "createdAt": {
@@ -6135,6 +6527,12 @@
           },
           "replyToDisplayName": {
             "type": "string"
+          },
+          "isPostAuthor": {
+            "type": "boolean"
+          },
+          "isLiked": {
+            "type": "boolean"
           }
         }
       },
@@ -6148,7 +6546,7 @@
             }
           },
           "nextCursor": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "hasNext": {
@@ -6197,7 +6595,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "title": {
@@ -6288,7 +6686,7 @@
         "type": "object",
         "properties": {
           "uid": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "userBrief": {
@@ -6318,19 +6716,19 @@
             "format": "date-time"
           },
           "followers": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "followings": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "likeCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "postCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }
@@ -6348,53 +6746,7 @@
             "type": "string"
           },
           "data": {
-            "$ref": "#/components/schemas/PageUserBrief"
-          }
-        }
-      },
-      "PageUserBrief": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserBrief"
-            }
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
-          "empty": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/PageObject"
           }
         }
       },
@@ -6419,26 +6771,26 @@
         "type": "object",
         "properties": {
           "uid": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "userBrief": {
             "$ref": "#/components/schemas/UserBrief"
           },
           "followers": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "followings": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "likeCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           },
           "postCount": {
-            "type": "integer",
+            "type": "string",
             "format": "int64"
           }
         }

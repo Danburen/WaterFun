@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -30,6 +31,10 @@ public class GatewaySecurityConfig {
     private final RsaJwtDecoder jwtParser;
     private final JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint;
     private final JsonAccessDeniedHandler jsonAccessDeniedHandler;
+
+    @Value("${waterfun.cors.allowed-origins:https://waterfun.top,http://localhost:3000,http://localhost:5173}")
+    private String allowedOrigins;
+
     @Bean
     SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
 
@@ -60,7 +65,7 @@ public class GatewaySecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedOriginPatterns(parseCsv(allowedOrigins));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("X-Request-Id"));

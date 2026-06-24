@@ -1,112 +1,124 @@
-# WaterFun - A new era diversified interactive forum
+# WaterFun — 多元化互动论坛社区
 
-WaterFun 是一个论坛 / 社区平台项目，采用 **前后端分离 + 网关** 的混合型单体仓库（**Gradle 多模块** + **pnpm workspace**）。仓库内包含用户侧论坛（Web Client）、后台管理（Admin）以及后端 API 服务（Gateway + Services）。
+<div align="center">
 
----
+**A feature-rich community forum platform with gateway-centric microservice architecture.**
 
-## ✨ Features
+[![Java 22](https://img.shields.io/badge/Java_22-ED8B00?logo=openjdk&logoColor=white)]()
+[![Spring Boot 4.0](https://img.shields.io/badge/Spring_Boot_4.0-6DB33F?logo=springboot&logoColor=white)]()
+[![Spring Cloud 2025](https://img.shields.io/badge/Spring_Cloud_2025-6DB33F?logo=spring&logoColor=white)]()
+[![Vue 3](https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white)]()
+[![Nuxt 4](https://img.shields.io/badge/Nuxt_4-00DC82?logo=nuxt&logoColor=white)]()
+[![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)]()
+[![Redis](https://img.shields.io/badge/Redis-FF4438?logo=redis&logoColor=white)]()
 
-- **统一网关作为信任边界**：鉴权在 Gateway 完成，下游服务专注业务（网关注入 `X-User-*` 上下文）。
-- **安全链路完整**：双令牌（Access/Refresh）+ **RSA JWT (RS256)**，并结合 Redis 做 token/jti 维护。
-- **缓存分层**：本地缓存（Caffeine）+ Redis + MySQL 的常见三层思路，适合热点数据与会话/验证码等场景。
-- **异步化审核/通知**：RabbitMQ 队列化处理 moderation 等任务。
-- **对象存储能力完善**：Tencent COS 预签名上传/下载、STS 临时凭证等。
-- **工程化统一规范**：统一响应封装（`ApiResponse<T>` / `ErrorResponse`），核心逻辑下沉到 `waterfun-service-core`。
-
----
-
-## ✅ Implemented Features
-
-### 用户侧（Forum / User）
-- 认证：账号密码 / 短信 / 邮箱验证码登录、注册、刷新 Token、登出、CSRF Token
-- 账号安全：设置/重置密码；绑定/激活/修改邮箱/手机号
-- 用户资料：基础信息、资料编辑、头像上传（预签名 URL + 回调确认）
-- 内容：发帖、帖子列表/详情（分页 + 分类/标签过滤）、标签管理
-- 通知：系统通知列表、未读数、批量已读/全部已读
-- 资源：COS 上传、预签名下载
-
-### 后台管理（Admin）
-- 管理员认证
-- 用户管理、角色/权限/菜单
-- 分类/标签、帖子管理与审核（moderation）
-- Banner 管理、仪表盘统计与图表
-
-### 网关（Gateway）
-- 统一 API 入口、JWT 校验、公共白名单
-- 基础限流、`X-Request-Id` 追踪
-
-> 以 `docs/api_docs/*.json` 与 `reference/*.openapi.json` 为准。
+</div>
 
 ---
 
-## 🧱 Monorepo Structure
+## Architecture Advantages
 
-```
-/waterfun-gateway          # 统一网关 (Spring Cloud Gateway)
-/waterfun-service          # 用户侧核心业务 API
-/waterfun-admin-service    # 后台管理 API
-/waterfun-notify-service   # 通知服务
-/waterfun-service-core     # 共享业务 / 领域能力
-/waterfun-common-lib       # 通用响应 / 错误 / 工具
-/waterfun-admin            # 管理后台前端 (Vue 3 + Vite)
-/waterfun-web-client       # 用户侧前端 (Nuxt 3)
-/waterfun-web-core         # 前端共享类型/工具
-/sqls                      # 数据库脚本
-/docs                      # 文档
-/reference                 # OpenAPI 参考
-```
+| Design Decision | Benefit |
+|----------------|---------|
+| **Gateway as trust boundary** | Only Gateway is public-facing. Downstream services (user-service, admin-service) never expose ports externally. Authentication, rate limiting, CORS all centralized in Gateway. User context propagated via `X-User-*` headers. |
+| **2-layer config system** | Development requires zero OS environment variables. Infra defaults embedded in `common.yml` (`:default`), third-party secrets in gitignored `common-dev-secrets.yml`. Production uses env var injection only. |
+| **Dual-token JWT (RS256) + Redis rotation** | Short-lived Access Token + long-lived Refresh Token with rotation family. RS256 asymmetric signing, Redis JTI lookup for revocation. Device fingerprinting prevents token theft. |
+| **3-tier cache** | Caffeine (L1, hot data in Gateway) → Redis (L2, session/token/captcha) → MySQL (L3, persistence). Optimized for read-heavy community workloads. |
+| **AOP-based ban enforcement** | `@BanCheck` annotation intercepts any service method. 6 ban types (login/post/comment/upload/chat/create), automatic extension logic, permanent-override semantics. |
+| **Unified ticket system + async MQ** | Single `POST /api/tickets` endpoint for report/appeal/feedback/suggestion. RabbitMQ decouples submission from review; admin review triggers penalty application and real-time notification via SSE. |
+| **Multi-module monorepo** | 5 Gradle modules + 3 pnpm workspaces. Shared core (`waterfun-service-core`) reduces duplication; common lib (`waterfun-common-lib`) has zero Spring dependency for cross-module reuse. |
 
 ---
 
-## 🧰 Tech Stack (Short)
+## Features
 
-- Backend: **Java 22**, **Spring Boot 4.x**, Spring Cloud Gateway, Spring Security/OAuth2, JPA/Hibernate + MyBatis, Redis + Spring Session, MySQL, RabbitMQ, Caffeine
-- Frontend: **Nuxt 3 (Web Client)**, **Vue 3 + Vite (Admin)**, Pinia, Element Plus, Axios
-- Integrations: Tencent COS, Aliyun SMS, Resend Email
+| Area | Capabilities |
+|------|-------------|
+| **Authentication** | Password / SMS / Email login & register, dual-token (Access+Refresh), RS256 JWT, device fingerprint, CSRF Token |
+| **Account Security** | Set/reset password, bind/modify email & phone, captcha verification |
+| **User Profiles** | Profile edit, avatar upload (COS presigned URL + callback confirm), follower system, privacy settings |
+| **Content** | Post CRUD, paginated lists with category/tag filters, tags, comments, likes, bookmarks |
+| **Notifications** | System inbox, unread count, batch read, SSE real-time push, RabbitMQ async delivery |
+| **Ticket System** | Content report, account appeal, feedback, suggestion — unified endpoint, MQ decoupled |
+| **Content Moderation** | Post/image/text audit workflow, batch operations, audit history, RabbitMQ callback strategies |
+| **Ban System** | 6 penalty types, AOP `@BanCheck` enforcement, auto-extension, permanent override, lift management |
+| **Admin Dashboard** | User/role/permission management, site statistics, JVM monitoring, online users, ECharts visualization |
+| **Object Storage** | Tencent COS presigned upload/download, STS temporary credentials, file type detection, callback confirmation |
+| **Rate Limiting** | Auth endpoint rate limit (10 req/60s), global IP-based rate limit (1000 GET / 300 write per 60s) |
 
 ---
 
-## 🚀 Local Development (Quick Start)
+## Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Framework | Spring Boot 4.0.x, Spring Cloud Gateway 2025.1.0 |
+| Language | Java 22, TypeScript 5.9 |
+| Auth | Spring Security, OAuth2 Resource Server, RS256 JWT (jjwt 0.12.x), BCrypt |
+| ORM | JPA / Hibernate + MyBatis 3.0.3 |
+| Cache | Caffeine 3.2.3 (L1) + Redis (L2) + MySQL (L3) |
+| Queue | RabbitMQ (moderation + ticket notifications) |
+| Storage | Tencent COS (presigned URLs) |
+| SMS | Aliyun SMS (dysmsapi) |
+| Email | Resend (resend-java), Spring Mail (SMTP) |
+| Frontend | Nuxt 4 + Vue 3 (Web Client), Vue 3 + Vite 7 (Admin) |
+| UI Library | Element Plus, ECharts 6 |
+| Mapping | MapStruct 1.6.3 (Java), Axios 1.13.5 (HTTP) |
+
+---
+
+## Getting Started
 
 ### Prerequisites
-- Java 22
-- Node.js `>= 20.19.0` + pnpm `10.7.1`
-- MySQL + Redis（必需）
-- RabbitMQ（需要审核/通知链路时）
 
-### Backend (Windows)
+- Java 22, Node.js >= 20.19.0, pnpm 10.7.1
+- MySQL + Redis (required), RabbitMQ (optional, for moderation)
+
+### Backend
+
 ```bash
-# build all
 gradlew.bat build
-
-# run modules
 gradlew.bat :waterfun-gateway:bootRun
 gradlew.bat :waterfun-service:bootRun
 gradlew.bat :waterfun-admin-service:bootRun
-gradlew.bat :waterfun-notify-service:bootRun
 ```
 
 ### Frontend
+
 ```bash
 pnpm install
+pnpm adev        # Admin (port 5173)
+pnpm cdev        # Web Client (port 3000)
+```
 
-# admin
-pnpm adev
+### Configuration
 
-# web client
-pnpm cdev
+The project uses a 2-layer config system. **No OS environment variables needed for development.**
+
+```
+deploy/config/common.yml                 # Infra defaults embedded (:default)
+deploy/config/common-dev-secrets.yml     # Third-party secrets (gitignored, request from teammate)
 ```
 
 ---
 
-## 📚 Docs / Config
+## Project Structure
 
-- 技术架构与细节：`docs/README_TECHNOLOGY.md`
-- API 文档：`docs/api_docs/*.json`
-- 参考 OpenAPI：`reference/*.openapi.json`
+```
+waterfun-gateway          API Gateway (Spring Cloud Gateway, port 8080)
+waterfun-service          User-Facing Business API (port 8081, incl. notification)
+waterfun-admin-service    Admin API (port 8082)
+waterfun-service-core     Shared Business Logic (JPA, services, AOP aspects)
+waterfun-common-lib       Shared Utilities (zero Spring dependency)
+waterfun-admin            Admin Dashboard (Vue 3 + Vite + Element Plus)
+waterfun-web-client       User Forum (Nuxt 4 + Vue 3 + Element Plus)
+waterfun-web-core         Shared Frontend Library (TS types, utilities)
+sqls/                     Database scripts
+deploy/                   Docker, config, scripts, keys
+```
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under **MPL-2.0**. See `LICENSE` for details.
+MPL-2.0. See `LICENSE` for details.

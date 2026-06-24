@@ -40,7 +40,7 @@ public class VerificationServiceImpl implements VerificationService {
     public CodeResult sendAutoTargetAuthenticationCode(VerifyChannel channel, VerifyScene scene) {
         UserDatum userDatum = userDatumRepo.findUserDatumByUserUid(UserCtxHolder.getUserUid())
                 .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
-        EncryptionDataKey aesKey = encryptedKeyService.getAesKey();
+        EncryptionDataKey aesKey = encryptedKeyService.getKeyById(userDatum.getEncryptionKeyId());
         CodeSender sender = codeSenderFactory.of(channel);
         String encryptedTarget = switch (channel) {
             case SMS -> userDatum.getPhoneEncrypted();

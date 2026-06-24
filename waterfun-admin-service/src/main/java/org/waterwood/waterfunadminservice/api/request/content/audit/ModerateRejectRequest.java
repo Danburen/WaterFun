@@ -5,14 +5,14 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModerateRejectRequest {
     @NotNull
-    private AuditRejectType rejectType;
+    private AuditType rejectType;
     @Size(max = 255)
     private String rejectReason;
 }

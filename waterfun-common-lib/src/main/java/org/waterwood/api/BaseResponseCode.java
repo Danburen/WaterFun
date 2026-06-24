@@ -131,7 +131,13 @@ public enum BaseResponseCode implements ResponseCode {
     ILLEGAL_UPLOAD_FILE_ARGUMENTS("system.illegal_upload_file_arguments"),
     INVALID_REFERENCE("system.invalid_reference"),
     BIZ_TYPE_NOT_ALLOW_ARGS("system.biz_type_not_allow_args"),
-    BANNER_NOT_FOUND("system.banner.not_found"),;
+    BANNER_NOT_FOUND("system.banner.not_found"),
+    BAN_FORBIDDEN("ban.forbidden"),
+    REPORT_ALREADY_EXISTS("report.already_exists"),
+    REPORT_NOT_FOUND("report.not_found"),
+    UNSUPPORTED_REPORT_TYPE("report.type_not_supported"),
+    TicketNotFoundException("ticket.not_found"),
+    REPORT_TARGET_INVALID("report.target_invalid"),;
     private final String code;
     // private final String defaultMessage;
 

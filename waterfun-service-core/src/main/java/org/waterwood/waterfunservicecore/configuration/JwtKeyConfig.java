@@ -1,5 +1,7 @@
 package org.waterwood.waterfunservicecore.configuration;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,12 +15,31 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+@Slf4j
 @Configuration
 public class JwtKeyConfig {
     @Value("${jwt.private-key}")
     private Resource privateKeyContent;
     @Value("${jwt.public-key}")
     private Resource publicKeyContent;
+
+    @PostConstruct
+    public void validateKeyConfig() {
+        if (privateKeyContent == null) {
+            throw new IllegalStateException(
+                "JWT Private Key is not configured. " +
+                "Set JWT_PRIVATE_KEY environment variable to the path of your RSA private key file " +
+                "(e.g., JWT_PRIVATE_KEY=file:/etc/waterfun/keys/private.key)."
+            );
+        }
+        if (!privateKeyContent.exists()) {
+            throw new IllegalStateException(
+                "JWT Private Key file not found: " + privateKeyContent + ". " +
+                "Please verify JWT_PRIVATE_KEY environment variable points to an existing RSA private key file."
+            );
+        }
+        log.info("JWT Private Key loaded from: {}", privateKeyContent);
+    }
 
     @Bean
     public PrivateKey getSigningKey() throws Exception {

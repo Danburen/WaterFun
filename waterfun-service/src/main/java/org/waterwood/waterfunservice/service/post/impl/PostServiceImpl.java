@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +20,15 @@ import org.waterwood.api.VO.OptionVO;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.ResourceType;
+import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.UserBizType;
 import org.waterwood.waterfunservice.api.UserUploadContext;
 import org.waterwood.waterfunservice.api.UserUploadPolicyReq;
+import org.waterwood.waterfunservice.api.request.PublicPostListReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.service.NotificationService;
+import org.waterwood.waterfunservicecore.api.UploadItem;
 import org.waterwood.waterfunservicecore.api.moderation.AuditPayload;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservice.api.response.post.*;
@@ -32,9 +37,6 @@ import org.waterwood.waterfunservice.service.post.TagService;
 import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.entity.post.PostResource;
-import org.waterwood.waterfunservicecore.entity.audit.AuditContentFormat;
-import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.post.*;
 import org.waterwood.waterfunservicecore.entity.resource.*;
 import org.waterwood.waterfunservicecore.entity.user.*;
@@ -53,6 +55,7 @@ import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerato
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
+import org.waterwood.waterfunservicecore.entity.spec.PostSpec;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservice.service.post.PostService;
@@ -68,9 +71,8 @@ import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
-import org.waterwood.waterfunservicecore.infrastructure.utils.ContentIdGenerator;
+import org.waterwood.waterfunservicecore.infrastructure.utils.IdGenerator;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -149,9 +151,18 @@ public class PostServiceImpl implements PostService {
                     res.setTags(postTagMap.getOrDefault(postId, Collections.emptyList()));
                     res.setCategory(postCategoryMap.get(postId));
                     res.setCoverImage(postCoverageImgMap.get(postId));
-                    res.setUserBrief(postUserBriefMap.get(postId));
+                    res.setUserBrief(postUserBriefMap.get(post.getAuthor().getUid()));
                 }
         );
+    }
+
+    @Override
+    public Page<PostCardResp> listPublicCardPosts(PublicPostListReq req) {
+        Specification<Post> spec = PostSpec.ofPublic(req.getCategoryId(), req.getTagIds(), null);
+        Pageable pageable = PageRequest
+                .of(Math.max(req.getPage() - 1, 0), Math.min(req.getSize(), 20))
+                .withSort(Sort.Direction.DESC, "publishedAt", "createdAt");
+        return listCardPosts(spec, pageable);
     }
 
     @Override
@@ -175,34 +186,75 @@ public class PostServiceImpl implements PostService {
         );
     }
 
+    @Transactional
     @Override
-    public PostDetailResp getPublicPostDetail(Long id) {
-        return postRepository.findByIdAndVisibilityAndIsDeleted(id, PostVisibility.PUBLIC, false)
-                .map(post -> buildPostDetailResp(
-                        post,
-                        postMapper::toPostDetailResp,
-                        (res, tags, category, coverImg) -> {
-                            res.setTags(tags);
-                            res.setCategory(category);
-                            res.setCoverImage(coverImg);
-                        }
-                ))
-                .orElseThrow(() -> new BizException(BaseResponseCode.NOT_FOUND));
-    }
+    public PostDetailResp getPostDetail(Long id) {
+        Long currentUid = UserCtxHolder.getUserUid();
 
-    @Override
-    public PostAuthorDetailResp getSelfPostDetail(Long id) {
-        return postRepository.findByIdAndAuthorUidAndIsDeleted(id, UserCtxHolder.getUserUid(), false)
-                .map(post -> buildPostDetailResp(
-                        post,
-                        postMapper::toPostAuthorDetailResp,
-                        (res, tags, category, coverImg) -> {
-                            res.setTags(tags);
-                            res.setCategory(category);
-                            res.setCoverImage(coverImg);
-                        }
-                ))
-                .orElseThrow(() -> new BizException(BaseResponseCode.NOT_FOUND));
+        Post post = postRepository.findByIdAndIsDeleted(id, false)
+                .orElseThrow(PostNotFoundException::new);
+
+        boolean isAuthor = post.getAuthor().getUid().equals(currentUid);
+
+        // Non-author: must be publicly visible, and only count views for non-author
+        if (!isAuthor) {
+            if (post.getVisibility() != PostVisibility.PUBLIC
+                    || post.getStatus() != PostStatus.PUBLISHED) {
+                throw new PostNotFoundException();
+            }
+            postRepository.increaseViewCount(id, 1);
+        }
+
+        PostDetailResp resp = postMapper.toPostDetailResp(post);
+        List<OptionVO<Long>> tags = tagRepository.findTagOptionVOsByPostId(post.getId());
+
+        CloudResPresignedUrlResp coverImg = null;
+        Resource coverageImgRes = post.getCoverageResource();
+        if (coverageImgRes != null) {
+            coverImg = cloudFileService.getReadUrlCached(
+                    CloudFSRoot.UPLOADS,
+                    coverageImgRes.getUuid(),
+                    post.getId(),
+                    TargetType.POST_COVERAGE_IMAGE
+            );
+        }
+
+        if (post.getCategory() != null) {
+            resp.setCategory(post.getCategory().toOption());
+        }
+        resp.setTags(tags);
+        resp.setCoverImage(coverImg);
+
+        if (isAuthor) {
+            resp.setVisibility(post.getVisibility());
+            resp.setStatus(post.getStatus());
+            resp.setEditStatus(post.getEditStatus());
+
+            // Fallback: if main fields are empty (draft/never published), show edited content
+            if (StringUtil.isBlank(resp.getTitle())) {
+                resp.setTitle(post.getEditedTitle());
+            }
+            if (StringUtil.isBlank(resp.getSubtitle())) {
+                resp.setSubtitle(post.getEditedSubtitle());
+            }
+            if (StringUtil.isBlank(resp.getContent())) {
+                resp.setContent(post.getEditedContent());
+            }
+            if (StringUtil.isBlank(resp.getSummary())) {
+                resp.setSummary(post.getEditedSummary());
+            }
+            if (resp.getCategory() == null && post.getEditedCategory() != null) {
+                resp.setCategory(post.getEditedCategory().toOption());
+            }
+            if (tags.isEmpty() && post.getEditedTagIds() != null && !post.getEditedTagIds().isEmpty()) {
+                resp.setTags(tagRepository.findTagOptionVosByIdsIn(post.getEditedTagIds()));
+            }
+        }
+        resp.setIsLiked(userLikeRepository.existsById(new UserLikeId(currentUid, post.getId())));
+        resp.setIsCollected(userCollectRepository.existsById(new UserCollectId(currentUid, post.getId())));
+        resp.setUserBrief(userBriefService.getUserBrief(post.getAuthor().getUid()));
+
+        return resp;
     }
 
     @Override
@@ -247,7 +299,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private Post createNewDraftPost(){
-        Long id = ContentIdGenerator.nextPostId();
+        Long id = IdGenerator.nextPostId();
         Post p = new Post();
         p.setId(id);
         p.setEditedTitle(messageSource.getMessage(
@@ -364,9 +416,10 @@ public class PostServiceImpl implements PostService {
             List<Tag> tags = tagRepository.findAllById(req.getTagIds());
             p.setEditedTagIds(tags.stream().map(Tag::getId).toList());
         }
-        p.setEditedNewTags(req.getNewTags().stream()
+
+        p.setEditedNewTags(CollectionUtil.isNotEmpty(req.getNewTags()) ? req.getNewTags().stream()
                 .map(str -> str.trim().replaceAll("[^a-z0-9-]", ""))
-                .toList());
+                .toList() : List.of());
         postRepository.save(p);
         return p.getId();
     }
@@ -408,6 +461,8 @@ public class PostServiceImpl implements PostService {
         toOrphanUuids.removeAll(allValidNewResUuids);
         Set<String> toActivateUuids = new HashSet<>(linkedNewResUuids);
         toActivateUuids.removeAll(originResUuids);
+
+        log.info("Sync post resources for post {}, to activate: {}, to orphan: {}", p.getId(), toActivateUuids, toOrphanUuids);
         if (!toActivateUuids.isEmpty()) {
             resourceRepository.batchUpdateStatusFromTo(ResourceStatus.ORPHAN, ResourceStatus.ACTIVE, toActivateUuids);
         }
@@ -541,7 +596,7 @@ public class PostServiceImpl implements PostService {
                     .build());
         }
         if( p.getEditedTagIds() != null) {
-            List<OptionVO<Long>> editedTags = tagRepository.findTagOptionVOsByPostIdIn(p.getEditedTagIds());
+            List<OptionVO<Long>> editedTags = tagRepository.findTagOptionVosByIdsIn(p.getEditedTagIds());
 
             resp.setEditedTagIds(editedTags);
         }
@@ -552,9 +607,19 @@ public class PostServiceImpl implements PostService {
         return resp;
     }
 
+    private void ensurePostPublished(Long postId) {
+        Post post = postRepository.findByIdAndIsDeleted(postId, false)
+                .orElseThrow(PostNotFoundException::new);
+        // Allow interaction if: publicly visible AND has been published at least once (has publishedAt)
+        if (post.getVisibility() != PostVisibility.PUBLIC || post.getPublishedAt() == null) {
+            throw new PostNotFoundException();
+        }
+    }
+
     @Transactional
     @Override
     public void like(Long postId) {
+        ensurePostPublished(postId);
         Long userUid = UserCtxHolder.getUserUid();
         PostAuthorUidTitleDO pdo = postRepository.findPostAuthorIdTitleDOById(
                 postId
@@ -587,8 +652,10 @@ public class PostServiceImpl implements PostService {
                 );
     }
 
+    @Transactional
     @Override
     public void collection(Long postId) {
+        ensurePostPublished(postId);
         Long userUid = UserCtxHolder.getUserUid();
         UserCounter uc = userCounterRepository.findByUserUid(userUid)
                 .orElseThrow(UserAssociationDataNotFoundException::new);
@@ -759,7 +826,7 @@ public class PostServiceImpl implements PostService {
         if(! validItems.isEmpty()){
             List<Resource> resources = validItems.stream()
                     .map(item -> {
-                        return cloudFileService.createAndSetUpUploadRes(item.uuidPlain, item.path, UserCtxHolder.getUserUid());
+                        return cloudFileService.createAndSetUpUploadRes(item.uuidPlain(), item.path(), UserCtxHolder.getUserUid());
                     })
                     .toList();
             resourceRepository.saveAll(resources);
@@ -827,37 +894,7 @@ public class PostServiceImpl implements PostService {
         ).orElseThrow(() -> new ResourceReferenceInvalidException(resourceUuid));
     }
 
-    private <T> T buildPostDetailResp(
-            Post post,
-            java.util.function.Function<Post, T> mapper,
-            DetailApplier<T> applier
-    ) {
-        T res = mapper.apply(post);
-        List<OptionVO<Long>> tags = tagRepository.findTagOptionVOsByPostIdIn(List.of(post.getId()));
-        OptionVO<Long> category = categoryRepository.findCategoryOptionVOByPostIdIn(List.of(post.getId())).getFirst();
-        Resource coverageImgRes = post.getCoverageResource();
-        CloudResPresignedUrlResp coverImg = null;
-        if(coverageImgRes != null) {
-            coverImg = cloudFileService.getReadUrlCached(
-                    CloudFSRoot.UPLOADS,
-                    coverageImgRes.getUuid(),
-                    post.getId(),
-                    TargetType.POST_COVERAGE_IMAGE
-            );
-        }
-        applier.apply(res, tags, category, coverImg);
-        return res;
-    }
 
-    @FunctionalInterface
-    private interface DetailApplier<T> {
-        void apply(
-                T res,
-                List<OptionVO<Long>> tags,
-                OptionVO<Long> category,
-                CloudResPresignedUrlResp coverImg
-        );
-    }
 
     private <T> Page<T> listCardPostsInternal(
             Specification<Post> spec,
@@ -921,12 +958,4 @@ public class PostServiceImpl implements PostService {
                 Map<Long, UserBrief> postUserBriefMap
         );
     }
-
-    private record UploadItem(
-            int originalIndex,
-            String path,
-            String uuidPlain,
-            UUID uuid,
-            FileExtension ext
-    ) {}
 }

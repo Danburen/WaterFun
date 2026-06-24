@@ -76,6 +76,7 @@ public class NotificationServiceImpl implements NotificationService {
             throw new ForbiddenException();
         }
         is.setIsRead(Boolean.TRUE);
+        inboxRepository.save(is);
     }
 
     @Override
@@ -170,7 +171,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void onReply(Long recipient, Long userUid, Long commentId, String title, Long postId, String replyContent) {
-        if (recipient == null || recipient.equals(userUid)) return;
+        if (recipient == null || recipient.equals(userUid)) return; // no self notification
         ReplyInboxPayload payload = new ReplyInboxPayload(
                 List.of(userUid),
                 replyContent,

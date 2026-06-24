@@ -1,6 +1,6 @@
 export interface Page<T> {
     content: T[];
-    totalElements?: number;
+    totalElements?: string;
     totalPages?: number;
     number?: number;
     size?: number;
@@ -10,13 +10,13 @@ export interface Page<T> {
     page?: {
         size: number;
         number: number;
-        totalElements: number;
+        totalElements: string;
         totalPages: number;
     };
 }
 
 export interface PageOptions {
-    total?: number;
+    total?: number | string;
     pageSize?: number;
     currentPage?: number;
 }

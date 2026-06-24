@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建议与反馈 - WaterFun Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --success-light: #dcfce7;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        /* ========== Sidebar ========== */
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo-text { font-size: 16px; font-weight: 700; }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section { margin-bottom: 8px; }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+        }
+
+        .nav-item:hover { background: var(--sidebar-hover); color: #e2e8f0; }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+
+        .nav-item i { width: 20px; text-align: center; font-size: 15px; }
+
+        .nav-badge {
+            margin-left: auto;
+            padding: 1px 8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-user-info { flex: 1; }
+        .sidebar-user-name { font-size: 14px; font-weight: 600; color: white; }
+        .sidebar-user-role { font-size: 12px; color: #64748b; }
+
+        /* ========== Main Content ========== */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            height: 60px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .top-bar-left { display: flex; align-items: center; gap: 12px; }
+        .page-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .top-bar-right { display: flex; align-items: center; gap: 8px; }
+
+        .top-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .top-btn:hover { background: var(--bg); color: var(--primary); }
+
+        .top-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        .content-area { padding: 24px 28px; flex: 1; }
+
+        /* ========== Queue Info ========== */
+        .queue-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .queue-info-left { display: flex; align-items: center; gap: 20px; }
+
+        .queue-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .queue-stat strong { color: var(--text-primary); font-size: 16px; }
+
+        .queue-info-right { display: flex; align-items: center; gap: 8px; }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* ========== Feedback List ========== */
+        .feedback-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .feedback-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+
+        .feedback-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+        }
+
+        .feedback-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--bg);
+            cursor: pointer;
+        }
+
+        .feedback-meta { display: flex; align-items: center; gap: 12px; }
+
+        .feedback-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-suggestion { background: var(--primary-light); color: var(--primary); }
+        .badge-feedback { background: var(--success-light); color: #15803d; }
+        .badge-complaint { background: var(--danger-light); color: #dc2626; }
+        .badge-bug { background: var(--warning-light); color: #b45309; }
+
+        .feedback-id {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'SF Mono', monospace;
+        }
+
+        .feedback-time { font-size: 12px; color: var(--text-muted); }
+
+        .feedback-status-bar { display: flex; align-items: center; gap: 8px; }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-new { background: var(--primary-light); color: var(--primary); }
+        .status-processing { background: var(--warning-light); color: #b45309; }
+        .status-resolved { background: var(--success-light); color: #15803d; }
+        .status-closed { background: var(--border-light); color: var(--text-muted); }
+
+        .feedback-card-body {
+            padding: 20px;
+            display: none;
+        }
+
+        .feedback-card-body.show { display: block; }
+
+        /* Feedback Preview (collapsed) */
+        .feedback-preview {
+            padding: 12px 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .feedback-preview:hover { color: var(--text-primary); }
+
+        /* Feedback Content */
+        .feedback-content {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+
+        .feedback-main { display: flex; flex-direction: column; gap: 16px; }
+
+        .panel-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .panel-label i { font-size: 11px; }
+
+        .feedback-text-box {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            border-left: 4px solid var(--primary);
+        }
+
+        .feedback-text-box p { margin-bottom: 8px; }
+        .feedback-text-box p:last-child { margin-bottom: 0; }
+
+        .feedback-screenshots {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .feedback-screenshots img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+        }
+
+        /* Reply Box */
+        .reply-box {
+            padding: 16px;
+            background: var(--primary-light);
+            border-radius: var(--radius-sm);
+            border: 1px solid #bfdbfe;
+        }
+
+        .reply-box label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .reply-box textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .reply-box textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .reply-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* ========== Right Panel ========== */
+        .info-card {
+            padding: 14px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .info-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-card-title i { font-size: 11px; }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .info-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .info-item:first-child { padding-top: 0; }
+
+        .info-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .info-detail { flex: 1; min-width: 0; }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-top: 1px;
+        }
+
+        /* User Mini Card */
+        .user-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            margin-bottom: 10px;
+        }
+
+        .user-mini-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .user-mini-info { flex: 1; }
+        .user-mini-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .user-mini-meta { font-size: 11px; color: var(--text-muted); }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .quick-tag {
+            padding: 4px 10px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-tag:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* ========== Action Buttons ========== */
+        .action-btn {
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn-pass {
+            background: var(--success);
+            color: white;
+        }
+
+        .action-btn-pass:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        }
+
+        .action-btn-reject {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn-reject:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+        }
+
+        .action-btn-skip {
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .action-btn-skip:hover {
+            background: var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .action-btn-detail {
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .action-btn-detail:hover { color: var(--text-secondary); }
+
+        .action-btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+        }
+
+        /* ========== Pagination ========== */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 24px;
+            padding: 16px;
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ========== Toast ========== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: var(--primary); }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 1200px) {
+            .feedback-content { grid-template-columns: 1fr; }
+            .feedback-screenshots { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar-logo-text, .nav-section-title, .nav-item span, .sidebar-user-info { display: none; }
+            .main-content { margin-left: 60px; }
+            .content-area { padding: 16px; }
+            .feedback-content { grid-template-columns: 1fr; }
+            .feedback-screenshots { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-logo">
+                    <div class="sidebar-logo-icon">WF</div>
+                    <span class="sidebar-logo-text">WaterFun</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">概览</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>在线用户</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">内容管理</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>帖子管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-comment"></i>
+                        <span>评论管理</span>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>审核工作台</span>
+                        <span class="nav-badge">42</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">用户</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-user"></i>
+                        <span>用户管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-ban"></i>
+                        <span>封禁记录</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>系统设置</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-history"></i>
+                        <span>操作日志</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="avatar" class="sidebar-user-avatar">
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name">Admin</div>
+                        <div class="sidebar-user-role">超级管理员</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1 class="page-title">建议与反馈</h1>
+                </div>
+                <div class="top-bar-right">
+                    <button class="top-btn"><i class="fas fa-search"></i></button>
+                    <button class="top-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                    <button class="top-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="queue-info">
+                    <div class="queue-info-left">
+                        <div class="queue-stat"><i class="fas fa-inbox"></i> 未处理 <strong>18</strong></div>
+                        <div class="queue-stat"><i class="fas fa-check-circle"></i> 今日已回复 <strong>12</strong></div>
+                        <div class="queue-stat"><i class="fas fa-archive"></i> 已归档 <strong>156</strong></div>
+                    </div>
+                    <div class="queue-info-right">
+                        <button class="filter-btn active">全部</button>
+                        <button class="filter-btn">建议</button>
+                        <button class="filter-btn">反馈</button>
+                        <button class="filter-btn">投诉</button>
+                        <button class="filter-btn">Bug</button>
+                    </div>
+                </div>
+
+                <!-- Feedback List -->
+                <div class="feedback-list">
+                    <!-- Feedback Item 1 -->
+                    <div class="feedback-card" data-id="1">
+                        <div class="feedback-card-header" onclick="toggleFeedback(1)">
+                            <div class="feedback-meta">
+                                <span class="feedback-type-badge badge-suggestion"><i class="fas fa-lightbulb"></i> 建议</span>
+                                <span class="feedback-id">#FB-20250612-089</span>
+                                <span class="feedback-time"><i class="far fa-clock"></i> 2026-06-12 14:20</span>
+                            </div>
+                            <div class="feedback-status-bar">
+                                <span class="status-chip status-new"><i class="fas fa-circle" style="font-size: 6px;"></i> 未处理</span>
+                                <i class="fas fa-chevron-down" id="icon-1" style="color: var(--text-muted); transition: transform 0.2s;"></i>
+                            </div>
+                        </div>
+                        <div class="feedback-preview" onclick="toggleFeedback(1)">
+                            建议增加夜间模式，现在的白色背景在晚上使用太刺眼了，希望可以像其他App一样有深色主题...
+                        </div>
+                        <div class="feedback-card-body" id="body-1">
+                            <div class="feedback-content">
+                                <div class="feedback-main">
+                                    <div class="panel-label"><i class="fas fa-align-left"></i> 详细内容</div>
+                                    <div class="feedback-text-box">
+                                        <p>建议增加夜间模式，现在的白色背景在晚上使用太刺眼了，希望可以像其他App一样有深色主题切换功能。</p>
+                                        <p>另外，建议夜间模式的切换可以跟随系统设置，这样用户不需要手动调整。如果技术实现有困难，至少可以先做一个手动开关放在设置里。</p>
+                                        <p>参考了竞品的设计，深色主题下文字对比度要足够，不要用纯黑背景，建议用深灰色（#1a1a2e 这种）。</p>
+                                    </div>
+                                    <div class="feedback-screenshots">
+                                        <img src="https://picsum.photos/seed/fb1a/200/150" alt="截图1">
+                                        <img src="https://picsum.photos/seed/fb1b/200/150" alt="截图2">
+                                    </div>
+                                    <div class="reply-box">
+                                        <label><i class="fas fa-reply"></i> 回复用户</label>
+                                        <textarea placeholder="输入回复内容..." id="reply-1"></textarea>
+                                        <div class="reply-actions">
+                                            <button class="action-btn action-btn-skip" onclick="event.stopPropagation(); markAsResolved(1, false)">标记已读</button>
+                                            <button class="action-btn action-btn-primary" onclick="event.stopPropagation(); replyFeedback(1)">发送回复</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="info-card">
+                                        <div class="info-card-title"><i class="fas fa-user"></i> 提交用户</div>
+                                        <div class="user-mini">
+                                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=userfb1" alt="avatar" class="user-mini-avatar">
+                                            <div class="user-mini-info">
+                                                <div class="user-mini-name">夜猫子程序员</div>
+                                                <div class="user-mini-meta">UID: 10456 · LV.7</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fas fa-mobile-alt"></i></div>
+                                            <div class="info-detail">
+                                                <div class="info-label">来源</div>
+                                                <div class="info-value">iOS App v2.3.1</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-icon" style="background: var(--success-light); color: #15803d;"><i class="fas fa-history"></i></div>
+                                            <div class="info-detail">
+                                                <div class="info-label">历史反馈</div>
+                                                <div class="info-value">3 次（均获回复）</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="info-card" style="margin-top: 12px;">
+                                        <div class="info-card-title"><i class="fas fa-tags"></i> 快捷标签</div>
+                                        <div class="quick-actions">
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(1, '已记录')">已记录</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(1, '产品需求')">产品需求</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(1, '高优先级')">高优先级</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(1, '转工单')">转工单</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(1, '重复反馈')">重复反馈</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Item 2 -->
+                    <div class="feedback-card" data-id="2">
+                        <div class="feedback-card-header" onclick="toggleFeedback(2)">
+                            <div class="feedback-meta">
+                                <span class="feedback-type-badge badge-feedback"><i class="fas fa-comment-dots"></i> 反馈</span>
+                                <span class="feedback-id">#FB-20250612-088</span>
+                                <span class="feedback-time"><i class="far fa-clock"></i> 2026-06-12 13:45</span>
+                            </div>
+                            <div class="feedback-status-bar">
+                                <span class="status-chip status-processing"><i class="fas fa-circle" style="font-size: 6px;"></i> 处理中</span>
+                                <i class="fas fa-chevron-down" id="icon-2" style="color: var(--text-muted); transition: transform 0.2s;"></i>
+                            </div>
+                        </div>
+                        <div class="feedback-preview" onclick="toggleFeedback(2)">
+                            最近发现App启动速度变慢了，从点击图标到首页加载完成大概需要5秒左右，之前只需要2秒...
+                        </div>
+                        <div class="feedback-card-body" id="body-2">
+                            <div class="feedback-content">
+                                <div class="feedback-main">
+                                    <div class="panel-label"><i class="fas fa-align-left"></i> 详细内容</div>
+                                    <div class="feedback-text-box">
+                                        <p>最近发现App启动速度变慢了，从点击图标到首页加载完成大概需要5秒左右，之前只需要2秒。手机是iPhone 14 Pro，系统iOS 18.2。</p>
+                                        <p>已经尝试过重装App和清理缓存，但问题依然存在。希望技术团队能排查一下。</p>
+                                    </div>
+                                    <div class="reply-box">
+                                        <label><i class="fas fa-reply"></i> 回复用户</label>
+                                        <textarea placeholder="输入回复内容..." id="reply-2"></textarea>
+                                        <div class="reply-actions">
+                                            <button class="action-btn action-btn-skip" onclick="event.stopPropagation(); markAsResolved(2, false)">标记已读</button>
+                                            <button class="action-btn action-btn-primary" onclick="event.stopPropagation(); replyFeedback(2)">发送回复</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="info-card">
+                                        <div class="info-card-title"><i class="fas fa-user"></i> 提交用户</div>
+                                        <div class="user-mini">
+                                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=userfb2" alt="avatar" class="user-mini-avatar">
+                                            <div class="user-mini-info">
+                                                <div class="user-mini-name">性能强迫症</div>
+                                                <div class="user-mini-meta">UID: 10234 · LV.9</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fas fa-mobile-alt"></i></div>
+                                            <div class="info-detail">
+                                                <div class="info-label">来源</div>
+                                                <div class="info-value">iOS App v2.3.1 · iPhone 14 Pro</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-icon" style="background: var(--warning-light); color: #b45309;"><i class="fas fa-bug"></i></div>
+                                            <div class="info-detail">
+                                                <div class="info-label">关联工单</div>
+                                                <div class="info-value">#TK-20250612-045</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="info-card" style="margin-top: 12px;">
+                                        <div class="info-card-title"><i class="fas fa-tags"></i> 快捷标签</div>
+                                        <div class="quick-actions">
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(2, '已记录')">已记录</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(2, '技术排查')">技术排查</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(2, '性能优化')">性能优化</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(2, '转工单')">转工单</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Item 3 -->
+                    <div class="feedback-card" data-id="3">
+                        <div class="feedback-card-header" onclick="toggleFeedback(3)">
+                            <div class="feedback-meta">
+                                <span class="feedback-type-badge badge-complaint"><i class="fas fa-angry"></i> 投诉</span>
+                                <span class="feedback-id">#FB-20250612-087</span>
+                                <span class="feedback-time"><i class="far fa-clock"></i> 2026-06-12 11:30</span>
+                            </div>
+                            <div class="feedback-status-bar">
+                                <span class="status-chip status-new"><i class="fas fa-circle" style="font-size: 6px;"></i> 未处理</span>
+                                <i class="fas fa-chevron-down" id="icon-3" style="color: var(--text-muted); transition: transform 0.2s;"></i>
+                            </div>
+                        </div>
+                        <div class="feedback-preview" onclick="toggleFeedback(3)">
+                            有人盗用了我的帖子内容发布在其他平台，希望能有原创保护机制，或者至少能在内容里加水印...
+                        </div>
+                        <div class="feedback-card-body" id="body-3">
+                            <div class="feedback-content">
+                                <div class="feedback-main">
+                                    <div class="panel-label"><i class="fas fa-align-left"></i> 详细内容</div>
+                                    <div class="feedback-text-box">
+                                        <p>有人盗用了我的帖子内容发布在其他平台，希望能有原创保护机制，或者至少能在内容里加水印。</p>
+                                        <p>我的帖子是《Vue3 性能优化实战指南》，发布于2026-06-11，但今天发现有人在某技术社区发布了几乎一模一样的内容，连代码示例都没改。</p>
+                                        <p>希望平台能增加：</p>
+                                        <p>1. 原创声明功能</p>
+                                        <p>2. 内容水印（至少图片加水印）</p>
+                                        <p>3. 抄袭举报通道</p>
+                                    </div>
+                                    <div class="reply-box">
+                                        <label><i class="fas fa-reply"></i> 回复用户</label>
+                                        <textarea placeholder="输入回复内容..." id="reply-3"></textarea>
+                                        <div class="reply-actions">
+                                            <button class="action-btn action-btn-skip" onclick="event.stopPropagation(); markAsResolved(3, false)">标记已读</button>
+                                            <button class="action-btn action-btn-primary" onclick="event.stopPropagation(); replyFeedback(3)">发送回复</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="info-card">
+                                        <div class="info-card-title"><i class="fas fa-user"></i> 提交用户</div>
+                                        <div class="user-mini">
+                                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=userfb3" alt="avatar" class="user-mini-avatar">
+                                            <div class="user-mini-info">
+                                                <div class="user-mini-name">小明</div>
+                                                <div class="user-mini-meta">UID: 10001 · LV.8</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fas fa-mobile-alt"></i></div>
+                                            <div class="info-detail">
+                                                <div class="info-label">来源</div>
+                                                <div class="info-value">Web端</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-icon" style="background: var(--danger-light); color: var(--danger);"><i class="fas fa-link"></i></div>
+                                            <div class="info-detail">
+                                                <div class="info-label">关联帖子</div>
+                                                <div class="info-value">Vue3 性能优化实战指南</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="info-card" style="margin-top: 12px;">
+                                        <div class="info-card-title"><i class="fas fa-tags"></i> 快捷标签</div>
+                                        <div class="quick-actions">
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(3, '已记录')">已记录</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(3, '产品需求')">产品需求</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(3, '版权保护')">版权保护</span>
+                                            <span class="quick-tag" onclick="event.stopPropagation(); addTag(3, '高优先级')">高优先级</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">...</button>
+                    <button class="page-btn">12</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">操作成功</span></div>
+
+    <script>
+        // Toast
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimer;
+
+        function showToast(msg, type) {
+            clearTimeout(toastTimer);
+            toastMsg.textContent = msg;
+            toast.className = 'toast ' + (type || 'info');
+            const icon = toast.querySelector('i');
+            if (type === 'success') icon.className = 'fas fa-check-circle';
+            else if (type === 'error') icon.className = 'fas fa-exclamation-circle';
+            else icon.className = 'fas fa-info-circle';
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Toggle feedback expand
+        function toggleFeedback(id) {
+            const body = document.getElementById('body-' + id);
+            const icon = document.getElementById('icon-' + id);
+            const isShow = body.classList.contains('show');
+
+            // Close all others
+            document.querySelectorAll('.feedback-card-body').forEach(b => b.classList.remove('show'));
+            document.querySelectorAll('.feedback-card-header .fa-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
+
+            if (!isShow) {
+                body.classList.add('show');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Reply feedback
+        function replyFeedback(id) {
+            const reply = document.getElementById('reply-' + id).value.trim();
+            if (!reply) {
+                showToast('请输入回复内容', 'error');
+                return;
+            }
+            document.getElementById('reply-' + id).value = '';
+            showToast('回复已发送给用户', 'success');
+        }
+
+        // Mark as resolved
+        function markAsResolved(id, withReply) {
+            showToast(withReply ? '已回复并归档' : '已标记为已读', 'success');
+        }
+
+        // Add tag
+        function addTag(id, tag) {
+            showToast('已添加标签：' + tag, 'info');
+        }
+    </script>
+
+</body>
+</html>

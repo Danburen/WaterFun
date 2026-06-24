@@ -41,6 +41,7 @@ public class RabbitConfig {
                 .to(moderationExchange())
                 .with(RabbitConstants.ROUTE_MODERATION_BATCH_RESULT);
     }
+
     @Bean
     public Queue moderationDlq() {
         return QueueBuilder.durable(RabbitConstants.QUEUE_MODERATION_NOTIFICATION + ".dlq")
@@ -49,8 +50,23 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue ticketNotificationQueue() {
+        return QueueBuilder.durable(RabbitConstants.QUEUE_TICKET_NOTIFICATION)
+                .quorum()
+                .withArgument("x-delivery-limit", 3)
+                .build();
+    }
+
+    @Bean
+    public Binding ticketResultBinding() {
+        return BindingBuilder
+                .bind(ticketNotificationQueue())
+                .to(moderationExchange())
+                .with(RabbitConstants.ROUTE_TICKET_RESULT);
+    }
+
+    @Bean
     public MessageConverter jsonMessageConverter() {
-        // Use JSON conversion instead of Java native serialization.
         return new JacksonJsonMessageConverter();
     }
 

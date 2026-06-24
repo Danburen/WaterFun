@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申诉处理 - WaterFun Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --success-light: #dcfce7;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --bg: #f8fafc;
+            --bg-white: #ffffff;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #3b82f6;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        /* ========== Sidebar ========== */
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo-text { font-size: 16px; font-weight: 700; }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section { margin-bottom: 8px; }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+        }
+
+        .nav-item:hover { background: var(--sidebar-hover); color: #e2e8f0; }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+
+        .nav-item i { width: 20px; text-align: center; font-size: 15px; }
+
+        .nav-badge {
+            margin-left: auto;
+            padding: 1px 8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-user-info { flex: 1; }
+        .sidebar-user-name { font-size: 14px; font-weight: 600; color: white; }
+        .sidebar-user-role { font-size: 12px; color: #64748b; }
+
+        /* ========== Main Content ========== */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            height: 60px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .top-bar-left { display: flex; align-items: center; gap: 12px; }
+        .page-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .top-bar-right { display: flex; align-items: center; gap: 8px; }
+
+        .top-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .top-btn:hover { background: var(--bg); color: var(--primary); }
+
+        .top-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-white);
+        }
+
+        .content-area { padding: 24px 28px; flex: 1; }
+
+        /* ========== Queue Info ========== */
+        .queue-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .queue-info-left { display: flex; align-items: center; gap: 20px; }
+
+        .queue-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .queue-stat strong { color: var(--text-primary); font-size: 16px; }
+
+        .queue-info-right { display: flex; align-items: center; gap: 8px; }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-white);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* ========== Review Card ========== */
+        .review-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .review-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--bg);
+        }
+
+        .review-meta { display: flex; align-items: center; gap: 16px; }
+
+        .review-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-appeal { background: #e0e7ff; color: #4338ca; }
+        .badge-mute { background: var(--warning-light); color: #b45309; }
+        .badge-ban { background: var(--danger-light); color: #dc2626; }
+        .badge-delete { background: #fce7f3; color: #be185d; }
+
+        .review-id {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'SF Mono', monospace;
+        }
+
+        .review-time { font-size: 13px; color: var(--text-muted); }
+
+        .review-status-bar { display: flex; align-items: center; gap: 8px; }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending { background: var(--warning-light); color: #b45309; }
+        .status-processing { background: #e0e7ff; color: #4338ca; }
+        .status-resolved { background: var(--success-light); color: #15803d; }
+        .status-rejected { background: var(--danger-light); color: #dc2626; }
+
+        .review-body { padding: 24px; }
+
+        /* ========== Appeal Layout ========== */
+        .appeal-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 24px;
+        }
+
+        .appeal-content-panel { display: flex; flex-direction: column; gap: 16px; }
+
+        .panel-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .panel-label i { font-size: 11px; }
+
+        /* Appeal Reason Box */
+        .appeal-reason-box {
+            padding: 20px;
+            background: var(--primary-light);
+            border-radius: var(--radius-sm);
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid var(--primary);
+        }
+
+        .appeal-reason-box .panel-label { color: var(--primary); }
+
+        .appeal-reason-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-top: 8px;
+        }
+
+        .appeal-reason-text p { margin-bottom: 8px; }
+
+        .appeal-attachments {
+            margin-top: 12px;
+        }
+
+        .attachments-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .attachments-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .attachments-grid img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* Original Penalty Card */
+        .penalty-card {
+            padding: 20px;
+            background: var(--danger-light);
+            border-radius: var(--radius-sm);
+            border: 1px solid #fecaca;
+            border-left: 4px solid var(--danger);
+        }
+
+        .penalty-card .panel-label { color: var(--danger); }
+
+        .penalty-summary {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 12px;
+            padding: 16px;
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+        }
+
+        .penalty-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .penalty-icon.mute { background: var(--warning-light); color: #b45309; }
+        .penalty-icon.ban { background: var(--danger-light); color: #dc2626; }
+        .penalty-icon.delete { background: #fce7f3; color: #be185d; }
+
+        .penalty-info { flex: 1; }
+        .penalty-type { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .penalty-desc { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .penalty-time { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Original Content Snapshot */
+        .content-snapshot {
+            padding: 20px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .snapshot-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .snapshot-comment { background: var(--success-light); color: #15803d; }
+
+        .snapshot-body {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .snapshot-body p { margin-bottom: 8px; }
+
+        .snapshot-highlight {
+            background: var(--warning-light);
+            padding: 1px 3px;
+            border-radius: 3px;
+            color: #b45309;
+            font-weight: 500;
+        }
+
+        /* ========== Right Panel ========== */
+        .info-card {
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .info-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-card-title i { font-size: 11px; }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .info-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .info-item:first-child { padding-top: 0; }
+
+        .info-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .info-detail { flex: 1; min-width: 0; }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        /* Appeal User Info */
+        .appeal-user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            margin-bottom: 12px;
+        }
+
+        .appeal-user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border);
+        }
+
+        .appeal-user-info { flex: 1; }
+        .appeal-user-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+        .appeal-user-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        /* Appeal History */
+        .appeal-history-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .appeal-history-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .appeal-history-item:first-child { padding-top: 0; }
+
+        .history-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .history-dot.penalty { background: var(--danger); }
+        .history-dot.appeal { background: var(--primary); }
+        .history-dot.review { background: var(--warning); }
+
+        .history-content { flex: 1; }
+        .history-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .history-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .history-time { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* ========== Action Bar ========== */
+        .review-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: var(--bg);
+            border-top: 1px solid var(--border-light);
+            gap: 12px;
+        }
+
+        .review-actions-left { display: flex; align-items: center; gap: 8px; }
+        .review-actions-right { display: flex; align-items: center; gap: 12px; }
+
+        .action-btn {
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn-pass {
+            background: var(--success);
+            color: white;
+        }
+
+        .action-btn-pass:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .action-btn-reject {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn-reject:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .action-btn-skip {
+            background: var(--bg-white);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .action-btn-skip:hover {
+            background: var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .action-btn-detail {
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .action-btn-detail:hover { color: var(--text-secondary); }
+
+        .action-btn-warn {
+            background: var(--warning);
+            color: white;
+        }
+
+        .action-btn-warn:hover {
+            background: #d97706;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ========== Decision Note ========== */
+        .decision-note-wrap {
+            display: none;
+            padding: 16px 24px;
+            background: var(--primary-light);
+            border-top: 1px solid #bfdbfe;
+        }
+
+        .decision-note-wrap.show { display: block; }
+
+        .decision-note-wrap label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .decision-note-wrap textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+        }
+
+        .decision-note-wrap textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* ========== Toast ========== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 24px;
+            background: var(--text-primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: var(--primary); }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 1200px) {
+            .appeal-layout { grid-template-columns: 1fr; }
+            .attachments-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar-logo-text, .nav-section-title, .nav-item span, .sidebar-user-info { display: none; }
+            .main-content { margin-left: 60px; }
+            .content-area { padding: 16px; }
+            .review-actions { flex-direction: column; }
+            .review-actions-left, .review-actions-right { width: 100%; justify-content: center; }
+            .appeal-layout { grid-template-columns: 1fr; }
+            .penalty-summary { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-logo">
+                    <div class="sidebar-logo-icon">WF</div>
+                    <span class="sidebar-logo-text">WaterFun</span>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">概览</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>在线用户</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">内容管理</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>帖子管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-comment"></i>
+                        <span>评论管理</span>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>审核工作台</span>
+                        <span class="nav-badge">6</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">用户</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-user"></i>
+                        <span>用户管理</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-ban"></i>
+                        <span>封禁记录</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>系统设置</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-history"></i>
+                        <span>操作日志</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="avatar" class="sidebar-user-avatar">
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name">Admin</div>
+                        <div class="sidebar-user-role">超级管理员</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1 class="page-title">申诉处理</h1>
+                </div>
+                <div class="top-bar-right">
+                    <button class="top-btn"><i class="fas fa-search"></i></button>
+                    <button class="top-btn"><i class="far fa-bell"></i><span class="badge"></span></button>
+                    <button class="top-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="queue-info">
+                    <div class="queue-info-left">
+                        <div class="queue-stat"><i class="fas fa-inbox"></i> 待处理 <strong>6</strong></div>
+                        <div class="queue-stat"><i class="fas fa-check-circle"></i> 今日已撤销 <strong>3</strong></div>
+                        <div class="queue-stat"><i class="fas fa-times-circle"></i> 今日已维持 <strong>2</strong></div>
+                    </div>
+                    <div class="queue-info-right">
+                        <button class="filter-btn active">全部</button>
+                        <button class="filter-btn">禁言申诉</button>
+                        <button class="filter-btn">封号申诉</button>
+                        <button class="filter-btn">内容删除申诉</button>
+                    </div>
+                </div>
+
+                <!-- Appeal Review Card -->
+                <div class="review-card">
+                    <div class="review-card-header">
+                        <div class="review-meta">
+                            <span class="review-type-badge badge-appeal"><i class="fas fa-gavel"></i> 申诉</span>
+                            <span class="review-id">#APL-20250612-023</span>
+                            <span class="review-time"><i class="far fa-clock"></i> 提交于 15:18</span>
+                        </div>
+                        <div class="review-status-bar">
+                            <span class="status-chip status-pending"><i class="fas fa-hourglass-half"></i> 待复核</span>
+                        </div>
+                    </div>
+
+                    <div class="review-body">
+                        <!-- Appeal Layout: Left=Content, Right=Info -->
+                        <div class="appeal-layout">
+                            <div class="appeal-content-panel">
+                                <!-- Appeal Reason -->
+                                <div class="appeal-reason-box">
+                                    <div class="panel-label"><i class="fas fa-edit"></i> 申诉理由</div>
+                                    <div class="appeal-reason-text">
+                                        <p>管理员您好，我的评论被误判为违规内容，请求复核。</p>
+                                        <p>我在帖子下回复"这个方案确实不错，但是<span class="snapshot-highlight">shallowRef</span>在某些场景下可能会有问题，建议结合使用"，这是正常的技术讨论，完全没有违规意图。</p>
+                                        <p>原审核拒绝原因写的是"含敏感词"，但我认为这属于误判，敏感词应该是被截断的技术术语，并非真正的敏感内容。希望管理员能重新审核，恢复我的评论。</p>
+                                    </div>
+                                    <div class="appeal-attachments">
+                                        <div class="attachments-label">申诉材料</div>
+                                        <div class="attachments-grid">
+                                            <img src="https://picsum.photos/seed/appeal1/200/150" alt="材料1">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Original Penalty -->
+                                <div class="penalty-card">
+                                    <div class="panel-label"><i class="fas fa-exclamation-triangle"></i> 原处罚记录</div>
+                                    <div class="penalty-summary">
+                                        <div class="penalty-icon mute"><i class="fas fa-microphone-slash"></i></div>
+                                        <div class="penalty-info">
+                                            <div class="penalty-type">评论删除 + 警告</div>
+                                            <div class="penalty-desc">评论内容被判定含敏感词，已删除并发送警告</div>
+                                            <div class="penalty-time"><i class="far fa-clock"></i> 处罚时间：2026-06-12 14:30:22 · 操作人：系统审核</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Original Content -->
+                                <div class="panel-label"><i class="fas fa-eye"></i> 被处罚的原内容</div>
+                                <div class="content-snapshot">
+                                    <span class="snapshot-type snapshot-comment"><i class="fas fa-comment"></i> 评论</span>
+                                    <div class="snapshot-body">
+                                        <p>这个方案确实不错，但是 <span class="snapshot-highlight">shallowRef</span> 在某些场景下可能会有问题，建议结合 <code>triggerRef</code> 使用。另外对于大型列表渲染，可以考虑使用 <span class="snapshot-highlight">virtual-scroller</span> 来优化性能。</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Panel -->
+                            <div>
+                                <div class="info-card">
+                                    <div class="info-card-title"><i class="fas fa-user"></i> 申诉人</div>
+                                    <div class="appeal-user-card">
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=appealer1" alt="avatar" class="appeal-user-avatar">
+                                        <div class="appeal-user-info">
+                                            <div class="appeal-user-name">前端小能手</div>
+                                            <div class="appeal-user-meta">UID: 10089 · LV.9 · 注册 2024-01-15</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-icon" style="background: var(--success-light); color: #15803d;"><i class="fas fa-shield-alt"></i></div>
+                                        <div class="info-detail">
+                                            <div class="info-label">账号状态</div>
+                                            <div class="info-value">正常（仅本次警告）</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fas fa-history"></i></div>
+                                        <div class="info-detail">
+                                            <div class="info-label">历史申诉</div>
+                                            <div class="info-value">1 次（上次：2026-03-20 · 已撤销）</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="info-card" style="margin-top: 16px;">
+                                    <div class="info-card-title"><i class="fas fa-stream"></i> 处理时间线</div>
+                                    <div class="appeal-history-item">
+                                        <div class="history-dot penalty"></div>
+                                        <div class="history-content">
+                                            <div class="history-title">评论被删除 + 警告</div>
+                                            <div class="history-desc">系统审核判定含敏感词，自动处理</div>
+                                            <div class="history-time">2026-06-12 14:30:22</div>
+                                        </div>
+                                    </div>
+                                    <div class="appeal-history-item">
+                                        <div class="history-dot appeal"></div>
+                                        <div class="history-content">
+                                            <div class="history-title">用户提交申诉</div>
+                                            <div class="history-desc">认为处罚有误，请求人工复核</div>
+                                            <div class="history-time">2026-06-12 15:18:05</div>
+                                        </div>
+                                    </div>
+                                    <div class="appeal-history-item">
+                                        <div class="history-dot review"></div>
+                                        <div class="history-content">
+                                            <div class="history-title">等待人工复核</div>
+                                            <div class="history-desc">当前状态</div>
+                                            <div class="history-time">--</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="info-card" style="margin-top: 16px;">
+                                    <div class="info-card-title"><i class="fas fa-link"></i> 关联信息</div>
+                                    <div class="info-item">
+                                        <div class="info-icon" style="background: var(--primary-light); color: var(--primary);"><i class="fas fa-file-alt"></i></div>
+                                        <div class="info-detail">
+                                            <div class="info-value">Vue3 性能优化实战指南</div>
+                                            <div class="info-label">原帖 · #POST-20250611-001</div>
+                                        </div>
+                                        <a href="#" style="color: var(--primary); font-size: 12px; font-weight: 500; text-decoration: none;">查看</a>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-icon" style="background: var(--danger-light); color: var(--danger);"><i class="fas fa-robot"></i></div>
+                                        <div class="info-detail">
+                                            <div class="info-value">系统自动审核</div>
+                                            <div class="info-label">原处理人 · 命中敏感词库</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="review-actions">
+                        <div class="review-actions-left">
+                            <button class="action-btn action-btn-detail"><i class="fas fa-history"></i> 申诉历史</button>
+                            <button class="action-btn action-btn-detail"><i class="fas fa-user"></i> 用户详情</button>
+                        </div>
+                        <div class="review-actions-right">
+                            <button class="action-btn action-btn-skip"><i class="fas fa-forward"></i> 跳过</button>
+                            <button class="action-btn action-btn-reject" id="appealMaintainBtn"><i class="fas fa-gavel"></i> 维持原判</button>
+                            <button class="action-btn action-btn-pass" id="appealOverturnBtn"><i class="fas fa-undo"></i> 撤销处罚</button>
+                        </div>
+                    </div>
+
+                    <!-- Decision Note (for overturn) -->
+                    <div class="decision-note-wrap" id="overturnNoteWrap">
+                        <label><i class="fas fa-comment-alt"></i> 撤销说明（将通知用户）</label>
+                        <textarea placeholder="请填写撤销原因，例如：经复核，原审核存在误判..." id="overturnNote"></textarea>
+                        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+                            <button class="action-btn action-btn-skip" onclick="hideOverturnNote()">取消</button>
+                            <button class="action-btn action-btn-pass" onclick="confirmOverturn()">确认撤销</button>
+                        </div>
+                    </div>
+
+                    <!-- Decision Note (for maintain) -->
+                    <div class="decision-note-wrap" id="maintainNoteWrap" style="background: var(--danger-light); border-top-color: #fecaca;">
+                        <label style="color: var(--danger);"><i class="fas fa-comment-alt"></i> 维持说明（将通知用户）</label>
+                        <textarea placeholder="请填写维持原判的原因..." id="maintainNote" style="border-color: #fecaca;"></textarea>
+                        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+                            <button class="action-btn action-btn-skip" onclick="hideMaintainNote()">取消</button>
+                            <button class="action-btn action-btn-reject" onclick="confirmMaintain()">确认维持</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">操作成功</span></div>
+
+    <script>
+        // Toast
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimer;
+
+        function showToast(msg, type) {
+            clearTimeout(toastTimer);
+            toastMsg.textContent = msg;
+            toast.className = 'toast ' + (type || 'info');
+            const icon = toast.querySelector('i');
+            if (type === 'success') icon.className = 'fas fa-check-circle';
+            else if (type === 'error') icon.className = 'fas fa-exclamation-circle';
+            else icon.className = 'fas fa-info-circle';
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Overturn logic
+        function showOverturnNote() {
+            document.getElementById('overturnNoteWrap').classList.add('show');
+            document.getElementById('maintainNoteWrap').classList.remove('show');
+        }
+
+        function hideOverturnNote() {
+            document.getElementById('overturnNoteWrap').classList.remove('show');
+            document.getElementById('overturnNote').value = '';
+        }
+
+        function confirmOverturn() {
+            const note = document.getElementById('overturnNote').value.trim();
+            if (!note) {
+                showToast('请填写撤销说明', 'error');
+                return;
+            }
+            hideOverturnNote();
+            showToast('处罚已撤销，已通知用户', 'success');
+        }
+
+        // Maintain logic
+        function showMaintainNote() {
+            document.getElementById('maintainNoteWrap').classList.add('show');
+            document.getElementById('overturnNoteWrap').classList.remove('show');
+        }
+
+        function hideMaintainNote() {
+            document.getElementById('maintainNoteWrap').classList.remove('show');
+            document.getElementById('maintainNote').value = '';
+        }
+
+        function confirmMaintain() {
+            const note = document.getElementById('maintainNote').value.trim();
+            if (!note) {
+                showToast('请填写维持说明', 'error');
+                return;
+            }
+            hideMaintainNote();
+            showToast('已维持原判，已通知用户', 'success');
+        }
+
+        // Actions
+        document.getElementById('appealOverturnBtn').addEventListener('click', showOverturnNote);
+        document.getElementById('appealMaintainBtn').addEventListener('click', showMaintainNote);
+    </script>
+
+</body>
+</html>

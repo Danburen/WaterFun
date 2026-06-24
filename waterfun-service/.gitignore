@@ -69,7 +69,6 @@ src/main/resources/sqls/*
 
 ### application properties
 /src/main/resources/application-repositories.yml
-/src/main/resources/application.yml
 /src/main/resources/application.properties
 /src/main/resources/application-*.yml
 /src/main/resources/application-*.properties

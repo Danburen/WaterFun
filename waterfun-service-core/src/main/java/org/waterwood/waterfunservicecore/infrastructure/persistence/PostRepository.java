@@ -27,13 +27,19 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     int deleteByIdIn(List<Long> attr0);
 
     Optional<Post> findByIdAndVisibilityAndIsDeleted(Long id, PostVisibility visibility, Boolean isDeleted);
-    @Query("SELECT p.id FROM Post p WHERE p.isDeleted = false")
-    Page<Long> findAllIds(Specification<Post> spec, Pageable pageable);
+    default Page<Long> findAllIds(Specification<Post> spec, Pageable pageable) {
+        Specification<Post> merged = Specification.where(spec)
+                .and((root, query, cb) -> cb.equal(root.get("isDeleted"), false));
+        return findAll(merged, pageable).map(Post::getId);
+    }
 
     @Query("SELECT p FROM Post p WHERE p.id = :id AND p.author.uid = :authorUid AND p.isDeleted = :isDeleted")
     Optional<Post> findByIdAndAuthorUidAndIsDeleted(@Param("id") Long id, @Param("authorUid") Long authorUid,@Param("isDeleted")  boolean isDeleted);
 
     Optional<Post> findByIdAndAuthorUidAndIsDeletedAndStatus(Long id, Long authorUid, Boolean isDeleted, PostStatus status);
+
+    @EntityGraph(attributePaths = { "author", "category", "tags"})
+    Optional<Post> findByIdAndIsDeleted(@NotNull Long id, Boolean isDeleted);
 
     @EntityGraph(attributePaths = { "author", "category", "tags"})
     Optional<Post> findByIdAndIsDeletedAndStatus(@NotNull Long id, Boolean isDeleted, PostStatus status);
@@ -56,14 +62,17 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     void decreaseLikeCount(@Param("postId") Long postId, @Param("count") int count);
 
     @Modifying
-    @Query("UPDATE Post p SET p.collectCount = p.collectCount + : count WHERE p.id = :postID")
+    @Query("UPDATE Post p SET p.collectCount = p.collectCount + :count WHERE p.id = :postId")
     void increaseCollectCount(@Param("postId") Long postId, @Param("count") int count);
 
     @Modifying
     @Query("UPDATE Post p SET p.collectCount = GREATEST(p.collectCount - :count, 0) WHERE p.id = :postId")
     void decreaseCollectCount(@Param("postId") Long postId, @Param("count") int count);
+    @Modifying
+    @Query("UPDATE Post p SET p.viewCount = p.viewCount + :count WHERE p.id = :postId")
+    void increaseViewCount(@Param("postId") Long postId,@Param("count") int count);
 
-    Long findAuthorUidById(@NotNull Long id);
+    Long findAuthorUidById(Long id);
 
     @Query("SELECT new org.waterwood.waterfunservicecore.entity.post.PostAuthorUidTitleDO(p.author.uid, p.title, p.coverageResource.id) " +
             "FROM Post p WHERE p.id = :id")
@@ -77,4 +86,6 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     long countByAuthorUidAndIsDeleted(Long authorUid, Boolean isDeleted);
 
     List<Post> findAllByIdInAndAuthorUidAndIsDeleted(List<Long> ids, Long authorUid, Boolean isDeleted);
+
+
 }

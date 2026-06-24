@@ -40,7 +40,7 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     @Override
     public void userOffline(Long uid) {
         redis.del(ONLINE_USER_PREFIX + uid);
-        redis.hashDel(ONLINE_USERS_KEY, String.valueOf(uid));
+        redis.setRemove(ONLINE_USERS_KEY, String.valueOf(uid));
     }
 
     @Override

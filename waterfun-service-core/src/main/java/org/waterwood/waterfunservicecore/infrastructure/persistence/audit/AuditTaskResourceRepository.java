@@ -1,18 +1,15 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence.audit;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
+import org.waterwood.waterfunservicecore.entity.audit.AuditTask;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.resource.AuditResource;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +21,7 @@ public interface AuditTaskResourceRepository extends JpaRepository<AuditResource
     Optional<AuditResource> findByTaskIdAndResourceUuid(Long taskId, String resourceUuid);
     Optional<AuditResource> findByTaskIdAndResourceUuidAndStatus(Long taskId, String resourceUuid, AuditStatus status);
 
+    @EntityGraph(attributePaths = {"auditor"})
     List<AuditResource> findAllByTaskId(Long taskId);
 
 
@@ -34,7 +32,7 @@ public interface AuditTaskResourceRepository extends JpaRepository<AuditResource
     @Modifying
     void updateStatusAndRejectTypeAndAuditorAndAuditAtByTaskIdIn(
             @Param("status") AuditStatus status,
-            @Param("type") AuditRejectType type,
+            @Param("type") AuditType type,
             @Param("auditor") User auditor,
             @Param("auditAt") Instant auditAt,
             @Param("taskIds") Collection<Long> taskIds);
@@ -44,7 +42,7 @@ public interface AuditTaskResourceRepository extends JpaRepository<AuditResource
     @Modifying
     void updateStatusAndRejectTypeAndAuditorAndAuditAtByTaskIdAndStatus(
             @Param("status") AuditStatus status,
-            @Param("type") AuditRejectType type,
+            @Param("type") AuditType type,
             @Param("auditor") User auditor,
             @Param("auditAt") Instant auditAt,
             @Param("taskId") Long taskId,
@@ -61,5 +59,10 @@ public interface AuditTaskResourceRepository extends JpaRepository<AuditResource
             "WHERE t.targetId = :targetId AND t.targetType = :targetType")
     List<String> findResourceUuidByTaskTargetIdAndTaskTargetType(
             @Param("targetId") String targetId,
+            @Param("targetType") TargetType targetType);
+
+    @Query("SELECT ar.task FROM AuditResource ar WHERE ar.resource.uuid = :resourceUuid AND ar.task.targetType = :targetType")
+    List<AuditTask> findTaskByResourceUuidAndTaskTargetType(
+            @Param("resourceUuid") String resourceUuid,
             @Param("targetType") TargetType targetType);
 }

@@ -6,10 +6,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.waterwood.api.BaseResponseCode;
-import org.waterwood.waterfunservicecore.entity.security.BanReasonType;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
-import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.BanForbiddenException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
@@ -29,16 +27,15 @@ public class BanCheckAspect {
         long userUid = UserCtxHolder.getUserUid();
         String requiredBan = banCheck.value();
 
+
         for (UserPermission up : userPermRepo.findByUserUid(userUid)) {
+            log.info(up.getCode());
             if (up.getPermission() == null || up.getPermission().getCode() == null) continue;
             if (up.getExpiresAt() != null && up.getExpiresAt().isBefore(Instant.now())) continue;
             if (!matchesBan(up.getPermission().getCode(), requiredBan)) continue;
 
-            BanReasonType reason = up.getBanReasonType() != null ? up.getBanReasonType() : BanReasonType.UNSPECIFIED;
-            String messageKey = reason.getMessageKey() != null ? reason.getMessageKey() : "http.forbidden";
-            log.warn("Ban check failed: uid={}, perm={}, reason={}",
-                    userUid, up.getPermission().getCode(), reason);
-            throw new BizException(BaseResponseCode.HTTP_FORBIDDEN.getCode(), messageKey);
+            log.warn("Ban check failed: uid={}, perm={}", userUid, up.getPermission().getCode());
+            throw new BanForbiddenException();
         }
     }
 

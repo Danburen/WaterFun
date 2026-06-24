@@ -2,14 +2,10 @@ import type { ISOString, PromiseResBody } from "@waterfun/web-core/src/types/api
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 import { getUploadPolicy, type PresignedResp } from "~/api/resource";
+import type { CloudResPresignedUrlResp } from "~/api/moderation";
 
 export type BannerPosition = "HOME" | "SIDE";
 export type BannerStatus = "SHOW" | "HIDE";
-
-export interface CloudResPresignedUrlResp {
-  url: string;
-  expireAt?: string | null;
-}
 
 export interface BannerResp {
   id: string;

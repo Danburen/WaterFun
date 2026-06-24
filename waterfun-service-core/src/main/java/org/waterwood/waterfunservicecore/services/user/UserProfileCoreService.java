@@ -5,9 +5,6 @@ import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
 
-import java.util.List;
-import java.util.Map;
-
 public interface UserProfileCoreService {
     void addUserProfile(UserProfile up);
 
@@ -31,13 +28,6 @@ public interface UserProfileCoreService {
      * @return the presigned url, null if the ofUser is not set
      */
     @Nullable CloudResPresignedUrlResp getUserAvatar(long userUid);
-
-    /**
-     * List the User Avatars
-     *
-     * @return the presigned url list
-     */
-    Map<Long, CloudResPresignedUrlResp> listUserAvatars(List<Long> userUids);
 
     /**
      * Update the User Profile

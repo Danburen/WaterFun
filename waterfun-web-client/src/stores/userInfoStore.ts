@@ -2,9 +2,10 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { getUserInfo } from "@/api/userApi";
 import type { CloudResourceUrlResp } from "@waterfun/web-core/src/types/api/response";
+import { updateUserNickname as apiUpdateNickname } from "@/api/userApi";
 interface UserInfo {
   username: string;
-  uid: number;
+  uid: string;
   nickname: string;
   avatar: CloudResourceUrlResp;
   accountStatus: string;
@@ -15,7 +16,7 @@ interface UserInfo {
 export const useUserInfoStore = defineStore('userInfoStore', () => {
   const userInfo = ref<UserInfo>({
     username: '',
-    uid: 0,
+    uid: '',
     nickname: '',
     avatar: {
         url: '',
@@ -31,7 +32,7 @@ export const useUserInfoStore = defineStore('userInfoStore', () => {
   };
 
   const clearUserInfo = () => {
-    userInfo.value = { username: '', uid: 0, nickname: '', avatar: { url: '', expireAt: 0 }, accountStatus: '', createdAt: '', passwordHash: false };
+    userInfo.value = { username: '', uid: '', nickname: '', avatar: { url: '', expireAt: 0 }, accountStatus: '', createdAt: '', passwordHash: false };
   };
 
   const fetchAndUpdateUserInfo = async() =>{
@@ -50,7 +51,12 @@ export const useUserInfoStore = defineStore('userInfoStore', () => {
     }
   }
 
-  return { userInfo, updateUserInfo, clearUserInfo, fetchAndUpdateUserInfo };
+  const updateNickname = async (nickname: string) => {
+    await apiUpdateNickname(nickname);
+    userInfo.value.nickname = nickname;
+  }
+
+  return { userInfo, updateUserInfo, clearUserInfo, fetchAndUpdateUserInfo, updateNickname };
 }, {
   persist: process.client ? {
         storage: localStorage

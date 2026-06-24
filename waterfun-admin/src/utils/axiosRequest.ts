@@ -47,23 +47,22 @@ service.interceptors.request.use(
 
 
         const token = useAuthStore().accessData.token;
-        // TODO: 这里的CSRFToken获取逻辑需要优化，目前是直接从store中获取，后续需要从response中获取并设置到store中
-        // if (config.method !== 'GET' && needCSRF) {
-        //     let CSRFToken = getCsrfToken()
-        //     if (!CSRFToken) {
-        //         console.log('First request,now try get csrf token');
-        //         try {
-        //             const response = await fetch(`${import.meta.env.VITE_API_BASE}/auth/csrf-token`, {
-        //                 credentials: 'include'
-        //             });
-        //             if (!response.ok) return Promise.reject(new Error(`Failed to fetch CSRF Token.Code ${response.status}`));
-        //             CSRFToken = getCsrfToken();
-        //         } catch (error) {
-        //             return Promise.reject(error);
-        //         }
-        //     }
-        //     config.headers['X-XSRF-TOKEN'] = CSRFToken;
-        // }
+        if (config.method !== 'GET' && needCSRF) {
+            let CSRFToken = getCsrfToken()
+            if (!CSRFToken) {
+                console.log('First request,now try get csrf token');
+                try {
+                    const response = await fetch(`${import.meta.env.VITE_API_BASE}/auth/csrf-token`, {
+                        credentials: 'include'
+                    });
+                    if (!response.ok) return Promise.reject(new Error(`Failed to fetch CSRF Token.Code ${response.status}`));
+                    CSRFToken = getCsrfToken();
+                } catch (error) {
+                    return Promise.reject(error);
+                }
+            }
+            config.headers['X-XSRF-TOKEN'] = CSRFToken;
+        }
 
         if (needAuth && token && token.trim().length > 0) {
             config.headers['Authorization'] = `Bearer ${token}`;

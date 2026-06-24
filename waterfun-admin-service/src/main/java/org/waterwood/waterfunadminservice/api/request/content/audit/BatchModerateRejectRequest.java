@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.waterwood.waterfunservicecore.entity.audit.AuditRejectType;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 
 import java.util.List;
 
@@ -15,6 +15,6 @@ public class BatchModerateRejectRequest {
     @NotNull
     private List<Long> auditTaskIds;
     @NotNull
-    private AuditRejectType rejectType;
+    private AuditType rejectType;
     private String rejectReason;
 }

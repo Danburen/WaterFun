@@ -9,6 +9,7 @@ import org.waterwood.waterfunservicecore.entity.user.UserBriefDO;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> , JpaSpecificationExecutor<User> {
@@ -58,7 +59,7 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
 
     @Query("""
         SELECT new org.waterwood.waterfunservicecore.entity.user.UserBriefDO(
-            u.uid, u.username, u.nickname, u.avatarResource.uuid,u.level, u.userType
+            u.uid, u.username, u.nickname, r.resourceKey, u.level, u.userType
         ) FROM User u
         LEFT JOIN u.avatarResource r
         WHERE u.uid IN :uids
@@ -66,10 +67,16 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
     List<UserBriefDO> findBriefDOsByUidIn(@Param("uids") List<Long> uids);
     @Query("""
         SELECT new org.waterwood.waterfunservicecore.entity.user.UserBriefDO(
-            u.uid, u.username, u.nickname, u.avatarResource.uuid,u.level, u.userType
+            u.uid, u.username, u.nickname, r.resourceKey, u.level, u.userType
         ) FROM User u
         LEFT JOIN u.avatarResource r
         WHERE u.uid = :uid
     """)
     UserBriefDO findBriefDOsByUid(@Param("uid") Long uid);
+
+    @Query("SELECT u.createdAt FROM User u WHERE u.uid = :uid")
+    Instant getUserCreatedAtByUid(@Param("uid") Long uid);
+
+    @Query("SELECT u.createdAt FROM User u WHERE u.uid = :uids")
+    List<Instant> getUserCreatedAtByUidIn(@Param("uids") List<Long> uids);
 }

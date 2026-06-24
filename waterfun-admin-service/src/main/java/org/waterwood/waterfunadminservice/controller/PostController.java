@@ -46,8 +46,8 @@ public class PostController {
         );
     }
 
-    @GetMapping("/id")
-    public ApiResponse<PostResponse> getPostById(@RequestParam Long id) {
+    @GetMapping("/{id}")
+    public ApiResponse<PostResponse> getPostById(@PathVariable Long id) {
         return ApiResponse.success(
                 postMapper.toPostResponseDto(postService.getPostById(id))
         );

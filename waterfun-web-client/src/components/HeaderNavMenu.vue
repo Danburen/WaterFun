@@ -7,10 +7,12 @@ import { useAuth } from "~/composables/useAuth"
 import { useUserInfoStore } from "~/stores/userInfoStore"
 import logoSrc from '~/assets/logo.svg'
 import { useUserProfileStore } from "~/stores/userProfileStore"
+import { useNotificationStore } from "~/stores/notificationStore"
 
 const { isLoggedIn, logout } = useAuth()
 const userInfoStore = useUserInfoStore()
 const userProfileStore = useUserProfileStore()
+const notificationStore = useNotificationStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -59,6 +61,9 @@ const getAvatarUrl = async () => {
 
 onMounted(async () => {
   userAvatar.value = await getAvatarUrl()
+  if (isLoggedIn.value) {
+    notificationStore.fetchUnreadCount()
+  }
 })
 </script>
 <template>
@@ -82,7 +87,9 @@ onMounted(async () => {
         <ClientOnly>
           <template v-if="isLoggedIn">
             <button class="icon-btn" @click="router.push('/message-center')">
-              <el-icon size="20"><Bell /></el-icon><span class="badge" />
+              <el-badge :hidden="notificationStore.unreadCount === 0" :value="notificationStore.unreadCount" :max="99">
+                <el-icon size="20"><Bell /></el-icon>
+              </el-badge>
             </button>
             <button class="icon-btn" @click="router.push('/message-center')">
               <el-icon size="20"><Message /></el-icon>
@@ -259,16 +266,6 @@ onMounted(async () => {
   background: #eff6ff;
 }
 
-.icon-btn .badge {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 8px;
-  height: 8px;
-  background: #ef4444;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-}
 
 .user-menu {
   display: flex;

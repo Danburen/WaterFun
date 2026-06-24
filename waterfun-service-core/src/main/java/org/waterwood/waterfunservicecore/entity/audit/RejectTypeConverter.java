@@ -4,14 +4,14 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class RejectTypeConverter implements AttributeConverter<AuditRejectType, Short> {
+public class RejectTypeConverter implements AttributeConverter<AuditType, Short> {
     @Override
-    public Short convertToDatabaseColumn(AuditRejectType attribute) {
+    public Short convertToDatabaseColumn(AuditType attribute) {
         return attribute == null ? null : (short) attribute.getCode();
     }
 
     @Override
-    public AuditRejectType convertToEntityAttribute(Short dbData) {
-        return dbData == null ? null : AuditRejectType.fromCode(dbData.intValue());
+    public AuditType convertToEntityAttribute(Short dbData) {
+        return dbData == null ? null : AuditType.fromCode(dbData.intValue());
     }
 }

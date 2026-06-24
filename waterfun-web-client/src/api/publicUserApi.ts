@@ -3,7 +3,7 @@ import type { PromiseResBody, CloudResourceUrlResp } from "@waterfun/web-core/sr
 import type { UserBrief } from "~/api/postApi"
 
 export interface UserPublicProfileResp {
-  uid: number
+  uid: string
   userBrief: UserBrief
   bio: string
   gender: string
@@ -17,7 +17,7 @@ export interface UserPublicProfileResp {
 }
 
 export interface UserPublicCardResp {
-  uid: number
+  uid: string
   userBrief: UserBrief
   followers: number
   followings: number
@@ -36,26 +36,26 @@ export interface PageUserBrief {
   empty: boolean
 }
 
-export const fetchUserPublicProfile = (uid: number): PromiseResBody<UserPublicProfileResp> => {
+export const fetchUserPublicProfile = (uid: string): PromiseResBody<UserPublicProfileResp> => {
   return request.get(`/user/${uid}/profile`)
 }
 
-export const fetchUserPublicCard = (uid: number): PromiseResBody<UserPublicCardResp> => {
+export const fetchUserPublicCard = (uid: string): PromiseResBody<UserPublicCardResp> => {
   return request.get(`/user/${uid}/card`)
 }
 
-export const fetchUserPublicAvatar = (uid: number): PromiseResBody<CloudResourceUrlResp> => {
+export const fetchUserPublicAvatar = (uid: string): PromiseResBody<CloudResourceUrlResp> => {
   return request.get(`/user/${uid}/avatar`)
 }
 
-export const toggleFollowUser = (uid: number): PromiseResBody<void> => {
+export const toggleFollowUser = (uid: string): PromiseResBody<void> => {
   return request.post(`/user/${uid}/follow`)
 }
 
-export const fetchFollowings = (uid: number, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
+export const fetchFollowings = (uid: string, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
   return request.get(`/user/${uid}/followings`, { params: { page, size } })
 }
 
-export const fetchFollowers = (uid: number, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
+export const fetchFollowers = (uid: string, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
   return request.get(`/user/${uid}/followers`, { params: { page, size } })
 }

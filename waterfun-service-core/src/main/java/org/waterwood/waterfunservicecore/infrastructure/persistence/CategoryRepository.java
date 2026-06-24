@@ -30,11 +30,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSp
 
     @Query("""
         SELECT new org.waterwood.waterfunservicecore.entity.post.IdOptionVOPackagedDO
-            (c.id, c.slug, c.name, false)
+            (p.id ,c.id, c.slug, c.name, false)
         FROM Post p JOIN p.category c
         WHERE p.id IN :postIds
     """)
-    List<IdOptionVOPackagedDO<Long>> findCategoryDOByPostIdIn(@Param("postIds") List<Long> postIds);
+    List<IdOptionVOPackagedDO<Long, Long>> findCategoryDOByPostIdIn(@Param("postIds") List<Long> postIds);
 
     List<Category> findAllByIsDeleted(Boolean isDeleted);
 

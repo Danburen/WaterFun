@@ -15,7 +15,7 @@ const roleOptions = ref<OptionResItem[]>([]);
 const roleDetail = ref<RoleResp | null>(null);
 const editDialogVisible = ref(false);
 
-type SimpleOption = { id: string; name: string };
+type SimpleOption = { id: number | string; name: string };
 const assignedPermissionOptions = ref<SimpleOption[]>([]);
 const assignedUserOptions = ref<SimpleOption[]>([]);
 const collapsePerms = ref(true);
@@ -40,7 +40,7 @@ const fetchAssignedPermissions = async () => {
     const all: SimpleOption[] = []; let page = 0; let totalPages = 1;
     while (page < totalPages) {
       const res = await listRolePerms(roleId.value, { page, size: 100 });
-      (res.data.content || []).forEach(item => all.push({ id: String(item.id), name: `${item.name} (${item.code || item.id})` }));
+      (res.data.content || []).forEach(item => all.push({ id: item.id, name: `${item.name} (${item.code || item.id})` }));
       totalPages = (res.data.totalPages ?? res.data.page?.totalPages ?? 0) || 0; page += 1;
     }
     assignedPermissionOptions.value = all;
@@ -65,7 +65,7 @@ const gotoAssignPermPage = () => { if (!Number.isNaN(roleId.value)) router.push(
 const gotoAssignUserPage = () => { if (!Number.isNaN(roleId.value)) router.push({ name: "roleUserAssign", params: { id: roleId.value } }); };
 const gotoRoleDetail = (id: number) => router.push({ name: "roleDetail", params: { id } });
 const gotoPermissionDetail = (id: number) => router.push({ name: "permissionDetail", params: { id } });
-const gotoUserDetail = (uid: string) => router.push({ name: "userDetail", params: { uid: String(uid) } });
+const gotoUserDetail = (uid: number | string) => router.push({ name: "userDetail", params: { uid } });
 
 const handleEditSuccess = async () => { await Promise.all([fetchRoleDetail(), fetchRoleOptions()]) };
 

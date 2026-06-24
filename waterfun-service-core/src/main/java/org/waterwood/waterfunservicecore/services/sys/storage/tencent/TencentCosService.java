@@ -215,7 +215,7 @@ public class TencentCosService implements CloudFileService {
             this.removeFile(root, KeyPath); // remove unsupported file
             throw new FileTypeNotAllowException(
                     suffix,
-                    Arrays.toString(Arrays.stream(allowResTypes).map(ResourceType::getAllowExtensions).toArray())
+                    Arrays.toString(Arrays.stream(allowResTypes).map(ResourceType::getAllowExtensionString).toArray())
             );
         }
         FileProbeResult meta;
@@ -283,7 +283,7 @@ public class TencentCosService implements CloudFileService {
     }
 
     @Override
-    public void setAndValidResourceForCallback(@NotNull Resource res, CloudFSRoot root, ResourceStatus resourceStatus, ResourceType... resourceType) {
+    public void setAndValidResourceForCallback(Resource res, CloudFSRoot root, ResourceStatus resourceStatus, ResourceType... resourceType) {
         if(res.getUploaderId() == null || ! res.getUploaderId().equals(UserCtxHolder.getUserUid())){
             throw new ForbiddenException();
         }
@@ -294,7 +294,9 @@ public class TencentCosService implements CloudFileService {
         res.setSizeBytes(probeResult.getSize());
         res.setMimeType(probeResult.getMimeType());
         res.setFileMeta(probeResult.getMeta().toJson());
-        res.setStatus(resourceStatus); // only bind when temporary saving or publishing.
+        if(res.getStatus().equals(ResourceStatus.UPLOAD_PENDING)) {
+            res.setStatus(resourceStatus);
+        }
     }
 
     private CloudResPresignedUrlResp getReadUrlCached(String fullPath, Serializable bizId, Duration dur, TargetType resType) {
@@ -330,10 +332,13 @@ public class TencentCosService implements CloudFileService {
      *
      * @param <ID>                id type, e.g. Long, String, or business semantic id like "coverage-<uuid>"
      * @param rootKey             cloud resource key root
-     * @param bizIdNonRootPathMap bizId and path map, where path is the key path under cloud root, e.g. "2024/06/01/xxx.jpg"
+     * @param bizIdNonRootPathMap bizId and path map, where path is the key path under cloud root.
      * @param cloudResType        resource type for building cache key, e.g. "coverage", "avatar", etc.
-     * @return map of bizId and presigned URL response, where null value means the file is not exist or failed to get url. The bizId is the key of map, which is provided in parameter, and the URL is the value of map.
-     * e.g., if bizIdPathMap is {123L: "2024/06/01/xxx.jpg"}, the returned map will be {123L: CloudResPresignedUrlResp}, where CloudResPresignedUrlResp contains the presigned URL and its expiration time.
+     * @return map of bizId and presigned URL response, where null value means the file is not exist or failed to get
+     * url or the path is null in original inpu. The bizId is the key of map, which is provided in parameter, and the
+     * URL is the value of map.
+     * e.g., if bizIdPathMap is {123L: "2024/06/01/xxx.jpg"}, the returned map will be {123L: CloudResPresignedUrlResp},
+     * where CloudResPresignedUrlResp contains the presigned URL and its expiration time.
      * @see CloudResPresignedUrlResp
      */
     @Override
@@ -380,6 +385,10 @@ public class TencentCosService implements CloudFileService {
         List<Integer> missIndices = new ArrayList<>();
 
         for (int i = 0; i < entries.size(); i++) {
+            if(entries.get(i).getValue() == null) { // skip null path, and will return null in result
+                result.put(entries.get(i).getKey(), null);
+                continue;
+            };
             String cachedUrl = cached.get(i);
             if (cachedUrl != null) {
                 ID bizId = entries.get(i).getKey();

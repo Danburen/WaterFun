@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePostStore } from '~/stores/postStore'
 import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import MarkdownIt from 'markdown-it'
@@ -10,7 +10,8 @@ import { getUploadPolicy, uploadFileToCos, uploadCallback } from '~/api/uploadAp
 import type { TagResponse, PostSaveReq } from '~/api/postApi'
 
 const postStore = usePostStore()
-const { categories } = storeToRefs(postStore)
+const { categories, editDraft } = storeToRefs(postStore)
+const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 
@@ -19,15 +20,17 @@ const form = reactive({
   subtitle: '',
   content: '',
   summary: '',
-  categoryId: undefined as number | undefined,
-  tagIds: [] as number[],
+  categoryId: undefined as string | undefined,
+  tagIds: [] as string[],
   newTags: [] as string[],
   coverageImgId: '' as string
 })
 
+const toBigInt = (v: string) => BigInt(v)
+
 const submitting = ref(false)
 const isEdit = ref(false)
-const postId = ref<number | null>(null)
+const postId = ref<string | null>(null)
 const newTagInput = ref('')
 const md = new MarkdownIt()
 const previewHtml = ref('')
@@ -53,6 +56,8 @@ const insertMarkdown = (before: string, after: string) => {
 const hotTags = ref<TagResponse[]>([])
 const searchResults = ref<TagResponse[]>([])
 const searchLoading = ref(false)
+const showSearchResults = ref(false)
+const tagInputRef = ref<HTMLInputElement | null>(null)
 let searchAbort: AbortController | null = null
 
 const fetchHotTags = async () => {
@@ -65,9 +70,11 @@ const fetchHotTags = async () => {
 const handleTagSearch = async (keyword: string) => {
   if (!keyword.trim()) {
     searchResults.value = []
+    showSearchResults.value = false
     return
   }
   searchLoading.value = true
+  showSearchResults.value = true
   if (searchAbort) searchAbort.abort()
   searchAbort = new AbortController()
   try {
@@ -99,23 +106,13 @@ const handlePreview = async () => {
   }
 }
 
-const tagFetchSuggestions = (query: string, cb: (items: { value: string }[]) => void) => {
-  handleTagSearch(query)
-  if (query.trim()) {
-    setTimeout(() => {
-      cb(searchResults.value.map(r => ({ value: r.name, ...r })))
-    }, 0)
-  } else {
-    cb([])
-  }
-}
-
 const selectTagFromSearch = (tag: TagResponse) => {
   if (!form.tagIds.includes(tag.id)) {
     form.tagIds.push(tag.id)
   }
   newTagInput.value = ''
   searchResults.value = []
+  showSearchResults.value = false
 }
 
 const toggleHotTag = (tag: TagResponse) => {
@@ -138,11 +135,73 @@ const addNewTag = () => {
   form.newTags.push(val)
   newTagInput.value = ''
   searchResults.value = []
+  showSearchResults.value = false
 }
 
 const removeNewTag = (index: number) => {
   form.newTags.splice(index, 1)
 }
+
+const removeTagId = (id: string) => {
+  form.tagIds = form.tagIds.filter(tid => tid !== id)
+}
+
+const selectedTagName = (id: string): string => {
+  return hotTags.value.find(t => t.id === id)?.name || searchResults.value.find(r => r.id === id)?.name || ''
+}
+
+const onTagInputKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    if (searchResults.value.length > 0) {
+      selectTagFromSearch(searchResults.value[0])
+    } else {
+      addNewTag()
+    }
+  }
+  if (e.key === 'Backspace' && !newTagInput.value && form.tagIds.length > 0) {
+    form.tagIds.pop()
+  }
+  if (e.key === 'Escape') {
+    showSearchResults.value = false
+  }
+}
+
+const onClickOutside = (e: MouseEvent) => {
+  const target = e.target as HTMLElement
+  if (!target.closest('.tag-search-wrapper')) {
+    showSearchResults.value = false
+  }
+}
+
+onMounted(() => {
+  postStore.fetchCategories()
+  fetchHotTags()
+  document.addEventListener('click', onClickOutside)
+  // Edit mode: if ?id= exists, fetch draft
+  const editId = route.query.id as string | undefined
+  if (editId) {
+    isEdit.value = true
+    postId.value = editId
+    postStore.fetchEditDraft(editId)
+  }
+})
+
+watch(editDraft, (draft) => {
+  if (!draft || !isEdit.value) return
+  form.title = draft.editedTitle || ''
+  form.content = draft.editedContent || ''
+  form.summary = draft.editedSummary || ''
+  if (draft.editedCategoryId) {
+    form.categoryId = draft.editedCategoryId.id
+  }
+  form.tagIds = draft.editedTagIds?.map(t => t.id) || []
+  form.newTags = draft.editedNewTagIds || []
+}, { immediate: false })
+
+onUnmounted(() => {
+  document.removeEventListener('click', onClickOutside)
+})
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
@@ -200,8 +259,8 @@ const buildSaveReq = (): PostSaveReq => ({
   summary: form.summary || undefined,
   coverageImgId: form.coverageImgId || undefined,
   newTags: form.newTags.length ? form.newTags : undefined,
-  tagIds: form.tagIds.length ? form.tagIds : undefined,
-  categoryId: form.categoryId!
+  tagIds: form.tagIds.length ? form.tagIds.map(toBigInt) : undefined,
+  categoryId: BigInt(form.categoryId!)
 })
 
 const handlePublish = async () => {
@@ -255,11 +314,6 @@ const handleSaveDraft = async () => {
     submitting.value = false
   }
 }
-
-onMounted(() => {
-  postStore.fetchCategories()
-  fetchHotTags()
-})
 </script>
 
 <template>
@@ -379,55 +433,63 @@ onMounted(() => {
           <div class="form-group">
             <label class="form-label">{{ $t('post.tags') }}</label>
 
-            <div v-if="hotTags.length" class="hot-tags-section">
-              <span class="hot-tags-label">热门标签：</span>
-              <el-tag
+            <div v-if="hotTags.length" class="tag-suggestions">
+              <span
                 v-for="tag in hotTags"
                 :key="tag.id"
-                :type="form.tagIds.includes(tag.id) ? 'primary' : 'info'"
-                :effect="form.tagIds.includes(tag.id) ? 'dark' : 'plain'"
-                style="cursor:pointer;margin:2px 4px 2px 0"
+                class="tag-suggestion"
+                :class="{ active: form.tagIds.includes(tag.id) }"
                 @click="toggleHotTag(tag)"
-              >{{ tag.name }}</el-tag>
+              >{{ tag.name }}</span>
             </div>
 
-            <div class="tag-search-row">
-              <el-autocomplete
-                v-model="newTagInput"
-                :fetch-suggestions="tagFetchSuggestions"
-                :trigger-on-focus="false"
-                placeholder="搜索或输入标签名称"
-                style="width: 240px"
-                @select="(item: any) => selectTagFromSearch(item as unknown as TagResponse)"
-                @keyup.enter="addNewTag"
-              >
-                <template #append>
-                  <el-button @click="addNewTag">添加</el-button>
-                </template>
-              </el-autocomplete>
+            <div class="tag-search-wrapper">
+              <div class="tag-input-wrap">
+                <span
+                  v-for="tagId in form.tagIds"
+                  :key="tagId"
+                  class="tag-chip"
+                >
+                  {{ selectedTagName(tagId) }}
+                  <span class="remove" @click="removeTagId(tagId)">&times;</span>
+                </span>
+                <span
+                  v-for="(tag, index) in form.newTags"
+                  :key="'new-' + index"
+                  class="tag-chip new-tag"
+                >
+                  {{ tag }}
+                  <span class="remove" @click="removeNewTag(index)">&times;</span>
+                </span>
+                <input
+                  ref="tagInputRef"
+                  v-model="newTagInput"
+                  class="tag-input"
+                  type="text"
+                  placeholder="输入标签名称搜索或按回车添加"
+                  @input="handleTagSearch(newTagInput)"
+                  @keydown="onTagInputKeydown"
+                >
+              </div>
+
+              <div v-if="showSearchResults && newTagInput.trim()" class="tag-search-dropdown">
+                <div v-if="searchLoading" class="tag-search-loading">搜索中...</div>
+                <div
+                  v-for="tag in searchResults"
+                  :key="tag.id"
+                  class="tag-search-item"
+                  :class="{ selected: form.tagIds.includes(tag.id) }"
+                  @click="selectTagFromSearch(tag)"
+                >
+                  <span class="tag-search-name">{{ tag.name }}</span>
+                  <span class="tag-search-count">{{ tag.usageCount || 0 }} 帖子</span>
+                </div>
+                <div v-if="!searchLoading && searchResults.length === 0 && newTagInput.trim()" class="tag-search-empty">
+                  按 <strong>Enter</strong> 添加「{{ newTagInput.trim() }}」为新标签
+                </div>
+              </div>
             </div>
 
-            <div v-if="form.tagIds.length" class="selected-tags">
-              <el-tag
-                v-for="tagId in form.tagIds"
-                :key="tagId"
-                closable
-                type="primary"
-                @close="form.tagIds = form.tagIds.filter(id => id !== tagId)"
-              >
-                {{ hotTags.find(t => t.id === tagId)?.name || searchResults.find(r => r.id === tagId)?.name || `Tag-${tagId}` }}
-              </el-tag>
-            </div>
-
-            <div v-if="form.newTags.length" class="new-tags-list">
-              <el-tag
-                v-for="(tag, index) in form.newTags"
-                :key="index"
-                closable
-                type="success"
-                @close="removeNewTag(index)"
-              >{{ tag }}</el-tag>
-            </div>
             <p class="form-hint">{{ $t('post.tagLimit') }}</p>
           </div>
         </div>
@@ -508,27 +570,6 @@ onMounted(() => {
   font-size: 13px;
   color: var(--wf-text-muted);
   margin-top: 6px;
-}
-
-.hot-tags-section {
-  margin-bottom: 10px;
-}
-
-.hot-tags-label {
-  font-size: 13px;
-  color: var(--wf-text-secondary);
-  margin-right: 6px;
-}
-
-.tag-search-row {
-  margin-bottom: 10px;
-}
-
-.selected-tags, .new-tags-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
 }
 
 .action-bar {
@@ -636,6 +677,165 @@ onMounted(() => {
 .preview-empty p {
   font-size: 14px;
   color: var(--wf-text-muted);
+}
+
+/* ========== Tags ========== */
+.tag-suggestions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.tag-suggestion {
+  padding: 5px 14px;
+  background: var(--wf-bg);
+  border: 1px solid var(--wf-border);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--wf-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.tag-suggestion:hover {
+  border-color: var(--wf-primary);
+  color: var(--wf-primary);
+  background: var(--wf-primary-light);
+}
+
+.tag-suggestion.active {
+  border-color: var(--wf-primary);
+  color: #fff;
+  background: var(--wf-primary);
+}
+
+.tag-search-wrapper {
+  position: relative;
+}
+
+.tag-input-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--wf-border);
+  border-radius: 8px;
+  background: var(--wf-bg-white);
+  min-height: 44px;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.tag-input-wrap:focus-within {
+  border-color: var(--wf-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: var(--wf-primary-light);
+  color: var(--wf-primary);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
+  animation: tagIn 0.2s ease;
+  white-space: nowrap;
+}
+
+.tag-chip.new-tag {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+@keyframes tagIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.tag-chip .remove {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  font-size: 14px;
+  line-height: 1;
+  margin-left: 2px;
+}
+
+.tag-chip .remove:hover { opacity: 1; }
+
+.tag-input {
+  flex: 1;
+  min-width: 100px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: var(--wf-text-primary);
+  background: transparent;
+  padding: 4px 2px;
+}
+
+.tag-input::placeholder { color: var(--wf-text-muted); }
+
+.tag-search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin-top: 4px;
+  background: var(--wf-bg-white);
+  border: 1px solid var(--wf-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.tag-search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.tag-search-item:hover {
+  background: var(--wf-primary-light);
+}
+
+.tag-search-item.selected {
+  background: var(--wf-primary-light);
+  color: var(--wf-primary);
+  font-weight: 600;
+}
+
+.tag-search-name {
+  font-size: 14px;
+  color: var(--wf-text-primary);
+}
+
+.tag-search-count {
+  font-size: 12px;
+  color: var(--wf-text-muted);
+}
+
+.tag-search-loading,
+.tag-search-empty {
+  padding: 14px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--wf-text-muted);
+}
+
+.tag-search-empty strong {
+  color: var(--wf-primary);
 }
 
 @media (max-width: 900px) {

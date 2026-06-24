@@ -5,6 +5,7 @@ import {getErrorMessage} from "~/utils/errorMessage";
 import {useAuthStore} from "~/stores/authStore";
 import {useUserInfoStore} from "~/stores/userInfoStore";
 import type {ApiRes} from "@waterfun/web-core/src/types";
+import JSONBig from 'json-bigint'
 
 declare module 'axios' {
     interface AxiosRequestConfig {
@@ -14,12 +15,70 @@ declare module 'axios' {
         };
     }
 }
+
+const JSONBigParser = JSONBig({ useNativeBigInt: true, alwaysParseAsBig: true })
+
+function isIdField(key: string): boolean {
+  return /^(id|uid|postId|parentId|rootId|commentId|categoryId|tagId|authorId|bizId)$/i.test(key)
+}
+
+function normalizeTypes(obj: any): any {
+  if (obj === null || obj === undefined) return obj
+
+  if (typeof obj === 'bigint') {
+    if (obj > BigInt(Number.MAX_SAFE_INTEGER) || obj < BigInt(Number.MIN_SAFE_INTEGER)) {
+      return obj.toString()
+    }
+    return Number(obj)
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(normalizeTypes)
+  }
+
+  if (typeof obj === 'object') {
+    const result: any = {}
+    for (const key of Object.keys(obj)) {
+      const value = obj[key]
+      if (isIdField(key) && typeof value === 'bigint') {
+        result[key] = value.toString()
+      } else {
+        result[key] = normalizeTypes(value)
+      }
+    }
+    return result
+  }
+
+  return obj
+}
+
 const CSRF_SKIP_LIST: string[] = import.meta.env.VITE_CSRF_SKIP_LIST?.split(',') || [];
 const AUTH_SKIP_LIST: string[] = import.meta.env.VITE_AUTH_SKIP_LIST?.split(',') || [];
 const service = axios.create({
     baseURL: import.meta.env.VITE_API_BASE,
     timeout: 5000,
-    withCredentials: true //allow credentials and cookies+
+    withCredentials: true,
+    transformRequest: [
+      (data, headers) => {
+        if (typeof data === 'undefined') return data
+        if (data instanceof FormData || data instanceof URLSearchParams || data instanceof Blob) return data
+        if (typeof data === 'object') {
+          headers['Content-Type'] = 'application/json'
+          return JSONBigParser.stringify(data)
+        }
+        return data
+      },
+    ],
+    transformResponse: [
+      (data) => {
+        if (typeof data !== 'string') return data
+        try {
+          return normalizeTypes(JSONBigParser.parse(data))
+        } catch {
+          return data
+        }
+      },
+    ],
 }) as ApiRes
 
 // request interceptors

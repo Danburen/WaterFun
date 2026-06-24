@@ -17,13 +17,11 @@ import java.time.Instant;
 @Table(name = "audit_task")
 public class AuditTask {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     @Size(max = 64)
-    @NotNull
-    @Column(name = "target_id", nullable = false, length = 64)
+    @Column(name = "target_id", length = 64)
     private String targetId;
 
     @NotNull
@@ -53,10 +51,10 @@ public class AuditTask {
     private User submitter;
 
     @Column(name = "reject_type", columnDefinition = "tinyint UNSIGNED")
-    private AuditRejectType rejectType;
+    private AuditType rejectType;
 
     @Column(name = "target_type", columnDefinition = "tinyint UNSIGNED not null")
-    private TargetType targetType = TargetType.UNKNOWN;
+    private TargetType targetType = TargetType.DEFAULT;
 
     @ColumnDefault("'0'")
     @Column(name = "format", columnDefinition = "tinyint UNSIGNED not null")
@@ -66,17 +64,6 @@ public class AuditTask {
     @Column(name = "status", columnDefinition = "tinyint UNSIGNED not null")
     private AuditStatus status = AuditStatus.PENDING;
 
-    @Deprecated
-    @Lob
-    @Column(name = "content")
-    private String content;
-
-    @Size(max = 10)
-    @NotNull
-    @ColumnDefault("'zh-CN'")
-    @Column(name = "user_locale", nullable = false, length = 10)
-    private String userLocale = "zh-CN";
-
     @Column(name = "payload", columnDefinition = "json")
     private String payload;
 
@@ -84,11 +71,6 @@ public class AuditTask {
     @ColumnDefault("(case when (`status` = 1) then `target_id` else NULL end)")
     @Column(name = "pending_target_id", length = 64, updatable = false, insertable = false) // the application usually won't use this
     private String pendingTargetId;
-
-    @Deprecated
-    @Size(max = 255)
-    @Column(name = "suspect_reason")
-    private String suspectReason;
 
     @Column(name = "trigger_type", columnDefinition = "tinyint UNSIGNED not null")
     private AuditTriggerType triggerType = AuditTriggerType.UNKNOWN;

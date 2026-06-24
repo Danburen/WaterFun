@@ -1,0 +1,95 @@
+# ============================================================
+# WaterFun 统一配置模板
+#   - 非三方/非敏感配置：自带 :default 开发默认值（零配置启动）
+#   - 三方接口/敏感配置：纯 ${VAR} 引用，值由 dev-secrets / 环境变量注入
+# ============================================================
+
+# -------- JWT (非三方) --------
+jwt:
+  issuer: waterfun
+  public-key: ${JWT_PUBLIC_KEY:file:./deploy/keys/public.key}
+  private-key: ${JWT_PRIVATE_KEY:file:./deploy/keys/private.key}
+
+spring:
+  # -------- 数据库 (infra, 非三方) --------
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/waterfun}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # -------- Redis (infra, 非三方) --------
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DATABASE:0}
+      username: ${REDIS_USERNAME:default}
+      password: ${REDIS_PASSWORD:}
+
+  # -------- RabbitMQ (infra, 非三方) --------
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:admin123}
+    virtual-host: ${RABBITMQ_VHOST:/}
+
+  # -------- Spring Security 默认用户 (非三方) --------
+  security:
+    user:
+      name: ${SECURITY_USER_NAME:admin}
+      password: ${SECURITY_USER_PASSWORD:admin}
+
+  # -------- 邮件服务器 (三方服务，值由 dev-secrets / 环境变量注入) --------
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          starttls:
+            enable: false
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+            port: ${MAIL_PORT}
+
+  # -------- 对象存储 - Tencent COS (三方服务，值由 dev-secrets / 环境变量注入) --------
+cloud:
+  tencent:
+    cos:
+      bucket-name: ${TENCENT_COS_BUCKET}
+      default-expires-seconds: 3600
+      safety-marge-seconds: 300
+      upload-expires-seconds: 300
+
+# -------- SMS - 阿里云 (三方服务，值由 dev-secrets / 环境变量注入) --------
+aliyun:
+  sms:
+    sign-name: ${ALIYUN_SMS_SIGN_NAME}
+    verify-code:
+      template-name: ${ALIYUN_SMS_VERIFY_CODE_TEMPLATE}
+
+# -------- 通知服务 (三方，值由 dev-secrets / 环境变量注入) --------
+mail:
+  resend:
+    api-key: ${RESEND_API_KEY}
+  support:
+    email: ${SUPPORT_EMAIL}
+  email-verify: https://waterfun.top/api/auth/email/activate?=
+
+# -------- 设备指纹盐值 (非三方) --------
+device:
+  salt: ${DEVICE_SALT:这个是我固定的盐值}
+
+# -------- 日志级别 --------
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

@@ -17,8 +17,8 @@ import SelectPermissionDialog from "../components/SelectPermissionDialog.vue";
 const route = useRoute();
 const router = useRouter();
 
-const uid = computed(() => String(route.params.uid ?? ""));
-const isValidUid = computed(() => /^\d+$/.test(uid.value));
+const uid = computed(() => String(route.params.uid));
+const isValidUid = computed(() => uid.value != null && uid.value !== '');
 const userName = ref("");
 
 const loading = ref(false);

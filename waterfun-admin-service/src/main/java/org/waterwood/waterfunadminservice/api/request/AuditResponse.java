@@ -6,8 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.waterwood.waterfunadminservice.api.response.AuditTaskRes;
 import org.waterwood.waterfunadminservice.api.response.content.audit.ModerationResourceRes;
+import org.waterwood.waterfunadminservice.api.response.content.audit.SourceContext;
 import org.waterwood.waterfunservicecore.api.moderation.AuditPayload;
-import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
 
 import java.util.List;
 
@@ -17,5 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 public class AuditResponse <T extends AuditPayload> extends AuditTaskRes {
     private T payload;
-    private List<ModerationResourceRes> resources;
+    private List<ModerationResourceRes> linkedResources;
+    private SourceContext sourceContext;
 }

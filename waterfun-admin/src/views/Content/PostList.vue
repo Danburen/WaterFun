@@ -30,6 +30,8 @@ const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
 
 const postStatusLabel: Record<string, string> = { DRAFT: "草稿", PENDING: "待审核", PUBLISHED: "已发布", REJECTED: "已拒绝", ARCHIVED: "已归档" };
 const postStatusBadge: Record<string, string> = { DRAFT: "badge-gray", PENDING: "badge-yellow", PUBLISHED: "badge-green", REJECTED: "badge-red", ARCHIVED: "badge-gray" };
+const postTypeLabel: Record<string, string> = { COMMON: "普通", NOTICE: "公告" };
+const postTypeBadge: Record<string, string> = { COMMON: "badge-gray", NOTICE: "badge-yellow" };
 
 const loadOptions = async () => {
   loadingOptions.value = true;
@@ -140,6 +142,8 @@ onMounted(() => { fetchData(); loadOptions(); });
           <th style="width:80px">分类ID</th>
           <th style="width:80px">作者ID</th>
           <th>标识符</th>
+          <th style="width:70px">类型</th>
+          <th style="width:60px">置顶</th>
           <th style="width:160px">创建时间</th>
           <th style="width:160px">操作</th>
         </tr>
@@ -153,6 +157,8 @@ onMounted(() => { fetchData(); loadOptions(); });
           <td>{{ row.categoryId }}</td>
           <td>{{ row.authorId }}</td>
           <td>{{ row.slug }}</td>
+          <td><span :class="['badge', postTypeBadge[row.type || ''] || 'badge-gray']">{{ postTypeLabel[row.type || ''] || '普通' }}</span></td>
+          <td>{{ row.isPinned ? '✅' : '❌' }}</td>
           <td>{{ formatDate(row.createdAt) || '无' }}</td>
           <td>
             <div class="table-actions">

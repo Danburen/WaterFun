@@ -22,7 +22,7 @@ export interface ListCategoryParams {
   size?: number;
   name?: string;
   slug?: string;
-  parentId?: string;
+  parentId?: number;
   creatorId?: string;
 }
 
@@ -30,7 +30,7 @@ export interface UpdateCategoryRequest {
   name?: string;
   slug?: string;
   description?: string;
-  parentId?: string;
+  parentId?: number;
   sortOrder?: number;
   isActive?: boolean;
 }
@@ -39,13 +39,13 @@ export interface CreateCategoryRequest {
   name: string;
   slug?: string;
   description?: string;
-  parentId?: string;
+  parentId?: number;
   sortOrder?: number;
   isActive?: boolean;
 }
 
 export interface RemoveCategoriesRequest {
-  categoryIds: number[];
+  categoryIds: string[];
 }
 
 export interface BatchResult {
@@ -53,6 +53,9 @@ export interface BatchResult {
   success: number;
   ignored: number;
   failed: number;
+  ignoredIds?: number[];
+  failedIds?: number[];
+  message?: string;
 }
 
 export const listCategories = (params: ListCategoryParams = {}): PromiseResBody<Page<CategoryResp>> => {

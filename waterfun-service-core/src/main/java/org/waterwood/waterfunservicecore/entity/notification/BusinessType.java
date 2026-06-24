@@ -7,7 +7,8 @@ public enum BusinessType {
     NONE(0),
     POST(1),
     COMMENT(2),
-    USER(3),;
+    USER(3),
+    TICKET_REPLY(4),;
 
     private final short value;
     private BusinessType(final int value) {

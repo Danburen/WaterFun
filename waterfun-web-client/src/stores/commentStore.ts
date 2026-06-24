@@ -24,7 +24,7 @@ export const useCommentStore = defineStore('comment', {
   }),
 
   actions: {
-    async fetchComments(postId: number, reset = false): Promise<void> {
+    async fetchComments(postId: number | bigint, reset = false): Promise<void> {
       if (this.loading) return
       if (!this.hasNext && !reset) return
 
@@ -49,7 +49,7 @@ export const useCommentStore = defineStore('comment', {
       }
     },
 
-    async fetchReplies(rootId: number, reset = false): Promise<void> {
+    async fetchReplies(rootId: number | bigint, reset = false): Promise<void> {
       const key = String(rootId)
       if (this.replyCursors[key] === null && !reset) return
 
@@ -58,7 +58,7 @@ export const useCommentStore = defineStore('comment', {
           cursor: reset ? undefined : this.replyCursors[key] ?? undefined,
           limit: 10,
         })
-        const page = res.data as unknown as CursorPageComment<CommentResponse, number>
+        const page = res.data as unknown as CursorPageComment<CommentResponse>
         const list = page?.list || []
 
         this.replies[key] = reset ? list : [...(this.replies[key] || []), ...list]
@@ -80,7 +80,7 @@ export const useCommentStore = defineStore('comment', {
       }
     },
 
-    async likeComment(commentId: number): Promise<void> {
+    async likeComment(commentId: string): Promise<void> {
       try {
         await commentApi.likeComment(commentId)
       } catch (err) {
@@ -89,7 +89,7 @@ export const useCommentStore = defineStore('comment', {
       }
     },
 
-    async removeComment(commentId: number): Promise<void> {
+    async removeComment(commentId: string): Promise<void> {
       try {
         await commentApi.deleteComment(commentId)
         this.comments = this.comments.filter((c) => c.id !== commentId)

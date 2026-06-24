@@ -151,37 +151,48 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import('@/layouts/EmptyLayout.vue'),
                 meta: { locale: '内容审核', icon: 'moderation' },
                 children: [
+
                     {
-                        path: 'workbench',
-                        name: 'moderationWorkbench',
-                        meta: { locale: '审核工作台', icon: 'clipboard-check' },
-                        component: () => import('@/views/Moderation/ContentModerationWorkbench.vue')
+                        path: 'posts',
+                        name: 'moderationPosts',
+                        meta: { locale: '帖子审核', icon: 'file-lines' },
+                        component: () => import('@/views/Moderation/PostModerationView.vue')
                     },
                     {
-                        path: 'tasks/:taskId',
-                        name: 'moderationTaskDetail',
-                        component: () => import('@/views/Moderation/ModerationDetail.vue'),
-                        props: true,
-                        meta: {
-                            locale: '任务详情',
-                            isDetail: true,
-                        }
+                        path: 'images',
+                        name: 'moderationImages',
+                        meta: { locale: '图片审核', icon: 'image' },
+                        component: () => import('@/views/Moderation/ImageModerationView.vue')
                     },
                     {
-                        path: 'tasks/:taskId/resources/:resourceUuid',
-                        name: 'moderationResourceDetail',
-                        component: () => import('@/views/Moderation/ModerationResourceDetail.vue'),
-                        props: true,
-                        meta: {
-                            locale: '资源详情',
-                            isDetail: true,
-                        }
+                        path: 'texts',
+                        name: 'moderationTexts',
+                        meta: { locale: '文本审核', icon: 'comment' },
+                        component: () => import('@/views/Moderation/TextModerationView.vue')
                     },
                     {
-                        path: 'resources',
-                        name: 'moderationResourceList',
-                        meta: { locale: '资源列表', icon: 'cubes' },
-                        component: () => import('@/views/Moderation/ResourceModerationList.vue')
+                        path: 'feedback',
+                        name: 'moderationFeedback',
+                        meta: { locale: '反馈管理', icon: 'lightbulb' },
+                        component: () => import('@/views/Moderation/FeedbackView.vue')
+                    },
+                    {
+                        path: 'appeal',
+                        name: 'moderationAppeal',
+                        meta: { locale: '申诉管理', icon: 'gavel' },
+                        component: () => import('@/views/Moderation/AppealView.vue')
+                    },
+                    {
+                        path: 'report',
+                        name: 'moderationReport',
+                        meta: { locale: '举报管理', icon: 'flag' },
+                        component: () => import('@/views/Moderation/ReportView.vue')
+                    },
+                    {
+                        path: 'bans',
+                        name: 'moderationBans',
+                        meta: { locale: '封禁管理', icon: 'gavel' },
+                        component: () => import('@/views/System/BanManagement.vue')
                     }
                 ]
             },

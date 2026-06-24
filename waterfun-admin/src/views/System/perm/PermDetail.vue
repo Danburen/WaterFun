@@ -16,7 +16,7 @@ const permissionDetail = ref<PermissionResp | null>(null);
 const editDialogVisible = ref(false);
 const collapseUsers = ref(true);
 
-type SimpleOption = { id: string; name: string };
+type SimpleOption = { id: number | string; name: string };
 const assignedUserOptions = ref<SimpleOption[]>([]);
 
 const fetchPermOptions = async () => {
@@ -47,7 +47,7 @@ const fetchPermUsersPreview = async () => {
 
 const openEditDialog = () => { if (!Number.isNaN(permissionId.value)) editDialogVisible.value = true; };
 const gotoPermissionDetail = (id: number) => router.push({ name: "permissionDetail", params: { id } });
-const gotoUserDetail = (uid: string) => router.push({ name: "userDetail", params: { uid: String(uid) } });
+const gotoUserDetail = (uid: number | string) => router.push({ name: "userDetail", params: { uid } });
 const handleEditSuccess = async () => { await Promise.all([fetchPermDetail(), fetchPermOptions()]) };
 
 onMounted(async () => { await Promise.all([fetchPermOptions(), fetchPermDetail(), fetchPermUsersPreview()]); });
