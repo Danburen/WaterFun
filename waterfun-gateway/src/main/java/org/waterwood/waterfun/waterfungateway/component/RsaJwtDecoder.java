@@ -52,16 +52,17 @@ public class RsaJwtDecoder implements ReactiveJwtDecoder {
     }
 
     @Override
-    public Mono<Jwt> decode(String token) throws JwtException {
+    public Mono<Jwt> decode(String token) {
         if (token == null || token.isEmpty())
-            throw new AuthException(AuthCode.TOKEN_MISSING);
-        try {
-            return Mono.fromCallable(() -> parseToken(token))
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .flatMap(claims -> validateToken(claims, token));
-        } catch (JwtException e) {
-            return Mono.error(new AuthException(AuthCode.TOKEN_INVALID));
-        }
+            return Mono.error(new AuthException(AuthCode.TOKEN_MISSING));
+        return Mono.fromCallable(() -> parseToken(token))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(claims -> validateToken(claims, token))
+                .onErrorResume(e ->
+                        e instanceof AuthException
+                                ? Mono.error(e)
+                                : Mono.error(new AuthException(AuthCode.TOKEN_INVALID))
+                );
     }
 
     private Jwt buildJwt(Claims claims, String token) {
