@@ -3,7 +3,7 @@ import type {
   OptionResItem,
   PromiseResBody,
 } from "@waterfun/web-core/src/types/api/response";
-import type { Page } from "~/types/api";
+import type { Page, BatchResult } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type PermissionType = "API" | "MENU" | "BUTTON" | "DATA" | "BAM";
@@ -67,16 +67,6 @@ export interface UserInfoARes {
   nickname: string | null;
   avatar: string | null;
   lastActiveAt: ISOString;
-}
-
-export interface BatchResult {
-  requested: number;
-  success: number;
-  ignored: number;
-  failed: number;
-  ignoredIds: number[];
-  failedIds: number[];
-  message: string;
 }
 
 export interface ExpirableOption<TId extends number | string = number> extends OptionResItem<TId> {

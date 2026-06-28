@@ -16,7 +16,6 @@ import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunadminservice.api.response.role.RoleResp;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
-import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;
 import org.waterwood.waterfunservicecore.entity.spec.RoleSpec;
 import org.waterwood.waterfunadminservice.service.role.RoleService;
 
@@ -28,7 +27,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/role")
-@RequireRole("ADMIN")
 public class RoleController {
     private final RoleMapper roleMapper;
     private final RoleService roleService;

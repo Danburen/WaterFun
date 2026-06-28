@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.InappropriateContentException;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
@@ -22,6 +23,7 @@ import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
 import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
+import org.waterwood.waterfunservicecore.services.content.TextFilterService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 
 @Service
@@ -37,6 +39,7 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     private final UserProfileRepository userProfileRepository;
     private final ResourceRepository resourceRepository;
     private final UserActivityLogService userActivityLogService;
+    private final TextFilterService textFilterService;
 
     @Override
     public void addUserProfile(UserProfile up) {
@@ -46,10 +49,13 @@ public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     @Override
     @Transactional
     public void updateProfileByDto(UpdateUserProfileRequest dto) {
-        //TODO
         long userUid = UserCtxHolder.getUserUid();
         User u = userCoreService.getUser(userUid);
         UserProfile profile = getUserProfile(userUid);
+
+        if (dto.getBio() != null && textFilterService.containsSensitiveWords(dto.getBio())) {
+            throw new InappropriateContentException();
+        }
 
         userProfileCoreMapper.toEntity(dto, profile);
         userCoreMapper.toEntity(dto, u);

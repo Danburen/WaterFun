@@ -91,7 +91,7 @@ definePageMeta({
   ssr: false
 })
 
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useUserInfoStore } from "~/stores/userInfoStore";
@@ -131,6 +131,15 @@ const locationOptions = provinceAndCityData as any[];
 
 const userProfile = computed(() => userProfileStore.userProfile);
 
+watch(userProfile, (profile) => {
+  editForm.value = {
+    ...editForm.value,
+    bio: profile.bio || '',
+    gender: profile.gender || '',
+    birthday: profile.birthday ? new Date(profile.birthday) : undefined as any,
+    residence: profile.residence ? profile.residence.split(' ') : [],
+  };
+}, { deep: true, immediate: true });
 
 const saveChanges = async () => {
   loading.value = true;
@@ -153,11 +162,9 @@ const saveChanges = async () => {
 
     // 如果有昵称变更，单独调用昵称更新
     if (editForm.value.nickname && editForm.value.nickname !== userInfoStore.userInfo.nickname) {
-      // 尝试更新昵称（如果后端支持）
       try {
         await userInfoStore.updateNickname(editForm.value.nickname);
       } catch {
-        // 昵称更新失败不影响主流程
         console.warn('昵称更新失败');
       }
     }
@@ -175,20 +182,9 @@ const handleAvatarSubmitted = () => {
   ElMessage.success('头像已提交审核，审核通过后会自动生效');
 };
 
-const loadUserData = async () => {
-  const profile = userProfileStore.userProfile;
-  editForm.value = {
-    nickname: userInfoStore.userInfo.nickname || userInfoStore.userInfo.username || '',
-    bio: profile.bio || '',
-    gender: profile.gender || '',
-    avatar: await userProfileStore.getAvatarUrl() || '',
-    birthday: profile.birthday ? new Date(profile.birthday) : undefined as any,
-    residence: profile.residence ? profile.residence.split(' ') : [],
-  };
-};
-
 onMounted(async () => {
-  await loadUserData();
+  editForm.value.nickname = userInfoStore.userInfo.nickname || userInfoStore.userInfo.username || '';
+  editForm.value.avatar = await userProfileStore.getAvatarUrl() || '';
 });
 </script>
 

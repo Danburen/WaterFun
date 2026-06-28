@@ -115,10 +115,14 @@ public class RegisterServiceImpl implements RegisterService {
         UserPreference upp = new UserPreference();
         upp.setUser(user);
 
+        UserSetting us = new UserSetting();
+        us.setUser(user);
+
         user.setUserCounter(uc);
         user.setUserProfile(up);
         user.setUserDatum(ud);
         user.setUserPreference(upp);
+        user.setUserSetting(us);
         userRepo.save(user);
         siteStatisticRecorder.recordNewUser();
         auditLogCoreService.record(user.getUid(), user.getUsername(), AuditLogActionType.REGISTER);

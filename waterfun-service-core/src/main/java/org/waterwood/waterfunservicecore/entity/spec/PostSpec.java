@@ -71,7 +71,7 @@ public final class PostSpec {
             if (StringUtil.isNotBlank(title)) {
                 preds.add(cb.like(root.get("title"), "%" + title + "%"));
             }
-            if (StringUtil.isNotBlank(slug)) {
+            if (status != null) {
                 preds.add(cb.equal(root.get("status"), status));
             }
             if (categoryId != null) {
@@ -84,7 +84,6 @@ public final class PostSpec {
                 Subquery<Long> hitCountSub = query.subquery(Long.class);
                 Root<Post> subRoot = hitCountSub.from(Post.class);
                 Join<Post, Tag> subTag = subRoot.join("tags");
-                // order with hit counts ofPending tags instead ofPending normal order.
                 hitCountSub.select(cb.count(subTag.get("id")))
                         .where(
                                 cb.equal(subRoot.get("id"), root.get("id")),
@@ -95,7 +94,7 @@ public final class PostSpec {
                 Join<Post, Tag> tagJoin = root.join("tags", JoinType.INNER);
                 return tagJoin.get("id").in(tagIds);
             }
-            if (slug != null) {
+            if (StringUtil.isNotBlank(slug)) {
                 preds.add(cb.equal(root.get("slug"), slug));
             }
             return cb.and(preds.toArray(new Predicate[0]));

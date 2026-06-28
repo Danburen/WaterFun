@@ -103,8 +103,6 @@ const validate = () => {
   clearErrs(); let ok = true;
   if (!title.value.trim()) { titleErr.value = '请输入标题'; ok = false; }
   if (!content.value.trim()) { contentErr.value = '请输入内容'; ok = false; }
-  if (!authorId.value) { authorIdErr.value = '请选择作者'; ok = false; }
-  if (categoryId.value == null) { categoryIdErr.value = '请选择分类'; ok = false; }
   return ok;
 };
 
@@ -251,7 +249,7 @@ const handleSave = async () => {
         <label class="form-label">分类ID</label>
         <div class="form-content">
             <select v-model="categoryId" class="form-select">
-              <option :value="null">请选择</option>
+              <option :value="null">无分类（全局公告）</option>
             <option v-for="item in categoryOptions" :key="item.id" :value="item.id" :disabled="item.disabled">{{ item.id }} ({{ item.name }})</option>
           </select>
           <div v-if="categoryIdErr" class="form-error">{{ categoryIdErr }}</div>

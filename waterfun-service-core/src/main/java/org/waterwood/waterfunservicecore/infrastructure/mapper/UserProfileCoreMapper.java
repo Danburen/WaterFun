@@ -9,10 +9,12 @@ import org.waterwood.waterfunservicecore.api.resp.user.UserProfileResponse;
 public interface UserProfileCoreMapper {
     UserProfile toEntity(UserProfileResponse userProfileResponse);
 
+    @Mapping(target = "birthday", source = "birthDate")
     UserProfileResponse toResponse(UserProfile userProfile);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     UserProfile partialUpdate(UserProfileResponse userProfileResponse, @MappingTarget UserProfile userProfile);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "birthDate", source = "birthday")
     UserProfile toEntity(UpdateUserProfileRequest body,  @MappingTarget UserProfile entity);
 }

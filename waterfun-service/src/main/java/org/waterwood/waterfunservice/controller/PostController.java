@@ -55,6 +55,13 @@ public class PostController {
         return ApiResponse.success(postService.listPublicCardPosts(req));
     }
 
+    @GetMapping("/hot")
+    public ApiResponse<Page<PostCardResp>> listHotPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.success(postService.listHotPosts(PageRequest.of(page, size)));
+    }
+
     @RateLimit(key = "listPublicPosts")
     @GetMapping("/{id}")
     public ApiResponse<PostDetailResp> getPostDetail(@PathVariable Long id){
@@ -190,6 +197,7 @@ public class PostController {
     public ApiResponse<ReportResponse> reportPost(@PathVariable Long id, @Valid @RequestBody CreateReportReq req) {
         AuthContext ctx = UserCtxHolder.safeGet()
                 .orElseThrow(() -> new ServiceException("Authentication required"));
+        postService.ensurePostReportable(id);
         Long taskId = reportService.submitReport(
                 String.valueOf(id),
                 TargetType.POST,

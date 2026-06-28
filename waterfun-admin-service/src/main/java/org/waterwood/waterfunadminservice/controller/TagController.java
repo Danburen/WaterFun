@@ -77,4 +77,15 @@ public class TagController {
                 tagService.getOptions()
         );
     }
+
+    @GetMapping("/search")
+    public ApiResponse<List<OptionVO<Long>>> searchTags(@RequestParam String keyword,
+                                                         @RequestParam(defaultValue = "10") int limit) {
+        return ApiResponse.success(tagService.searchTags(keyword, limit));
+    }
+
+    @GetMapping("/hot")
+    public ApiResponse<List<OptionVO<Long>>> getHotTags(@RequestParam(defaultValue = "20") int limit) {
+        return ApiResponse.success(tagService.getHotTags(limit));
+    }
 }

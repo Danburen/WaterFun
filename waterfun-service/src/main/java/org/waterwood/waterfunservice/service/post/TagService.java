@@ -58,6 +58,11 @@ public interface TagService {
     List<Tag> createNewTags(Set<String> newTags, Long userUid);
 
     /**
+     * Create new tags by names with a pre-fetched existing tag count (avoids N+1).
+     */
+    List<Tag> createNewTags(Set<String> newTags, Long userUid, int existingCount);
+
+    /**
      * Get tags
      *
      * @param pageable pageable

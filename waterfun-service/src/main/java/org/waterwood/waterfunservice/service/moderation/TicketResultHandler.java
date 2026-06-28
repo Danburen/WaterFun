@@ -18,6 +18,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.notification
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ticket.TicketRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPreferenceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
 
 import java.time.Instant;
 import java.util.Locale;
@@ -35,6 +36,7 @@ public class TicketResultHandler {
     private final SSEService sseService;
     private final InboxSystemMapper inboxSystemMapper;
     private final UserPreferenceRepository userPreferenceRepository;
+    private final UserSettingRepository userSettingRepository;
 
     @Transactional
     public void handle(TicketMessage msg) {
@@ -58,7 +60,14 @@ public class TicketResultHandler {
         }
     }
 
+    private boolean isEventNotificationAllowed(Long userUid) {
+        return userSettingRepository.findById(userUid)
+                .map(s -> Boolean.TRUE.equals(s.getEventNotifications()))
+                .orElse(true);
+    }
+
     private void notifySubmitter(TicketMessage msg) {
+        if (!isEventNotificationAllowed(msg.getSubmitterId())) return;
         try {
             Inbox inbox = buildInbox(msg);
             inboxRepository.save(inbox);
@@ -69,6 +78,7 @@ public class TicketResultHandler {
     }
 
     private void notifyTargetUser(TicketMessage msg) {
+        if (!isEventNotificationAllowed(msg.getTargetUserUid())) return;
         try {
             String storedLocale = userPreferenceRepository.getLocaleByUserUid(msg.getTargetUserUid());
             Locale locale = StringUtil.isBlank(storedLocale) ? Locale.getDefault() : Locale.forLanguageTag(storedLocale);

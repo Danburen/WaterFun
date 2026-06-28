@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox, ElMessage } from "element-plus";
+import MarkdownIt from 'markdown-it'
 import {
   listPostModerations,
   approveModerationById,
@@ -12,7 +13,11 @@ import {
   type ModerationStatsResp,
 } from "~/api/moderation";
 import type { PageOptions } from "~/types/api";
+import type { OptionResItem } from "@waterfun/web-core/src/types";
+import { getTagOptions } from "~/api/tag";
 import BaseDialog from "~/components/BaseDialog.vue";
+
+const md = new MarkdownIt({ html: true, breaks: true, linkify: true });
 
 const loading = ref(false);
 const statsLoading = ref(false);
@@ -27,6 +32,19 @@ const rejectSubmitting = ref(false);
 const currentRejectTaskId = ref<string | null>(null);
 const rejectType = ref<ModerateRejectType>("OTHER");
 const rejectReason = ref("");
+
+const tagOptions = ref<OptionResItem<number>[]>([]);
+const tagNameMap = computed(() => {
+  const m = new Map<number, string>();
+  tagOptions.value.forEach(i => m.set(i.id, i.name));
+  return m;
+});
+
+const renderedContent = (task: AuditResponsePostAuditPayload): string => {
+  const raw = task.payload?.contentHtml || task.payload?.content || task.payload?.summary || '';
+  if (!raw) return '(无内容)';
+  return md.render(raw);
+};
 
 const rejectTypeOptions = [
   { label: "违反社区准则", value: "VIOLATION_OF_GUIDELINES" },
@@ -49,6 +67,10 @@ const fetchStats = async () => {
 const fetchData = async () => {
   loading.value = true;
   try {
+    if (!tagOptions.value.length) {
+      const tr = await getTagOptions();
+      tagOptions.value = tr.data || [];
+    }
     const query: any = {};
     if (filterStatus.value) query.status = filterStatus.value;
     const res = await listPostModerations(query, (pageOpts.value.currentPage || 1) - 1, pageOpts.value.pageSize);
@@ -150,8 +172,8 @@ onMounted(async () => {
           </div>
           <div class="review-status-bar">
             <span v-if="task.priority" :class="['author-risk', priorityClass(task.priority)]">{{ priorityLabel(task.priority) }}</span>
-            <span :class="['status-chip', 'status-' + (task.taskId ? 'pending' : '')]">
-              <i class="fa-solid fa-hourglass-half"></i> {{ statusLabel("PENDING") }}
+            <span :class="['status-chip', statusTagClass(task.status)]">
+              <i class="fa-solid" :class="task.status === 'APPROVED' ? 'fa-check-circle' : task.status === 'REJECTED' ? 'fa-times-circle' : 'fa-hourglass-half'"></i> {{ statusLabel(task.status) }}
             </span>
           </div>
         </div>
@@ -171,15 +193,12 @@ onMounted(async () => {
             <div class="post-content-panel">
               <div class="panel-label"><i class="fa-solid fa-font"></i> 文本内容</div>
               <div class="post-title-display">{{ task.payload.title || "(无标题)" }}</div>
-              <div class="post-content-display">
-                <p>{{ task.payload.content || task.payload.summary || "(无内容)" }}</p>
-                <div v-if="task.payload.subTitle" class="post-subtitle">{{ task.payload.subTitle }}</div>
+              <div class="post-content-display" v-html="renderedContent(task)"></div>
                 <div v-if="task.payload.categoryId || (task.payload.tagIds?.length)" class="post-tags">
                   <span v-if="task.payload.categoryId" class="badge badge-blue">分类: {{ task.payload.categoryId }}</span>
-                  <span v-for="tid in task.payload.tagIds" :key="tid" class="badge badge-green">标签: {{ tid }}</span>
+                  <span v-for="tid in task.payload.tagIds" :key="tid" class="badge badge-green">标签: {{ tagNameMap.get(tid) || tid }}</span>
                   <span v-for="tname in task.payload.newTagNames" :key="tname" class="badge badge-yellow">新标签: {{ tname }}</span>
                 </div>
-              </div>
             </div>
 
             <div class="image-panel" v-if="task.linkedResources?.length">
@@ -316,7 +335,8 @@ onMounted(async () => {
   font-size: 15px; line-height: 1.8; color: var(--text-secondary);
   min-height: 120px; max-height: 300px; overflow-y: auto;
 }
-.post-subtitle { margin-top: 8px; font-size: 14px; color: var(--text-muted); }
+.post-content-display :deep(img) { max-width: 100%; border-radius: 6px; margin: 8px 0; }
+.post-content-display :deep(p) { margin: 0 0 8px; }
 .post-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .post-tags .badge { font-size: 11px; }
 

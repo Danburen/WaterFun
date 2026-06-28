@@ -3,9 +3,9 @@ import { ElMessage } from "element-plus";
 import {
   listTickets,
   reviewTicket,
+  restoreTicket,
   type TicketResponse,
   type TicketReviewRequest,
-  type TicketType,
 } from "~/api/tickets";
 import type { PageOptions } from "~/types/api";
 import { statusLabel, statusChipClass, previewImage } from "~/composables/useModeration";
@@ -20,7 +20,6 @@ const filterStatus = ref<string>("PENDING");
 const typeOptions: { label: string; value: TicketType }[] = [
   { label: "建议", value: "SUGGESTION" },
   { label: "反馈", value: "FEATURE_FEEDBACK" },
-  { label: "投诉", value: "CONTENT_REPORT" },
 ];
 
 const typeBadgeClass = (t?: string) =>
@@ -37,7 +36,7 @@ const fetchData = async () => {
     if (filterType.value) {
       params.ticketTypes = filterType.value;
     } else {
-      params.ticketTypes = ["SUGGESTION", "FEATURE_FEEDBACK", "CONTENT_REPORT"].join(",");
+      params.ticketTypes = ["SUGGESTION", "FEATURE_FEEDBACK"].join(",");
     }
     if (filterStatus.value) params.status = filterStatus.value;
     const res = await listTickets(params);
@@ -60,7 +59,7 @@ const toggleExpand = (idx: number) => {
 const handleRestore = async (id?: number) => {
   if (!id) return;
   try {
-    await reviewTicket(id, { action: "REJECT", auditNote: "工单已恢复", replyContent: "工单已恢复" });
+    await restoreTicket(id);
     ElMessage.success("工单已恢复");
     await fetchData();
   } catch { ElMessage.error("恢复失败"); }
@@ -109,6 +108,11 @@ onMounted(() => fetchData());
           @click="filterType = filterType === opt.value ? '' : opt.value; pageOpts.currentPage = 1; fetchData()">
           {{ opt.label }}
         </button>
+        <span class="filter-divider"></span>
+        <button :class="['filter-btn', { active: filterStatus === 'PENDING' }]" @click="filterStatus = 'PENDING'; pageOpts.currentPage = 1; fetchData()">未处理</button>
+        <button :class="['filter-btn', { active: filterStatus === 'RESOLVED' }]" @click="filterStatus = 'RESOLVED'; pageOpts.currentPage = 1; fetchData()">已解决</button>
+        <button :class="['filter-btn', { active: filterStatus === 'REJECTED' }]" @click="filterStatus = 'REJECTED'; pageOpts.currentPage = 1; fetchData()">已拒绝</button>
+        <button :class="['filter-btn', { active: filterStatus === '' }]" @click="filterStatus = ''; pageOpts.currentPage = 1; fetchData()">全部状态</button>
       </div>
     </div>
 
@@ -145,11 +149,8 @@ onMounted(() => fetchData());
               <div class="feedback-text-box">
                 <p>{{ item.content || "(无内容)" }}</p>
               </div>
-              <div v-if="item.attachments?.length" class="feedback-screenshots">
-                <img v-for="(att, i) in item.attachments" :key="i" :src="att" :alt="'附件' + i" @click.stop="previewImage(att)">
-              </div>
-              <div v-else-if="item.evidenceResourceUuids?.length" class="feedback-screenshots">
-                <div class="evidence-label">证据资源 ({{ item.evidenceResourceUuids.length }})</div>
+              <div v-if="(item.evidenceUrls ?? item.evidenceResourceUuids)?.length" class="feedback-screenshots">
+                <img v-for="(att, i) in (item.evidenceUrls ?? item.evidenceResourceUuids)" :key="i" :src="att" :alt="'附件' + i" @click.stop="previewImage(att)">
               </div>
               <div class="reply-box">
                 <label><i class="fa-solid fa-reply"></i> 回复用户</label>
@@ -236,6 +237,8 @@ onMounted(() => fetchData());
 .badge-complaint { background: var(--danger-light); color: #dc2626; }
 .badge-bug { background: var(--warning-light); color: #b45309; }
 .status-new { background: var(--primary-light); color: var(--primary); }
+
+.filter-divider { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
 
 /* ---- Feedback button variants ---- */
 .action-btn-warn { background: var(--warning); color: white; }

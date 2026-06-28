@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
-import org.waterwood.api.AuthCode;
 import org.waterwood.api.BaseResponseCode;
-import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.exception.BizException;
@@ -78,8 +76,20 @@ public class TokenService implements AuthTokenService {
         } else {
             String oldRefRedisKey = buildRefCacheKey(userUid, deviceId, family);
             String oldRefCache = redisHelper.getValue(oldRefRedisKey);
-            if(oldRefCache == null) { // new device login in or a refresh token is expired
-                throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
+            if(oldRefCache == null) {
+                // Refresh token expired or device changed — rebuild family for fresh login
+                redisHelper.setRemove(buildRtFamiliesCacheKey(userUid), List.of(family));
+                family = StringUtil.noDashRandomUUIDString();
+                redisHelper.setAdd(
+                        buildRtFamiliesCacheKey(userUid),
+                        family,
+                        String.valueOf(System.currentTimeMillis())
+                );
+                redisHelper.set(
+                        buildRtFamilyCacheKey(userUid, deviceId),
+                        family,
+                        Duration.ofSeconds(refFamilyExpire)
+                );
             } else { // revoke the old refresh token
                 redisHelper.del(oldRefRedisKey);
             }

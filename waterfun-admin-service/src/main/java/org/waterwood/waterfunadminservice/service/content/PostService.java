@@ -8,6 +8,7 @@ import org.waterwood.waterfunadminservice.api.request.DeletePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.AssignTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.CreatePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.PutPostReq;
+import org.waterwood.waterfunadminservice.api.response.content.PostResponse;
 import org.waterwood.waterfunadminservice.api.response.content.audit.PostBrief;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
@@ -87,4 +88,18 @@ public interface PostService {
      * @return {@link PostBrief} post brief
      */
     PostBrief getPostBrief(Long postId);
+
+    /**
+     * Preview content: resolve res://uuid placeholders to actual URLs
+     * @param content raw content with res://uuid placeholders
+     * @return content with placeholders replaced by actual resource URLs
+     */
+    String previewContent(String content);
+
+    /**
+     * Get post detail response with resolved content images and cover image presigned URL
+     * @param id target post id
+     * @return fully populated {@link PostResponse}
+     */
+    PostResponse getPostDetailResponse(Long id);
 }

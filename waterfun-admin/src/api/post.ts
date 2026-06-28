@@ -1,5 +1,5 @@
 import type { ISOString, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
-import type { Page } from "~/types/api";
+import type { Page, BatchResult } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type PostStatus = "DRAFT" | "PENDING" | "PUBLISHED" | "REJECTED" | "ARCHIVED";
@@ -12,9 +12,11 @@ export interface PostResp {
   title: string;
   subtitle?: string;
   content?: string;
+  contentHtml?: string;
   summary?: string;
   authorId: string;
   coverImg?: string;
+  coverImage?: { url: string; expireAt: number } | null;
   status?: PostStatus;
   visibility?: PostVisibility;
   categoryId?: string;
@@ -29,6 +31,14 @@ export interface PostResp {
   publishedAt?: ISOString;
   createdAt?: ISOString;
   updatedAt?: ISOString;
+  editedTitle?: string;
+  editedSubtitle?: string;
+  editedContent?: string;
+  editedContentHtml?: string;
+  editedSummary?: string;
+  editedCoverImg?: string;
+  editedCategoryId?: string;
+  editedTagIds?: string[];
 }
 
 export interface ListPostParams {
@@ -68,22 +78,19 @@ export interface AssignTagsRequest {
   tagIds: string[];
 }
 
-export interface BatchResult {
-  requested: number;
-  success: number;
-  ignored: number;
-  failed: number;
-  ignoredIds?: number[];
-  failedIds?: number[];
-  message?: string;
-}
+export const previewContent = (content: string): PromiseResBody<string> => {
+  return request.post<string>("/posts/content/preview", content, {
+    headers: { 'Content-Type': 'text/plain' },
+    meta: { needCSRF: false },
+  });
+};
 
 export const listPosts = (params: ListPostParams = {}): PromiseResBody<Page<PostResp>> => {
   return request.get<Page<PostResp>>("/posts/list", { params });
 };
 
 export const getPostById = (id: string | number): PromiseResBody<PostResp> => {
-  return request.get<PostResp>("/posts/id", { params: { id } });
+  return request.get<PostResp>(`/posts/${id}`);
 };
 
 export const createPost = (data: UpsertPostRequest): PromiseResBody<null> => {

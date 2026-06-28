@@ -62,4 +62,19 @@ public interface TagService {
      * @return list ofPending optionVOs
      */
     List<OptionVO<Long>> getOptions();
+
+    /**
+     * Search tags by keyword
+     * @param keyword search keyword
+     * @param limit max results
+     * @return list of matching tag optionVOs
+     */
+    List<OptionVO<Long>> searchTags(String keyword, int limit);
+
+    /**
+     * Get hot tags sorted by usage count
+     * @param limit max results
+     * @return list of hot tag optionVOs
+     */
+    List<OptionVO<Long>> getHotTags(int limit);
 }

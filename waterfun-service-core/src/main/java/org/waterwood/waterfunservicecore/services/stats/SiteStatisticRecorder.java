@@ -49,6 +49,18 @@ public class SiteStatisticRecorder {
         return delta.peakOnline.get();
     }
 
+    public long getTodayNewUsers() {
+        SiteStatistic todayStat = repository.findById(LocalDate.now()).orElse(null);
+        long dbNewUsers = todayStat != null && todayStat.getNewUsers() != null ? todayStat.getNewUsers() : 0L;
+        return dbNewUsers + delta.newUsers.get();
+    }
+
+    public long getTodayPeakOnline() {
+        SiteStatistic todayStat = repository.findById(LocalDate.now()).orElse(null);
+        long dbPeakOnline = todayStat != null && todayStat.getPeakOnline() != null ? todayStat.getPeakOnline() : 0L;
+        return Math.max(dbPeakOnline, delta.peakOnline.get());
+    }
+
     @Transactional
     public void flush() {
         StatsDelta old = delta;

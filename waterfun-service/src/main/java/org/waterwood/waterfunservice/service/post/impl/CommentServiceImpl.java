@@ -13,6 +13,7 @@ import org.waterwood.waterfunservice.service.post.CommentService;
 import org.waterwood.waterfunservicecore.api.CursorPage;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.post.*;
+import org.waterwood.waterfunservicecore.entity.user.ContentPermission;
 import org.waterwood.waterfunservicecore.exception.CommentAlreadyDeletedOrNotFoundException;
 import org.waterwood.waterfunservicecore.exception.notfound.CommentNotFoundException;
 import org.waterwood.waterfunservicecore.exception.reference.PostReferenceInvalidException;
@@ -20,13 +21,20 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentLikeR
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentRepository;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.privacy.CommentNotAllowedException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserFollowerRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
+import org.waterwood.waterfunservicecore.entity.user.UserFollowerId;
 import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
 import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.IdGenerator;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.exception.InappropriateContentException;
 import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
+import org.waterwood.waterfunservicecore.services.content.TextFilterService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.UserBriefService;
 
@@ -43,6 +51,10 @@ public class CommentServiceImpl implements CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final NotificationService notificationService;
     private final UserActivityLogService userActivityLogService;
+    private final UserSettingRepository userSettingRepository;
+    private final UserFollowerRepository userFollowerRepository;
+    private final UserCounterRepository userCounterRepository;
+    private final TextFilterService textFilterService;
 
     private static final int DEFAULT_LIMIT = 10;
     private static final int MAX_LIMIT = 20;
@@ -63,6 +75,20 @@ public class CommentServiceImpl implements CommentService {
         if (p.getVisibility() != PostVisibility.PUBLIC || p.getPublishedAt() == null) {
             throw new CommentNotFoundException();
         }
+        // Check post author's comment permission
+        Long postAuthorUid = p.getAuthor().getUid();
+        Long currentUid = UserCtxHolder.getUserUid();
+        if (!postAuthorUid.equals(currentUid)) {
+            userSettingRepository.findById(postAuthorUid).ifPresent(setting -> {
+                if (setting.getCommentPermission() == ContentPermission.NONE) {
+                    throw new CommentNotAllowedException();
+                }
+                if (setting.getCommentPermission() == ContentPermission.FOLLOWERS
+                        && !userFollowerRepository.existsById(new UserFollowerId(postAuthorUid, currentUid))) {
+                    throw new CommentNotAllowedException();
+                }
+            });
+        }
         comment.setPost(postRepository.getReferenceById(postId));
 
         if(req.getParentId() != null){
@@ -79,18 +105,21 @@ public class CommentServiceImpl implements CommentService {
         }
         postRepository.increaseCommentCountById(postId, 1);
 
-        Long authorUid = UserCtxHolder.getUserUid();
-        comment.setAuthor(userRepository.getReferenceById(authorUid));
+        if (textFilterService.containsSensitiveWords(req.getContent())) {
+            throw new InappropriateContentException();
+        }
+
+        comment.setAuthor(userRepository.getReferenceById(currentUid));
         comment.setContent(req.getContent());
         commentRepository.save(comment);
-        userActivityLogService.record(authorUid, UserActionType.CREATE, BusinessType.COMMENT, comment.getId());
+        userActivityLogService.record(currentUid, UserActionType.CREATE, BusinessType.COMMENT, comment.getId());
 
         // Send reply notification
         if (parent != null) {
-            if (!parent.getAuthor().getUid().equals(authorUid)) {
+            if (!parent.getAuthor().getUid().equals(currentUid)) {
                 notificationService.onReply(
                         parent.getAuthor().getUid(),
-                        authorUid,
+                        currentUid,
                         comment.getId(),
                         parent.getContent(),
                         postId,
@@ -98,11 +127,10 @@ public class CommentServiceImpl implements CommentService {
                 );
             }
         } else {
-            Long postAuthorUid = comment.getPost().getAuthor().getUid();
-            if (!postAuthorUid.equals(authorUid)) {
+            if (!postAuthorUid.equals(currentUid)) {
                 notificationService.onPostReply(
                         postAuthorUid,
-                        authorUid,
+                        currentUid,
                         comment.getId(),
                         comment.getPost().getTitle(),
                         postId,
@@ -145,6 +173,7 @@ public class CommentServiceImpl implements CommentService {
                 cl -> {
                     commentLikeRepository.delete(cl);
                     commentRepository.decreaseLikeCountById(id, 1);
+                    userCounterRepository.decreaseUserLikeCount(userUid, 1);
                     userActivityLogService.record(userUid, UserActionType.DELETED, BusinessType.COMMENT, id);
                 },
                 () -> {
@@ -153,6 +182,7 @@ public class CommentServiceImpl implements CommentService {
                     commentLike.setId(commentLikeId);
                     commentLikeRepository.save(commentLike);
                     commentRepository.increaseLikeCountById(id, 1);
+                    userCounterRepository.increaseUserLikeCount(userUid, 1);
                     if (commentDO != null) {
                         notificationService.onCommentLike(
                                 commentDO.getAuthorUid(),
@@ -239,13 +269,18 @@ public class CommentServiceImpl implements CommentService {
         }
 
         Set<Long> allUserIds = new HashSet<>();
-        list.forEach(c -> {
+        Set<Long> parentIds = new HashSet<>();
+        for (Comment c : list) {
             allUserIds.add(c.getAuthor().getUid());
             if (c.getParentId() != null && !c.getParentId().equals(rootId)) {
-                commentRepository.findById(c.getParentId())
-                        .ifPresent(p -> allUserIds.add(p.getAuthor().getUid()));
+                parentIds.add(c.getParentId());
             }
-        });
+        }
+        Map<Long, Comment> parentCommentMap = parentIds.isEmpty()
+                ? Collections.emptyMap()
+                : commentRepository.findAllById(parentIds).stream()
+                        .collect(Collectors.toMap(Comment::getId, p -> p));
+        parentCommentMap.values().forEach(p -> allUserIds.add(p.getAuthor().getUid()));
 
         Map<Long, UserBrief> userBriefMap = userBriefService.listUseBriefs(new ArrayList<>(allUserIds)).stream().collect(
                 Collectors.toMap(UserBrief::getUid, ub -> ub)
@@ -255,12 +290,13 @@ public class CommentServiceImpl implements CommentService {
         for (Comment c : list) {
             Long parentId = c.getParentId();
             if (parentId != null && !parentId.equals(rootId)) {
-                parentAuthorNameMap.put(parentId,
-                        commentRepository.findById(parentId)
-                                .map(p -> userBriefMap.get(p.getAuthor().getUid()))
-                                .map(UserBrief::getDisplayName)
-                                .orElse(null)
-                );
+                Comment parent = parentCommentMap.get(parentId);
+                if (parent != null) {
+                    UserBrief parentAuthor = userBriefMap.get(parent.getAuthor().getUid());
+                    if (parentAuthor != null) {
+                        parentAuthorNameMap.put(parentId, parentAuthor.getDisplayName());
+                    }
+                }
             }
         }
 

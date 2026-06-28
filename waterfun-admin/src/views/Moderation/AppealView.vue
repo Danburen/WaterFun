@@ -127,10 +127,10 @@ onMounted(() => fetchData());
                 <div class="appeal-reason-text">
                   <p>{{ item.content || "(无内容)" }}</p>
                 </div>
-                <div v-if="item.attachments?.length" class="appeal-attachments">
+                <div v-if="(item.evidenceUrls ?? item.evidenceResourceUuids)?.length" class="appeal-attachments">
                   <div class="attachments-label">申诉材料</div>
                   <div class="attachments-grid">
-                    <img v-for="(att, i) in item.attachments" :key="i" :src="att" alt="材料" @click="previewImage(att)">
+                    <img v-for="(att, i) in (item.evidenceUrls ?? item.evidenceResourceUuids)" :key="i" :src="att" alt="材料" @click="previewImage(att)">
                   </div>
                 </div>
               </div>

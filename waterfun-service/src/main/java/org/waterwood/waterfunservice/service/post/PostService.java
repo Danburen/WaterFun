@@ -41,6 +41,10 @@ public interface PostService {
 
     Page<PostCardResp> listPublicCardPosts(PublicPostListReq req);
 
+    Page<PostCardResp> listAnnouncements(Pageable pageable);
+
+    Page<PostCardResp> listHotPosts(Pageable pageable);
+
     Page<PostAuthorCardResp> listAuthorCardPosts(Specification<Post> spec, Pageable pageable);
 
     /**
@@ -168,4 +172,10 @@ public interface PostService {
      * @param ids list of draft post IDs to submit
      */
     void batchPublish(List<Long> ids);
+
+    /**
+     * Validate that a post exists and is reportable (not a system post).
+     * @param postId target post id
+     */
+    void ensurePostReportable(Long postId);
 }

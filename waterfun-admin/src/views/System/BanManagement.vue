@@ -5,7 +5,7 @@ import { ElMessage } from 'element-plus'
 
 const bans = ref<BanUserResponse[]>([])
 const totalElements = ref(0)
-const currentPage = ref(0)
+const currentPage = ref(1)
 const pageSize = ref(20)
 const loading = ref(false)
 const searchUid = ref<number | undefined>()
@@ -39,6 +39,18 @@ const penaltyLabel = (code: string): string => {
   return map[code] || code
 }
 
+const permissionCodeToPenaltyType = (code: string): PenaltyType | undefined => {
+  const map: Record<string, PenaltyType> = {
+    'ban:login': 'BAN_LOGIN',
+    'ban:post': 'BAN_POST',
+    'ban:comment': 'BAN_COMMENT',
+    'ban:upload': 'BAN_UPLOAD',
+    'ban:chat': 'BAN_CHAT',
+    'ban:create': 'BAN_CREATE',
+  }
+  return map[code]
+}
+
 const formatTime = (timeStr?: string): string => {
   if (!timeStr) return '永久'
   return new Date(timeStr).toLocaleString('zh-CN', { hour12: false })
@@ -47,7 +59,7 @@ const formatTime = (timeStr?: string): string => {
 const fetchBans = async () => {
   loading.value = true
   try {
-    const params: any = { page: currentPage.value, size: pageSize.value }
+    const params: any = { page: currentPage.value - 1, size: pageSize.value }
     if (searchUid.value) params.userUid = searchUid.value
     if (searchNickname.value.trim()) params.nickname = searchNickname.value.trim()
     const res = await listBans(params)
@@ -60,7 +72,7 @@ const fetchBans = async () => {
   }
 }
 
-const search = () => { currentPage.value = 0; fetchBans() }
+const search = () => { currentPage.value = 1; fetchBans() }
 
 const openBanDialog = (uid?: number, nickname?: string) => {
   banUid.value = uid
@@ -93,7 +105,8 @@ const confirmBan = async () => {
 
 const handleLift = async (item: BanUserResponse) => {
   try {
-    await liftPenalty(item.userUid, { userUid: item.userUid })
+    const penaltyType = permissionCodeToPenaltyType(item.permissionCode)
+    await liftPenalty(item.userUid, { userUid: item.userUid, penaltyType })
     ElMessage.success('已解除该限制')
     await fetchBans()
   } catch {
@@ -179,9 +192,9 @@ onMounted(() => fetchBans())
     </div>
 
     <div class="pagination-bar" v-if="totalElements > pageSize">
-      <button class="btn" :disabled="currentPage <= 0" @click="currentPage--; fetchBans()">上一页</button>
-      <span class="page-info">{{ currentPage + 1 }} / {{ Math.ceil(totalElements / pageSize) }} (共 {{ totalElements }})</span>
-      <button class="btn" :disabled="(currentPage + 1) >= Math.ceil(totalElements / pageSize)" @click="currentPage++; fetchBans()">下一页</button>
+      <button class="btn" :disabled="currentPage <= 1" @click="currentPage--; fetchBans()">上一页</button>
+      <span class="page-info">{{ currentPage }} / {{ Math.ceil(totalElements / pageSize) }} (共 {{ totalElements }})</span>
+      <button class="btn" :disabled="currentPage >= Math.ceil(totalElements / pageSize)" @click="currentPage++; fetchBans()">下一页</button>
     </div>
 
     <div v-if="loading" class="loading-wrap"><i class="fa-solid fa-spinner fa-spin"></i> 加载中...</div>

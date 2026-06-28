@@ -2,6 +2,7 @@ package org.waterwood.waterfunservicecore.infrastructure.utils.context;
 
 
 import org.jspecify.annotations.Nullable;
+import org.waterwood.waterfunservicecore.entity.user.UserSetting;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -55,5 +56,10 @@ public class UserCtxHolder {
 
     public static String getClientIp() {
         return get().getClientIp();
+    }
+
+    public static @Nullable UserSetting getUserSetting() {
+        AuthContext ctx = get();
+        return ctx != null ? ctx.getUserSetting() : null;
     }
 }

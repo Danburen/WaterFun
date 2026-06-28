@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,6 @@ import org.waterwood.waterfunadminservice.api.response.content.PostResponse;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.PostMapper;
 import org.waterwood.waterfunadminservice.service.content.PostService;
 import org.waterwood.waterfunservicecore.entity.post.Post;
-import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;
 import org.waterwood.waterfunservicecore.entity.spec.PostSpec;
 
 import java.util.List;
@@ -26,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admin/posts")
-@RequireRole("ADMIN")
 public class PostController {
     private final PostService postService;
     private final PostMapper postMapper;
@@ -38,7 +37,7 @@ public class PostController {
                                                      @RequestParam(required = false) Long authorId,
                                                      @RequestParam(required = false) List<Integer> tagIds,
                                                      @RequestParam(required = false) String slug,
-                                                     @PageableDefault() Pageable pageable) {
+                                                     @PageableDefault(sort = {"isPinned", "type"}, direction = Sort.Direction.DESC) Pageable pageable) {
         Specification<Post> spec = PostSpec.of(title, status, categoryId, authorId, tagIds, slug);
         Page<Post> posts = postService.listPosts(spec, pageable);
         return ApiResponse.success(
@@ -49,7 +48,7 @@ public class PostController {
     @GetMapping("/{id}")
     public ApiResponse<PostResponse> getPostById(@PathVariable Long id) {
         return ApiResponse.success(
-                postMapper.toPostResponseDto(postService.getPostById(id))
+                postService.getPostDetailResponse(id)
         );
     }
 
@@ -97,5 +96,10 @@ public class PostController {
         return ApiResponse.success(
                 postService.deletePostTags(id, req)
         );
+    }
+
+    @PostMapping("/content/preview")
+    public ApiResponse<String> previewContent(@RequestBody String content) {
+        return ApiResponse.success(postService.previewContent(content));
     }
 }

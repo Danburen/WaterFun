@@ -8,17 +8,26 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.RabbitConstants;
 import org.waterwood.waterfunadminservice.api.request.ticket.TicketReviewRequest;
 import org.waterwood.waterfunadminservice.api.response.BanStatusResponse;
 import org.waterwood.waterfunadminservice.api.response.ticket.TicketResponse;
+import org.waterwood.waterfunadminservice.api.response.ticket.TicketStatsResponse;
 import org.waterwood.waterfunadminservice.api.response.user.UserAdminBrief;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.TicketMapper;
 import org.waterwood.waterfunadminservice.service.user.UserAdminService;
 import org.waterwood.waterfunservicecore.api.message.TicketMessage;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
+import org.waterwood.waterfunservicecore.entity.BanPermission;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
+import org.waterwood.waterfunservicecore.entity.perm.Permission;
+import org.waterwood.waterfunservicecore.entity.post.Comment;
+import org.waterwood.waterfunservicecore.entity.post.CommentStatus;
+import org.waterwood.waterfunservicecore.entity.post.Post;
+import org.waterwood.waterfunservicecore.entity.resource.Resource;
+import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.entity.security.PenaltyType;
 import org.waterwood.waterfunservicecore.entity.spec.TicketSpec;
 import org.waterwood.waterfunservicecore.entity.ticket.Ticket;
@@ -26,17 +35,19 @@ import org.waterwood.waterfunservicecore.entity.ticket.TicketAuditStatus;
 import org.waterwood.waterfunservicecore.entity.ticket.TicketRejectType;
 import org.waterwood.waterfunservicecore.entity.ticket.TicketType;
 import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.waterfunservicecore.entity.BanPermission;
-import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
 import org.waterwood.waterfunservicecore.exception.TicketNotFoundException;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ticket.TicketRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ticket.TicketResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPenaltyHistoryRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.UserBriefService;
 
 import java.time.Instant;
@@ -61,13 +72,18 @@ public class TicketModerationServiceImpl implements TicketModerationService {
 
     private final UserPermRepo userPermRepo;
     private final PermissionRepo permissionRepo;
+    private final ResourceRepository resourceRepository;
+    private final CloudFileService cloudFileService;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public Page<TicketResponse> listTickets(List<TicketType> ticketTypes, TicketAuditStatus status, String targetId, Pageable pageable) {
         Specification<Ticket> spec = TicketSpec.of(
                 ticketTypes, status, null, targetId, null, null
         );
-        List<Ticket> tickets = ticketRepository.findAll(spec, pageable).getContent();
+        Page<Ticket> ticketPage = ticketRepository.findAll(spec, pageable);
+        List<Ticket> tickets = ticketPage.getContent();
         Map<Long, UserBrief> auditorUserBriefMap = userBriefService.queryForMapUserIdBriefMap(
                 tickets.stream().map(t -> t.getAuditor() != null ? t.getAuditor().getUid() : null).filter(Objects::nonNull).toList()
         );
@@ -79,7 +95,10 @@ public class TicketModerationServiceImpl implements TicketModerationService {
         );
         // Batch-load current ban status
         Map<Long, BanStatusResponse> currentBansMap = loadCurrentBansForTickets(tickets);
-        return ticketRepository.findAll(spec, pageable).map(ticket-> {
+        // Batch-load evidence URLs
+        Map<Long, List<String>> evidenceUuidsMap = loadEvidenceUuidsForTickets(tickets);
+        Map<Long, List<String>> evidenceUrlsMap = resolveEvidenceUrls(evidenceUuidsMap);
+        return ticketPage.map(ticket-> {
             TicketResponse resp = ticketMapper.toTicketResponse(ticket);
             resp.setSubmitter(submitterUserAdminBriefMap.get(ticket.getSubmitter() == null ?  null : ticket.getSubmitter().getUid()));
             resp.setTargetUser(targetUserAdminBriefMap.get(ticket.getTargetUserUid()));
@@ -92,7 +111,8 @@ public class TicketModerationServiceImpl implements TicketModerationService {
                 resp.setRejectType(ticket.getRejectType().name());
             }
             
-            resp.setEvidenceResourceUuids(loadEvidenceUuids(ticket.getId()));
+            resp.setEvidenceResourceUuids(evidenceUuidsMap.get(ticket.getId()));
+            resp.setEvidenceUrls(evidenceUrlsMap.get(ticket.getId()));
             resp.setOriginalPenalty(loadOriginalPenalty(ticket));
             // For appeals, currentBans targets the submitter; for content reports, the target user
             Long currentBansUserUid = ticket.getTicketType() == TicketType.CONTENT_REPORT
@@ -102,6 +122,65 @@ public class TicketModerationServiceImpl implements TicketModerationService {
             resp.setTimeline(buildTimeline(ticket));
             return resp;
         });
+    }
+
+    @Override
+    public TicketResponse getTicketDetail(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(TicketNotFoundException::new);
+        return toTicketResponse(ticket);
+    }
+
+    @Override
+    public TicketStatsResponse getTicketStats() {
+        List<Object[]> results = ticketRepository.countByTicketType();
+        long reportCount = 0, appealCount = 0, feedbackCount = 0, suggestionCount = 0;
+        for (Object[] row : results) {
+            TicketType type = (TicketType) row[0];
+            long count = (long) row[1];
+            switch (type) {
+                case CONTENT_REPORT -> reportCount = count;
+                case ACCOUNT_APPEAL -> appealCount = count;
+                case FEATURE_FEEDBACK -> feedbackCount = count;
+                case SUGGESTION -> suggestionCount = count;
+            }
+        }
+        return new TicketStatsResponse(reportCount, appealCount, feedbackCount, suggestionCount);
+    }
+
+    private TicketResponse toTicketResponse(Ticket ticket) {
+        List<Ticket> tickets = List.of(ticket);
+        Map<Long, UserBrief> auditorUserBriefMap = userBriefService.queryForMapUserIdBriefMap(
+                tickets.stream().map(t -> t.getAuditor() != null ? t.getAuditor().getUid() : null).filter(Objects::nonNull).toList()
+        );
+        Map<Long, UserAdminBrief> submitterUserAdminBriefMap = userAdminService.batchGetUserAdminBrief(
+                tickets.stream().map(t -> t.getSubmitter() != null ? t.getSubmitter().getUid() : null).filter(Objects::nonNull).toList()
+        );
+        Map<Long, UserAdminBrief> targetUserAdminBriefMap = userAdminService.batchGetUserAdminBrief(
+                tickets.stream().map(Ticket::getTargetUserUid).filter(Objects::nonNull).toList()
+        );
+        Map<Long, BanStatusResponse> currentBansMap = loadCurrentBansForTickets(tickets);
+        Map<Long, List<String>> evidenceUuidsMap = loadEvidenceUuidsForTickets(tickets);
+        Map<Long, List<String>> evidenceUrlsMap = resolveEvidenceUrls(evidenceUuidsMap);
+
+        TicketResponse resp = ticketMapper.toTicketResponse(ticket);
+        resp.setSubmitter(submitterUserAdminBriefMap.get(ticket.getSubmitter() == null ? null : ticket.getSubmitter().getUid()));
+        resp.setTargetUser(targetUserAdminBriefMap.get(ticket.getTargetUserUid()));
+        if (ticket.getAuditor() != null) {
+            resp.setAuditor(auditorUserBriefMap.get(ticket.getAuditor().getUid()));
+        }
+        if (ticket.getRejectType() != null) {
+            resp.setRejectType(ticket.getRejectType().name());
+        }
+        resp.setEvidenceResourceUuids(evidenceUuidsMap.get(ticket.getId()));
+        resp.setEvidenceUrls(evidenceUrlsMap.get(ticket.getId()));
+        resp.setOriginalPenalty(loadOriginalPenalty(ticket));
+        Long currentBansUserUid = ticket.getTicketType() == TicketType.CONTENT_REPORT
+                ? ticket.getTargetUserUid()
+                : (ticket.getSubmitter() != null ? ticket.getSubmitter().getUid() : null);
+        resp.setCurrentBans(currentBansMap.get(currentBansUserUid));
+        resp.setTimeline(buildTimeline(ticket));
+        return resp;
     }
 
     @Transactional
@@ -135,14 +214,20 @@ public class TicketModerationServiceImpl implements TicketModerationService {
             penaltyType = request.getPenaltyType();
             targetUserUid = resolveTargetUserUid(ticket);
 
-            if (targetUserUid != null) {
+            if (penaltyType == PenaltyType.UNSPECIFIED) {
+                deleteReportedContent(ticket);
+            } else if (penaltyType == PenaltyType.OTHER) {
+                log.info("Warning issued for ticket {} target user {}", ticket.getId(), targetUserUid);
+            } else if (targetUserUid != null) {
                 Instant expiresAt = request.getPenaltyDurationHours() != null
                         ? Instant.now().plusSeconds(request.getPenaltyDurationHours() * 3600)
                         : null;
                 penaltyService.applyPenalty(targetUserUid, penaltyType,
                         request.getBanReasonType(), expiresAt,
                         ticket.getTargetId(), ticket.getTargetType(), ticket.getContent());
+            }
 
+            if (targetUserUid != null) {
                 try {
                     targetUserDisplayName = userBriefService.getUserBrief(targetUserUid).getDisplayName();
                 } catch (Exception e) {
@@ -157,6 +242,35 @@ public class TicketModerationServiceImpl implements TicketModerationService {
         }
 
         sendTicketMessage(ticket, request.getReplyContent(), penaltyType, targetUserUid, targetUserDisplayName);
+    }
+
+    private void deleteReportedContent(Ticket ticket) {
+        if (ticket.getTargetId() == null) {
+            log.warn("Cannot delete reported content for ticket {}: targetId is null", ticket.getId());
+            return;
+        }
+        try {
+            if (ticket.getTargetType() == TargetType.POST) {
+                Long postId = Long.parseLong(ticket.getTargetId());
+                postRepository.deleteById(postId);
+                log.info("Deleted post {} reported in ticket {}", postId, ticket.getId());
+            } else if (ticket.getTargetType() == TargetType.COMMENT) {
+                Long commentId = Long.parseLong(ticket.getTargetId());
+                Comment comment = commentRepository.findById(commentId).orElse(null);
+                if (comment != null && comment.getStatus() != CommentStatus.DELETED) {
+                    if (comment.getReplyCount() > 0) {
+                        commentRepository.updateStatusByParentId(CommentStatus.DELETED, commentId);
+                    }
+                    comment.setStatus(CommentStatus.DELETED);
+                    commentRepository.save(comment);
+                    log.info("Deleted comment {} reported in ticket {}", commentId, ticket.getId());
+                }
+            } else {
+                log.warn("Unsupported target type {} for content deletion in ticket {}", ticket.getTargetType(), ticket.getId());
+            }
+        } catch (NumberFormatException e) {
+            log.warn("Invalid targetId format for ticket {}: {}", ticket.getId(), ticket.getTargetId());
+        }
     }
 
     private void rejectTicket(Ticket ticket, User auditor, TicketReviewRequest request) {
@@ -190,7 +304,7 @@ public class TicketModerationServiceImpl implements TicketModerationService {
                     message
             );
         } catch (Exception e) {
-            log.warn("Failed to send ticket message for ticket {}: {}", ticket.getId(), e.getMessage());
+            log.error("Failed to send ticket notification for ticket {}. Penalty applied but user will not be notified. Reason: {}", ticket.getId(), e.getMessage(), e);
         }
     }
 
@@ -275,6 +389,50 @@ public class TicketModerationServiceImpl implements TicketModerationService {
         return result;
     }
 
+    private Map<Long, List<String>> loadEvidenceUuidsForTickets(List<Ticket> tickets) {
+        List<Long> ticketIds = tickets.stream().map(Ticket::getId).distinct().toList();
+        if (ticketIds.isEmpty()) return Map.of();
+        try {
+            return ticketResourceRepository.findByIdTicketIdIn(ticketIds).stream()
+                    .collect(Collectors.groupingBy(
+                            tr -> tr.getTicket().getId(),
+                            Collectors.mapping(tr -> tr.getId().getResourceUuid(), Collectors.toList())
+                    ));
+        } catch (Exception e) {
+            log.warn("Failed to batch-load evidence UUIDs", e);
+            return Map.of();
+        }
+    }
+
+    private Map<Long, List<String>> resolveEvidenceUrls(Map<Long, List<String>> evidenceUuidsMap) {
+        Set<String> allUuids = evidenceUuidsMap.values().stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toSet());
+        if (allUuids.isEmpty()) return Map.of();
+        try {
+            Map<String, String> uuidToKey = resourceRepository.findByUuidIn(allUuids).stream()
+                    .filter(r -> r.getStatus() != ResourceStatus.DELETED)
+                    .collect(Collectors.toMap(Resource::getUuid, Resource::getResourceKey));
+            Map<String, CloudResPresignedUrlResp> urlMap = cloudFileService.batchGetReadPublicUrlCached(
+                    CloudFSRoot.UPLOADS, uuidToKey, TargetType.USER_REPORT_ATTACHMENT);
+            Map<Long, List<String>> result = new HashMap<>();
+            evidenceUuidsMap.forEach((ticketId, uuids) -> {
+                List<String> urls = uuids.stream()
+                        .map(uuid -> {
+                            CloudResPresignedUrlResp urlResp = urlMap.get(uuid);
+                            return urlResp != null ? urlResp.getUrl() : null;
+                        })
+                        .filter(Objects::nonNull)
+                        .toList();
+                result.put(ticketId, urls);
+            });
+            return result;
+        } catch (Exception e) {
+            log.warn("Failed to resolve evidence URLs", e);
+            return Map.of();
+        }
+    }
+
     private List<String> loadEvidenceUuids(Long ticketId) {
         try {
             return ticketResourceRepository.findByIdTicketId(ticketId).stream()
@@ -321,6 +479,24 @@ public class TicketModerationServiceImpl implements TicketModerationService {
                 ticket.getAuditAt(),
                 ticket.getStatus() != null ? ticket.getStatus().name() : null
         );
+    }
+
+    @Transactional
+    @Override
+    public void restoreTicket(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(TicketNotFoundException::new);
+        if (ticket.getStatus() == TicketAuditStatus.PENDING) {
+            return;
+        }
+        ticket.setStatus(TicketAuditStatus.PENDING);
+        ticket.setAuditor(null);
+        ticket.setAuditNote(null);
+        ticket.setReplyContent(null);
+        ticket.setRejectType(null);
+        ticket.setAuditAt(null);
+        ticket.setUpdatedAt(Instant.now());
+        ticketRepository.save(ticket);
     }
 
     private UserAdminBrief buildUserAdminBrief(User user, UserBrief brief, CloudResPresignedUrlResp resp) {

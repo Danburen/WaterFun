@@ -31,6 +31,5 @@ public class PostSaveReq {
 
     private Set<String> newTags;
     private Set<Long> tagIds;
-    @NotNull
     private Long categoryId;
 }

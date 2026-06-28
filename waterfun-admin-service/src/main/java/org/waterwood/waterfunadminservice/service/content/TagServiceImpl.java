@@ -3,6 +3,7 @@ package org.waterwood.waterfunadminservice.service.content;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -81,5 +82,29 @@ public class TagServiceImpl implements TagService {
                         .code(t.getSlug())
                         .name(t.getName())
                         .build()).toList();
+    }
+
+    @Override
+    public List<OptionVO<Long>> searchTags(String keyword, int limit) {
+        return tagRepository.searchByKeyword(keyword, PageRequest.of(0, limit))
+                .stream()
+                .map(t -> OptionVO.<Long>builder()
+                        .id(t.getId())
+                        .code(t.getSlug())
+                        .name(t.getName())
+                        .build())
+                .toList();
+    }
+
+    @Override
+    public List<OptionVO<Long>> getHotTags(int limit) {
+        return tagRepository.findTopByOrderByUsageCountDesc(limit)
+                .stream()
+                .map(t -> OptionVO.<Long>builder()
+                        .id(t.getId())
+                        .code(t.getSlug())
+                        .name(t.getName())
+                        .build())
+                .toList();
     }
 }

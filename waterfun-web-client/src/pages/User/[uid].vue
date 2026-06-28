@@ -8,6 +8,7 @@ import { toggleFollowUser } from '~/api/publicUserApi'
 import { useUserInfoStore } from '~/stores/userInfoStore'
 import { createTicket } from '~/api/ticketApi'
 import ReportDropdown from '~/components/ReportDropdown.vue'
+import { getTagColor } from '@waterfun/web-core/src/tagColor'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -297,7 +298,13 @@ onMounted(() => {
                   </div>
                   <span v-if="post.category" class="post-tag" :class="post.category?.name === '技术' ? 'tag-tech' : 'tag-life'">{{ post.category.name }}</span>
                 </div>
-                <div class="post-title">{{ post.title }}</div>
+                <div class="post-title-row">
+                  <div class="post-title">{{ post.title }}</div>
+                  <div v-if="post.tags?.length" class="post-card-tags">
+                    <span v-for="tag in post.tags" :key="tag.id" class="post-card-tag"
+                      :style="{ backgroundColor: getTagColor(tag.name) }">{{ tag.name }}</span>
+                  </div>
+                </div>
                 <div v-if="post.summary" class="post-excerpt">{{ post.summary }}</div>
                 <div class="post-footer">
                   <span class="post-stat"><i class="far fa-comment"></i> {{ post.commentCount || 0 }}</span>

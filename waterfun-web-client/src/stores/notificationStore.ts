@@ -161,11 +161,20 @@ export const useNotificationStore = defineStore('notification', {
         'Authorization': `Bearer ${token}`,
       })
 
+      const tabMap: Record<number, string> = {
+        1: 'subscribe',  // LIKE → INTERACTION
+        2: 'reply',      // REPLY
+        3: 'mention',    // MENTION
+        4: 'subscribe',  // NEW_FOLLOWER → INTERACTION
+        5: 'subscribe',  // COLLECT → INTERACTION
+        9: 'system',     // PROMOTION → SYSTEM
+        10: 'system',    // SYSTEM
+      }
       sseClient.addEventListener('notification', (event: MessageEvent) => {
         try {
           const data = JSON.parse(event.data) as InboxNotificationRes
           this.unreadCount++
-          const tab = data.noticeType === 1 ? 'system' : data.noticeType === 2 ? 'reply' : data.noticeType === 3 ? 'mention' : 'subscribe'
+          const tab = tabMap[data.noticeType] || 'subscribe'
           if (this.notifications[tab]) {
             this.notifications[tab].unshift(data)
           }

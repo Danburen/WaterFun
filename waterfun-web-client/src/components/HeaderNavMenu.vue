@@ -34,7 +34,7 @@ const isActive = (path: string) => {
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
-    router.push({ path: '/post', query: { q: searchQuery.value.trim() } })
+    router.push({ path: '/search', query: { q: searchQuery.value.trim() } })
   }
 }
 

@@ -3,10 +3,12 @@ package org.waterwood.waterfun.waterfungateway.exception;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebExceptionHandler;
 import org.waterwood.api.BaseResponseCode;
@@ -17,6 +19,8 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+@Component
+@Order(-2)
 @RequiredArgsConstructor
 public class AuthErrorWebExceptionHandler implements WebExceptionHandler {
     private final ObjectMapper objectMapper;
@@ -40,12 +44,10 @@ public class AuthErrorWebExceptionHandler implements WebExceptionHandler {
                     null,
                     new Date()
             );
-        } else { // original auth exception via spring security and other librarys,
-            // we just return a generic message to avoid leaking details.
-            // TODO REMOVE WHEN ONLINE
+        } else {
             body = new ErrorResponse(
                     BaseResponseCode.INVALID_TOKEN_OR_EXPIRED.getCode(),
-                    ex.getMessage(),
+                    "Authentication failed",
                     null,
                     new Date()
             );

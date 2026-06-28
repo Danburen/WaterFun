@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservice.api.request.PhoneChangeActivateDto;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
 import org.waterwood.waterfunservicecore.api.resp.AccountResp;
 import org.waterwood.waterfunservice.api.request.EmailChangeDto;
 import org.waterwood.waterfunservice.api.request.ResetPasswordDto;
@@ -41,6 +42,15 @@ public class AuthAccountController {
         return ApiResponse.success(
             userDatumCoreService.getAccountInfo(UserCtxHolder.getUserUid())
         );
+    }
+
+    @Operation(summary = "账户页发送验证码")
+    @PostMapping("/send-verify-code")
+    public ApiResponse<Void> sendVerifyCode(@Valid @RequestBody SendCodeDto dto, HttpServletResponse response) {
+        CodeResult result = verificationService.sendCode(dto);
+        String cookieKey = dto.getChannel().name() + "_CODE_KEY";
+        ResponseUtil.setCookieAndNoCache(response, cookieKey, result.getKey(), 120);
+        return ApiResponse.success();
     }
 
     @Operation(summary = "重置密码")

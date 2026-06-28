@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum PostEditStatus {
     NONE(0),
-    PENDING(1),;
+    PENDING(1),
+    REJECTED(2);
     private final short value;
     PostEditStatus(int value) {
         this.value = (short) value;

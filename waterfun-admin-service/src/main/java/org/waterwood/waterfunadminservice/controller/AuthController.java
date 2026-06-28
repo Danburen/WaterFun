@@ -40,6 +40,14 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @Operation(summary = "获取 CSRF Token")
+    @GetMapping("/csrf-token")
+    public ApiResponse<Void> csrfToken(HttpServletRequest request) {
+        // CSRF 启用时：CsrfFilter + CookieCsrfTokenRepository 自动设置 XSRF-TOKEN cookie
+        // CSRF 关闭时：仅返回 success，前端收到 200 即不再报错
+        return ApiResponse.success();
+    }
+
     @RateLimit(key = "auth.login.captcha", permits = 5)
     @Operation(summary = "获取图形验证码")
     @GetMapping("/captcha")

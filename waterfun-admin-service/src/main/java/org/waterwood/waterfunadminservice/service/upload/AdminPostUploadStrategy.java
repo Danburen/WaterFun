@@ -69,7 +69,7 @@ public class AdminPostUploadStrategy implements UploadBizStrategy<AdminUploadPol
                 )
         );
         return List.of(cloudFileService.buildPutPolicyWithPayload(
-                CloudFSRoot.SYSTEM,
+                CloudFSRoot.UPLOADS,
                 cosPath,
                 payload)
         );
@@ -96,7 +96,7 @@ public class AdminPostUploadStrategy implements UploadBizStrategy<AdminUploadPol
 
         cloudFileService.setAndValidResourceForCallback(
                 res,
-                CloudFSRoot.SYSTEM,
+                CloudFSRoot.UPLOADS,
                 ResourceStatus.ORPHAN,
                 ResourceType.IMAGE
         );

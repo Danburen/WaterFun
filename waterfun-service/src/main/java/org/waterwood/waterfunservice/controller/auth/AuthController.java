@@ -17,7 +17,6 @@ import org.waterwood.api.TokenPair;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.services.auth.*;
 import org.waterwood.waterfunservicecore.api.req.auth.*;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
@@ -47,7 +46,6 @@ public class AuthController {
     private final RegisterServiceImpl registerService;
     private final AuthCoreServiceImpl authService;
     private final VerificationService verificationService;
-    private final UserRepository userRepository;
     private final AuditLogService auditLogService;
 
 

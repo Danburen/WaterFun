@@ -8,7 +8,6 @@ import ListPage from "~/components/ListPage.vue";
 import { deletePostById, deletePosts, listPosts, type PostResp, type PostStatus } from "~/api/post";
 import { getUserOptions } from "~/api/user";
 import type { PageOptions } from "~/types/api";
-import PostCreateDialog from "~/views/Content/components/PostCreateDialog.vue";
 import { ElMessage } from "element-plus";
 
 const router = useRouter();
@@ -16,9 +15,6 @@ const loading = ref(false);
 const loadingOptions = ref(false);
 const postList = ref<PostResp[]>([]);
 const selectedPostIds = ref<Set<string>>(new Set());
-const createDialogVisible = ref(false);
-const dialogMode = ref<"create" | "edit">("create");
-const currentPostId = ref<string>("");
 const categoryOptions = ref<OptionResItem<number>[]>([]);
 const userOptions = ref<OptionResItem<string>[]>([]);
 
@@ -58,8 +54,8 @@ const fetchData = async () => {
 
 const handleSearch = () => { pageOpts.value.currentPage = 1; fetchData(); };
 const handleReset = () => { pageOpts.value.currentPage = 1; searchForm.value = { title: "", status: "", categoryId: null, authorId: null, slug: "" }; fetchData(); };
-const handleAdd = () => { dialogMode.value = "create"; currentPostId.value = ""; createDialogVisible.value = true; };
-const handleEdit = (id?: string | number) => { if (!id) return; dialogMode.value = "edit"; currentPostId.value = String(id); createDialogVisible.value = true; };
+const handleAdd = () => { router.push({ name: "contentPostEditor" }); };
+const handleEdit = (id?: string | number) => { if (!id) return; router.push({ name: "contentPostEditor", query: { id: String(id) } }); };
 const gotoDetail = (id?: string | number) => { if (!id) return; router.push({ name: "contentPostDetail", params: { id: String(id) } }); };
 const handleCreateSuccess = () => fetchData();
 
@@ -154,8 +150,8 @@ onMounted(() => { fetchData(); loadOptions(); });
           <td>{{ row.id }}</td>
           <td><a class="link" @click="gotoDetail(row.id)">{{ row.title }}</a></td>
           <td><span :class="['badge', postStatusBadge[row.status?.toUpperCase() || ''] || 'badge-gray']">{{ postStatusLabel[row.status?.toUpperCase() || ''] || '未知' }}</span></td>
-          <td>{{ row.categoryId }}</td>
-          <td>{{ row.authorId }}</td>
+          <td>{{ row.categoryId ?? '全局公告' }}</td>
+          <td>{{ row.authorId ?? '系统' }}</td>
           <td>{{ row.slug }}</td>
           <td><span :class="['badge', postTypeBadge[row.type || ''] || 'badge-gray']">{{ postTypeLabel[row.type || ''] || '普通' }}</span></td>
           <td>{{ row.isPinned ? '✅' : '❌' }}</td>
@@ -169,6 +165,5 @@ onMounted(() => { fetchData(); loadOptions(); });
         </tr>
       </tbody>
     </table>
-    <PostCreateDialog v-model="createDialogVisible" :mode="dialogMode" :post-id="currentPostId" @success="handleCreateSuccess" />
   </ListPage>
 </template>

@@ -17,7 +17,6 @@ import org.waterwood.waterfunadminservice.api.response.perm.PermissionResp;
 import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.PermissionMapper;
-import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;
 import org.waterwood.waterfunservicecore.entity.spec.PermSpec;
 import org.waterwood.waterfunadminservice.service.perm.PermissionService;
 
@@ -27,7 +26,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/permission")
-@RequireRole("ADMIN")
 public class PermissionController {
     private final PermissionService permissionService;
     private final PermissionMapper permissionMapper;

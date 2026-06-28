@@ -82,7 +82,7 @@ const confirmPenalty = async () => {
   if (!currentTicketId.value || !selectedPenalty.value) { ElMessage.warning("请选择处罚措施"); return; }
   try {
     const opt = penaltyMap[selectedPenalty.value];
-    await reviewTicket(currentTicketId.value, { action: "APPROVE", auditNote: `处罚: ${opt.label}`, penaltyType: opt.penaltyType as any, penaltyDurationHours: opt.hours });
+    await reviewTicket(currentTicketId.value, { action: "APPROVE", auditNote: `处罚: ${opt.label}`, penaltyType: opt.penaltyType as any, penaltyDurationHours: opt.hours != null ? String(opt.hours) : undefined });
     ElMessage.success("举报已采纳并执行处罚");
     showPenaltyModal.value = false;
     currentTicketId.value = null;
@@ -168,10 +168,10 @@ onMounted(() => fetchData());
                 <div class="panel-label"><i class="fa-solid fa-flag"></i> 举报详情</div>
                 <div class="report-reason"><i class="fa-solid fa-exclamation-circle"></i> {{ reportTypeLabel(item.banReasonType) || '内容举报' }}</div>
                 <div class="report-desc">{{ item.content || '无详细描述' }}</div>
-                <div v-if="(item.evidenceResourceUuids ?? item.attachments)?.length" class="report-evidence">
+                <div v-if="(item.evidenceUrls ?? item.evidenceResourceUuids ?? item.attachments)?.length" class="report-evidence">
                   <div class="evidence-label">举报证据截图</div>
                   <div class="evidence-grid">
-                    <img v-for="(att, i) in (item.evidenceResourceUuids ?? item.attachments ?? [])" :key="i" :src="att" alt="证据">
+                    <img v-for="(att, i) in (item.evidenceUrls ?? item.evidenceResourceUuids ?? item.attachments ?? [])" :key="i" :src="att" alt="证据">
                   </div>
                 </div>
               </div>

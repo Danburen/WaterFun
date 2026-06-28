@@ -36,12 +36,11 @@ public class CreatePostRequest implements Serializable {
     private PostStatus status;
     @NotNull
     private PostVisibility visibility;
-    @NotNull
     private Long authorId;
-    @NotNull
     private Long categoryId;
     private String slug;
     private List<Long> tagIds;
     private PostType type = PostType.COMMON;
     private Boolean isPinned = false;
+    private Boolean isAnnouncement = false;
 }

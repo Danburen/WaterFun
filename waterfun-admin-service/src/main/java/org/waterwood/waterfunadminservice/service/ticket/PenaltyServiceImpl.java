@@ -3,6 +3,7 @@ package org.waterwood.waterfunadminservice.service.ticket;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.waterwood.waterfunservicecore.entity.BanPermission;
 import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.perm.Permission;
@@ -19,7 +20,10 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRep
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -103,10 +107,19 @@ public class PenaltyServiceImpl implements PenaltyService {
     @Transactional
     @Override
     public void liftAllPenalties(Long userUid) {
+        List<String> banCodes = Arrays.stream(BanPermission.values())
+                .map(BanPermission::getCode)
+                .toList();
+        List<Permission> banPermissions = permissionRepo.findByCodeIn(banCodes);
+        if (banPermissions.isEmpty()) return;
+        Set<Integer> banPermissionIds = banPermissions.stream()
+                .map(Permission::getId)
+                .collect(Collectors.toSet());
+
         Set<UserPermission> currentPerms = userPermRepo.findByUserUid(userUid);
         if (currentPerms.isEmpty()) return;
 
-        userPermRepo.deleteByUserUid(userUid);
+        userPermRepo.deleteByUserUidAndPermissionIdIn(userUid, banPermissionIds);
 
         UserPenaltyHistory history = new UserPenaltyHistory();
         history.setUser(userRepository.getReferenceById(userUid));

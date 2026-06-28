@@ -85,12 +85,16 @@ const publishPostById = async (id: string) => {
   await postStore.fetchMyPostDetail(id)
   const data = postStore.currentMyPost
   if (!data) throw new Error('获取帖子详情失败')
+  await postStore.fetchEditDraft(id)
+  const draft = postStore.editDraft
   await postStore.publishPost(id, {
     title: data.title || '',
     content: data.content || '',
     categoryId: BigInt(data.category?.id || 0),
     subtitle: data.subtitle,
     summary: data.summary,
+    tagIds: draft?.editedTagIds?.length ? draft.editedTagIds.map(t => BigInt(t.id)) : undefined,
+    newTags: draft?.editedNewTagIds?.length ? [...draft.editedNewTagIds] : undefined,
   })
 }
 
@@ -283,7 +287,7 @@ onMounted(async () => {
             <div class="post-meta-row">
               <span class="post-meta-item">
                 <i class="far fa-folder"></i>
-                <span class="category-tag">{{ post.category?.name || '未分类' }}</span>
+                <span class="category-tag">{{ post.category?.name || '全局公告' }}</span>
               </span>
               <span class="post-meta-item">
                 <i class="far fa-clock"></i>

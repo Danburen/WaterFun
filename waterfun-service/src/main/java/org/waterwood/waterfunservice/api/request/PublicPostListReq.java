@@ -8,6 +8,7 @@ import java.util.List;
 public class PublicPostListReq {
     private Integer categoryId;
     private List<Integer> tagIds;
+    private String keyword;
     private int page = 1;
     private int size = 10;
 }

@@ -38,4 +38,5 @@ public class PutPostReq implements Serializable {
     private List<Long> tagIds;
     private PostType type;
     private Boolean isPinned;
+    private Boolean isAnnouncement;
 }

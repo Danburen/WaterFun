@@ -27,7 +27,7 @@ export interface BanUserRequest {
   userUid: string;
   penaltyType: PenaltyType;
   banReasonType?: string;
-  penaltyDurationHours?: string;
+  penaltyDurationHours?: number;
   reasonText?: string;
 }
 

@@ -101,16 +101,21 @@ public class TagServiceImpl implements TagService {
         return new HashSet<>(tagRepository.findAllById(tagIds));
     }
 
-    // TODO achieve tag audit
-    @Transactional
     @Override
     public List<Tag> createNewTags(Set<String> newTagNames, Long userUid) {
-        if(CollectionUtil.isEmpty(newTagNames)) return List.of();
+        int existingCount = tagRepository.countByCreatorUid(userUid);
+        return createNewTags(newTagNames, userUid, existingCount);
+    }
+
+    @Transactional
+    @Override
+    public List<Tag> createNewTags(Set<String> newTagNames, Long userUid, int existingCount) {
+        if (CollectionUtil.isEmpty(newTagNames)) return List.of();
         User u = userRepository.getReferenceById(userUid);
         List<Tag> existingTags = tagRepository.findAllByNameIn(newTagNames);
         Set<String> existingNames = existingTags.stream()
                 .map(Tag::getName)
-                .map(String::toLowerCase)  // unified lower case
+                .map(String::toLowerCase)
                 .collect(Collectors.toSet());
 
         List<Tag> tagsToCreate = newTagNames.stream()
@@ -125,16 +130,14 @@ public class TagServiceImpl implements TagService {
                 })
                 .toList();
         if (!tagsToCreate.isEmpty()) {
-            int createdCount = tagRepository.countByCreatorUid(userUid);
-            if(createdCount > userMaxTagCreateCount) {
-                if(userCoreService.isUserAdmin(userUid)){
-                    // Admin can bypass the quota limit, but we still want to log it for audit
+            if (existingCount > userMaxTagCreateCount) {
+                if (userCoreService.isUserAdmin(userUid)) {
                     log.warn("Admin user {} is creating tags beyond the quota limit. Current count: {}, Attempting to create: {}, Quota limit: {}",
-                            userUid, createdCount, tagsToCreate.size(), userMaxTagCreateCount);
+                            userUid, existingCount, tagsToCreate.size(), userMaxTagCreateCount);
                 } else {
                     throw new TagLimitExceededException();
                 }
-            };
+            }
             return tagRepository.saveAll(tagsToCreate);
         }
         return List.of();

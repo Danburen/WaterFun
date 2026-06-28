@@ -10,15 +10,15 @@ import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.api.resp.user.UserPublicCardResp;
 import org.waterwood.waterfunservice.api.response.UserPublicProfileResp;
 import org.waterwood.waterfunservicecore.entity.user.*;
+import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
+import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
 import org.waterwood.waterfunservicecore.exception.SelfFollowIsNotAllowException;
 import org.waterwood.waterfunservicecore.exception.notfound.UserAssociationDataNotFoundException;
 import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserFollowerRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
-import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
-import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
+import org.waterwood.waterfunservicecore.exception.privacy.FollowNotAllowedException;
+import org.waterwood.waterfunservicecore.exception.privacy.ProfileNotVisibleException;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.UserLikeRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.*;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
 import org.waterwood.waterfunservicecore.services.user.*;
@@ -34,11 +34,15 @@ public class UserServiceImpl implements UserService{
     private final UserBriefService userBriefService;
     private final UserProfileRepository userProfileRepository;
     private final UserCounterRepository userCounterRepository;
+    private final UserSettingRepository userSettingRepository;
     private final NotificationService notificationService;
     private final UserActivityLogService userActivityLogService;
+    private final UserLikeRepository userLikeRepository;
 
     @Override
     public UserPublicProfileResp getPublicUserProfile(long userUid) {
+        checkProfileVisibility(userUid);
+
         User u = userRepository.findById(userUid)
                 .orElseThrow(() -> new UserNotFoundException(userUid));
         UserBrief ub = userBriefService.getUserBrief(userUid);
@@ -63,6 +67,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserPublicCardResp getPublicUserCard(long userUid) {
+        checkProfileVisibility(userUid);
+
         User u = userRepository.findById(userUid)
                 .orElseThrow(() -> new UserNotFoundException(userUid));
         UserBrief ub = userBriefService.getUserBrief(userUid);
@@ -101,8 +107,15 @@ public class UserServiceImpl implements UserService{
     @Override
     public void follow(long targetUid) {
         Long userUid = UserCtxHolder.getUserUid();
-        if(userUid.equals(targetUid)) throw new SelfFollowIsNotAllowException();
-        userFollowerRepository.findById(new UserFollowerId(targetUid, userUid)) // userUic -> targetUid
+        if (userUid.equals(targetUid)) throw new SelfFollowIsNotAllowException();
+
+        userSettingRepository.findById(targetUid).ifPresent(setting -> {
+            if (Boolean.FALSE.equals(setting.getAllowFollow())) {
+                throw new FollowNotAllowedException();
+            }
+        });
+
+        userFollowerRepository.findById(new UserFollowerId(targetUid, userUid))
                 .ifPresentOrElse(
                         uf -> {
                             userFollowerRepository.delete(uf);
@@ -123,5 +136,27 @@ public class UserServiceImpl implements UserService{
                 );
     }
 
+    @Override
+    public Page<Long> getLikedPostIds(long userUid, Pageable pageable) {
+        return userLikeRepository.findPostIdsByUserId(userUid, pageable);
+    }
 
+    private void checkProfileVisibility(long targetUid) {
+        Long viewerUid = UserCtxHolder.getUserUid();
+        // Always visible to self
+        if (viewerUid != null && viewerUid.equals(targetUid)) return;
+
+        userSettingRepository.findById(targetUid).ifPresent(setting -> {
+            if (setting.getProfileVisibility() == ProfileVisibility.PRIVATE) {
+                throw new ProfileNotVisibleException();
+            }
+            if (setting.getProfileVisibility() == ProfileVisibility.FOLLOWERS) {
+                boolean isFollowing = viewerUid != null &&
+                        userFollowerRepository.existsById(new UserFollowerId(targetUid, viewerUid));
+                if (!isFollowing) {
+                    throw new ProfileNotVisibleException();
+                }
+            }
+        });
+    }
 }

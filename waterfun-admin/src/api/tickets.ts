@@ -78,7 +78,6 @@ export interface BanStatusInfo {
 }
 
 export interface TicketResponse {
-  /** API field: ticketId (not id) */
   ticketId?: number;
   ticketType?: TicketType;
   status?: TicketStatus;
@@ -93,18 +92,15 @@ export interface TicketResponse {
   auditNote?: string | null;
   replyContent?: string | null;
   evidenceResourceUuids?: string[];
+  evidenceUrls?: string[];
   originalPenalty?: any;
   currentBans?: BanStatusInfo;
   timeline?: TicketTimeline;
   createdAt?: ISOString;
   auditAt?: string | null;
   updatedAt?: ISOString;
-
-  /** Penalty fields used by appeals */
   penaltyType?: PenaltyType;
   banReasonType?: BanReasonType;
-
-  /** Legacy/fallback aliases used in templates */
   id?: number;
   submitterId?: number;
   attachments?: string[];
@@ -116,9 +112,7 @@ export interface TicketResponse {
 export interface ListTicketParams {
   page?: number;
   size?: number;
-  /** 逗号分隔的工单类型列表，如 "SUGGESTION,FEATURE_FEEDBACK" */
   ticketTypes?: string;
-  /** 兼容旧版：单类型（已废弃，建议使用 ticketTypes） */
   ticketType?: TicketType;
   status?: TicketStatus;
   targetId?: string;
@@ -134,6 +128,13 @@ export interface TicketReviewRequest {
   replyContent?: string;
 }
 
+export interface TicketStats {
+  reportCount: number;
+  appealCount: number;
+  feedbackCount: number;
+  suggestionCount: number;
+}
+
 export const listTickets = (params: ListTicketParams = {}): PromiseResBody<Page<TicketResponse>> => {
   return request.get<Page<TicketResponse>>("/tickets", { params });
 };
@@ -142,33 +143,14 @@ export const getTicketDetail = (id: number): PromiseResBody<TicketResponse> => {
   return request.get<TicketResponse>(`/tickets/${id}`);
 };
 
-export const getTicketStats = (): PromiseResBody<{
-  reportCount: number;
-  appealCount: number;
-  feedbackCount: number;
-  suggestionCount: number;
-}> => {
-  return request.get("/tickets/stats");
-};
-
-export const createTicket = (data: {
-  ticketType: TicketType;
-  type: string;
-  reason: string;
-  targetId?: string;
-  targetType?: string;
-  resourceUuids?: string[];
-  penaltyType?: PenaltyType;
-}): PromiseResBody<{ taskId: number }> => {
-  return request.post("/tickets", data);
-};
-
-export const cancelTicket = (id: number): PromiseResBody<null> => {
-  return request.post<null>(`/tickets/${id}/cancel`);
+export const getTicketStats = (): PromiseResBody<TicketStats> => {
+  return request.get<TicketStats>("/tickets/stats");
 };
 
 export const reviewTicket = (id: number, data: TicketReviewRequest): PromiseResBody<null> => {
   return request.post<null>(`/tickets/${id}/review`, data);
 };
 
-
+export const restoreTicket = (id: number): PromiseResBody<null> => {
+  return request.post<null>(`/tickets/${id}/restore`);
+};

@@ -35,6 +35,7 @@ public class TicketResponse {
     private Instant updatedAt;
 
     private List<String> evidenceResourceUuids;
+    private List<String> evidenceUrls;
     private PenaltyDetail originalPenalty;
     private BanStatusResponse currentBans;
     private Timeline timeline;

@@ -16,11 +16,6 @@ import org.waterwood.waterfunadminservice.api.response.TrendPointVO;
 import org.waterwood.waterfunadminservice.service.AdminOnlineService;
 import org.waterwood.waterfunadminservice.service.DashboardService;
 import org.waterwood.waterfunadminservice.service.StatisticService;
-import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.SiteStatisticRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,10 +28,6 @@ public class DashboardController {
     private final StatisticService statisticService;
     private final AdminOnlineService adminOnlineService;
     private final DashboardService dashboardService;
-    private final UserRepository userRepository;
-    private final PostRepository postRepository;
-    private final AuditTaskRepository auditTaskRepository;
-    private final SiteStatisticRepository siteStatisticRepository;
 
     @GetMapping("/statistics/list")
     public ApiResponse<Page<SiteStatisticResponse>> listStatistics(
@@ -66,18 +57,7 @@ public class DashboardController {
 
     @GetMapping("/overview")
     public ApiResponse<DashboardOverviewVO> overview() {
-        long totalUsers = userRepository.count();
-        long totalPosts = postRepository.count();
-        long pendingModerations = auditTaskRepository.countByStatus(AuditStatus.PENDING);
-        var todayStat = siteStatisticRepository.findById(LocalDate.now());
-        long todayNewUsers = todayStat.map(s -> s.getNewUsers() != null ? s.getNewUsers() : 0L).orElse(0L);
-        long todayNewPosts = todayStat.map(s -> s.getNewPosts() != null ? s.getNewPosts() : 0L).orElse(0L);
-        long todayPv = todayStat.map(s -> s.getDailyPv() != null ? s.getDailyPv() : 0L).orElse(0L);
-        long onlineUserCount = adminOnlineService.getOnlineCount();
-        long peakOnline = todayStat.map(s -> s.getPeakOnline() != null ? s.getPeakOnline() : 0L).orElse(0L);
-        return ApiResponse.success(new DashboardOverviewVO(
-                onlineUserCount, totalUsers, totalPosts, todayNewUsers, todayNewPosts, todayPv, pendingModerations, peakOnline
-        ));
+        return ApiResponse.success(dashboardService.getOverview());
     }
 
     @GetMapping("/recent-activities")

@@ -58,9 +58,8 @@ public class Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "author_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
     private User author;
 
     @ColumnDefault("'0'")
@@ -165,4 +164,7 @@ public class Post {
     @Column(name = "is_pinned")
     private Boolean isPinned = false;
 
+    public boolean isSystem() {
+        return type == PostType.NOTICE || author == null;
+    }
 }

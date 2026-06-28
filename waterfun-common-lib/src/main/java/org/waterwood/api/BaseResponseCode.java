@@ -137,7 +137,16 @@ public enum BaseResponseCode implements ResponseCode {
     REPORT_NOT_FOUND("report.not_found"),
     UNSUPPORTED_REPORT_TYPE("report.type_not_supported"),
     TicketNotFoundException("ticket.not_found"),
-    REPORT_TARGET_INVALID("report.target_invalid"),;
+    REPORT_TARGET_INVALID("report.target_invalid"),
+
+    // Privacy
+    PRIVACY_PROFILE_NOT_VISIBLE("privacy.profile_not_visible"),
+    PRIVACY_COMMENT_NOT_ALLOWED("privacy.comment_not_allowed"),
+    PRIVACY_MESSAGE_NOT_ALLOWED("privacy.message_not_allowed"),
+    PRIVACY_FOLLOW_NOT_ALLOWED("privacy.follow_not_allowed"),
+
+    // Content
+    CONTENT_INAPPROPRIATE("content.inappropriate"),;
     private final String code;
     // private final String defaultMessage;
 

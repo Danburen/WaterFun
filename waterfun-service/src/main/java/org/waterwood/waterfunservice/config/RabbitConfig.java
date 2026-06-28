@@ -54,6 +54,15 @@ public class RabbitConfig {
         return QueueBuilder.durable(RabbitConstants.QUEUE_TICKET_NOTIFICATION)
                 .quorum()
                 .withArgument("x-delivery-limit", 3)
+                .withArgument("x-dead-letter-exchange", "")
+                .withArgument("x-dead-letter-routing-key", RabbitConstants.QUEUE_TICKET_NOTIFICATION + ".dlq")
+                .build();
+    }
+
+    @Bean
+    public Queue ticketDlq() {
+        return QueueBuilder.durable(RabbitConstants.QUEUE_TICKET_NOTIFICATION + ".dlq")
+                .quorum()
                 .build();
     }
 

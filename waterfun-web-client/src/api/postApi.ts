@@ -9,7 +9,7 @@ export interface CloudResPresignedUrlResp {
 export interface UserBrief {
   uid: string
   displayName: string
-  avatar: CloudResourceUrlResp
+  avatar: CloudResourceUrlResp | null
   level: number
   userType: 'COMMON' | 'ADMIN' | 'BOT' | 'MODERATOR' | 'VIP'
 }
@@ -19,6 +19,7 @@ export interface PostCardResp {
   title: string
   subtitle: string
   summary: string
+  userBrief: UserBrief | null
   coverImage: CloudResourceUrlResp | null
   category: OptionVOLong | null
   tags: OptionVOLong[]
@@ -28,12 +29,14 @@ export interface PostCardResp {
   collectCount: number
   slug: string
   publishedAt: string | null
+  type?: 'COMMON' | 'NOTICE'
+  isPinned?: boolean
 }
 
 export interface PostAuthorCardResp extends PostCardResp {
   visibility: 'PUBLIC' | 'PRIVATE' | 'FANS_ONLY'
   status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
-  editStatus: 'NONE' | 'PENDING'
+  editStatus: 'NONE' | 'PENDING' | 'REJECTED'
   updatedAt: string | null
   editedTitle?: string
   editedContent?: string
@@ -58,12 +61,12 @@ export interface PostDetailResp {
   updatedAt: string | null
   type: 'COMMON' | 'NOTICE'
   isPinned: boolean
-  userBrief: UserBrief
+  userBrief: UserBrief | null
   isLiked: boolean
   isCollected: boolean
   visibility: 'PUBLIC' | 'PRIVATE' | 'FANS_ONLY'
   status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
-  editStatus: 'NONE' | 'PENDING'
+  editStatus: 'NONE' | 'PENDING' | 'REJECTED'
 }
 
 export interface PostDraftResp {
@@ -71,6 +74,7 @@ export interface PostDraftResp {
   editedContent: string
   editedSummary: string
   coverageImgPresignedUrl: CloudResPresignedUrlResp | null
+  editedCoverImg: string | null
   editedCategoryId: OptionVOLong | null
   editedTagIds: OptionVOLong[]
   editedNewTagIds: string[]
@@ -82,6 +86,7 @@ export interface OptionVOLong {
   code: string
   name: string
   disabled: boolean
+  usageCount?: number
 }
 
 export interface PostSaveReq {
@@ -92,7 +97,7 @@ export interface PostSaveReq {
   coverageImgId?: string
   newTags?: string[]
   tagIds?: (number | bigint)[]
-  categoryId: number | bigint
+  categoryId?: number | bigint | null
 }
 
 export interface CategoryResponse {
@@ -138,6 +143,7 @@ export interface PageResult<T> {
 export interface PostListParams {
   categoryId?: string
   tagIds?: string[]
+  keyword?: string
   page?: number
   size?: number
 }

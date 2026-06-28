@@ -11,8 +11,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -41,14 +39,6 @@ public class Tag {
     @ColumnDefault("'0'")
     @Column(name = "usage_count", columnDefinition = "int UNSIGNED")
     private Long usageCount = 0L;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "post_tag",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags = new HashSet<>();
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

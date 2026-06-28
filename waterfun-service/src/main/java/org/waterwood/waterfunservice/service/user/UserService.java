@@ -42,4 +42,12 @@ public interface UserService {
      * @param uid target user uid
      */
     void follow(long uid);
+
+    /**
+     * Get paginated liked post IDs for a user
+     * @param userUid target user uid
+     * @param pageable pageable
+     * @return page of post IDs
+     */
+    Page<Long> getLikedPostIds(long userUid, Pageable pageable);
 }

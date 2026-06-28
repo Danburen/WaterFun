@@ -1,16 +1,16 @@
 import type { ISOString, OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
-import type { Page } from "~/types/api";
+import type { Page, BatchResult } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type TagOptionVO = OptionResItem<number>;
 
 export interface TagResp {
-  id: string;
+  id: number;
   name: string;
   slug?: string;
   description?: string;
-  usageCount?: string;
-  creatorId?: string;
+  usageCount?: number;
+  creatorId?: number;
   createdAt?: ISOString;
   updateAt?: ISOString;
 }
@@ -38,17 +38,7 @@ export interface CreateTagRequest {
 }
 
 export interface DeleteTagsRequest {
-  tagIds: string[];
-}
-
-export interface BatchResult {
-  requested: number;
-  success: number;
-  ignored: number;
-  failed: number;
-  ignoredIds?: number[];
-  failedIds?: number[];
-  message?: string;
+  tagIds: number[];
 }
 
 export const listTags = (params: ListTagParams = {}): PromiseResBody<Page<TagResp>> => {
@@ -71,11 +61,19 @@ export const deleteTag = (id: number): PromiseResBody<null> => {
   return request.delete<null>(`/tags/${id}`);
 };
 
-export const deleteTags = (tagIds: string[]): PromiseResBody<BatchResult> => {
+export const deleteTags = (tagIds: number[]): PromiseResBody<BatchResult> => {
   const data: DeleteTagsRequest = { tagIds };
   return request.delete<BatchResult>("/tags", { data });
 };
 
 export const getTagOptions = (): PromiseResBody<OptionResItem<number>[]> => {
   return request.get<OptionResItem<number>[]>("/tags/options");
+};
+
+export const searchTags = (keyword: string, limit: number = 10): PromiseResBody<OptionResItem<number>[]> => {
+  return request.get<OptionResItem<number>[]>("/tags/search", { params: { keyword, limit } });
+};
+
+export const getHotTags = (limit: number = 20): PromiseResBody<OptionResItem<number>[]> => {
+  return request.get<OptionResItem<number>[]>("/tags/hot", { params: { limit } });
 };

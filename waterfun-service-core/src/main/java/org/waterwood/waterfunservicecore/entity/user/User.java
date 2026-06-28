@@ -102,6 +102,9 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserPreference userPreference;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserSetting userSetting;
+
     public OptionVO<Long> toOptionVO(){
         return OptionVO.of(this.uid, this.nickname, this.nickname, ! this.accountStatus.equals(AccountStatus.ACTIVE));
     }

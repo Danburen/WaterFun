@@ -21,3 +21,10 @@ export interface PageOptions {
     currentPage?: number;
 }
 
+export interface BatchResult {
+    requested: number;
+    success: number;
+    ignored: number;
+    failed: number;
+}
+

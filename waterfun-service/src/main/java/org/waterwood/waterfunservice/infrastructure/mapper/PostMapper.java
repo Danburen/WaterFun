@@ -1,6 +1,7 @@
 package org.waterwood.waterfunservice.infrastructure.mapper;
 
 import org.mapstruct.*;
+import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
 import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservicecore.entity.post.Post;
@@ -41,4 +42,15 @@ public interface PostMapper {
     @Mapping(target = "editedTagIds", ignore = true)
     @Mapping(target = "editedCategoryId", ignore = true)
     PostDraftResp toPostDraftResp(Post p);
+
+    @AfterMapping
+    default void afterToPostCardResp(Post post, @MappingTarget PostCardResp resp) {
+        resp.setSummary(StringUtil.fallbackSummary(resp.getSummary(), post.getContent(), 200));
+    }
+
+    @AfterMapping
+    default void afterToPostAuthorCardResp(Post post, @MappingTarget PostAuthorCardResp resp) {
+        resp.setSummary(StringUtil.fallbackSummary(resp.getSummary(), post.getContent(), 200));
+    }
+
 }

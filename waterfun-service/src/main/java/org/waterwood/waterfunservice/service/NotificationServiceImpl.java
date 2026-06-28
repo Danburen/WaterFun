@@ -21,6 +21,7 @@ import org.waterwood.waterfunservicecore.api.CursorPage;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.notification.InboxRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.io.Serializable;
@@ -36,6 +37,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final InboxRepository inboxRepository;
     private final InboxSystemMapper inboxSystemMapper;
     private final UserRepository userRepository;
+    private final UserSettingRepository userSettingRepository;
     private final SSEService sseService;
 
     @Override
@@ -139,8 +141,25 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
+    private boolean isNotificationAllowed(Long recipient, String settingField) {
+        return userSettingRepository.findById(recipient)
+                .map(s -> {
+                    boolean allowed = switch (settingField) {
+                        case "comment" -> s.getCommentNotifications();
+                        case "like" -> s.getLikeNotifications();
+                        case "follow" -> s.getFollowNotifications();
+                        case "message" -> s.getMessageNotifications();
+                        case "event" -> s.getEventNotifications();
+                        default -> true;
+                    };
+                    return Boolean.TRUE.equals(allowed);
+                })
+                .orElse(true);
+    }
+
     @Override
     public void onCommentLike(Long recipient, Long userUid, Long commentId, String title, Long postId) {
+        if (!isNotificationAllowed(recipient, "like")) return;
         ReactionInboxPayload payload = new ReactionInboxPayload(
                 List.of(userUid),
                 null,
@@ -151,6 +170,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void onPostLike(Long recipient, Long userUid, Long postId, String title, Long coverageResourceUuid) {
+        if (!isNotificationAllowed(recipient, "like")) return;
         ReactionInboxPayload payload = new ReactionInboxPayload(
                 List.of(userUid),
                 coverageResourceUuid,
@@ -161,6 +181,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void onPostCollect(Long recipient, Long userUid, Long postId, String title, Long coverageResourceUuid) {
+        if (!isNotificationAllowed(recipient, "like")) return;
         ReactionInboxPayload payload = new ReactionInboxPayload(
                 List.of(userUid),
                 coverageResourceUuid,
@@ -172,6 +193,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void onReply(Long recipient, Long userUid, Long commentId, String title, Long postId, String replyContent) {
         if (recipient == null || recipient.equals(userUid)) return; // no self notification
+        if (!isNotificationAllowed(recipient, "comment")) return;
         ReplyInboxPayload payload = new ReplyInboxPayload(
                 List.of(userUid),
                 replyContent,
@@ -183,6 +205,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void onPostReply(Long recipient, Long userUid, Long commentId, String title, Long postId, String commentContent) {
         if (recipient == null || recipient.equals(userUid)) return;
+        if (!isNotificationAllowed(recipient, "comment")) return;
         ReplyInboxPayload payload = new ReplyInboxPayload(
                 List.of(userUid),
                 commentContent,
@@ -194,6 +217,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void onNewFollower(Long recipient, Long followerUid) {
         if (recipient == null || recipient.equals(followerUid)) return;
+        if (!isNotificationAllowed(recipient, "follow")) return;
         FollowerInboxPayload payload = new FollowerInboxPayload(
                 followerUid,
                 "/user/" + followerUid

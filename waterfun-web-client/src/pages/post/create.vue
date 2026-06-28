@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import MarkdownIt from 'markdown-it'
+import { getTagColor } from '@waterfun/web-core/src/tagColor'
 import { previewContent, previewContentAlone, searchTags, getHotTags } from '~/api/postApi'
 import { getUploadPolicy, uploadFileToCos, uploadCallback } from '~/api/uploadApi'
 import type { TagResponse, PostSaveReq } from '~/api/postApi'
@@ -58,12 +59,14 @@ const searchResults = ref<TagResponse[]>([])
 const searchLoading = ref(false)
 const showSearchResults = ref(false)
 const tagInputRef = ref<HTMLInputElement | null>(null)
+const tagNameMap = ref<Record<string, string>>({})
 let searchAbort: AbortController | null = null
 
 const fetchHotTags = async () => {
   try {
     const res = await getHotTags({ page: 1, size: 20 })
     hotTags.value = ((res.data as any)?.content || []) as TagResponse[]
+    hotTags.value.forEach(t => { tagNameMap.value[t.id] = t.name })
   } catch { /* ignore */ }
 }
 
@@ -80,6 +83,7 @@ const handleTagSearch = async (keyword: string) => {
   try {
     const res = await searchTags(keyword, 10)
     searchResults.value = (res.data || []) as TagResponse[]
+    searchResults.value.forEach(t => { tagNameMap.value[t.id] = t.name })
   } catch {
     searchResults.value = []
   } finally {
@@ -110,8 +114,8 @@ const selectTagFromSearch = (tag: TagResponse) => {
   if (!form.tagIds.includes(tag.id)) {
     form.tagIds.push(tag.id)
   }
+  tagNameMap.value[tag.id] = tag.name
   newTagInput.value = ''
-  searchResults.value = []
   showSearchResults.value = false
 }
 
@@ -122,6 +126,7 @@ const toggleHotTag = (tag: TagResponse) => {
   } else {
     form.tagIds.splice(idx, 1)
   }
+  tagNameMap.value[tag.id] = tag.name
 }
 
 const addNewTag = () => {
@@ -147,8 +152,13 @@ const removeTagId = (id: string) => {
 }
 
 const selectedTagName = (id: string): string => {
-  return hotTags.value.find(t => t.id === id)?.name || searchResults.value.find(r => r.id === id)?.name || ''
+  return tagNameMap.value[id] || hotTags.value.find(t => t.id === id)?.name
+    || searchResults.value.find(r => r.id === id)?.name
+    || editDraft.value?.editedTagIds?.find(t => t.id === id)?.name
+    || id
 }
+
+const moreOptionsExpanded = ref(false)
 
 const onTagInputKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Enter') {
@@ -195,8 +205,12 @@ watch(editDraft, (draft) => {
   if (draft.editedCategoryId) {
     form.categoryId = draft.editedCategoryId.id
   }
-  form.tagIds = draft.editedTagIds?.map(t => t.id) || []
+  form.tagIds = draft.editedTagIds?.map(t => { tagNameMap.value[t.id] = t.name; return t.id }) || []
   form.newTags = draft.editedNewTagIds || []
+  if (draft.editedCoverImg) {
+    form.coverageImgId = draft.editedCoverImg
+    coverImageUrl.value = draft.coverageImgPresignedUrl?.url || ''
+  }
 }, { immediate: false })
 
 onUnmounted(() => {
@@ -204,6 +218,48 @@ onUnmounted(() => {
 })
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+
+const coverImageInput = ref<HTMLInputElement | null>(null)
+const coverImageUrl = ref('')
+
+const uploadCoverImage = async (file: File) => {
+  try {
+    const ext = file.name.split('.').pop() || 'png'
+    const policyResp = await getUploadPolicy({
+      bizType: 'POST_COVERAGE_IMAGE',
+      exts: [ext]
+    })
+    if (!policyResp.data?.length) {
+      ElMessage.error('获取上传策略失败')
+      return
+    }
+    const { url: cosUrl, method, token } = policyResp.data[0]
+    if (!token) {
+      ElMessage.error('上传策略缺少 token')
+      return
+    }
+    const uploadResp = await uploadFileToCos(cosUrl, method, file)
+    if (!uploadResp.ok) {
+      ElMessage.error('封面上传失败')
+      return
+    }
+    const { uuid } = (await uploadCallback({ token })).data
+    form.coverageImgId = uuid
+    coverImageUrl.value = URL.createObjectURL(file)
+  } catch {
+    ElMessage.error('封面上传失败')
+  }
+}
+
+const handleCoverSelect = () => {
+  coverImageInput.value?.click()
+}
+
+const removeCoverImage = () => {
+  form.coverageImgId = ''
+  coverImageUrl.value = ''
+  if (coverImageInput.value) coverImageInput.value.value = ''
+}
 
 const insertImage = async () => {
   const input = document.createElement('input')
@@ -408,27 +464,55 @@ const handleSaveDraft = async () => {
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">{{ $t('post.summary') }}</label>
-            <el-input
-              v-model="form.summary"
-              type="textarea"
-              :rows="3"
-              placeholder="请输入摘要"
-              maxlength="500"
-              show-word-limit
-            />
+          <div class="more-options-toggle" @click="moreOptionsExpanded = !moreOptionsExpanded">
+            <i class="fa-solid" :class="moreOptionsExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            更多选项
           </div>
 
-          <div class="form-group">
-            <label class="form-label">{{ $t('post.subtitle') }}</label>
-            <el-input
-              v-model="form.subtitle"
-              placeholder="请输入副标题"
-              maxlength="64"
-              show-word-limit
-            />
-          </div>
+          <template v-if="moreOptionsExpanded">
+            <div class="form-group">
+              <label class="form-label">{{ $t('post.summary') }}</label>
+              <el-input
+                v-model="form.summary"
+                type="textarea"
+                :rows="3"
+                placeholder="留空则自动从正文截取"
+                maxlength="500"
+                show-word-limit
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">{{ $t('post.subtitle') }}</label>
+              <el-input
+                v-model="form.subtitle"
+                placeholder="请输入副标题"
+                maxlength="64"
+                show-word-limit
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">封面图</label>
+              <div class="cover-upload-wrap" @click="handleCoverSelect">
+                <input
+                  ref="coverImageInput"
+                  type="file"
+                  accept="image/*"
+                  style="display:none"
+                  @change="(e: any) => e.target.files?.[0] && uploadCoverImage(e.target.files[0])"
+                />
+                <div v-if="!coverImageUrl" class="cover-upload-placeholder">
+                  <i class="fas fa-image"></i>
+                  <span>点击上传封面图</span>
+                </div>
+                <div v-else class="cover-preview">
+                  <img :src="coverImageUrl" alt="封面预览" />
+                  <button class="cover-remove-btn" @click.stop="removeCoverImage"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+            </div>
+          </template>
 
           <div class="form-group">
             <label class="form-label">{{ $t('post.tags') }}</label>
@@ -449,6 +533,7 @@ const handleSaveDraft = async () => {
                   v-for="tagId in form.tagIds"
                   :key="tagId"
                   class="tag-chip"
+                  :style="{ backgroundColor: getTagColor(selectedTagName(tagId)), color: '#fff' }"
                 >
                   {{ selectedTagName(tagId) }}
                   <span class="remove" @click="removeTagId(tagId)">&times;</span>
@@ -457,6 +542,7 @@ const handleSaveDraft = async () => {
                   v-for="(tag, index) in form.newTags"
                   :key="'new-' + index"
                   class="tag-chip new-tag"
+                  :style="{ backgroundColor: getTagColor(tag), color: '#fff' }"
                 >
                   {{ tag }}
                   <span class="remove" @click="removeNewTag(index)">&times;</span>
@@ -679,6 +765,65 @@ const handleSaveDraft = async () => {
   color: var(--wf-text-muted);
 }
 
+/* ========== Cover Image ========== */
+.cover-upload-wrap {
+  width: 100%;
+  height: 180px;
+  border: 2px dashed var(--wf-border);
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+  position: relative;
+}
+.cover-upload-wrap:hover {
+  border-color: var(--wf-primary);
+}
+.cover-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--wf-text-muted);
+  font-size: 14px;
+}
+.cover-upload-placeholder i {
+  font-size: 36px;
+  opacity: 0.4;
+}
+.cover-preview {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.cover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+.cover-remove-btn:hover {
+  background: rgba(0,0,0,0.7);
+}
 /* ========== Tags ========== */
 .tag-suggestions {
   display: flex;
@@ -836,6 +981,25 @@ const handleSaveDraft = async () => {
 
 .tag-search-empty strong {
   color: var(--wf-primary);
+}
+
+.more-options-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--wf-text-muted);
+  padding: 6px 0;
+  margin-bottom: 10px;
+  user-select: none;
+  transition: color 0.15s;
+}
+.more-options-toggle:hover {
+  color: var(--wf-primary);
+}
+.more-options-toggle i {
+  font-size: 12px;
 }
 
 @media (max-width: 900px) {

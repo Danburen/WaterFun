@@ -16,7 +16,7 @@ public class ReplyPayload implements AuditPayload {
     private Long commentId;
     private Long replierUid;
 
-    private final AuditContentFormat format = AuditContentFormat.IMAGE;
+    private final AuditContentFormat format = AuditContentFormat.TXT;
     @Override
     public String toJson() {
         return JsonUtil.toJson(this);

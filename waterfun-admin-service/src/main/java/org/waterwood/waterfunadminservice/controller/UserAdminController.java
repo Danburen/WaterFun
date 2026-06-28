@@ -18,7 +18,6 @@ import org.waterwood.waterfunadminservice.api.response.user.UserInfoARes;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserAdminMapper;
 import org.waterwood.waterfunadminservice.service.user.UserAdminService;
 import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.waterfunservicecore.infrastructure.aspect.RequireRole;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
 import java.time.Instant;
@@ -27,7 +26,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/users")
-@RequireRole("ADMIN")
 public class UserAdminController {
     private final UserAdminService userAdminService;
     private final UserCoreService userCoreService;

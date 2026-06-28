@@ -22,8 +22,6 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
 
   List<Tag> findAllByCreatorUid(Long currentUserUid);
 
-  List<Long> findTagIdsByTagsIdIn(Collection<Long> tagsIds);
-
   int removeByIdIn(Collection<Long> ids);
 
   @Query("SELECT t FROM Tag t ORDER BY t.usageCount DESC LIMIT :limit")
@@ -44,17 +42,20 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
 """)
   List<OptionVO<Long>> findTagOptionVosByIdsIn(@Param("ids") List<Long> ids);
 
-  @Query("""
+    @Query("""
         SELECT new org.waterwood.waterfunservicecore.entity.post.IdOptionVOPackagedDO
-            (p.id, t.id, t.slug, t.name, false)
+            (p.id, t.id, t.slug, t.name, false, t.usageCount)
         FROM Post p JOIN p.tags t
         WHERE p.id IN :postIds
     """)
-  List<IdOptionVOPackagedDO<Long, Long>> findTagDOByPostIdIn(@Param("postIds") List<Long> postIds);
+    List<IdOptionVOPackagedDO<Long, Long>> findTagDOByPostIdIn(@Param("postIds") List<Long> postIds);
 
   List<Tag> findAllByNameIn(Set<String> newTagNames);
 
   int countByCreatorUid(Long userUid);
+
+  @Query("SELECT t.creator.uid, COUNT(t) FROM Tag t WHERE t.creator.uid IN :uids GROUP BY t.creator.uid")
+  List<Object[]> countByCreatorUidIn(@Param("uids") List<Long> uids);
 
   Optional<Tag> findByName(String name);
 
@@ -84,4 +85,5 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
 """)
   void decreaseUsageCountInIds(@Param("ids") List<Long> removedTagIds, @Param("count") int count);
 
+  List<Long> findTagByIdIn(Set<Long> attr0);
 }

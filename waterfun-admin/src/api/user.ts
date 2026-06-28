@@ -1,5 +1,5 @@
 import type { ISOString, OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
-import type { Page } from "~/types/api";
+import type { Page, BatchResult } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
@@ -113,16 +113,6 @@ export interface UserRoleItemDto {
 export interface UserPermItemDto {
   permissionId: number;
   expiresAt?: ISOString;
-}
-
-export interface BatchResult {
-  requested: number;
-  success: number;
-  ignored: number;
-  failed: number;
-  ignoredIds: number[];
-  failedIds: number[];
-  message: string;
 }
 
 export interface RemoveUsersReq {

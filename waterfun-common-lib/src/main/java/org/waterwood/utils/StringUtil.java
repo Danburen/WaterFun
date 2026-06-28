@@ -133,6 +133,41 @@ public final class StringUtil {
      * @see Matcher#appendReplacement(StringBuffer, String)
      * @see Matcher#appendTail(StringBuffer)
      */
+    /**
+     * Generate a fallback summary from post content when no explicit summary is provided.
+     * Image placeholders (markdown or res://) are replaced with "【图片】",
+     * remaining markdown syntax is stripped, HTML tags are removed, and text is truncated to maxLen.
+     *
+     * @param summary explicit summary (returned as-is if non-blank)
+     * @param content raw post content
+     * @param maxLen  max character length for auto-generated summary
+     * @return summary if non-blank, else auto-generated fallback, else empty string
+     */
+    public static String fallbackSummary(String summary, String content, int maxLen) {
+        if (isNotBlank(summary)) return summary;
+        if (isBlank(content)) return "";
+        // 1. markdown images → 【图片】
+        String text = content.replaceAll("!\\[.*?\\]\\(.*?\\)", " 【图片】 ");
+        // 2. res:// placeholders → 【图片】
+        text = text.replaceAll("res://[a-fA-F0-9\\-]+", " 【图片】 ");
+        // 3. inline links → keep only text
+        text = text.replaceAll("\\[(.*?)\\]\\(.*?\\)", "$1");
+        // 4. code fences
+        text = text.replaceAll("```[\\s\\S]*?```", " ");
+        // 5. inline code
+        text = text.replaceAll("`[^`]*`", " ");
+        // 6. heading markers
+        text = text.replaceAll("^#{1,6}\\s+", "");
+        // 7. HTML tags
+        text = text.replaceAll("<[^>]+>", "");
+        // 8. horizontal rules / blockquote / list markers
+        text = text.replaceAll("^[>\\-*_]\\s*", "");
+        // 9. collapse whitespace
+        text = text.replaceAll("\\s+", " ").trim();
+        if (text.length() <= maxLen) return text;
+        return text.substring(0, maxLen).trim();
+    }
+
     public static String replaceResPlaceholders(String content, Map<String, String> uuidToUrl) {
         if(isBlank(content)) return content;
         StringBuffer sb = new StringBuffer();

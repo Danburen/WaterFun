@@ -24,6 +24,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const userInfoStore = useUserInfoStore()
+const { userInfo } = storeToRefs(userInfoStore)
 
 const md = new MarkdownIt()
 const renderedContent = computed(() => currentPost.value ? md.render(currentPost.value.content) : '')
@@ -263,6 +264,7 @@ const formatCount = (n: number) => {
 const commentSectionRef = ref<HTMLElement | null>(null)
 let commentsLoaded = false
 
+const goToCreate = () => router.push('/post/create')
 const goBack = () => router.push('/post')
 
 onMounted(() => {
@@ -296,8 +298,11 @@ watch(currentPost, (post) => {
 <template>
   <div>
     <HeaderNavMenu />
-    <div class="main">
-      <div v-if="currentPost">
+    <div style="max-width:1280px;margin:0 auto;padding:24px">
+      <el-row :gutter="24">
+        <el-col :xs="24" :md="17">
+          <div class="main" style="max-width:none;margin:0;padding:0">
+            <div v-if="currentPost">
         <div class="breadcrumb">
           <a href="/"><i class="fas fa-home"></i> 首页</a>
           <i class="fas fa-chevron-right"></i>
@@ -316,27 +321,41 @@ watch(currentPost, (post) => {
         <article class="post-detail">
           <div class="post-detail-header">
             <div class="post-detail-meta">
-              <img
-                :src="currentPost.userBrief?.avatar?.url || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
-                :alt="currentPost.userBrief?.displayName || '用户'"
-                class="post-detail-avatar"
-              >
-              <div class="post-detail-author-info">
-                <a
-                  v-if="currentPost.userBrief?.uid"
-                  :href="'/User/' + currentPost.userBrief.uid"
-                  class="post-detail-author-name"
-                >{{ currentPost.userBrief?.displayName || '用户' }}</a>
-                <a
-                  v-if="userInfoStore.userInfo.uid && userInfoStore.userInfo.uid === currentPost.userBrief?.uid"
-                  :href="'/post/create?id=' + postId"
-                  class="post-detail-edit-link"
-                ><i class="fas fa-pen"></i> 编辑</a>
-                <div class="post-detail-time">
-                  发布于 {{ formatDateTime(currentPost.publishedAt) }}
-                  <template v-if="currentPost.updatedAt"> · 最后编辑于 {{ formatDateTime(currentPost.updatedAt) }}</template>
-                </div>
-              </div>
+              <template v-if="!(currentPost.isPinned && !currentPost.userBrief)">
+                <template v-if="currentPost.userBrief">
+                  <img
+                    :src="currentPost.userBrief?.avatar?.url || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
+                    :alt="currentPost.userBrief?.displayName || '用户'"
+                    class="post-detail-avatar"
+                  >
+                  <div class="post-detail-author-info">
+                    <a
+                      v-if="currentPost.userBrief?.uid"
+                      :href="'/User/' + currentPost.userBrief.uid"
+                      class="post-detail-author-name"
+                    >{{ currentPost.userBrief?.displayName || '用户' }}</a>
+                    <a
+                      v-if="userInfoStore.userInfo.uid && userInfoStore.userInfo.uid === currentPost.userBrief?.uid"
+                      :href="'/post/create?id=' + postId"
+                      class="post-detail-edit-link"
+                    ><i class="fas fa-pen"></i> 编辑</a>
+                    <div class="post-detail-time">
+                      发布于 {{ formatDateTime(currentPost.publishedAt) }}
+                      <template v-if="currentPost.updatedAt"> · 最后编辑于 {{ formatDateTime(currentPost.updatedAt) }}</template>
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="post-detail-avatar" style="display:flex;align-items:center;justify-content:center;background:#e2e8f0;border-radius:50%;width:40px;height:40px;"><i class="fas fa-robot" style="color:#64748b;"></i></div>
+                  <div class="post-detail-author-info">
+                    <span class="post-detail-author-name">系统</span>
+                    <div class="post-detail-time">
+                      发布于 {{ formatDateTime(currentPost.publishedAt) }}
+                      <template v-if="currentPost.updatedAt"> · 最后编辑于 {{ formatDateTime(currentPost.updatedAt) }}</template>
+                    </div>
+                  </div>
+                </template>
+              </template>
               <div class="post-detail-meta-right">
                 <span v-if="currentPost.isPinned" class="post-detail-pinned"><i class="fas fa-thumbtack"></i> 置顶</span>
                 <span v-if="currentPost.type === 'NOTICE'" class="post-detail-notice"><i class="fas fa-bullhorn"></i> 公告</span>
@@ -383,6 +402,7 @@ watch(currentPost, (post) => {
             <div class="post-actions-right">
               <button class="wf-btn-text"><i class="fas fa-share-alt"></i> 分享</button>
               <ReportDropdown
+                v-if="currentPost.userBrief && currentPost.type !== 'NOTICE'"
                 target-type="POST"
                 :target-id="postId"
                 @report="openReportDialog"
@@ -592,6 +612,33 @@ watch(currentPost, (post) => {
         <div class="wf-state-text wf-state-error">帖子不存在</div>
         <button class="wf-btn wf-btn-primary" @click="goBack">返回社区</button>
       </div>
+          </div>
+        </el-col>
+        <el-col :xs="0" :md="7">
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <el-card shadow="never">
+              <ClientOnly>
+                <div style="text-align:center">
+                  <template v-if="authStore.isAccess && userInfo">
+                    <el-avatar :size="64" :src="userInfo.avatar?.url || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" style="margin-bottom:10px" />
+                    <div style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:4px">{{ userInfo.nickname || userInfo.username }}</div>
+                    <el-button type="primary" style="width:100%;margin-top:16px" @click="goToCreate">
+                      <el-icon size="14" style="margin-right:4px"><Edit /></el-icon> 发布帖子
+                    </el-button>
+                  </template>
+                  <template v-else>
+                    <div style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:8px">欢迎来到社区</div>
+                    <p style="font-size:13px;color:#64748b;margin-bottom:16px">登录后即可发布帖子</p>
+                    <el-button type="primary" style="width:100%" @click="router.push('/login')">
+                      <el-icon size="14" style="margin-right:4px"><User /></el-icon> 立即登录
+                    </el-button>
+                  </template>
+                </div>
+              </ClientOnly>
+            </el-card>
+          </div>
+        </el-col>
+      </el-row>
     </div>
 
     <!-- Report Dialog - Teleport to body to avoid any stacking context issue -->
@@ -642,12 +689,6 @@ watch(currentPost, (post) => {
 </template>
 
 <style scoped>
-.main {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
 .breadcrumb {
   display: flex;
   align-items: center;
@@ -1305,7 +1346,6 @@ watch(currentPost, (post) => {
 }
 
 @media (max-width: 768px) {
-  .main { padding: 16px; }
   .post-detail-header { padding: 20px 20px 0; }
   .post-detail-content { padding: 0 20px 20px; }
   .post-detail-cover { padding: 0 20px; }

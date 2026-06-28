@@ -17,6 +17,7 @@ import org.waterwood.common.io.FileMeta;
 import org.waterwood.common.io.FileProbeResult;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.JsonUtil;
+import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunadminservice.api.request.AuditResponse;
 import org.waterwood.waterfunadminservice.api.request.ModerationBaseQuery;
 import org.waterwood.waterfunadminservice.api.request.content.audit.BatchModerateRejectRequest;
@@ -131,7 +132,7 @@ public class ModerationServiceImpl implements ModerationService {
         if(!tasks.isEmpty()){
             sendMessages(tasks);
         }
-        return BatchResult.ofNullable(req.getAuditTaskIds(), success);
+        return BatchResult.ofNullable(req.getAuditTaskIds(), tasks.size());
     }
 
     @Override
@@ -326,7 +327,8 @@ public class ModerationServiceImpl implements ModerationService {
                 query.submitterUid(), query.submitAtStart(), query.submitAtEnd(),
                 targetType, format
         );
-        List<AuditTask> res = auditTaskRepository.findAll(spec, pageable).getContent();
+        Page<AuditTask> taskPage = auditTaskRepository.findAll(spec, pageable);
+        List<AuditTask> res = taskPage.getContent();
         Map<Long, UserBrief> userBriefMap = userBriefService.queryForMapUserIdBriefMap(
                 res.stream().map(task -> task.getSubmitter().getUid()).toList()
         );
@@ -350,7 +352,7 @@ public class ModerationServiceImpl implements ModerationService {
             resp.setSourceContext(resolveSourceContext(task, type));
             return resp;
         }).collect(Collectors.collectingAndThen(Collectors.toList(),
-                list -> new PageImpl<>(list, pageable, pageable.getPageSize())));
+                list -> new PageImpl<>(list, pageable, taskPage.getTotalElements())));
     }
 
     private <T extends AuditPayload> AuditResponse<T> getTask(Long id, Class<T> type) {
@@ -454,20 +456,24 @@ public class ModerationServiceImpl implements ModerationService {
         return switch (targetType) {
             case POST -> {
                 PostAuditPayload payload = JsonUtil.fromJson(json, PostAuditPayload.class);
-                if (payload != null && payload.getCoverageResUuid() != null) {
-                    Resource coverageRes = resourceRepository.findByUuidAndStatusNot(
-                            payload.getCoverageResUuid(), ResourceStatus.DELETED
-                    ).orElse(null);
-                    if (coverageRes != null) {
-                        payload.setCoverResPresignedUrl(cloudFileService.getReadUrlCached(
-                                getCloudFSRootByTargetType(targetType),
-                                coverageRes.getResourceKey(),
-                                payload.getCoverageResUuid(),
-                                targetType
-                        ));
-                    } else {
-                        payload.setCoverResPresignedUrl(null);
+                if (payload != null) {
+                    if (payload.getCoverageResUuid() != null) {
+                        Resource coverageRes = resourceRepository.findByUuidAndStatusNot(
+                                payload.getCoverageResUuid(), ResourceStatus.DELETED
+                        ).orElse(null);
+                        if (coverageRes != null) {
+                            payload.setCoverResPresignedUrl(cloudFileService.getReadUrlCached(
+                                    getCloudFSRootByTargetType(targetType),
+                                    coverageRes.getResourceKey(),
+                                    payload.getCoverageResUuid(),
+                                    targetType
+                            ));
+                        } else {
+                            payload.setCoverResPresignedUrl(null);
+                        }
                     }
+                    // Resolve res://<uuid> in content
+                    resolveContentImages(payload);
                 }
                 yield payload;
             }
@@ -483,6 +489,23 @@ public class ModerationServiceImpl implements ModerationService {
         };
     }
 
+
+    private void resolveContentImages(PostAuditPayload payload) {
+        String content = payload.getContent();
+        if (StringUtil.isBlank(content)) return;
+        Set<String> uuids = StringUtil.extraResPlaceholders(content);
+        if (uuids.isEmpty()) return;
+        Map<String, String> uuidToKey = resourceRepository.findByUuidIn(uuids).stream()
+                .filter(r -> r.getStatus() != ResourceStatus.DELETED)
+                .collect(Collectors.toMap(Resource::getUuid, Resource::getResourceKey));
+        if (uuidToKey.isEmpty()) return;
+        Map<String, CloudResPresignedUrlResp> urlMap = cloudFileService.batchGetReadPublicUrlCached(
+                CloudFSRoot.UPLOADS, uuidToKey, TargetType.POST_CONTENT_IMAGE);
+        payload.setContentHtml(StringUtil.replaceResPlaceholders(content,
+                urlMap.entrySet().stream()
+                        .filter(e -> e.getValue() != null && e.getValue().getUrl() != null)
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getUrl()))));
+    }
 
     private ModerationResourceRes toModerationResourceRes(AuditResource auditResource) {
         CloudResPresignedUrlResp urlResp = null;

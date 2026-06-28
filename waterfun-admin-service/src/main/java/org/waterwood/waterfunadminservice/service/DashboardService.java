@@ -4,12 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.waterwood.waterfunadminservice.api.response.DashboardRecentActivityVO;
 import org.waterwood.waterfunadminservice.api.response.TrendPointVO;
+import org.waterwood.waterfunadminservice.api.response.DashboardOverviewVO;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.SiteStatistic;
+import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
 import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
 import org.waterwood.waterfunservicecore.entity.audit.UserActivityLog;
 import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.SiteStatisticRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
 import org.waterwood.waterfunservicecore.services.online.OnlineUserService;
 import org.waterwood.waterfunservicecore.services.user.UserBriefService;
@@ -26,6 +31,9 @@ public class DashboardService {
     private final UserActivityLogService userActivityLogService;
     private final UserBriefService userBriefService;
     private final SiteStatisticRepository siteStatisticRepository;
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final AuditTaskRepository auditTaskRepository;
 
     public List<DashboardRecentActivityVO> getRecentActivities(int limit) {
         Set<String> onlineIds = onlineUserService.getOnlineUserIds();
@@ -90,6 +98,21 @@ public class DashboardService {
             }
         }
         return result;
+    }
+
+    public DashboardOverviewVO getOverview() {
+        long totalUsers = userRepository.count();
+        long totalPosts = postRepository.count();
+        long pendingModerations = auditTaskRepository.countByStatus(AuditStatus.PENDING);
+        var todayStat = siteStatisticRepository.findById(LocalDate.now());
+        long todayNewUsers = todayStat.map(s -> s.getNewUsers() != null ? s.getNewUsers() : 0L).orElse(0L);
+        long todayNewPosts = todayStat.map(s -> s.getNewPosts() != null ? s.getNewPosts() : 0L).orElse(0L);
+        long todayPv = todayStat.map(s -> s.getDailyPv() != null ? s.getDailyPv() : 0L).orElse(0L);
+        long onlineUserCount = onlineUserService.getOnlineCount();
+        long peakOnline = todayStat.map(s -> s.getPeakOnline() != null ? s.getPeakOnline() : 0L).orElse(0L);
+        return new DashboardOverviewVO(
+                onlineUserCount, totalUsers, totalPosts, todayNewUsers, todayNewPosts, todayPv, pendingModerations, peakOnline
+        );
     }
 
     private String buildDescription(UserActivityLog log, UserBrief brief) {

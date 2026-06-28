@@ -87,5 +87,55 @@ public interface PostRepository extends JpaRepository<Post, Long>,
 
     List<Post> findAllByIdInAndAuthorUidAndIsDeleted(List<Long> ids, Long authorUid, Boolean isDeleted);
 
+    @Query(value = """
+        SELECT p.id FROM post p
+        WHERE p.is_deleted = false
+        AND p.status = 2
+        AND p.visibility = 0
+        AND (
+            MATCH(p.title, p.summary, p.content) AGAINST(:keyword IN BOOLEAN MODE)
+            OR EXISTS (
+                SELECT 1 FROM post_tag pt
+                INNER JOIN tag t ON pt.tag_id = t.id
+                WHERE pt.post_id = p.id AND t.name = :exactKeyword
+            )
+        )
+        ORDER BY MATCH(p.title, p.summary, p.content) AGAINST(:keyword IN BOOLEAN MODE) DESC
+        """,
+        countQuery = """
+        SELECT COUNT(*) FROM (
+            SELECT p.id FROM post p
+            WHERE p.is_deleted = false
+            AND p.status = 2
+            AND p.visibility = 0
+            AND (
+                MATCH(p.title, p.summary, p.content) AGAINST(:keyword IN BOOLEAN MODE)
+                OR EXISTS (
+                    SELECT 1 FROM post_tag pt
+                    INNER JOIN tag t ON pt.tag_id = t.id
+                    WHERE pt.post_id = p.id AND t.name = :exactKeyword
+                )
+            )
+        ) AS cnt
+        """,
+        nativeQuery = true)
+    Page<Long> searchByFulltext(@Param("keyword") String keyword, @Param("exactKeyword") String exactKeyword, Pageable pageable);
 
+    @Query(value = """
+        SELECT p.id FROM post p
+        WHERE p.is_deleted = false
+        AND p.status = 2
+        AND p.visibility = 0
+        AND p.type = 0
+        ORDER BY (p.view_count * 1 + p.comment_count * 3 + p.like_count * 2) DESC
+        """,
+        countQuery = """
+        SELECT COUNT(p.id) FROM post p
+        WHERE p.is_deleted = false
+        AND p.status = 2
+        AND p.visibility = 0
+        AND p.type = 0
+        """,
+        nativeQuery = true)
+    Page<Long> findHotPostIds(Pageable pageable);
 }

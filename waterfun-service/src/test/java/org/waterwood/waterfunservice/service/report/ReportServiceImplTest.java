@@ -197,7 +197,7 @@ class ReportServiceImplTest {
             reportService.cancelReport(USER_UID, ticketId);
         }
 
-        assertEquals(TicketAuditStatus.CLOSED, ticket.getStatus());
+        assertEquals(TicketAuditStatus.RESOLVED, ticket.getStatus());
         verify(ticketRepository).save(ticket);
         verify(userReportRepository, never()).save(any());
     }

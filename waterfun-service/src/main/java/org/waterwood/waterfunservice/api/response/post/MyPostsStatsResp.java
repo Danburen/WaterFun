@@ -16,4 +16,5 @@ public class MyPostsStatsResp {
     private long pendingCount;
     private long rejectedCount;
     private long totalLikeCount;
+    private long followerCount;
 }

@@ -26,34 +26,41 @@ export interface UpdateUserProfileRequest {
     residence?: string;
 }
 
+export interface UserProfile {
+    bio: string | null;
+    gender: 'MALE' | 'FEMALE' | 'UNKNOWN' | 'OTHER' | null;
+    birthday: string | null;
+    residence: string | null;
+}
+
+export interface UserRole {
+    id: number;
+    role: { id: number; code: string; name: string };
+    expiresAt: ISOString | null;
+}
+
+export interface UserPermission {
+    id: number;
+    permission: { id: number; code: string; name: string };
+    expiresAt: ISOString | null;
+}
 
 export const getCurrentUserInfo = (): PromiseResBody<AdminUserInfoResponse> => {
-    return request.post<AdminUserInfoResponse>('/me/info');
+    return request.get<AdminUserInfoResponse>('/me/info');
+}
+
+export const getCurrentUserProfile = (): PromiseResBody<UserProfile> => {
+    return request.get<UserProfile>('/me/profile');
+}
+
+export const getCurrentUserRoles = (): PromiseResBody<UserRole[]> => {
+    return request.get<UserRole[]>('/me/roles');
+}
+
+export const getCurrentUserPermissions = (): PromiseResBody<UserPermission[]> => {
+    return request.get<UserPermission[]>('/me/permissions');
 }
 
 export const updateCurrentUserProfile = (data: UpdateUserProfileRequest): PromiseResBody<null> => {
     return request.put<null>('/me/updateProfile', data);
 }
-
-// ========== User-facing API endpoints (from openapi.json) ==========
-
-export const getUserInfo = (): PromiseResBody<AdminUserInfoResponse> => {
-    return request.get<AdminUserInfoResponse>('/user/userInfo');
-};
-
-export const getUserProfile = (): PromiseResBody<{
-    bio: string | null;
-    gender: 'MALE' | 'FEMALE' | 'UNKNOWN' | 'OTHER' | null;
-    birthday: string | null;
-    residence: string | null;
-}> => {
-    return request.get('/user/profile');
-};
-
-export const getUserPermissions = (): PromiseResBody<string[]> => {
-    return request.get<string[]>('/user/permissions');
-};
-
-export const getUserAvatar = (): PromiseResBody<AdminAvatarResponse> => {
-    return request.get<AdminAvatarResponse>('/user/avatar');
-};

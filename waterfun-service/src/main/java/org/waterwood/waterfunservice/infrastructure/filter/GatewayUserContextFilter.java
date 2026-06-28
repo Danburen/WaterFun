@@ -10,16 +10,24 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.waterwood.utils.StringUtil;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.AuthContext;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 2)
 public class GatewayUserContextFilter extends OncePerRequestFilter {
+
+    private final UserSettingRepository userSettingRepository;
+
+    public GatewayUserContextFilter(UserSettingRepository userSettingRepository) {
+        this.userSettingRepository = userSettingRepository;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -42,12 +50,16 @@ public class GatewayUserContextFilter extends OncePerRequestFilter {
         authCtx.setLocale(Locale.forLanguageTag(lang != null ? lang : "en"));
         authCtx.setDid(request.getHeader("X-User-Did"));
         authCtx.setClientIp((String) request.getAttribute("clientIp"));
-        // TODO: ADD PERMISSIONS INJECTION
+
+        // Load user settings once per request
+        userSettingRepository.findById(authCtx.getUserUid())
+                .ifPresent(authCtx::setUserSetting);
+
         UserCtxHolder.set(authCtx);
         try {
             filterChain.doFilter(request, response);
         } finally {
-            UserCtxHolder.remove();  // must clean to prevent MEMORY_LEAK
+            UserCtxHolder.remove();
         }
     }
 

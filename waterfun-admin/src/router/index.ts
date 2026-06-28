@@ -208,6 +208,15 @@ export const routes: RouteRecordRaw[] = [
                         component: () => import('@/views/Content/PostList.vue')
                     },
                     {
+                        path: 'post/editor',
+                        name: 'contentPostEditor',
+                        component: () => import('@/views/Content/PostEditor.vue'),
+                        meta: {
+                            locale: '编辑帖子',
+                            isDetail: true,
+                        }
+                    },
+                    {
                         path: 'post/:id',
                         name: 'contentPostDetail',
                         component: () => import('@/views/Content/PostDetail.vue'),

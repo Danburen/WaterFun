@@ -72,11 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> categories = categoryRepository.findAllByIsDeletedWithParentOrderByUsageCountDesc();
         return categories.stream()
                 .filter(c -> c.getIsActive() && !c.getIsDeleted())
-                .map(c -> OptionVO.<Long>builder()
-                        .id(c.getId())
-                        .name(c.getName())
-                        .code(c.getSlug())
-                        .build()
+                .map(c -> new OptionVO<>(c.getId(), c.getSlug(), c.getName(), false)
                 ).toList();
     }
 

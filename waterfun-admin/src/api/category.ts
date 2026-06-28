@@ -1,5 +1,5 @@
 import type { ISOString, OptionResItem, PromiseResBody } from "@waterfun/web-core/src/types/api/response";
-import type { Page } from "~/types/api";
+import type { Page, BatchResult } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type CategoryOptionVO = OptionResItem<number>;
@@ -9,10 +9,10 @@ export interface CategoryResp {
   name: string;
   slug?: string;
   description?: string;
-  parentId?: string;
+  parentId?: number | null;
   sortOrder?: number;
   isActive?: boolean;
-  creatorId?: string;
+  creatorId?: number | null;
   updateAt?: ISOString;
   createdAt?: ISOString;
 }
@@ -45,17 +45,7 @@ export interface CreateCategoryRequest {
 }
 
 export interface RemoveCategoriesRequest {
-  categoryIds: string[];
-}
-
-export interface BatchResult {
-  requested: number;
-  success: number;
-  ignored: number;
-  failed: number;
-  ignoredIds?: number[];
-  failedIds?: number[];
-  message?: string;
+  categoryIds: number[];
 }
 
 export const listCategories = (params: ListCategoryParams = {}): PromiseResBody<Page<CategoryResp>> => {

@@ -253,12 +253,17 @@
     "loginPrompt": "登录后即可参与讨论",
     "loginNow": "立即登录",
     "hotTopics": "热门话题",
+    "hotTags": "热门标签",
     "announcements": "社区公告",
     "friendLinks": "友情链接",
     "onlineCount": "当前在线",
     "todayNew": "今日新增",
     "todayPeak": "今日峰值",
-    "onlineStats": "社区动态"
+    "onlineStats": "社区动态",
+    "onlineUsers": "在线用户",
+    "postCount": "帖子",
+    "total": "总计",
+    "likeCount": "获赞"
   },
   "confirm": {
     "confirmReadLicences": "我已阅读悉知并同意",
@@ -271,7 +276,8 @@
     "no": "否",
     "search": "搜索",
     "select": "选择",
-    "more": "更多"
+    "more": "更多",
+    "shuffle": "换一批"
   },
   "general": {
     "loading": "加载中...",

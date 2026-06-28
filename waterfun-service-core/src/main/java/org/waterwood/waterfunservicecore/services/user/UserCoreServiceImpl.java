@@ -23,6 +23,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPermRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.InappropriateContentException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRoleRepo;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.entity.spec.UserPermSpec;
@@ -30,6 +31,7 @@ import org.waterwood.waterfunservicecore.entity.spec.UserSpec;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
 import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
+import org.waterwood.waterfunservicecore.services.content.TextFilterService;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -53,6 +55,7 @@ public class UserCoreServiceImpl implements UserCoreService {
     private final ResourceRepository resourceRepository;
     private final AuditLogCoreService auditLogCoreService;
     private final UserActivityLogService userActivityLogService;
+    private final TextFilterService textFilterService;
 
     @Override
     public Set<Permission> getUserPermissions(long userUid) {
@@ -134,6 +137,17 @@ public class UserCoreServiceImpl implements UserCoreService {
     @Override
     public String getUserAvatar(Long userUid) {
         return userRepository.getUserAvatarByUid(userUid);
+    }
+
+    @Override
+    public void updateNickname(long userUid, String nickname) {
+        User user = userRepository.findById(userUid)
+                .orElseThrow(() -> new NotFoundException("User not found: " + userUid));
+        if (textFilterService.containsSensitiveWords(nickname)) {
+            throw new InappropriateContentException();
+        }
+        user.setNickname(nickname);
+        userRepository.save(user);
     }
 
     @Override

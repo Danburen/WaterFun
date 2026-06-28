@@ -17,6 +17,7 @@ public class PostDraftResp {
     private String editedContent;
     private String editedSummary;
     private CloudResPresignedUrlResp coverageImgPresignedUrl;
+    private String editedCoverImg;
     private OptionVO<Long> editedCategoryId;
     private List<OptionVO<Long>> editedTagIds;
     private List<String> editedNewTagIds;

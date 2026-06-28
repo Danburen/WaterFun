@@ -9,23 +9,23 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.api.resp.user.UserPublicCardResp;
+import org.waterwood.waterfunservice.api.request.UpdateNicknameRequest;
 import org.waterwood.waterfunservice.api.response.UserPublicProfileResp;
+import org.waterwood.waterfunservice.api.response.UserSettingsResp;
 import org.waterwood.waterfunservice.service.user.UserService;
+import org.waterwood.waterfunservice.service.user.UserSettingsService;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
 import org.waterwood.waterfunservicecore.api.resp.user.UserProfileResponse;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.perm.Permission;
-import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserCoreMapper;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserProfileCoreMapper;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.user.UserProfileCoreService;
-import org.waterwood.waterfunservicecore.services.user.UserProfileCoreServiceImpl;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
 import java.util.Set;
@@ -38,35 +38,40 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserCoreService userCoreService;
-    private final UserProfileCoreServiceImpl userCoreProfileService;
+    private final UserProfileCoreService userProfileCoreService;
     private final UserCoreMapper userCoreMapper;
     private final UserProfileCoreMapper userProfileCoreMapper;
     private final UserService userService;
-    private final UserProfileCoreService userProfileCoreService;
-    private final UserRepository userRepository;
+    private final UserSettingsService userSettingsService;
 
     @Operation(summary = "Get current user info")
     @GetMapping("/userInfo")
     public ApiResponse<UserInfoResponse> getUserInfo(){
-        User user = userRepository.findById(UserCtxHolder.getUserUid())
-                .orElseThrow(() -> new UserNotFoundException(UserCtxHolder.getUserUid()));
+        User user = userCoreService.getUser(UserCtxHolder.getUserUid());
         UserInfoResponse res = userCoreMapper.toUserInfoResponse(user);
-        res.setAvatar(userCoreProfileService.getUserAvatar(user.getUid()));
+        res.setAvatar(userProfileCoreService.getUserAvatar(user.getUid()));
         res.setPasswordHash(user.getPasswordHash() != null);
         return ApiResponse.success(res);
+    }
+
+    @Operation(summary = "Update current user nickname")
+    @PutMapping("/userInfo")
+    public ApiResponse<Void> updateNickname(@RequestBody UpdateNicknameRequest body) {
+        userCoreService.updateNickname(UserCtxHolder.getUserUid(), body.getNickname());
+        return ApiResponse.success();
     }
 
     @Operation(summary = "Update current user profile")
     @PutMapping("/updateProfile")
     public ApiResponse<Void> updateProfile(@RequestBody @Valid UpdateUserProfileRequest body){
-        userCoreProfileService.updateProfileByDto(body);
+        userProfileCoreService.updateProfileByDto(body);
         return ApiResponse.success();
     }
 
     @Operation(summary = "Get current user profile")
     @GetMapping("/profile")
     public ApiResponse<UserProfileResponse> getProfile(){
-        UserProfile up = userCoreProfileService.getUserProfile(UserCtxHolder.getUserUid());
+        UserProfile up = userProfileCoreService.getUserProfile(UserCtxHolder.getUserUid());
         UserProfileResponse res = userProfileCoreMapper.toResponse(up);
         return ApiResponse.success(res);
     }
@@ -75,7 +80,7 @@ public class UserController {
     @GetMapping("/avatar")
     public ApiResponse<CloudResPresignedUrlResp> getAvatar(){
         return ApiResponse.success(
-                userCoreProfileService.getUserAvatar(UserCtxHolder.getUserUid())
+                userProfileCoreService.getUserAvatar(UserCtxHolder.getUserUid())
         );
     }
 
@@ -87,6 +92,15 @@ public class UserController {
                 .stream().map(Permission::getCode)
                 .collect(Collectors.toSet());
         return ApiResponse.success(permCodes);
+    }
+
+    @Operation(summary = "Get user liked post IDs")
+    @RequestMapping("/{uid}/likes")
+    public ApiResponse<Page<Long>> getLikedPosts(@PathVariable long uid,
+                                                  @RequestParam(defaultValue = "1") int page,
+                                                  @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        return ApiResponse.success(userService.getLikedPostIds(uid, pageable));
     }
 
     @Operation(summary = "Get user public profile")
@@ -139,6 +153,19 @@ public class UserController {
     @RequestMapping("/{uid}/follow")
     public ApiResponse<Void> follow(@PathVariable long uid) {
         userService.follow(uid);
+        return ApiResponse.success();
+    }
+
+    @Operation(summary = "Get current user settings (privacy + notification)")
+    @GetMapping("/settings")
+    public ApiResponse<UserSettingsResp> getSettings() {
+        return ApiResponse.success(userSettingsService.getSettings(UserCtxHolder.getUserUid()));
+    }
+
+    @Operation(summary = "Update current user settings")
+    @PutMapping("/settings")
+    public ApiResponse<Void> updateSettings(@RequestBody @Valid UserSettingsResp body) {
+        userSettingsService.updateSettings(UserCtxHolder.getUserUid(), body);
         return ApiResponse.success();
     }
 }

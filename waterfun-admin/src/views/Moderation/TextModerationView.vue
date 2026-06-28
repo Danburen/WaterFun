@@ -102,6 +102,9 @@ const riskLevelClass = (r?: string): string =>
 const statusLabel = (s?: string): string =>
   ({ PENDING: "待审核", APPROVED: "已通过", REJECTED: "已驳回", SUSPECT: "可疑" })[s || ""] || s || "未知";
 
+const statusTagClass = (s?: string): string =>
+  ({ PENDING: "status-pending", APPROVED: "status-passed", REJECTED: "status-rejected", SUSPECT: "status-suspect" })[s || ""] || "status-pending";
+
 const priorityLabel = (p?: string): string =>
   ({ EMERGENCY: "紧急", HIGH: "高", MEDIUM: "中", LOW: "低" })[p || ""] || p || "-";
 
@@ -144,7 +147,9 @@ onMounted(async () => {
           </div>
           <div class="review-status-bar">
             <span v-if="task.priority" :class="['author-risk', priorityClass(task.priority)]">{{ priorityLabel(task.priority) }}</span>
-            <span class="status-chip status-pending"><i class="fa-solid fa-hourglass-half"></i> 待审核</span>
+            <span :class="['status-chip', statusTagClass(task.status)]">
+              <i class="fa-solid" :class="task.status === 'APPROVED' ? 'fa-check-circle' : task.status === 'REJECTED' ? 'fa-times-circle' : 'fa-hourglass-half'"></i> {{ statusLabel(task.status) }}
+            </span>
           </div>
         </div>
 
@@ -196,7 +201,7 @@ onMounted(async () => {
                   </div>
                 </div>
                 <div class="source-item" v-if="task.payload?.format">
-                  <div class="source-icon" style="background: var(--warning-light); color: #b45309;"><i class="fa-solid fa-format"></i></div>
+                  <div class="source-icon" style="background: var(--warning-light); color: #b45309;"><i class="fa-solid fa-align-left"></i></div>
                   <div class="source-info">
                     <div class="source-name">{{ task.payload.format }}</div>
                     <div class="source-meta">文本格式</div>
@@ -287,6 +292,8 @@ onMounted(async () => {
 .review-status-bar { display: flex; align-items: center; gap: 8px; }
 .status-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
 .status-pending { background: var(--warning-light); color: #b45309; }
+.status-passed { background: var(--success-light); color: #15803d; }
+.status-rejected { background: var(--danger-light); color: #dc2626; }
 
 .review-body { padding: 24px; }
 .author-info {

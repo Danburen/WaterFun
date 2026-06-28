@@ -85,4 +85,11 @@ public interface UserCoreService {
      */
     boolean isUserAdmin(Long userUid);
 
+    /**
+     * Update user nickname
+     * @param userUid target user uid
+     * @param nickname new nickname
+     */
+    void updateNickname(long userUid, String nickname);
+
 }

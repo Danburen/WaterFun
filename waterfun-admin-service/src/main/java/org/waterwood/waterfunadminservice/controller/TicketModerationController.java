@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunadminservice.api.request.ticket.TicketReviewRequest;
 import org.waterwood.waterfunadminservice.api.response.ticket.TicketResponse;
+import org.waterwood.waterfunadminservice.api.response.ticket.TicketStatsResponse;
 import org.waterwood.waterfunadminservice.service.ticket.TicketModerationService;
 import org.waterwood.waterfunservicecore.entity.ticket.TicketAuditStatus;
 import org.waterwood.waterfunservicecore.entity.ticket.TicketType;
@@ -41,11 +42,31 @@ public class TicketModerationController {
         );
     }
 
+    @GetMapping("/stats")
+    public ApiResponse<TicketStatsResponse> getTicketStats() {
+        return ApiResponse.success(
+                ticketModerationService.getTicketStats()
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<TicketResponse> getTicketDetail(@PathVariable Long id) {
+        return ApiResponse.success(
+                ticketModerationService.getTicketDetail(id)
+        );
+    }
+
     @PostMapping("/{id}/review")
     public ApiResponse<Void> reviewTicket(
             @PathVariable Long id,
             @Valid @RequestBody TicketReviewRequest request) {
         ticketModerationService.reviewTicket(id, request);
+        return ApiResponse.success();
+    }
+
+    @PostMapping("/{id}/restore")
+    public ApiResponse<Void> restoreTicket(@PathVariable Long id) {
+        ticketModerationService.restoreTicket(id);
         return ApiResponse.success();
     }
 }

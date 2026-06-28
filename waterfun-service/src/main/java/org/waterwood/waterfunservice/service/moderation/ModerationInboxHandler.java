@@ -19,6 +19,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.notification
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPreferenceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,9 +39,14 @@ public class ModerationInboxHandler {
     private final InboxSystemMapper inboxSystemMapper;
     private final UserCounterRepository userCounterRepository;
     private final UserPreferenceRepository userPreferenceRepository;
+    private final UserSettingRepository userSettingRepository;
 
     @Transactional
     public void handleModeration(ModerationConsumerMessage msg, Long targetUserUid, Object... args) {
+        if (!isEventNotificationAllowed(targetUserUid)) {
+            log.debug("User {} has event notifications disabled, skipping moderation notification", targetUserUid);
+            return;
+        }
         Inbox is = buildInbox(msg, targetUserUid, args);
         inboxRepository.save(is);
         pushInboxToUser(targetUserUid, is);
@@ -63,7 +69,11 @@ public class ModerationInboxHandler {
     @Transactional
     public void handleBatch(List<ModerationConsumerMessage> msgs, Object... args) {
         if (msgs.isEmpty()) return;
-        List<Inbox> inboxes = msgs.stream()
+        List<ModerationConsumerMessage> allowedMsgs = msgs.stream()
+                .filter(msg -> isEventNotificationAllowed(Long.parseLong(msg.getTargetId())))
+                .toList();
+        if (allowedMsgs.isEmpty()) return;
+        List<Inbox> inboxes = allowedMsgs.stream()
                 .map(msg ->
                         buildInbox(msg, Long.parseLong(msg.getTargetId()), args)
                 ).toList();
@@ -71,6 +81,12 @@ public class ModerationInboxHandler {
         inboxes.forEach(inbox ->
                 pushInboxToUser(inbox.getUser().getUid(), inbox)
         );
+    }
+
+    private boolean isEventNotificationAllowed(Long userUid) {
+        return userSettingRepository.findById(userUid)
+                .map(s -> Boolean.TRUE.equals(s.getEventNotifications()))
+                .orElse(true);
     }
     private void pushInboxToUser(Long recipient, Inbox inbox) {
         try {
