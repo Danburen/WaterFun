@@ -3,6 +3,7 @@ package org.waterwood.waterfunservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.waterfunservice.api.response.InboxNotificationRes;
 import org.waterwood.waterfunservice.infrastructure.dto.InboxPayload;
@@ -68,6 +69,7 @@ public class NotificationServiceImpl implements NotificationService {
         return inboxRepository.countByIsReadAndUserUidAndIsDeleted(Boolean.FALSE, UserCtxHolder.getUserUid(), false);
     }
 
+    @Transactional
     @Override
     public void markInboxRead(Long id) {
         Inbox is = inboxRepository.findById(id).orElseThrow(
@@ -81,11 +83,13 @@ public class NotificationServiceImpl implements NotificationService {
         inboxRepository.save(is);
     }
 
+    @Transactional
     @Override
     public void markSystemNotificationAllRead() {
         inboxRepository.markAllReadByUserUid(UserCtxHolder.getUserUid(), Instant.now());
     }
 
+    @Transactional
     @Override
     public BatchResult batchMarkSystemNotificationRead(BatchMarkReadReq req) {
         int marked = 0;
@@ -225,6 +229,7 @@ public class NotificationServiceImpl implements NotificationService {
         handleSingleNewInbox(recipient, NoticeType.NEW_FOLLOWER, BusinessType.NONE, followerUid, "New Follower", payload);
     }
 
+    @Transactional
     @Override
     public void deleteInbox(Long id) {
         Inbox inbox = inboxRepository.findById(id).orElseThrow(
@@ -234,6 +239,7 @@ public class NotificationServiceImpl implements NotificationService {
             throw new ForbiddenException();
         }
         inbox.setIsDeleted(Boolean.TRUE);
+        inboxRepository.save(inbox);
     }
 
     private void handleSingleNewInbox(Long recipient, NoticeType noticeType, BusinessType type,

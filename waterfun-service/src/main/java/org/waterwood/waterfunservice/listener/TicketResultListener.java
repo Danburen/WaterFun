@@ -12,7 +12,7 @@ import org.waterwood.waterfunservicecore.api.message.TicketMessage;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@RabbitListener(queues = RabbitConstants.QUEUE_TICKET_NOTIFICATION)
+@RabbitListener(queues = RabbitConstants.QUEUE_TICKET_NOTIFICATION, containerFactory = "rabbitListenerContainerFactory")
 public class TicketResultListener {
 
     private final TicketResultHandler ticketResultHandler;

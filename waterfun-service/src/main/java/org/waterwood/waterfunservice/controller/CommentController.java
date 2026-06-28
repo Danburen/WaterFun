@@ -28,7 +28,7 @@ public class CommentController {
     private final ContentAuditService contentAuditService;
 
     @Operation(summary = "List root comments of a post with cursor pagination")
-    @RequestMapping("/list")
+    @GetMapping("/list")
     public ApiResponse<CursorPage<CommentResponse, String>> listPostComments(
             @RequestParam Long postId,
             @RequestParam(required = false) String cursor,

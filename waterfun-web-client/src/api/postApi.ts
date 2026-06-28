@@ -263,11 +263,11 @@ export const getHotTags = (params: { page?: number; size?: number; sort?: string
   return request.get('/post/tags/hot', { params })
 }
 
-export const publishNewPost = (data: PostSaveReq): PromiseResBody<void> => {
+export const publishNewPost = (data: PostSaveReq): PromiseResBody<number> => {
   return request.post('/posts/publish', data)
 }
 
-export const tempSaveNewPost = (data: PostSaveReq): PromiseResBody<void> => {
+export const tempSaveNewPost = (data: PostSaveReq): PromiseResBody<number> => {
   return request.post('/posts/temp-save', data)
 }
 

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunservice.service.NotificationService;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.api.resp.user.UserPublicCardResp;
@@ -104,6 +105,7 @@ public class UserServiceImpl implements UserService{
         return new PageImpl<>(userBriefService.listUseBriefs(ids), pageable, idPage.getTotalElements());
     }
 
+    @Transactional
     @Override
     public void follow(long targetUid) {
         Long userUid = UserCtxHolder.getUserUid();

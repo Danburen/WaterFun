@@ -57,8 +57,6 @@ public class LoginServiceImpl implements LoginService {
                 throw new AuthException(AuthCode.CAPTCHA_INVALID);
             if(! encoder.matches(body.getPassword(), uu.getPasswordHash()))
                 throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
-            if(uu.getPasswordHash() == null)
-                throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
             return uu;
         }).orElseThrow(() -> new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
         siteStatisticRecorder.recordLogin();

@@ -81,6 +81,7 @@ public class TagServiceImpl implements TagService {
                         .id(t.getId())
                         .code(t.getSlug())
                         .name(t.getName())
+                        .usageCount(t.getUsageCount())
                         .build()).toList();
     }
 
@@ -92,6 +93,7 @@ public class TagServiceImpl implements TagService {
                         .id(t.getId())
                         .code(t.getSlug())
                         .name(t.getName())
+                        .usageCount(t.getUsageCount())
                         .build())
                 .toList();
     }

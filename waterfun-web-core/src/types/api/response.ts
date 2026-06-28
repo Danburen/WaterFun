@@ -38,7 +38,7 @@ interface ApiRes extends AxiosInstance {
 
 export interface CloudResourceUrlResp {
     url: string;
-    expireAt: number;
+    expireAt: string;
 }
 
 export type ISOString = string | null;

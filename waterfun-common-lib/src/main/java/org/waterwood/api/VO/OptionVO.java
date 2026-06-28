@@ -1,5 +1,6 @@
 package org.waterwood.api.VO;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import java.time.Instant;
 
 @Data
 @NoArgsConstructor
+@Builder
 public class OptionVO<ID extends Serializable> {
     private ID id;
     private String code;

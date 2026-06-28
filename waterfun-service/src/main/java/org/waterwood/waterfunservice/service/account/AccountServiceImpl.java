@@ -51,6 +51,7 @@ public class AccountServiceImpl implements AccountService {
     private String emailVerifyUrl;
     @Value("${expire.email.verify}")
     private Long expireDuration;
+    @Transactional
     @Override
     public void changePwd(String verifyCodeKey, ResetPasswordDto dto) {
         long userUid = UserCtxHolder.getUserUid();
@@ -70,6 +71,7 @@ public class AccountServiceImpl implements AccountService {
         userCoreService.changePwd(userUid, dto.getNewPwd());
     }
 
+    @Transactional
     @Override
     public void setPassword(String verifyCodeKey, SetPasswordDto dto) {
         long userUid = UserCtxHolder.getUserUid();

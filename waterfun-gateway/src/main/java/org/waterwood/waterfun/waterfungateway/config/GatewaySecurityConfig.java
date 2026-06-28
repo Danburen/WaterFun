@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,7 +57,18 @@ public class GatewaySecurityConfig {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/api/auth/**").permitAll()
                         .pathMatchers("/api/admin/auth/**").permitAll()
-                        .pathMatchers("/api/posts/list", "/api/posts/list/detail", "/api/banners").permitAll()
+                        // Private GET (must precede public wildcards)
+                        .pathMatchers(HttpMethod.GET, "/api/posts/me/**").authenticated()
+                        .pathMatchers(HttpMethod.GET, "/api/post/tags/me").authenticated()
+                        // Public GET read-only
+                        .pathMatchers(HttpMethod.GET, "/api/posts/*", "/api/posts/hot").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/banners", "/api/banners/by-position").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/announcements").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/post/category/options").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/post/tags/hot", "/api/post/tags/search/**", "/api/post/tags/*").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/user/*/profile", "/api/user/*/card", "/api/user/*/avatar").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/user/*/followers", "/api/user/*/followings").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/resource/legal/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .build();

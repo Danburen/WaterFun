@@ -95,7 +95,7 @@ public class UserController {
     }
 
     @Operation(summary = "Get user liked post IDs")
-    @RequestMapping("/{uid}/likes")
+    @GetMapping("/{uid}/likes")
     public ApiResponse<Page<Long>> getLikedPosts(@PathVariable long uid,
                                                   @RequestParam(defaultValue = "1") int page,
                                                   @RequestParam(defaultValue = "20") int size) {
@@ -104,7 +104,7 @@ public class UserController {
     }
 
     @Operation(summary = "Get user public profile")
-    @RequestMapping("/{uid}/profile")
+    @GetMapping("/{uid}/profile")
     public ApiResponse<UserPublicProfileResp> getUserProfile(@PathVariable long uid) {
         return ApiResponse.success(
                 userService.getPublicUserProfile(uid)
@@ -112,14 +112,14 @@ public class UserController {
     }
 
     @Operation(summary = "Get user public card")
-    @RequestMapping("/{uid}/card")
+    @GetMapping("/{uid}/card")
     public ApiResponse<UserPublicCardResp> getUserCard(@PathVariable long uid) {
         return ApiResponse.success(
                 userService.getPublicUserCard(uid)
         );
     }
     @Operation(summary = "Get the followers list of a user")
-    @RequestMapping("/{uid}/followers")
+    @GetMapping("/{uid}/followers")
     public ApiResponse<Page<UserBrief>> getFollower(@PathVariable long uid,
                                                              @RequestParam(defaultValue = "1") int page,
                                                              @RequestParam(defaultValue = "20") int size) {
@@ -130,7 +130,7 @@ public class UserController {
     }
 
     @Operation(summary = "Get the following list of a user")
-    @RequestMapping("/{uid}/followings")
+    @GetMapping("/{uid}/followings")
     public ApiResponse<Page<UserBrief>> getFollowing(@PathVariable long uid,
                                                      @RequestParam(defaultValue = "1") int page,
                                                      @RequestParam(defaultValue = "20") int size){
@@ -141,7 +141,7 @@ public class UserController {
     }
 
     @Operation(summary = "Get a user avatar")
-    @RequestMapping("/{uid}/avatar")
+    @GetMapping("/{uid}/avatar")
     public ApiResponse<CloudResPresignedUrlResp> getUserAvatar(@PathVariable long uid) {
         return ApiResponse.success(
                 userProfileCoreService.getUserAvatar(uid)
@@ -150,7 +150,7 @@ public class UserController {
 
     @Operation(summary = "Follow/ unFollower a user",
             description = "Follow a user if not followed, otherwise unFollow the user")
-    @RequestMapping("/{uid}/follow")
+    @PostMapping("/{uid}/follow")
     public ApiResponse<Void> follow(@PathVariable long uid) {
         userService.follow(uid);
         return ApiResponse.success();

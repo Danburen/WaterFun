@@ -89,6 +89,10 @@ public class CommentServiceImpl implements CommentService {
                 }
             });
         }
+        if (textFilterService.containsSensitiveWords(req.getContent())) {
+            throw new InappropriateContentException();
+        }
+
         comment.setPost(postRepository.getReferenceById(postId));
 
         if(req.getParentId() != null){
@@ -104,10 +108,6 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.increaseReplyCountById(req.getParentId());
         }
         postRepository.increaseCommentCountById(postId, 1);
-
-        if (textFilterService.containsSensitiveWords(req.getContent())) {
-            throw new InappropriateContentException();
-        }
 
         comment.setAuthor(userRepository.getReferenceById(currentUid));
         comment.setContent(req.getContent());
@@ -145,7 +145,6 @@ public class CommentServiceImpl implements CommentService {
     public void delete(Long id) {
         Comment comment = commentRepository.findByIdAndStatus(id, CommentStatus.NORMAL)
                 .orElseThrow(CommentNotFoundException::new);
-        if(comment.isDeleted()) throw new CommentAlreadyDeletedOrNotFoundException();
 
         int deletedReplies = 0;
         if (comment.getReplyCount() > 0) {

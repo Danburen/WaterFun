@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@RabbitListener(queues = RabbitConstants.QUEUE_MODERATION_NOTIFICATION)
+@RabbitListener(queues = RabbitConstants.QUEUE_MODERATION_NOTIFICATION, containerFactory = "rabbitListenerContainerFactory")
 public class AuditModerationListener {
 
     private final ModerationCallbackStrategyFactory moderationCallbackStrategyFactory;

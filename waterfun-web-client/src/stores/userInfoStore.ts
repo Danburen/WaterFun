@@ -20,7 +20,7 @@ export const useUserInfoStore = defineStore('userInfoStore', () => {
     nickname: '',
     avatar: {
         url: '',
-        expireAt: 0,
+        expireAt: '',
     },
     accountStatus: '',
     createdAt: '',
@@ -32,7 +32,7 @@ export const useUserInfoStore = defineStore('userInfoStore', () => {
   };
 
   const clearUserInfo = () => {
-    userInfo.value = { username: '', uid: '', nickname: '', avatar: { url: '', expireAt: 0 }, accountStatus: '', createdAt: '', passwordHash: false };
+    userInfo.value = { username: '', uid: '', nickname: '', avatar: { url: '', expireAt: '' }, accountStatus: '', createdAt: '', passwordHash: false };
   };
 
   const fetchAndUpdateUserInfo = async() =>{

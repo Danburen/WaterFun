@@ -389,8 +389,10 @@ public class PostServiceImpl implements PostService {
         // Auto-generate summary from content if still blank
         resp.setSummary(StringUtil.fallbackSummary(resp.getSummary(), post.getContent(), 200));
 
-        resp.setIsLiked(userLikeRepository.existsById(new UserLikeId(currentUid, post.getId())));
-        resp.setIsCollected(userCollectRepository.existsById(new UserCollectId(currentUid, post.getId())));
+        if (currentUid != null) {
+            resp.setIsLiked(userLikeRepository.existsById(new UserLikeId(currentUid, post.getId())));
+            resp.setIsCollected(userCollectRepository.existsById(new UserCollectId(currentUid, post.getId())));
+        }
         if (post.getAuthor() != null) {
             resp.setUserBrief(userBriefService.getUserBrief(post.getAuthor().getUid()));
         }
@@ -477,7 +479,6 @@ public class PostServiceImpl implements PostService {
         p.setTitle("");
         p.setEditedContent("");
         p.setAuthor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
-        siteStatisticRecorder.recordNewPost();
         return postRepository.save(p);
     }
 
@@ -507,6 +508,7 @@ public class PostServiceImpl implements PostService {
             p.setEditStatus(PostEditStatus.PENDING);
         } else {
             p.setStatus(PostStatus.PENDING);
+            siteStatisticRecorder.recordNewPost();
         }
         postRepository.save(p);
         // Collect all the resource include content image and coverage
