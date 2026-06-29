@@ -5,12 +5,12 @@ import request from "~/utils/axiosRequest";
 export type TagOptionVO = OptionResItem<number>;
 
 export interface TagResp {
-  id: number;
+  id: string;
   name: string;
   slug?: string;
   description?: string;
-  usageCount?: number;
-  creatorId?: number;
+  usageCount?: string;
+  creatorId?: string;
   createdAt?: ISOString;
   updateAt?: ISOString;
 }

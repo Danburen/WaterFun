@@ -8,6 +8,10 @@ spring:
   web:
     locale: zh_CN
     locale-resolver: accept_header
+  data:
+    redis:
+      repositories:
+        enabled: false
   cache:
     type: redis
     redis:

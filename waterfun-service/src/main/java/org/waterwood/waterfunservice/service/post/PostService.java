@@ -11,6 +11,7 @@ import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
+import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 
 import java.util.List;
@@ -178,4 +179,11 @@ public interface PostService {
      * @param postId target post id
      */
     void ensurePostReportable(Long postId);
+
+    /**
+     * Get users who liked a post.
+     * @param postId target post id
+     * @return list of user briefs
+     */
+    List<UserBrief> getLikedUsers(Long postId);
 }

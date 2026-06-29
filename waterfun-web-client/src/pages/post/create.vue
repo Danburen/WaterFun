@@ -27,8 +27,6 @@ const form = reactive({
   coverageImgId: '' as string
 })
 
-const toBigInt = (v: string) => BigInt(v)
-
 const submitting = ref(false)
 const isEdit = ref(false)
 const postId = ref<string | null>(null)
@@ -315,8 +313,8 @@ const buildSaveReq = (): PostSaveReq => ({
   summary: form.summary || undefined,
   coverageImgId: form.coverageImgId || undefined,
   newTags: form.newTags.length ? form.newTags : undefined,
-  tagIds: form.tagIds.length ? form.tagIds.map(toBigInt) : undefined,
-  categoryId: BigInt(form.categoryId!)
+  tagIds: form.tagIds.length ? form.tagIds : undefined,
+  categoryId: form.categoryId!
 })
 
 const handlePublish = async () => {

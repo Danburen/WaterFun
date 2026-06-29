@@ -3,7 +3,7 @@ import request from "~/utils/axiosRequest";
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-export type AdminUploadBizType = 'BANNER_IMAGE';
+export type AdminUploadBizType = 'BANNER_IMAGE' | 'POST_COVERAGE_IMAGE' | 'POST_CONTENT_IMAGE';
 
 export interface UploadPolicyReq {
   bizType: AdminUploadBizType;

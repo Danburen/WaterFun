@@ -114,13 +114,13 @@ export const sendAuthenticationCode = async (sendCodeData: SecuritySendCodeType)
 }
 
 export const logout = async (deviceFp: string): PromiseResBody<void> => {
-    return request.post('/user/security/logout', deviceFp)
+    return request.post('/user/security/logout', { deviceFp })
 }
 
 export const getCsrfToken = (): PromiseResBody<void> => {
     return request.get('/auth/csrf-token');
 }
 
-export const refreshAccessToken = (deviceFp?: string): PromiseResBody<AccessTokenResponse> => {
+export const refreshAccessToken = (deviceFp: string): PromiseResBody<AccessTokenResponse> => {
     return request.post('/auth/refresh', null, { params: { deviceFp } });
 }

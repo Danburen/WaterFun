@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -97,9 +98,9 @@ public class UserController {
     @Operation(summary = "Get user liked post IDs")
     @GetMapping("/{uid}/likes")
     public ApiResponse<Page<Long>> getLikedPosts(@PathVariable long uid,
-                                                  @RequestParam(defaultValue = "1") int page,
-                                                  @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
+                                                   @RequestParam(defaultValue = "1") int page,
+                                                   @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(size, 20));
         return ApiResponse.success(userService.getLikedPostIds(uid, pageable));
     }
 
@@ -123,7 +124,7 @@ public class UserController {
     public ApiResponse<Page<UserBrief>> getFollower(@PathVariable long uid,
                                                              @RequestParam(defaultValue = "1") int page,
                                                              @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(size, 20));
         return ApiResponse.success(
                 userService.listUserFollowers(uid, pageable)
         );
@@ -132,9 +133,9 @@ public class UserController {
     @Operation(summary = "Get the following list of a user")
     @GetMapping("/{uid}/followings")
     public ApiResponse<Page<UserBrief>> getFollowing(@PathVariable long uid,
-                                                     @RequestParam(defaultValue = "1") int page,
-                                                     @RequestParam(defaultValue = "20") int size){
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
+                                                      @RequestParam(defaultValue = "1") int page,
+                                                      @RequestParam(defaultValue = "20") int size){
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(size, 20));
         return ApiResponse.success(
                 userService.listUserFollowing(uid, pageable)
         );

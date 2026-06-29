@@ -4,13 +4,16 @@ import type { UserBrief } from "~/api/dashboard";
 import request from "~/utils/axiosRequest";
 
 export type TargetType =
-  | "UNKNOWN"
+  | "DEFAULT"
   | "USER_AVATAR"
   | "POST"
   | "POST_COVERAGE_IMAGE"
   | "POST_CONTENT_IMAGE"
   | "BANNER_IMAGE"
-  | "POST_CONTENT";
+  | "COMMENT"
+  | "USER_REPORT_ATTACHMENT"
+  | "MODERATION_IMAGE"
+  | "USER";
 
 export type ModerateRejectType =
   | "VIOLATION_OF_GUIDELINES"

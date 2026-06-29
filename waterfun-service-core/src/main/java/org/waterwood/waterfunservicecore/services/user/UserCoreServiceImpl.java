@@ -135,11 +135,6 @@ public class UserCoreServiceImpl implements UserCoreService {
     }
 
     @Override
-    public String getUserAvatar(Long userUid) {
-        return userRepository.getUserAvatarByUid(userUid);
-    }
-
-    @Override
     public void updateNickname(long userUid, String nickname) {
         User user = userRepository.findById(userUid)
                 .orElseThrow(() -> new NotFoundException("User not found: " + userUid));

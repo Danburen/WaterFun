@@ -9,8 +9,8 @@
         @click="emit('tab-change', item.key)"
       >
         <span>{{ item.label }}</span>
-        <el-tag v-if="item.key === 'system' && unreadCount > 0" size="small" type="danger" round class="badge">
-          {{ unreadCount > 99 ? '99+' : unreadCount }}
+        <el-tag v-if="item.count > 0" size="small" type="danger" round class="badge">
+          {{ item.count > 99 ? '99+' : item.count }}
         </el-tag>
       </li>
     </ul>
@@ -34,15 +34,16 @@ const emit = defineEmits<{
 
 const notificationStore = useNotificationStore()
 const unreadCount = computed(() => notificationStore.unreadCount)
+const tabCount = (key: string) => notificationStore.tabUnreadCounts[key] || 0
 const { t } = useI18n()
 
 void props;
 
-const menuItems = computed<{ key: MessageTabType; label: string }[]>(() => [
-  { key: "system", label: t('notification.system') },
-  { key: "subscribe", label: t('notification.subscribe') },
-  { key: "reply", label: t('notification.reply') },
-  { key: "mention", label: t('notification.mention') },
+const menuItems = computed<{ key: MessageTabType; label: string; count: number }[]>(() => [
+  { key: "system", label: t('notification.system'), count: tabCount('system') },
+  { key: "subscribe", label: t('notification.subscribe'), count: tabCount('subscribe') },
+  { key: "reply", label: t('notification.reply'), count: tabCount('reply') },
+  { key: "mention", label: t('notification.mention'), count: tabCount('mention') },
 ]);
 
 onMounted(() => {

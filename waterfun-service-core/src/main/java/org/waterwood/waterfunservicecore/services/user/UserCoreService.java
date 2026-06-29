@@ -74,13 +74,6 @@ public interface UserCoreService {
     int updateAvatarResourceUuid(Long userUid, String uuid);
 
     /**
-     * Return target user ofUser
-     * @param userUid target user uid
-     * @return string of ofUser null if user's ofUser or user is not exists.
-     */
-    String getUserAvatar(Long userUid);
-
-    /**
      * Whether a user is admin
      */
     boolean isUserAdmin(Long userUid);

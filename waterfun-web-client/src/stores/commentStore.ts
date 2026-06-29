@@ -8,7 +8,7 @@ interface CommentState {
   hasNext: boolean
   loading: boolean
   replies: Record<string, CommentResponse[]>
-  replyCursors: Record<string, number | null>
+  replyCursors: Record<string, string | null>
   replyHasNext: Record<string, boolean>
 }
 
@@ -24,7 +24,7 @@ export const useCommentStore = defineStore('comment', {
   }),
 
   actions: {
-    async fetchComments(postId: number | bigint, reset = false): Promise<void> {
+    async fetchComments(postId: string, reset = false): Promise<void> {
       if (this.loading) return
       if (!this.hasNext && !reset) return
 
@@ -49,8 +49,8 @@ export const useCommentStore = defineStore('comment', {
       }
     },
 
-    async fetchReplies(rootId: number | bigint, reset = false): Promise<void> {
-      const key = String(rootId)
+    async fetchReplies(rootId: string, reset = false): Promise<void> {
+      const key = rootId
       if (this.replyCursors[key] === null && !reset) return
 
       try {
@@ -58,7 +58,7 @@ export const useCommentStore = defineStore('comment', {
           cursor: reset ? undefined : this.replyCursors[key] ?? undefined,
           limit: 10,
         })
-        const page = res.data as unknown as CursorPageComment<CommentResponse>
+        const page = res.data as unknown as CursorPageComment<CommentResponse, string>
         const list = page?.list || []
 
         this.replies[key] = reset ? list : [...(this.replies[key] || []), ...list]

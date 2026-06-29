@@ -73,7 +73,7 @@ const batchDelete = async () => {
     await ElMessageBox.confirm(`确定要删除选中的 ${selectedIds.value.size} 个帖子吗？此操作不可恢复。`, '确认删除', {
       confirmButtonText: '删除', cancelButtonText: '取消', type: 'warning'
     })
-    await postStore.batchDeletePosts(Array.from(selectedIds.value).map(id => BigInt(id)))
+    await postStore.batchDeletePosts(Array.from(selectedIds.value))
     ElMessage.success(`已删除 ${selectedIds.value.size} 个帖子`)
     selectedIds.value = new Set()
     loadMyPosts(myPagination.value.number + 1)
@@ -90,10 +90,10 @@ const publishPostById = async (id: string) => {
   await postStore.publishPost(id, {
     title: data.title || '',
     content: data.content || '',
-    categoryId: BigInt(data.category?.id || 0),
+    categoryId: data.category?.id || undefined,
     subtitle: data.subtitle,
     summary: data.summary,
-    tagIds: draft?.editedTagIds?.length ? draft.editedTagIds.map(t => BigInt(t.id)) : undefined,
+    tagIds: draft?.editedTagIds?.length ? draft.editedTagIds.map(t => t.id) : undefined,
     newTags: draft?.editedNewTagIds?.length ? [...draft.editedNewTagIds] : undefined,
   })
 }
@@ -108,7 +108,7 @@ const publishSingleDraft = async (id: string) => {
 }
 
 const batchPublish = async () => {
-  const draftIds = myPosts.value.filter(p => p.status === 'DRAFT' && selectedIds.value.has(p.id)).map(p => BigInt(p.id))
+  const draftIds = myPosts.value.filter(p => p.status === 'DRAFT' && selectedIds.value.has(p.id)).map(p => p.id)
   if (!draftIds.length) {
     ElMessage.warning('请选择草稿状态的帖子')
     return

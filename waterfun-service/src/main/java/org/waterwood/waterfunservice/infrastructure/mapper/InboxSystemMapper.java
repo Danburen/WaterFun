@@ -27,34 +27,35 @@ public interface InboxSystemMapper {
 
     default NotificationContent mapContent(NoticeType noticeType, Map<String, Object> content) {
         if (content == null) return null;
-        switch (noticeType) {
-            case REPLY: {
+        return switch (noticeType) {
+            case REPLY -> {
                 List<Long> uids = safeLongList(content.get("userUids"));
                 Long replierUid = uids.isEmpty() ? null : uids.getFirst();
                 Object rc = content.get("replyContent");
-                return new ReplyContentDTO(
+                yield new ReplyContentDTO(
                         replierUid,
                         rc instanceof String ? (String) rc : "",
-                        safeString(content.get("nativeUrl"))
+                        safeString(content.get("nativeUrl")),
+                        null
                 );
             }
-            case LIKE:
-            case COLLECT:
-                return new LikeContentDTO(
+            case LIKE, COLLECT -> {
+                yield new LikeContentDTO(
                         safeLongList(content.get("userUids")),
-                        safeLong(content.get("imageUuid")),
-                        safeString(content.get("nativeUrl"))
+                        safeString(content.get("nativeUrl")),
+                        null
                 );
-            case NEW_FOLLOWER:
-                return new FollowerContentDTO(
-                        safeLong(content.get("followerUid")),
-                        safeString(content.get("nativeUrl"))
-                );
-            default:
-                return new SystemContentDTO(
-                        safeString(content.get("text"))
-                );
-        }
+            }
+            case NEW_FOLLOWER -> {
+                Long followerUid = safeLong(content.get("followerUid"));
+                String nativeText = safeString(content.get("nativeUrl"));
+                yield new FollowerContentDTO(followerUid, nativeText);
+            }
+            default -> {
+                String text = safeString(content.get("text"));
+                yield new SystemContentDTO(text);
+            }
+        };
     }
 
     default Long safeLong(Object value) {

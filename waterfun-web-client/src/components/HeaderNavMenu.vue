@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 //@ts-ignore
 import { Bell, Message, Search } from '@element-plus/icons-vue'
 import { useAuth } from "~/composables/useAuth"
 import { useUserInfoStore } from "~/stores/userInfoStore"
+import { useAccountPoolStore } from "~/stores/accountPoolStore"
 import logoSrc from '~/assets/logo.svg'
 import { useUserProfileStore } from "~/stores/userProfileStore"
 import { useNotificationStore } from "~/stores/notificationStore"
 
-const { isLoggedIn, logout } = useAuth()
+const { isLoggedIn, logout, switchAccount } = useAuth()
+const accountPoolStore = useAccountPoolStore()
 const userInfoStore = useUserInfoStore()
 const userProfileStore = useUserProfileStore()
 const notificationStore = useNotificationStore()
@@ -19,7 +21,11 @@ const route = useRoute()
 const searchQuery = ref('')
 const userAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png')
 
-const userName = computed(() => userInfoStore.userInfo.username || '未登录')
+const userName = computed(() => userInfoStore.userInfo.nickname || userInfoStore.userInfo.username || '未登录')
+
+watch(() => accountPoolStore.activeUid, async () => {
+  userAvatar.value = await userProfileStore.getAvatarUrl() || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+})
 
 const navItems = [
   { key: 'home', path: '/' },
@@ -44,9 +50,16 @@ const handleLogout = () => {
 }
 
 const handleCommand = (command: string) => {
+  if (command.startsWith('switch:')) {
+    const uid = command.slice(7)
+    switchAccount(uid)
+    return
+  }
   switch (command) {
-    case 'profile': router.push('/profile'); break
+    case 'profile': router.push('/profile/info'); break
     case 'account': router.push('/profile/account'); break
+    case 'accounts': router.push('/profile/accounts'); break
+    case 'switch-manage': router.push('/login'); break
     case 'logout': handleLogout(); break
   }
 }
@@ -103,14 +116,21 @@ onMounted(async () => {
                 <el-dropdown-menu>
                   <el-dropdown-item command="profile">个人中心</el-dropdown-item>
                   <el-dropdown-item command="account">账号设置</el-dropdown-item>
+                  <el-dropdown-item command="accounts">账号管理</el-dropdown-item>
+                  <el-dropdown-item v-for="acc in accountPoolStore.otherAccounts" :key="acc.uid" :command="'switch:' + acc.uid" divided>
+                    <div class="switch-account-item">
+                      <img :src="acc.avatarUrl || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" class="switch-account-avatar" />
+                      <span>{{ acc.nickname || acc.username }}</span>
+                    </div>
+                  </el-dropdown-item>
+                  <el-dropdown-item command="switch-manage" divided>添加账号</el-dropdown-item>
                   <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
           </template>
           <template v-else>
-            <button class="login-btn" @click="router.push('/login')">登录</button>
-            <button class="register-btn" @click="router.push('/register')">注册</button>
+            <button class="login-btn" @click="router.push('/login')">未登录</button>
           </template>
           <template #fallback>
             <div class="header-actions-skeleton" />
@@ -329,6 +349,18 @@ onMounted(async () => {
 .header-actions-skeleton {
   width: 120px;
   height: 36px;
+}
+
+.switch-account-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.switch-account-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 @media (max-width: 1024px) {

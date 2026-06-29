@@ -222,7 +222,7 @@ public class PostServiceImpl implements PostService {
         Pageable pageable = PageRequest
                 .of(Math.max(req.getPage() - 1, 0), Math.min(req.getSize(), 20), sort);
 
-        Specification<Post> spec = PostSpec.ofPublic(req.getCategoryId(), req.getTagIds(), null);
+        Specification<Post> spec = PostSpec.ofPublic(req.getCategoryId(), req.getTagIds(), req.getAuthorId());
         Set<Long> excludedAuthorIds = getWorkVisibilityExcludedAuthorIds();
         if (!excludedAuthorIds.isEmpty()) {
             spec = spec.and((root, query, cb) ->
@@ -835,6 +835,13 @@ public class PostServiceImpl implements PostService {
                             }
                         }
                 );
+    }
+
+    @Override
+    public List<UserBrief> getLikedUsers(Long postId) {
+        List<Long> userIds = userLikeRepository.findUserIdsByPostId(postId);
+        if (userIds.isEmpty()) return Collections.emptyList();
+        return userBriefService.listUseBriefs(userIds);
     }
 
     @Transactional

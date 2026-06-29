@@ -24,8 +24,8 @@ export interface CursorPageComment<T, C = number> {
 }
 
 export interface CreateCommentReq {
-  postId: number | bigint
-  parentId?: number | bigint
+  postId: string
+  parentId?: string
   content: string
 }
 
@@ -34,19 +34,19 @@ export const postComment = (data: CreateCommentReq): PromiseResBody<void> => {
 }
 
 export const listComments = (params: {
-  postId: number | bigint
+  postId: string
   cursor?: string
   limit?: number
-  includeRootId?: number
+  includeRootId?: string
 }): PromiseResBody<CursorPageComment<CommentResponse, string>> => {
   return request.get('/comments/list', { params })
 }
 
-export const listReplies = (rootId: number | bigint, params: {
-  cursor?: number
+export const listReplies = (rootId: string, params: {
+  cursor?: string
   limit?: number
-  includeRootId?: number
-}): PromiseResBody<CursorPageComment<CommentResponse>> => {
+  includeRootId?: string
+}): PromiseResBody<CursorPageComment<CommentResponse, string>> => {
   return request.get(`/comments/${rootId}/replies`, { params })
 }
 

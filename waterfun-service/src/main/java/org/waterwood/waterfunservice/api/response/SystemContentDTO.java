@@ -10,8 +10,4 @@ import lombok.NoArgsConstructor;
 public class SystemContentDTO implements NotificationContent {
     private String text;
 
-    @Override
-    public String getDisplayText() {
-        return text;
-    }
 }

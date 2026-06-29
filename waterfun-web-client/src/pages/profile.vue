@@ -22,42 +22,50 @@
 definePageMeta({
   ssr: false
 })
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import UserCenterSideBar from '~/components/UserCenterSideBar.vue';
 import { useUserInfoStore } from "~/stores/userInfoStore";
 import { useUserProfileStore } from "~/stores/userProfileStore";
-import { ElMessage } from 'element-plus';
+import { useAccountPoolStore } from "~/stores/accountPoolStore";
 
 const router = useRouter();
 const route = useRoute();
 const userInfoStore = useUserInfoStore();
 const userProfileStore = useUserProfileStore();
+const accountPoolStore = useAccountPoolStore();
 
 const userInfo = computed(() => userInfoStore.userInfo);
 const userProfile = computed(() => userProfileStore.userProfile);
 
 const userProfileData = ref({
-  nickname: userInfo.value.username,
+  nickname: '',
   avatar: '',
-  joinDate: userInfo.value.createdAt
+  joinDate: ''
 });
 
-onMounted(async () => {
-  await userProfileStore.fetchAndUpdateUserProfile().catch(console.error);
-
+const refreshProfileData = async () => {
+  userProfileData.value.nickname = userInfo.value.nickname || userInfo.value.username
+  userProfileData.value.joinDate = userInfo.value.createdAt
   try {
-    userProfileData.value.avatar = await userProfileStore.getAvatarUrl();
+    userProfileData.value.avatar = await userProfileStore.getAvatarUrl() || ''
   } catch (error) {
-    console.error('Failed to load avatar:', error);
+    console.error('Failed to load avatar:', error)
   }
-  userProfileData.value.nickname = userInfo.value.username;
-  userProfileData.value.joinDate = userInfo.value.createdAt;
-  
+}
+
+onMounted(async () => {
+  await userProfileStore.fetchAndUpdateUserProfile().catch(console.error)
+  await refreshProfileData()
+
   if (route.path === '/profile') {
     router.push('/profile/info');
   }
 });
+
+watch(() => accountPoolStore.activeUid, () => {
+  refreshProfileData()
+})
 
 const activeTab = computed(() => {
   const path = route.path;
@@ -65,6 +73,7 @@ const activeTab = computed(() => {
   if (path.includes('/profile/account')) return 'security';
   if (path.includes('/profile/notifications')) return 'notification';
   if (path.includes('/profile/posts')) return 'posts';
+  if (path.includes('/profile/accounts')) return 'accounts';
   return 'profile';
 });
 
@@ -73,6 +82,7 @@ const handleTabChange = (tabId: string) => {
   const map: Record<string, string> = {
     profile: '/profile/info',
     security: '/profile/account',
+    accounts: '/profile/accounts',
     notification: '/profile/notifications',
     posts: '/profile/posts',
   }

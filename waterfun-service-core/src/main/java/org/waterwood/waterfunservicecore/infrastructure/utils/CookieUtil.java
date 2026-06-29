@@ -34,29 +34,38 @@ public final class CookieUtil {
                 .secure(COOKIE_SECURE)
                 .sameSite(COOKIE_SAME_SITE_CONFIG)
                 .maxAge(expireIn)  // same segment jwt refresh tokenValue
-                .path("/api/auth")
+                .path("/")
                 .build();
         response.addHeader("Set-Cookie", refreshCookie.toString());
+        // Expire old cookie with path=/api/auth (migration from old path)
+        ResponseCookie oldPathExpire = ResponseCookie.from("REFRESH_TOKEN", "")
+                .httpOnly(true)
+                .secure(COOKIE_SECURE)
+                .sameSite(COOKIE_SAME_SITE_CONFIG)
+                .maxAge(0)
+                .path("/api/auth")
+                .build();
+        response.addHeader("Set-Cookie", oldPathExpire.toString());
     }
 
     public static void cleanTokenCookie(HttpServletResponse response) {
-//        ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", "")
-//                .httpOnly(true)
-//                .secure(COOKIE_SECURE)
-//                .sameSite(COOKIE_SAME_SITE_CONFIG)
-//                .maxAge(0)  // Instance expired
-//                .path("/")
-//                .build();
-//        response.addHeader("Set-Cookie", accessCookie.toString());
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", "")
                 .httpOnly(true)
                 .secure(COOKIE_SECURE)
                 .sameSite(COOKIE_SAME_SITE_CONFIG)
                 .maxAge(0)  // Instance expired
+                .path("/")
+                .build();
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+
+        ResponseCookie oldPathExpire = ResponseCookie.from("REFRESH_TOKEN", "")
+                .httpOnly(true)
+                .secure(COOKIE_SECURE)
+                .sameSite(COOKIE_SAME_SITE_CONFIG)
+                .maxAge(0)
                 .path("/api/auth")
                 .build();
-
-        response.addHeader("Set-Cookie", refreshCookie.toString());
+        response.addHeader("Set-Cookie", oldPathExpire.toString());
     }
 
     /**

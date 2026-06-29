@@ -35,7 +35,7 @@ public class AuditLogCoreServiceImpl implements AuditLogCoreService {
             log.setUsername(username);
             log.setAction(action);
             log.setStatus(status);
-            log.setFailReason(failReason);
+            log.setFailReason(failReason != null && failReason.length() > 64 ? failReason.substring(0, 64) : failReason);
             log.setCreatedAt(Instant.now());
 
             String ip = resolveClientIp();

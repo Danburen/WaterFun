@@ -31,6 +31,12 @@ public interface NotificationService {
     Integer countAllUnread();
 
     /**
+     * Get unread notification count with per-tab breakdown.
+     * @return UnreadCountResp containing total and per-tab counts
+     */
+    org.waterwood.waterfunservice.api.response.notifications.UnreadCountResp getUnreadCountWithTabs();
+
+    /**
      * Mark a system notification as read by id.
      * <b>THIS METHOD IS IDEMPOTENT</b>
      * @param id target read
@@ -87,7 +93,7 @@ public interface NotificationService {
      * @param title         title of the inbox message
      * @param coverageResourceUuid post coverage resource uuid
      */
-    void onPostLike(Long recipient, Long userUid, Long postId, String title, Long coverageResourceUuid);
+    void onPostLike(Long recipient, Long userUid, Long postId, String title, String coverageResourceUuid);
 
     /**
      * Post collection notification
@@ -95,9 +101,9 @@ public interface NotificationService {
      * @param userUid               sender user uid must not null
      * @param postId                post id for the collected post
      * @param title                 title of the inbox message
-     * @param coverageResourceUuid  post coverage resource uuid, used for inbox message link
+     * @param coverageResourceUuid  post coverage resource uuid
      */
-    void onPostCollect(Long recipient, Long userUid, Long postId, String title, Long coverageResourceUuid);
+    void onPostCollect(Long recipient, Long userUid, Long postId, String title, String coverageResourceUuid);
 
     /**
      * Reply notification — notify comment author when someone replies to their comment.

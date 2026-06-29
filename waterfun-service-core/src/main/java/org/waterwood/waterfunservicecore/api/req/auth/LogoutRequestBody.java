@@ -8,6 +8,5 @@ import lombok.Data;
  */
 @Data
 public class LogoutRequestBody {
-    private String deviceId;
-
+    private String deviceFp;
 }

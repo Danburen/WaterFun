@@ -55,11 +55,6 @@ const handleRegisterClick = async () => {
     buttonLoad.value = false;
   }).catch(err=>{
     console.log('注册错误:', err);
-    if(err.code === "verify.code.invalid"){
-      ElMessage.error(i18n.t('message.error.badRequest.captchaIncorrect'));
-    }else{
-      ElMessage.error(i18n.t('message.error.unknownError'));
-    }
   }).finally(()=>{
     buttonLoad.value = false;
   })

@@ -2,19 +2,40 @@ import { defineNuxtPlugin } from '#app';
 import { useAuthStore } from '~/stores/authStore';
 import { useUserInfoStore } from '~/stores/userInfoStore';
 import { useUserAccountStore } from '~/stores/userAccountStore';
+import { useAccountPoolStore } from '~/stores/accountPoolStore';
+import { useUserProfileStore } from '~/stores/userProfileStore';
 
 export default defineNuxtPlugin(async (nuxtApp) => {
     nuxtApp.hook('app:mounted', () => {
         const authStore = useAuthStore();
-        // 每次应用启动时，主动再更新一次用户的基础资料（如用户数据、头像URL及过期时间）
+        const poolStore = useAccountPoolStore();
+        const userInfoStore = useUserInfoStore();
+
+        if (poolStore.activeUid && poolStore.isTokenValid(poolStore.activeUid)) {
+            const active = poolStore.activeAccount
+            if (active && (!authStore.isAccess || authStore.accessData.token !== active.token)) {
+                authStore.fromPool = true;
+                authStore.setToken(active.token, active.expire);
+                userInfoStore.updateUserInfo({
+                    uid: active.uid,
+                    username: active.username,
+                    nickname: active.nickname,
+                    avatar: { url: active.avatarUrl, expireAt: String(active.avatarExpireAt) },
+                });
+                if (active.avatarUrl) {
+                    const expireTime = typeof active.avatarExpireAt === 'string'
+                        ? new Date(active.avatarExpireAt).getTime() : (active.avatarExpireAt as number) || 0
+                    useUserProfileStore().updateAvatar(active.avatarUrl, expireTime, active.uid)
+                }
+            }
+        }
+
         if (authStore.isAccess) {
-            const userInfoStore = useUserInfoStore();
             const userAccountStore = useUserAccountStore();
-            
+
             userInfoStore.fetchAndUpdateUserInfo().catch(console.error);
             userAccountStore.fetchAccountInfoAndUpdate().catch(console.error);
 
-            // 全局 SSE 实时通知连接
             import('~/stores/notificationStore').then(({ useNotificationStore }) => {
                 useNotificationStore().connectSSE();
             });

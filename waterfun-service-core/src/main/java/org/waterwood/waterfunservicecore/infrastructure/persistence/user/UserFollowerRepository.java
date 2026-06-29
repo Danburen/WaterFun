@@ -12,7 +12,7 @@ import org.waterwood.waterfunservicecore.entity.user.UserFollowerId;
 public interface UserFollowerRepository extends JpaRepository<UserFollower, UserFollowerId> ,
         JpaSpecificationExecutor<UserFollower> {
 
-    @Query("SELECT uf.id.userUid FROM UserFollower uf " +
+    @Query("SELECT uf.id.followerUid FROM UserFollower uf " +
             "WHERE uf.id.userUid = :uid " +
             "ORDER BY uf.createdAt DESC ")
     Page<Long> findByUserUid(@Param("uid") Long uid, Pageable pageable);

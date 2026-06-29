@@ -239,7 +239,7 @@ export const usePostStore = defineStore('post', {
       }
     },
 
-    async batchPublishPosts(ids: (number | bigint)[]): Promise<void> {
+    async batchPublishPosts(ids: string[]): Promise<void> {
       try {
         await batchPublishPosts(ids)
       } catch (err) {
@@ -248,7 +248,7 @@ export const usePostStore = defineStore('post', {
       }
     },
 
-    async batchDeletePosts(ids: (number | bigint)[]): Promise<void> {
+    async batchDeletePosts(ids: string[]): Promise<void> {
       try {
         await batchDeletePosts(ids)
       } catch (err) {

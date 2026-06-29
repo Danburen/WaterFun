@@ -19,7 +19,6 @@ export interface PermissionResp {
   isSystem: boolean;
   parentId: number | null;
   createdAt: ISOString;
-  updatedAt: ISOString;
 }
 
 export interface ListPermissionParams {

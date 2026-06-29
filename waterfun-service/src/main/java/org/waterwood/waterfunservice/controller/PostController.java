@@ -18,6 +18,7 @@ import org.waterwood.waterfunservice.api.request.PublicPostListReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.ReportResponse;
 import org.waterwood.waterfunservice.api.response.post.*;
+import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.PostStatus;
 import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
@@ -57,9 +58,9 @@ public class PostController {
 
     @GetMapping("/hot")
     public ApiResponse<Page<PostCardResp>> listHotPosts(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.success(postService.listHotPosts(PageRequest.of(page, size)));
+        return ApiResponse.success(postService.listHotPosts(PageRequest.of(Math.max(page - 1, 0), size)));
     }
 
     @RateLimit(key = "listPublicPosts")
@@ -191,6 +192,12 @@ public class PostController {
     public ApiResponse<Void> collection(@PathVariable Long id) {
         postService.collection(id);
         return ApiResponse.success();
+    }
+
+    @Operation(summary = "Get users who liked a post")
+    @GetMapping("/{id}/liked-users")
+    public ApiResponse<List<UserBrief>> getLikedUsers(@PathVariable Long id) {
+        return ApiResponse.success(postService.getLikedUsers(id));
     }
 
     @PostMapping("/{id}/report")

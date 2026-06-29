@@ -415,7 +415,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         List<User> users = userRepository.findAllByUidIn(userUids);
         Map<Long, CloudResPresignedUrlResp> userAvatarUrls = cloudFileService.batchGetReadPublicUrlCached(
                 CloudFSRoot.UPLOADS,
-                users.stream().collect(Collectors.toMap(
+                users.stream().filter(user -> user.getAvatarResource() != null).collect(Collectors.toMap(
                         User::getUid,
                         u -> u.getAvatarResource().getResourceKey()
                 )),

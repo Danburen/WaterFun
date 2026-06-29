@@ -21,18 +21,12 @@ export const useUserProfileStore = defineStore('userProfileStore', () => {
     residence: '',
   });
 
-  const avatarCache = ref<avatar>({
-    expiresAt: 0,
-    lastAccess: 0,
-    presignedUrl: '',
-  });
+  const avatarCaches = ref<Record<string, avatar>>({});
 
-  /** 更新本地 profile 状态（不调接口） */
   const updateLocalProfile = (data: Partial<UserProfile>) => {
     userProfile.value = { ...userProfile.value, ...data };
   };
 
-  /** 更新 profile → 调后端 API + 同步本地状态 */
   const updateUserProfile = async (data: Partial<UserProfile>) => {
     const payload: { bio?: string; gender?: string; birthday?: string; residence?: string } = {};
     if (data.bio !== undefined) payload.bio = data.bio;
@@ -44,12 +38,13 @@ export const useUserProfileStore = defineStore('userProfileStore', () => {
     }
     if (data.residence !== undefined) payload.residence = data.residence;
     await apiUpdateProfile(payload);
-    // sync local after successful API call
     userProfile.value = { ...userProfile.value, ...data };
   };
 
-  const updateAvatar = (avatarUrl: string, expiresAt: number) => {
-    avatarCache.value = {
+  const updateAvatar = (avatarUrl: string, expiresAt: number, uid?: string) => {
+    const key = uid || useUserInfoStore().userInfo.uid;
+    if (!key) return;
+    avatarCaches.value[key] = {
       expiresAt: expiresAt || Date.now() + 1000 * 60 * 60,
       lastAccess: Date.now(),
       presignedUrl: avatarUrl,
@@ -58,36 +53,33 @@ export const useUserProfileStore = defineStore('userProfileStore', () => {
 
   const clearUserProfile = () => {
     userProfile.value = { bio: '', gender: '', birthday: null, residence: '' };
-    avatarCache.value = { expiresAt: 0, lastAccess: 0, presignedUrl: '' };
+    avatarCaches.value = {};
   };
 
-  /**
-   * Get user avatar url from memory
-   * @returns avatar presigned url, empty string if user is not logged in
-   */
-  const getAvatarUrl = async (): Promise<string> => {
-    const uid = useUserInfoStore().userInfo.uid;
-    if (!uid) return '';
-    
-    if (avatarCache.value.presignedUrl && Date.now() < avatarCache.value.expiresAt) {
-      avatarCache.value.lastAccess = Date.now();
-      return avatarCache.value.presignedUrl;
+  const getAvatarUrl = async (uid?: string): Promise<string> => {
+    const key = uid || useUserInfoStore().userInfo.uid;
+    if (!key) return '';
+
+    const cache = avatarCaches.value[key];
+    if (cache?.presignedUrl && Date.now() < cache.expiresAt) {
+      cache.lastAccess = Date.now();
+      return cache.presignedUrl;
     }
-    
+
     try {
       const response = await getAvatar();
       const expireParam = response.data.expireAt;
       const expireTime = typeof expireParam === 'string' ? new Date(expireParam).getTime() : (expireParam || 0);
 
-      avatarCache.value = {
+      avatarCaches.value[key] = {
         expiresAt: expireTime || Date.now() + 1000 * 60 * 60,
         lastAccess: Date.now(),
         presignedUrl: response.data.url || ''
       };
-      return avatarCache.value.presignedUrl;
+      return avatarCaches.value[key].presignedUrl;
     } catch (error) {
       console.error('Failed to get avatar from API:', error);
-      return avatarCache.value.presignedUrl || '';
+      return cache?.presignedUrl || '';
     }
   };
 
@@ -106,10 +98,10 @@ export const useUserProfileStore = defineStore('userProfileStore', () => {
     }
   }
 
-  return { userProfile, avatarCache, updateUserProfile, updateLocalProfile, updateAvatar, clearUserProfile, getAvatarUrl, fetchAndUpdateUserProfile };
+  return { userProfile, avatarCaches, updateUserProfile, updateLocalProfile, updateAvatar, clearUserProfile, getAvatarUrl, fetchAndUpdateUserProfile };
 }, {
   persist: process.client ? {
     storage: localStorage,
-    pick: ['avatarCache']
+    pick: ['avatarCaches']
   } : false
 });

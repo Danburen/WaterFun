@@ -115,15 +115,14 @@ public class TokenService implements AuthTokenService {
     public RefreshTokenPayload validateRefreshToken(long userUid, String refreshToken, String dfp) {
         String calculatedHashDid = deviceService.calculaateDid(userUid, dfp);
         String familyId = redisHelper.getValue(buildRtFamilyCacheKey(userUid, calculatedHashDid));
-        if(familyId == null) throw new BizException(BaseResponseCode.REAUTHENTICATE_REQUIRED); // INVALID Refresh token family
+        if(familyId == null) throw new BizException(BaseResponseCode.REAUTHENTICATE_REQUIRED);
         boolean isNewDevice = deviceService.isNewDeviceDid(userUid, calculatedHashDid);
         if(isNewDevice){
-            // TODO: Add device risk control;
             log.info("New device detected for user {}, did {}, calculatedDid {}, familyId {}", userUid, dfp, calculatedHashDid, familyId);
         }
         String ref = redisHelper.getValue(buildRefCacheKey(userUid, calculatedHashDid, familyId));
         if(ref == null){
-            throw new BizException(BaseResponseCode.REAUTHENTICATE_REQUIRED); // Missing refresh token
+            throw new BizException(BaseResponseCode.REAUTHENTICATE_REQUIRED);
         }
         return new RefreshTokenPayload(userUid,calculatedHashDid);
     }
@@ -142,7 +141,7 @@ public class TokenService implements AuthTokenService {
 
     @Override
     public void removeRefreshToken(long userUid, String dfp, String refreshToken) {
-        String calculatedHashDid = deviceService.calculaateDid(userUid,dfp);
+        String calculatedHashDid = deviceService.calculaateDid(userUid, dfp);
         String familyId = redisHelper.getValue(buildRtFamilyCacheKey(userUid, calculatedHashDid));
         redisHelper.del(buildRefCacheKey(userUid, calculatedHashDid, familyId));
     }

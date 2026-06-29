@@ -94,11 +94,16 @@ public class UserProfileServiceImpl implements UserProfileService {
         );
         resourceRepository.save(newRes);
         // Update old resource status to orphan if exists
-        List<String> uuidList = contentAuditService
-                .getLinkedResourcesUuids(
-                        userRepository.getUserAvatarByUid(bizId),
-                        TargetType.USER_AVATAR
-                );
+        List<String> uuidList =  userRepository.getUserAvatarByUid(bizId).map(
+                avatarUuid -> {
+                    return contentAuditService
+                            .getLinkedResourcesUuids(
+                                    avatarUuid,
+                                    TargetType.USER_AVATAR
+                            );
+                }
+        ).orElse(List.of());
+
         if (uuidList.size() == 1) {
             resourceRepository.updateStatusTo(ResourceStatus.ORPHAN, uuidList.getFirst());
         } else if (uuidList.size() > 1) {

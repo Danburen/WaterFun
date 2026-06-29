@@ -17,6 +17,8 @@ import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.AuthContext;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.api.req.auth.RegisterRequest;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.utils.codec.HashUtil;
@@ -30,6 +32,7 @@ import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Locale;
 
 @Slf4j
 @Service
@@ -114,6 +117,7 @@ public class RegisterServiceImpl implements RegisterService {
         uc.setUser(user);
         UserPreference upp = new UserPreference();
         upp.setUser(user);
+        upp.setLocale(UserCtxHolder.safeGet().map(AuthContext::getLocale).orElse(Locale.CHINA).toLanguageTag());
 
         UserSetting us = new UserSetting();
         us.setUser(user);

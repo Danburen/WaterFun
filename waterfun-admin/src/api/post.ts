@@ -16,7 +16,7 @@ export interface PostResp {
   summary?: string;
   authorId: string;
   coverImg?: string;
-  coverImage?: { url: string; expireAt: number } | null;
+  coverImage?: { url: string; expireAt: string } | null;
   status?: PostStatus;
   visibility?: PostVisibility;
   categoryId?: string;
@@ -39,6 +39,7 @@ export interface PostResp {
   editedCoverImg?: string;
   editedCategoryId?: string;
   editedTagIds?: string[];
+  isAnnouncement?: boolean;
 }
 
 export interface ListPostParams {
@@ -60,14 +61,15 @@ export interface UpsertPostRequest {
   summary?: string;
   /** UUID returned from upload callback, not a URL */
   coverageUuid?: string;
-  status?: PostStatus;
-  visibility?: PostVisibility;
+  status: PostStatus;
+  visibility: PostVisibility;
   authorId?: string;
   categoryId?: string;
   slug?: string;
   tagIds?: string[];
   type?: PostType;
   isPinned?: boolean;
+  isAnnouncement?: boolean;
 }
 
 export interface DeletePostRequest {

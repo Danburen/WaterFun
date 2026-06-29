@@ -7,6 +7,7 @@ import org.waterwood.api.VO.BatchResult;
 import org.waterwood.waterfunservice.api.request.notifications.BatchMarkReadReq;
 import org.waterwood.waterfunservice.api.response.InboxNotificationRes;
 import org.waterwood.waterfunservice.service.NotificationService;
+import org.waterwood.waterfunservice.api.response.notifications.UnreadCountResp;
 import org.waterwood.waterfunservicecore.api.CursorPage;
 import org.waterwood.waterfunservicecore.entity.notification.NoticeGroup;
 import org.waterwood.waterfunservicecore.entity.notification.NoticeType;
@@ -40,8 +41,8 @@ public class NotificationController {
     }
 
     @GetMapping("/unreadCount")
-    public ApiResponse<Integer> unreadCount() {
-        return ApiResponse.success(notificationService.countAllUnread());
+    public ApiResponse<UnreadCountResp> unreadCount() {
+        return ApiResponse.success(notificationService.getUnreadCountWithTabs());
     }
 
     @PostMapping("/read/{id}")

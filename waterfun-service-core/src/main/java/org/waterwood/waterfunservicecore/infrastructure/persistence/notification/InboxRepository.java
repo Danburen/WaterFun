@@ -61,4 +61,7 @@ public interface InboxRepository extends JpaRepository<Inbox, Long> {
     List<Inbox> findByBusinessTypeAndTargetIdOrderByCreatedAtDesc(BusinessType businessType, @Size(max = 64) String targetId);
 
     Integer countByIsReadAndUserUidAndIsDeleted(Boolean isRead, Long userUid, Boolean isDeleted);
+
+    @Query("SELECT i.noticeType, COUNT(i) FROM Inbox i WHERE i.user.uid = :userId AND i.isRead = false AND i.isDeleted = false GROUP BY i.noticeType")
+    List<Object[]> countUnreadGroupedByNoticeType(@Param("userId") Long userId);
 }

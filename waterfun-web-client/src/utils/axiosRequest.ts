@@ -1,9 +1,10 @@
 import axios from 'axios'
 import { ElMessage } from "element-plus";
 import { translate } from "~/utils/translator";
-import {getErrorMessage} from "~/utils/errorMessage";
 import {useAuthStore} from "~/stores/authStore";
 import {useUserInfoStore} from "~/stores/userInfoStore";
+import {useAccountPoolStore} from "~/stores/accountPoolStore";
+import { generateFingerprint } from "@waterfun/web-core/src/fingerprint";
 import type {ApiRes} from "@waterfun/web-core/src/types";
 import JSONBig from 'json-bigint'
 
@@ -22,7 +23,7 @@ function isIdField(key: string): boolean {
   return /^(id|uid|postId|parentId|rootId|commentId|categoryId|tagId|authorId|bizId)$/i.test(key)
 }
 
-function normalizeTypes(obj: any): any {
+function normalizeResponseTypes(obj: any): any {
   if (obj === null || obj === undefined) return obj
 
   if (typeof obj === 'bigint') {
@@ -33,7 +34,7 @@ function normalizeTypes(obj: any): any {
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(normalizeTypes)
+    return obj.map(normalizeResponseTypes)
   }
 
   if (typeof obj === 'object') {
@@ -43,7 +44,35 @@ function normalizeTypes(obj: any): any {
       if (isIdField(key) && typeof value === 'bigint') {
         result[key] = value.toString()
       } else {
-        result[key] = normalizeTypes(value)
+        result[key] = normalizeResponseTypes(value)
+      }
+    }
+    return result
+  }
+
+  return obj
+}
+
+function normalizeRequestTypes(obj: any): any {
+  if (obj === null || obj === undefined) return obj
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => {
+      if (typeof item === 'string' && /^\d{1,19}$/.test(item)) {
+        return BigInt(item)
+      }
+      return normalizeRequestTypes(item)
+    })
+  }
+
+  if (typeof obj === 'object') {
+    const result: any = {}
+    for (const key of Object.keys(obj)) {
+      const value = obj[key]
+      if (isIdField(key) && typeof value === 'string' && /^\d{1,19}$/.test(value)) {
+        result[key] = BigInt(value)
+      } else {
+        result[key] = normalizeRequestTypes(value)
       }
     }
     return result
@@ -64,7 +93,7 @@ const service = axios.create({
         if (data instanceof FormData || data instanceof URLSearchParams || data instanceof Blob) return data
         if (typeof data === 'object') {
           headers['Content-Type'] = 'application/json'
-          return JSONBigParser.stringify(data)
+          return JSONBigParser.stringify(normalizeRequestTypes(data))
         }
         return data
       },
@@ -73,7 +102,7 @@ const service = axios.create({
       (data) => {
         if (typeof data !== 'string') return data
         try {
-          return normalizeTypes(JSONBigParser.parse(data))
+          return normalizeResponseTypes(JSONBigParser.parse(data))
         } catch {
           return data
         }
@@ -107,7 +136,7 @@ service.interceptors.request.use(
             config.headers['X-XSRF-TOKEN'] = CSRFToken;
         }
 
-        if(needAuth){
+        if(needAuth && token){
             config.headers['Authorization'] = `Bearer ${token}`;
         }
 
@@ -130,7 +159,7 @@ let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
 const onRefreshed = (token: string) => {
-    refreshSubscribers.map(cb => cb(token));
+    refreshSubscribers.splice(0).forEach(cb => cb(token));
 };
 
 const addRefreshSubscriber = (cb: (token: string) => void) => {
@@ -147,94 +176,130 @@ service.interceptors.response.use(
         }
     },
     error => {
-        let showError = error.config.meta?.showError !== false;
         const body = error.response?.data || {};
-        let errMessage
         if(error.response) {
             console.log(error.response);
             const status = error.response.status
-            errMessage = getErrorMessage(error.response.code)
-            if(errMessage === 'UNKNOWN_ERROR') { 
-                showError = false ; 
-                console.error(error.response.data.message); 
-            }
             switch (status) {
                 case 401: {
                     const authStore = useAuthStore();
                     const originalRequest = error.config;
-                    
+
+                    const authPaths = ['/login', '/register', '/auth/']
+                    const onAuthPage = authPaths.some(p => window.location.pathname.includes(p))
+                    if (onAuthPage) {
+                        ElMessage({
+                            message: body.message || translate('message.error.unknownError'),
+                            type: 'error',
+                            duration: 3000
+                        })
+                        return Promise.reject(body)
+                    }
+
+                    function showMessageAndRedirect() {
+                        const hasToken = !!authStore.accessData.token
+                        authStore.removeToken()
+                        const msg = hasToken
+                            ? '登录已过期，请重新登录'
+                            : '该功能需要登录才能使用，正在跳转到登录界面'
+                        ElMessage.warning(msg)
+                        setTimeout(() => {
+                            if (!window.location.pathname.includes('/login')) {
+                                window.location.href = '/login'
+                            }
+                        }, 1500)
+                    }
+
                     if (!isRefreshing) {
                         isRefreshing = true;
-                        
-                        // use fetch to refresh access token to avoid infinit axios looping
-                        const csrfTokenForFetch = getCsrfToken();
-                        const fetchOptions: RequestInit = {
-                            method: 'POST',
-                            credentials: 'include',
-                            headers: {
-                                'Accept': 'application/json, text/plain, */*',
-                            }
-                        };
-                        if (csrfTokenForFetch) {
-                            (fetchOptions.headers as Record<string, string>)['X-XSRF-TOKEN'] = csrfTokenForFetch;
+
+                        if (!authStore.accessData.token) {
+                            showMessageAndRedirect()
+                            isRefreshing = false
+                            return Promise.reject(body)
                         }
 
-                        fetch(`${import.meta.env.VITE_API_BASE}/auth/refresh`, fetchOptions)
-                            .then(res => {
-                                if (!res.ok) {
-                                  throw new Error("refresh failed");
+                        if (!authStore.isAccess) {
+                            onRefreshed('')
+                            showMessageAndRedirect()
+                            isRefreshing = false
+                            return Promise.reject(body)
+                        }
+
+                        if (authStore.fromPool && authStore.lastBrowserLoginUid && authStore.lastBrowserLoginUid !== useUserInfoStore().userInfo.uid) {
+                            onRefreshed('')
+                            showMessageAndRedirect()
+                            isRefreshing = false
+                            return Promise.reject(body)
+                        }
+
+                        (async () => {
+                            try {
+                                const csrfTokenForFetch = getCsrfToken();
+                                const deviceFp = await generateFingerprint();
+                                const fetchOptions: RequestInit = {
+                                    method: 'POST',
+                                    credentials: 'include',
+                                    headers: {
+                                        'Accept': 'application/json, text/plain, */*',
+                                    }
+                                };
+                                if (csrfTokenForFetch) {
+                                    (fetchOptions.headers as Record<string, string>)['X-XSRF-TOKEN'] = csrfTokenForFetch;
                                 }
-                                return res.json();
-                            })
-                            .then(resData => {
+
+                                const res = await fetch(`${import.meta.env.VITE_API_BASE}/auth/refresh?deviceFp=${encodeURIComponent(deviceFp)}`, fetchOptions);
+                                if (!res.ok) {
+                                    throw new Error("refresh failed");
+                                }
+                                const resData = await res.json();
                                 const newAccess = resData.data.accessToken;
                                 const newExp = resData.data.exp;
                                 authStore.setToken(newAccess, newExp);
-                                
-                                // Auto sync user info and avatar on successful refresh
+
                                 useUserInfoStore().fetchAndUpdateUserInfo().catch(console.error);
+                                const poolStore = useAccountPoolStore();
+                                if (poolStore.activeUid) {
+                                    poolStore.updateToken(poolStore.activeUid, newAccess, newExp);
+                                }
 
                                 onRefreshed(newAccess);
-                                refreshSubscribers = [];
-                            })
-                            .catch(err => {
-                                // refresh failed
+                            } catch (err) {
                                 console.error('Token refresh failed', err);
-                                authStore.removeToken();
-                                refreshSubscribers = [];
-                                window.location.href = '/login';
-                            })
-                            .finally(() => {
+                                onRefreshed('')
+                                showMessageAndRedirect()
+                            } finally {
                                 isRefreshing = false;
-                            });
+                            }
+                        })();
                     }
-                    
-                    // Put original request onto queue and wait for the refresh to complete
-                    return new Promise((resolve) => {
+
+                    return new Promise((resolve, reject) => {
                         addRefreshSubscriber((newToken: string) => {
+                            if (!newToken) {
+                                reject(body)
+                                return
+                            }
                             originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
                             resolve(service(originalRequest));
                         });
                     });
                 }
             }
-            if(showError) {
-                ElMessage({
-                    message: errMessage,
-                    type: 'error',
-                    duration: 3000
-                })
-            }
+            ElMessage({
+                message: body.message || translate('message.error.unknownError'),
+                type: 'error',
+                duration: 3000
+            })
             return Promise.reject(body)
         }else if(error.request) {
-            // no response
-            errMessage = translate("message.error.networkError")
-        }else{
-            errMessage = translate("message.error.sendRequestError");
-        }
-        if(showError) {
             ElMessage({
-                message: errMessage,
+                message: translate("message.error.networkError"),
+                type: 'error',
+            })
+        }else{
+            ElMessage({
+                message: translate("message.error.sendRequestError"),
                 type: 'error',
             })
         }

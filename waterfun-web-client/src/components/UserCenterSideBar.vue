@@ -28,14 +28,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue';
+import { ref, shallowRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAccountPoolStore } from '~/stores/accountPoolStore';
 import {
   User,
   Lock,
   Bell,
   Document,
-  Headset
+  Headset,
+  Switch
 // @ts-ignore
 } from '@element-plus/icons-vue';
 
@@ -57,6 +59,7 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const accountPoolStore = useAccountPoolStore();
 const userProfileStore = useUserProfileStore();
 const userInfoStore = useUserInfoStore();
 
@@ -70,6 +73,7 @@ const avatar = ref('');
 const navItems = shallowRef([
   { id: 'profile', label: '个人资料', icon: User },
   { id: 'security', label: '账号安全', icon: Lock },
+  { id: 'accounts', label: '账号管理', icon: Switch },
   { id: 'notification', label: '通知与隐私', icon: Bell },
   { id: 'posts', label: '我的帖子', icon: Document },
   { id: 'customer-service', label: '客服中心', icon: Headset }
@@ -87,6 +91,10 @@ const handleNavClick = (item: { id: string }) => {
 onMounted(async () => {
   avatar.value = await userProfileStore.getAvatarUrl();
   console.log(avatar.value);
+});
+
+watch(() => accountPoolStore.activeUid, async () => {
+  avatar.value = await userProfileStore.getAvatarUrl();
 });
 </script>
 

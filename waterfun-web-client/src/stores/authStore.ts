@@ -12,6 +12,9 @@ export const useAuthStore = defineStore('accessStore', ()=>{
         expire: 0,
     })
 
+    const fromPool = ref(false)
+    const lastBrowserLoginUid = ref('')
+
     const setToken = (token:string,expire:number) => {
         accessData.value = {
             token: token,
@@ -35,10 +38,13 @@ export const useAuthStore = defineStore('accessStore', ()=>{
         removeToken,
         accessData,
         isAccess,
+        fromPool,
+        lastBrowserLoginUid,
     }
 },{
     persist: process.client ? {
-        storage: localStorage
+        storage: localStorage,
+        pick: ['accessData', 'lastBrowserLoginUid']
     } : false
 })
 

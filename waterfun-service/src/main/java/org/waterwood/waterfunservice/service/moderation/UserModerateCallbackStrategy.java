@@ -152,19 +152,20 @@ public class UserModerateCallbackStrategy implements ModerationCallbackStrategy 
                 () -> new IllegalArgumentException("AuditResource not found for task id: " + msg.getId())
         );
         if(msg.getStatus() == AuditStatus.APPROVED){
-            String dbAvatarResourceUuid = userCoreService.getUserAvatar(userUid);
-            if(dbAvatarResourceUuid != null){
-                resourceRepository.findByUuidAndStatus(dbAvatarResourceUuid, ResourceStatus.ACTIVE)
-                        .ifPresentOrElse(
-                                resource -> {
-                                   resource.setStatus(ResourceStatus.ORPHAN);
-                                   resourceRepository.save(resource);
-                                },
-                                () -> {
-                                    // Resource is manual deleted
-                                    log.warn("User {}'s avatar resource {} is not found during moderation callback, it might be manually deleted", userUid, dbAvatarResourceUuid);
-                                });
-            }
+            userRepository.getUserAvatarByUid(userUid).ifPresent(
+                    dbAvatarResourceUuid -> {
+                        resourceRepository.findByUuidAndStatus(dbAvatarResourceUuid, ResourceStatus.ACTIVE)
+                                .ifPresentOrElse(
+                                        resource -> {
+                                            resource.setStatus(ResourceStatus.ORPHAN);
+                                            resourceRepository.save(resource);
+                                        },
+                                        () -> {
+                                            // Resource is manual deleted
+                                            log.warn("User {}'s avatar resource {} is not found during moderation callback, it might be manually deleted", userUid, dbAvatarResourceUuid);
+                                        });
+                    }
+            );
             userCoreService.updateAvatarResourceUuid(userUid, auditRes.getResource().getUuid());
             // Remove cached url in redis, so that new avatar can be fetched with new url
             String redisKey = cloudFileService.getCachedRedisKey(

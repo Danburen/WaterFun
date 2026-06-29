@@ -10,6 +10,8 @@ import BannerCarousel from '~/components/BannerCarousel.vue'
 import { formatRelativeTime } from '~/utils/date'
 import { View, Star, ChatDotSquare, ArrowRight, Edit, User, Bell, Link as IconLink } from '@element-plus/icons-vue'
 import { getTagColor } from '@waterfun/web-core/src/tagColor'
+import { fetchMyPostStats, fetchHotPosts as apiFetchHotPosts, fetchAnnouncements as apiFetchAnnouncements, getHotTags } from '~/api/postApi'
+import { getOnlineStats, listOnlineUsers } from '~/api/userApi'
 
 const postStore = usePostStore()
 const authStore = useAuthStore()
@@ -26,8 +28,7 @@ const myStats = ref<{ publishedCount: number; followerCount: number; totalLikeCo
 
 const fetchMyStats = async () => {
   try {
-    const { default: request } = await import('~/utils/axiosRequest')
-    const res = await request.get('/posts/me/stats')
+    const res = await fetchMyPostStats()
     const d = res.data as any
     myStats.value = { publishedCount: d.publishedCount, followerCount: d.followerCount, totalLikeCount: d.totalLikeCount }
   } catch { /* ignore */ }
@@ -35,8 +36,7 @@ const fetchMyStats = async () => {
 
 const fetchOnlineStats = async () => {
   try {
-    const { default: request } = await import('~/utils/axiosRequest')
-    const res = await request.get('/online-users/stats')
+    const res = await getOnlineStats()
     onlineStats.value = res.data as { onlineCount: number; todayNewUsers: number; todayPeakOnline: number }
   } catch { /* ignore */ }
 }
@@ -44,8 +44,7 @@ const fetchOnlineStats = async () => {
 const fetchOnlineUsers = async () => {
   onlineUsersLoading.value = true
   try {
-    const { default: request } = await import('~/utils/axiosRequest')
-    const res = await request.get('/online-users/list', { params: { page: 0, size: 12 } })
+    const res = await listOnlineUsers({ page: 0, size: 12 })
     onlineUsers.value = (res.data.content || []) as any[]
   } catch { /* ignore */ }
   onlineUsersLoading.value = false
@@ -57,8 +56,7 @@ const hotPostsLoading = ref(false)
 const fetchHotPosts = async (page: number) => {
   hotPostsLoading.value = true
   try {
-    const { default: request } = await import('~/utils/axiosRequest')
-    const res = await request.get('/posts/hot', { params: { page, size: 5 } })
+    const res = await apiFetchHotPosts({ page, size: 5 })
     hotPosts.value = res.data.content as any[]
     hotPostsPage.value = page
   } catch { /* ignore */ }
@@ -71,8 +69,7 @@ const announcementsLoading = ref(false)
 const fetchAnnouncements = async (page: number) => {
   announcementsLoading.value = true
   try {
-    const { default: request } = await import('~/utils/axiosRequest')
-    const res = await request.get('/announcements', { params: { page, size: 5 } })
+    const res = await apiFetchAnnouncements({ page, size: 5 })
     announcements.value = res.data.content as any[]
     announcementsPage.value = page
   } catch { /* ignore */ }
@@ -84,8 +81,7 @@ const hotTagsLoading = ref(false)
 const fetchHotTags = async () => {
   hotTagsLoading.value = true
   try {
-    const { default: request } = await import('~/utils/axiosRequest')
-    const res = await request.get('/post/tags/hot', { params: { page: 0, size: 8 } })
+    const res = await getHotTags({ page: 0, size: 8 })
     hotTags.value = res.data.content as any[]
   } catch { /* ignore */ }
   hotTagsLoading.value = false
@@ -116,8 +112,10 @@ onMounted(async () => {
   const page = route.query.page ? Math.max(1, parseInt(route.query.page as string)) : 1
   try { await postStore.fetchPostList({ categoryId: selectedCategoryId.value, page, size: 12 }) } catch { /* ignore */ }
   postStore.fetchCategories()
-  fetchOnlineStats()
-  fetchOnlineUsers()
+  if (authStore.isAccess) {
+    fetchOnlineStats()
+    fetchOnlineUsers()
+  }
   fetchHotPosts(0)
   fetchAnnouncements(0)
   fetchHotTags()

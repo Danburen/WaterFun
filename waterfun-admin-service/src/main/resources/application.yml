@@ -5,6 +5,10 @@ spring:
     basename: messages
     encoding: UTF-8
     cache-duration: 3600s
+  data:
+    redis:
+      repositories:
+        enabled: false
   cache:
     type: redis
     redis:

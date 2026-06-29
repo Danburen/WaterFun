@@ -95,11 +95,6 @@ const submitForm = (form:FormInstance | undefined) => {
         }).catch(err=>{
           console.log(err);
           refreshCaptcha()
-          if(err.code === "verify.code.invalid"){
-            ElMessage.error(i18n.t('message.error.badRequest.captchaIncorrect'));
-          }else{
-            ElMessage.error(i18n.t('message.error.unknownError'));
-          }
         }).finally(()=>{
           buttonLoad.value = false;
         })

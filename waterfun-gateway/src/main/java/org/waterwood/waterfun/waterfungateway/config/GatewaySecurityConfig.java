@@ -33,7 +33,7 @@ public class GatewaySecurityConfig {
     private final JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint;
     private final JsonAccessDeniedHandler jsonAccessDeniedHandler;
 
-    @Value("${waterfun.cors.allowed-origins:https://waterfun.top,http://localhost:3000,http://localhost:5173}")
+    @Value("${waterfun.cors.allowed-origin-patterns:https://waterfun.top,http://localhost:*,http://127.0.0.1:*}")
     private String allowedOrigins;
 
     @Bean

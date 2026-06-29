@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class PostAuthorUidTitleDO {
     private Long authorUid;
     private String title;
-    private Long coverageResourceUuid;
+    private String coverageResourceUuid;
 }

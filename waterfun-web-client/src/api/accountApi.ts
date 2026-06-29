@@ -42,11 +42,6 @@ export interface UnbindEmailRequest {
     verify: SecurityVerifyCodeDto;
 }
 
-export interface BindPhoneRequest {
-    phone: string;
-    verify: SecurityVerifyCodeDto;
-}
-
 export interface ActivatePhoneRequest {
     phone: string;
     verify: SecurityVerifyCodeDto;
@@ -83,10 +78,6 @@ export const activateEmail = (activateEmailData: ActivateEmailRequest): PromiseR
 
 export const changeEmail = (changeEmailData: ChangeEmailRequest): PromiseResBody<void> => {
     return request.post('/auth/account/email/change', changeEmailData);
-}
-    
-export const bindPhone = (bindPhoneData: BindPhoneRequest): PromiseResBody<void> => {
-    return request.post('/auth/account/phone/bind', bindPhoneData);
 }
     
 export const activatePhone = (activatePhoneData: ActivatePhoneRequest): PromiseResBody<void> => {

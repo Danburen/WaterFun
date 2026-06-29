@@ -57,12 +57,15 @@ public class AuthCoreServiceImpl implements AuthCoreService {
         StringUtil.isBlankThen(refreshToken, () -> {
             throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
         });// Missing refresh token
-        long userUid = UserCtxHolder.getUserUid();
-        RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
-        TokenResult RT = userRepository.findById(userUid).map(_ ->
-                        tokenService.genAndCacheRefToken(userUid, payload.deviceId()))
-                .orElseThrow(() -> new AuthException(AuthCode.USER_NOT_FOUND));
-        TokenResult AT = tokenService.genCacheNewAccTokenRevokeOlds(userUid, payload.deviceId());
-        return TokenPair.of(AT, RT);
+        return UserCtxHolder.safeGetUserId().map(
+                userUid -> {
+                    RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
+                    TokenResult RT = userRepository.findById(userUid).map(_ ->
+                                    tokenService.genAndCacheRefToken(userUid, payload.deviceId()))
+                            .orElseThrow(AuthException::new);
+                    TokenResult AT = tokenService.genCacheNewAccTokenRevokeOlds(userUid, payload.deviceId());
+                    return TokenPair.of(AT, RT);
+                }
+        ).orElseThrow(() -> new AuthException(AuthCode.REAUTHORIZATION_REQUIRED));
     }
 }

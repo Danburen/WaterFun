@@ -1996,6 +1996,37 @@
         }
       }
     },
+    "/api/admin/tickets/{id}/restore": {
+      "post": {
+        "tags": [
+          "ticket-moderation-controller"
+        ],
+        "operationId": "restoreTicket",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/tags": {
       "post": {
         "tags": [
@@ -2230,6 +2261,36 @@
         }
       }
     },
+    "/api/admin/posts/content/preview": {
+      "post": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "previewContent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/permission": {
       "post": {
         "tags": [
@@ -2446,26 +2507,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseBatchResult"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/me/info": {
-      "post": {
-        "tags": [
-          "user-controller"
-        ],
-        "operationId": "getCurrentUserInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseAdminUserInfoResponse"
                 }
               }
             }
@@ -3035,6 +3076,97 @@
         }
       }
     },
+    "/api/admin/tickets/{id}": {
+      "get": {
+        "tags": [
+          "ticket-moderation-controller"
+        ],
+        "operationId": "getTicketDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTicketResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/tickets/stats": {
+      "get": {
+        "tags": [
+          "ticket-moderation-controller"
+        ],
+        "operationId": "getTicketStats",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTicketStatsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/tags/search": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "searchTags",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/tags/options": {
       "get": {
         "tags": [
@@ -3121,6 +3253,38 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponsePageTagResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/tags/hot": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getHotTags",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOptionVOLong"
                 }
               }
             }
@@ -4275,6 +4439,106 @@
         }
       }
     },
+    "/api/admin/me/roles": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getRoles",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSetUserRole"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/me/profile": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getProfile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserProfile"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/me/permissions": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getPermissions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSetUserPermission"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/me/info": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getCurrentUserInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAdminUserInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/me/avatar": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getAvatar",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/dashboard/trend": {
       "get": {
         "tags": [
@@ -4722,6 +4986,27 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseBanStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/auth/csrf-token": {
+      "get": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "获取 CSRF Token",
+        "operationId": "csrfToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
                 }
               }
             }
@@ -5178,6 +5463,9 @@
             ]
           },
           "isPinned": {
+            "type": "boolean"
+          },
+          "isAnnouncement": {
             "type": "boolean"
           }
         },
@@ -5868,16 +6156,34 @@
           },
           "isPinned": {
             "type": "boolean"
+          },
+          "isAnnouncement": {
+            "type": "boolean"
           }
         },
         "required": [
-          "authorId",
-          "categoryId",
           "content",
           "status",
           "title",
           "visibility"
         ]
+      },
+      "ApiResponseString": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          }
+        }
       },
       "CreatePermRequest": {
         "type": "object",
@@ -6103,70 +6409,6 @@
               "type": "string",
               "format": "int64"
             }
-          }
-        }
-      },
-      "AdminUserInfoResponse": {
-        "type": "object",
-        "properties": {
-          "uid": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "nickname": {
-            "type": "string"
-          },
-          "avatar": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          },
-          "accountStatus": {
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "SUSPENDED",
-              "DEACTIVATED"
-            ]
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "passwordHash": {
-            "type": "boolean"
-          },
-          "roles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "permissions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "isAdmin": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ApiResponseAdminUserInfoResponse": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/AdminUserInfoResponse"
           }
         }
       },
@@ -6512,6 +6754,10 @@
           "disabled": {
             "type": "boolean"
           },
+          "usageCount": {
+            "type": "string",
+            "format": "int64"
+          },
           "expiresAt": {
             "type": "string",
             "format": "date-time"
@@ -6741,19 +6987,6 @@
             "type": "integer",
             "format": "int32"
           },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
           "size": {
             "type": "integer",
             "format": "int32"
@@ -6771,6 +7004,19 @@
           "sort": {
             "$ref": "#/components/schemas/SortObject"
           },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
           "empty": {
             "type": "boolean"
           }
@@ -6779,6 +7025,13 @@
       "PageableObject": {
         "type": "object",
         "properties": {
+          "offset": {
+            "type": "string",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
           "paged": {
             "type": "boolean"
           },
@@ -6792,26 +7045,19 @@
           },
           "unpaged": {
             "type": "boolean"
-          },
-          "offset": {
-            "type": "string",
-            "format": "int64"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
           }
         }
       },
       "SortObject": {
         "type": "object",
         "properties": {
+          "empty": {
+            "type": "boolean"
+          },
           "sorted": {
             "type": "boolean"
           },
           "unsorted": {
-            "type": "boolean"
-          },
-          "empty": {
             "type": "boolean"
           }
         }
@@ -6868,6 +7114,10 @@
           },
           "disabled": {
             "type": "boolean"
+          },
+          "usageCount": {
+            "type": "string",
+            "format": "int64"
           }
         }
       },
@@ -6948,6 +7198,138 @@
           }
         }
       },
+      "PenaltyDetail": {
+        "type": "object",
+        "properties": {
+          "penaltyType": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "operatorName": {
+            "type": "string"
+          },
+          "appliedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TicketResponse": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "ticketType": {
+            "type": "string",
+            "enum": [
+              "CONTENT_REPORT",
+              "ACCOUNT_APPEAL",
+              "FEATURE_FEEDBACK",
+              "SUGGESTION"
+            ]
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "DEFAULT",
+              "USER_AVATAR",
+              "POST",
+              "POST_COVERAGE_IMAGE",
+              "POST_CONTENT_IMAGE",
+              "BANNER_IMAGE",
+              "COMMENT",
+              "USER_REPORT_ATTACHMENT",
+              "MODERATION_IMAGE",
+              "USER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RESOLVED",
+              "REJECTED"
+            ]
+          },
+          "content": {
+            "type": "string"
+          },
+          "rejectType": {
+            "type": "string"
+          },
+          "auditNote": {
+            "type": "string"
+          },
+          "replyContent": {
+            "type": "string"
+          },
+          "submitter": {
+            "$ref": "#/components/schemas/UserAdminBrief"
+          },
+          "targetUser": {
+            "$ref": "#/components/schemas/UserAdminBrief"
+          },
+          "auditor": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "auditAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "evidenceResourceUuids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidenceUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "originalPenalty": {
+            "$ref": "#/components/schemas/PenaltyDetail"
+          },
+          "currentBans": {
+            "$ref": "#/components/schemas/BanStatusResponse"
+          },
+          "timeline": {
+            "$ref": "#/components/schemas/Timeline"
+          }
+        }
+      },
+      "Timeline": {
+        "type": "object",
+        "properties": {
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
       "UserAdminBrief": {
         "type": "object",
         "properties": {
@@ -7019,6 +7401,61 @@
               "MODERATOR",
               "VIP"
             ]
+          }
+        }
+      },
+      "ApiResponseTicketResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TicketResponse"
+          }
+        }
+      },
+      "ApiResponseTicketStatsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TicketStatsResponse"
+          }
+        }
+      },
+      "TicketStatsResponse": {
+        "type": "object",
+        "properties": {
+          "reportCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "appealCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "feedbackCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "suggestionCount": {
+            "type": "string",
+            "format": "int64"
           }
         }
       },
@@ -7371,6 +7808,10 @@
           },
           "disabled": {
             "type": "boolean"
+          },
+          "usageCount": {
+            "type": "string",
+            "format": "int64"
           }
         }
       },
@@ -7424,6 +7865,9 @@
           "content": {
             "type": "string"
           },
+          "contentHtml": {
+            "type": "string"
+          },
           "summary": {
             "type": "string"
           },
@@ -7433,6 +7877,9 @@
           },
           "coverImg": {
             "type": "string"
+          },
+          "coverImage": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
           },
           "status": {
             "type": "string",
@@ -7503,6 +7950,38 @@
           },
           "isPinned": {
             "type": "boolean"
+          },
+          "isAnnouncement": {
+            "type": "boolean"
+          },
+          "editedTitle": {
+            "type": "string"
+          },
+          "editedSubtitle": {
+            "type": "string"
+          },
+          "editedContent": {
+            "type": "string"
+          },
+          "editedContentHtml": {
+            "type": "string"
+          },
+          "editedSummary": {
+            "type": "string"
+          },
+          "editedCoverImg": {
+            "type": "string"
+          },
+          "editedCategoryId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "editedTagIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            }
           }
         }
       },
@@ -8341,6 +8820,10 @@
             "$ref": "#/components/schemas/CloudResPresignedUrlResp",
             "readOnly": true
           },
+          "contentHtml": {
+            "type": "string",
+            "readOnly": true
+          },
           "format": {
             "type": "string",
             "enum": [
@@ -8618,6 +9101,729 @@
           },
           "data": {
             "$ref": "#/components/schemas/AuditResponseImageAuditPayload"
+          }
+        }
+      },
+      "ApiResponseSetUserRole": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRole"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "Resource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64"
+          },
+          "resourceKey": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "resourceType": {
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "IMAGE",
+              "VIDEO",
+              "AUDIO",
+              "TEXT",
+              "DOCUMENT",
+              "ARCHIVE",
+              "EXECUTABLE",
+              "OTHER"
+            ]
+          },
+          "mimeType": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 0
+          },
+          "sizeBytes": {
+            "type": "string",
+            "format": "int64"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "SYSTEM",
+              "CONTENT_ATTACHED",
+              "USER_UPLOADED"
+            ]
+          },
+          "uploaderId": {
+            "type": "string",
+            "format": "int64"
+          },
+          "expiredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uuid": {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 0
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "UPLOAD_PENDING",
+              "ACTIVE",
+              "ORPHAN",
+              "DELETED"
+            ]
+          },
+          "fileMeta": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "createdAt",
+          "resourceKey",
+          "updatedAt",
+          "uuid"
+        ]
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "orderWeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isSystem": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "passwordHash": {
+            "type": "string"
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ]
+          },
+          "statusChangedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "nickname": {
+            "type": "string",
+            "maxLength": 12,
+            "minLength": 0
+          },
+          "avatarResource": {
+            "$ref": "#/components/schemas/Resource"
+          },
+          "lastActiveAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "userType": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "ADMIN",
+              "BOT",
+              "MODERATOR",
+              "VIP"
+            ]
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "exp": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userDatum": {
+            "$ref": "#/components/schemas/UserDatum"
+          },
+          "userProfile": {
+            "$ref": "#/components/schemas/UserProfile"
+          },
+          "userCounter": {
+            "$ref": "#/components/schemas/UserCounter"
+          },
+          "userPreference": {
+            "$ref": "#/components/schemas/UserPreference"
+          },
+          "userSetting": {
+            "$ref": "#/components/schemas/UserSetting"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        }
+      },
+      "UserCounter": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64"
+          },
+          "user": {
+
+          },
+          "followerCnt": {
+            "type": "string",
+            "format": "int64"
+          },
+          "followingCnt": {
+            "type": "string",
+            "format": "int64"
+          },
+          "likeCnt": {
+            "type": "string",
+            "format": "int64"
+          },
+          "postCnt": {
+            "type": "string",
+            "format": "int64"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "collectCnt": {
+            "type": "string",
+            "format": "int64"
+          },
+          "submitCnt": {
+            "type": "string",
+            "format": "int64"
+          },
+          "rejectCnt": {
+            "type": "string",
+            "format": "int64"
+          },
+          "reportCnt": {
+            "type": "string",
+            "format": "int64"
+          },
+          "reportHitCnt": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      },
+      "UserDatum": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "phoneVerified": {
+            "type": "boolean"
+          },
+          "encryptionKeyId": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "emailEncrypted": {
+            "type": "string"
+          },
+          "emailHash": {
+            "type": "string"
+          },
+          "phoneEncrypted": {
+            "type": "string"
+          },
+          "phoneHash": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "emailExpireAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserPreference": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "locale": {
+            "type": "string",
+            "maxLength": 10,
+            "minLength": 0
+          },
+          "timezone": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "locale"
+        ]
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "user": {
+
+          },
+          "bio": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "residence": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "updateAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "uid"
+        ]
+      },
+      "UserRole": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "UserSetting": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64"
+          },
+          "user": {
+
+          },
+          "profileVisibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "FOLLOWERS",
+              "PRIVATE"
+            ]
+          },
+          "workVisibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "FOLLOWERS",
+              "PRIVATE"
+            ]
+          },
+          "commentPermission": {
+            "type": "string",
+            "enum": [
+              "ALL",
+              "FOLLOWERS",
+              "NONE"
+            ]
+          },
+          "messagePermission": {
+            "type": "string",
+            "enum": [
+              "ALL",
+              "FOLLOWERS",
+              "NONE"
+            ]
+          },
+          "allowFollow": {
+            "type": "boolean"
+          },
+          "showActiveStatus": {
+            "type": "boolean"
+          },
+          "messageNotifications": {
+            "type": "boolean"
+          },
+          "commentNotifications": {
+            "type": "boolean"
+          },
+          "likeNotifications": {
+            "type": "boolean"
+          },
+          "followNotifications": {
+            "type": "boolean"
+          },
+          "eventNotifications": {
+            "type": "boolean"
+          },
+          "emailNotifications": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "allowFollow",
+          "commentNotifications",
+          "commentPermission",
+          "emailNotifications",
+          "eventNotifications",
+          "followNotifications",
+          "likeNotifications",
+          "messageNotifications",
+          "messagePermission",
+          "profileVisibility",
+          "showActiveStatus",
+          "workVisibility"
+        ]
+      },
+      "ApiResponseUserProfile": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserProfile"
+          }
+        }
+      },
+      "ApiResponseSetUserPermission": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserPermission"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "Permission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/Permission"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "orderWeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isSystem": {
+            "type": "boolean"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "API",
+              "MENU",
+              "BUTTON",
+              "DATA",
+              "BAM"
+            ]
+          }
+        }
+      },
+      "UserPermission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "permission": {
+            "$ref": "#/components/schemas/Permission"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "banReasonType": {
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "VIOLATION_OF_GUIDELINES",
+              "INAPPROPRIATE_CONTENT",
+              "ADVERTISEMENT",
+              "VIOLENCE",
+              "SENSITIVE",
+              "CHEATING",
+              "IMPERSONATION",
+              "PRIVACY",
+              "TROLLING",
+              "OTHER"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminUserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "passwordHash": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isAdmin": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseAdminUserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminUserInfoResponse"
+          }
+        }
+      },
+      "ApiResponseCloudResPresignedUrlResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
           }
         }
       },

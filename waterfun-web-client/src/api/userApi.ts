@@ -103,14 +103,6 @@ export const updateUserSettings = (data: UserSettingsDto): PromiseResBody<null> 
     return request.put(`/user/settings`, data);
 }
 
-export const getPermissions = (): PromiseResBody<string[]> => {
-    return request.get(`/user/permissions`);
-}
-
-export const followUser = (uid: string): PromiseResBody<void> => {
-    return request.post(`/user/${uid}/follow`);
-}
-
 export interface PageUserBrief {
     content: UserBrief[]
     totalElements: number
@@ -122,10 +114,30 @@ export interface PageUserBrief {
     empty: boolean
 }
 
-export const getFollowings = (uid: string, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
-    return request.get(`/user/${uid}/followings`, { params: { page, size } });
+export const getPermissions = (): PromiseResBody<string[]> => {
+    return request.get(`/user/permissions`);
 }
 
-export const getFollowers = (uid: string, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
-    return request.get(`/user/${uid}/followers`, { params: { page, size } });
+export interface OnlineUserStats {
+    onlineCount: number
+    todayNewUsers: number
+    todayPeakOnline: number
+}
+
+export const getOnlineStats = (): PromiseResBody<OnlineUserStats> => {
+    return request.get('/online-users/stats');
+}
+
+export const listOnlineUsers = (params: {
+    page?: number
+    size?: number
+} = {}): PromiseResBody<PageUserBrief> => {
+    return request.get('/online-users/list', { params });
+}
+
+export const getUserLikedPostIds = (uid: string, params: {
+    page?: number
+    size?: number
+} = {}): PromiseResBody<PageUserBrief> => {
+    return request.get(`/user/${uid}/likes`, { params });
 }

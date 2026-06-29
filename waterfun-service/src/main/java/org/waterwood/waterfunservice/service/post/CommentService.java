@@ -11,7 +11,7 @@ public interface CommentService {
      * Create a comment
      * @param req request body
      */
-    void create(@Valid CreateCommentReq req);
+    void create(CreateCommentReq req);
 
     /**
      * Delete a comment

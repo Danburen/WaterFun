@@ -66,7 +66,7 @@ const loadProfile = async () => {
 
 const loadPosts = async () => {
   try {
-    await postStore.fetchPostList({ page: 1, size: 20 })
+    await postStore.fetchPostList({ page: 1, size: 20, authorId: uid.value })
   } catch { /* ignore */ }
 }
 

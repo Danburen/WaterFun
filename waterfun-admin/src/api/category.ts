@@ -9,10 +9,10 @@ export interface CategoryResp {
   name: string;
   slug?: string;
   description?: string;
-  parentId?: number | null;
+  parentId?: string | null;
   sortOrder?: number;
   isActive?: boolean;
-  creatorId?: number | null;
+  creatorId?: string | null;
   updateAt?: ISOString;
   createdAt?: ISOString;
 }

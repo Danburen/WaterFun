@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,10 +19,12 @@ import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
+import org.waterwood.waterfunservicecore.api.req.auth.LogoutRequestBody;
 import org.waterwood.waterfunservicecore.services.auth.AuthCoreService;
 import org.waterwood.waterfunservicecore.services.auth.LoginService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user/security")
 @RequiredArgsConstructor
@@ -44,9 +47,9 @@ public class UserSecurityController {
 
     @Operation(summary = "登出")
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(@RequestBody String deviceFp, HttpServletRequest request, HttpServletResponse response) {
+    public ApiResponse<Void> logout(@RequestBody @Valid LogoutRequestBody req, HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = CookieUtil.getCookieValue(request.getCookies(),"REFRESH_TOKEN");
-        loginService.logout(refreshToken, deviceFp);
+        loginService.logout(refreshToken, req.getDeviceFp());
         CookieUtil.cleanTokenCookie(response);
         return ApiResponse.success();
     }

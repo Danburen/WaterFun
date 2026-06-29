@@ -1,6 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import * as notificationApi from '~/api/notificationApi'
-import type { InboxNotificationRes, NotificationType, NotificationGroup, CursorPageLong } from '~/api/notificationApi'
+import type { InboxNotificationRes, NotificationType, NotificationGroup, CursorPageLong, UnreadCountResp } from '~/api/notificationApi'
 import { useAuthStore } from '~/stores/authStore'
 import { useUserInfoStore } from '~/stores/userInfoStore'
 import { SseClient } from '~/utils/sseClient'
@@ -13,6 +13,7 @@ interface NotificationState {
   hasNext: Record<string, boolean>
   loading: Record<string, boolean>
   unreadCount: number
+  tabUnreadCounts: Record<string, number>
   sseConnected: boolean
 }
 
@@ -30,10 +31,10 @@ export const useNotificationStore = defineStore('notification', {
       [SUBSCRIBE]: [],
     },
     cursors: {
-      [SYSTEM]: null,
-      [REPLY]: null,
-      [MENTION]: null,
-      [SUBSCRIBE]: null,
+      [SYSTEM]: null as number | null,
+      [REPLY]: null as number | null,
+      [MENTION]: null as number | null,
+      [SUBSCRIBE]: null as number | null,
     },
     hasNext: {
       [SYSTEM]: true,
@@ -48,6 +49,7 @@ export const useNotificationStore = defineStore('notification', {
       [SUBSCRIBE]: false,
     },
     unreadCount: 0,
+    tabUnreadCounts: { system: 0, subscribe: 0, reply: 0, mention: 0 },
     sseConnected: false,
   }),
 
@@ -97,7 +99,7 @@ export const useNotificationStore = defineStore('notification', {
         const page = res.data as unknown as CursorPageLong<InboxNotificationRes>
         const list = page?.list || []
 
-        this.notifications[tab] = reset ? list : [...this.notifications[tab], ...list]
+        this.notifications[tab] = reset ? list : [...(this.notifications[tab] ?? []), ...list]
         this.cursors[tab] = page?.nextCursor ?? null
         this.hasNext[tab] = Boolean(page?.hasNext)
       } catch (err) {
@@ -111,23 +113,33 @@ export const useNotificationStore = defineStore('notification', {
     async fetchUnreadCount(): Promise<void> {
       try {
         const res = await notificationApi.getUnreadCount()
-        this.unreadCount = (res.data as unknown as number) || 0
+        const data = res.data as unknown as UnreadCountResp
+        if (data) {
+          this.unreadCount = data.total ?? 0
+          if (data.tabs) {
+            for (const key of ['system', 'subscribe', 'reply', 'mention']) {
+              this.tabUnreadCounts[key] = data.tabs[key] ?? 0
+            }
+          }
+        }
       } catch (err) {
         console.error('fetch unread count failed:', err)
       }
     },
 
-    async markAsRead(id: string): Promise<void> {
+    async markAsRead(id: number): Promise<void> {
       try {
         await notificationApi.markNotificationRead(id)
         for (const key of Object.keys(this.notifications)) {
-          const idx = this.notifications[key].findIndex((n) => n.id === id)
-          if (idx !== -1) {
-            this.notifications[key][idx].isRead = true
+          const list = this.notifications[key]
+          if (!list) continue
+          const idx = list.findIndex((n) => n.id === id)
+          if (idx !== -1 && list[idx]) {
+            list[idx].isRead = true
             break
           }
         }
-        if (this.unreadCount > 0) this.unreadCount--
+        await this.fetchUnreadCount()
       } catch (err) {
         console.error('mark notification read failed:', err)
       }
@@ -137,9 +149,9 @@ export const useNotificationStore = defineStore('notification', {
       try {
         await notificationApi.markAllNotificationsRead()
         for (const key of Object.keys(this.notifications)) {
-          this.notifications[key].forEach((n) => (n.isRead = true))
+          this.notifications[key]?.forEach((n) => (n.isRead = true))
         }
-        this.unreadCount = 0
+        await this.fetchUnreadCount()
       } catch (err) {
         console.error('mark all notifications read failed:', err)
       }
@@ -175,6 +187,9 @@ export const useNotificationStore = defineStore('notification', {
           const data = JSON.parse(event.data) as InboxNotificationRes
           this.unreadCount++
           const tab = tabMap[data.noticeType] || 'subscribe'
+          if (this.tabUnreadCounts[tab] !== undefined) {
+            this.tabUnreadCounts[tab]++
+          }
           if (this.notifications[tab]) {
             this.notifications[tab].unshift(data)
           }
@@ -194,12 +209,14 @@ export const useNotificationStore = defineStore('notification', {
       }
     },
 
-    async deleteNotification(id: string): Promise<void> {
+    async deleteNotification(id: number): Promise<void> {
       try {
         await notificationApi.deleteNotification(id)
         for (const key of Object.keys(this.notifications)) {
-          this.notifications[key] = this.notifications[key].filter((n) => n.id !== id)
+          const list = this.notifications[key]
+          if (list) this.notifications[key] = list.filter((n) => n.id !== id)
         }
+        await this.fetchUnreadCount()
       } catch (err) {
         console.error('delete notification failed:', err)
       }

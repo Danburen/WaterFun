@@ -31,23 +31,33 @@ public class GatewayUserContextFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String lang = request.getHeader("X-User-Lang");
+        Locale locale = Locale.forLanguageTag(lang != null ? lang : "en");
+
         String userUid = request.getHeader("X-User-Uid");
         if(StringUtil.isBlank(userUid)) {
-            filterChain.doFilter(request, response);
+            AuthContext authCtx = new AuthContext();
+            authCtx.setLocale(locale);
+            authCtx.setClientIp((String) request.getAttribute("clientIp"));
+            UserCtxHolder.set(authCtx);
+            try {
+                filterChain.doFilter(request, response);
+            } finally {
+                UserCtxHolder.remove();
+            }
             return;
         }
 
         AuthContext authCtx = new AuthContext();
 
         String jti = request.getHeader("X-Token-Jti");
-        String lang = request.getHeader("X-User-Lang");
         if(StringUtil.isBlank(jti)){
             jti = request.getHeader("X-User-Jti");
         }
 
         authCtx.setUserUid(Long.valueOf(userUid));
         authCtx.setJti(jti);
-        authCtx.setLocale(Locale.forLanguageTag(lang != null ? lang : "en"));
+        authCtx.setLocale(locale);
         authCtx.setDid(request.getHeader("X-User-Did"));
         authCtx.setClientIp((String) request.getAttribute("clientIp"));
 

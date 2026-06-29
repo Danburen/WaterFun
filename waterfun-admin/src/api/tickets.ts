@@ -43,7 +43,7 @@ export interface AvatarInfo {
 }
 
 export interface UserBriefWithStats {
-  uid?: number;
+  uid?: string;
   nickname?: string;
   displayName?: string;
   avatar?: string | AvatarInfo | null;
@@ -72,20 +72,19 @@ export interface ActiveRestriction {
 }
 
 export interface BanStatusInfo {
-  userUid: number;
+  userUid: string;
   banned: boolean;
   restrictions: ActiveRestriction[];
 }
 
 export interface TicketResponse {
-  ticketId?: number;
+  ticketId?: string;
   ticketType?: TicketType;
   status?: TicketStatus;
   submitter?: UserBriefWithStats;
   auditor?: UserBriefWithStats | null;
-  targetUserId?: number;
   targetUser?: UserBriefWithStats;
-  targetId?: string | null;
+  targetId?: string;
   targetType?: string;
   content?: string;
   rejectType?: RejectType;
@@ -99,14 +98,6 @@ export interface TicketResponse {
   createdAt?: ISOString;
   auditAt?: string | null;
   updatedAt?: ISOString;
-  penaltyType?: PenaltyType;
-  banReasonType?: BanReasonType;
-  id?: number;
-  submitterId?: number;
-  attachments?: string[];
-  source?: string;
-  sourceUrl?: string;
-  relatedTitle?: string;
 }
 
 export interface ListTicketParams {
@@ -129,10 +120,10 @@ export interface TicketReviewRequest {
 }
 
 export interface TicketStats {
-  reportCount: number;
-  appealCount: number;
-  feedbackCount: number;
-  suggestionCount: number;
+  reportCount: string;
+  appealCount: string;
+  feedbackCount: string;
+  suggestionCount: string;
 }
 
 export const listTickets = (params: ListTicketParams = {}): PromiseResBody<Page<TicketResponse>> => {

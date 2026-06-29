@@ -3,7 +3,7 @@ import { usePostStore } from '~/stores/postStore'
 import { useCommentStore } from '~/stores/commentStore'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { likePost, collectPost, fetchPostList, reportPost } from '~/api/postApi'
+import { likePost, collectPost, fetchPostList, reportPost, getPostLikedUsers } from '~/api/postApi'
 import { likeComment, reportComment } from '~/api/commentApi'
 import type { ReportType } from '~/api/ticketApi'
 import UserBadge from '~/components/UserBadge.vue'
@@ -13,7 +13,7 @@ import { useUserInfoStore } from '~/stores/userInfoStore'
 import MarkdownIt from 'markdown-it'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '~/stores/authStore'
-import type { PostCardResp } from '~/api/postApi'
+import type { PostCardResp, UserBrief } from '~/api/postApi'
 
 const postStore = usePostStore()
 const commentStore = useCommentStore()
@@ -35,6 +35,7 @@ const collected = ref(false)
 const likeCount = ref(0)
 const collectCount = ref(0)
 const commentCount = ref(0)
+const likedUsers = ref<UserBrief[]>([])
 
 const commentText = ref('')
 const commentTextareaRef = ref<HTMLTextAreaElement | null>(null)
@@ -79,12 +80,20 @@ const fetchDetail = async () => {
         relatedPosts.value = (data?.content || []).filter((p: PostCardResp) => p.id !== postId.value).slice(0, 5)
       }
     }
+    loadLikedUsers()
   } catch { /* ignore */ }
   finally { pageLoading.value = false }
 }
 
 const fetchComments = (reset = false) => {
-  commentStore.fetchComments(BigInt(postId.value), reset)
+  commentStore.fetchComments(postId.value, reset)
+}
+
+const loadLikedUsers = async () => {
+  try {
+    const res = await getPostLikedUsers(postId.value)
+    likedUsers.value = (res.data as UserBrief[]) || []
+  } catch { /* ignore */ }
 }
 
 const handleLike = async () => {
@@ -93,6 +102,7 @@ const handleLike = async () => {
     await likePost(postId.value)
     liked.value = !liked.value
     likeCount.value += liked.value ? 1 : -1
+    loadLikedUsers()
   } catch { /* ignore */ }
 }
 
@@ -110,7 +120,7 @@ const submitComment = async () => {
   if (!authStore.isAccess) { router.push('/login'); return }
   submitting.value = true
   try {
-    await commentStore.addComment({ postId: BigInt(postId.value), content: commentText.value.trim() })
+    await commentStore.addComment({ postId: postId.value, content: commentText.value.trim() })
     commentText.value = ''
     commentCount.value++
     ElMessage.success('评论发布成功！')
@@ -139,8 +149,8 @@ const submitReply = async () => {
   replySubmitting.value = true
   try {
     await commentStore.addComment({
-      postId: BigInt(postId.value),
-      parentId: BigInt(replyTarget.value.commentId),
+      postId: postId.value,
+      parentId: replyTarget.value.commentId,
       content: replyText.value.trim(),
     })
     replyText.value = ''
@@ -155,6 +165,16 @@ const handleLikeComment = async (commentId: string) => {
   if (!authStore.isAccess) { router.push('/login'); return }
   try {
     await likeComment(commentId)
+    const updateItem = (item: { isLiked?: boolean; likeCount: number }) => {
+      item.isLiked = !item.isLiked
+      item.likeCount += item.isLiked ? 1 : -1
+    }
+    const root = commentStore.comments.find(c => c.id === commentId)
+    if (root) { updateItem(root); return }
+    for (const replies of Object.values(commentStore.replies)) {
+      const reply = replies.find(r => r.id === commentId)
+      if (reply) { updateItem(reply); return }
+    }
   } catch { /* ignore */ }
 }
 
@@ -164,14 +184,14 @@ const toggleReplies = async (rootId: string) => {
     return
   }
   expandedReplies.value.add(rootId)
-  await commentStore.fetchReplies(BigInt(rootId), true)
+  await commentStore.fetchReplies(rootId, true)
 }
 
 const getReplies = (rootId: string) => commentStore.replies[rootId] || []
 const replyHasNext = (rootId: string) => commentStore.replyHasNext[rootId] ?? false
 
 const loadMoreReplies = async (rootId: string) => {
-  await commentStore.fetchReplies(BigInt(rootId), false)
+  await commentStore.fetchReplies(rootId, false)
 }
 
 const reportDialog = ref(false)
@@ -283,6 +303,15 @@ watch(currentPost, (post) => {
   nextTick(() => {
     const el = commentSectionRef.value
     if (!el) return
+
+    const hash = window.location.hash
+    if (hash.startsWith('#comment-')) {
+      commentsLoaded = true
+      fetchComments(true)
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
+
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && !commentsLoaded) {
         commentsLoaded = true
@@ -409,6 +438,20 @@ watch(currentPost, (post) => {
               />
             </div>
           </div>
+          <div v-if="likedUsers.length > 0" class="liked-users-bar">
+            <div class="liked-avatars">
+              <img
+                v-for="user in likedUsers.slice(0, 5)"
+                :key="user.uid"
+                :src="user.avatar?.url || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
+                :title="user.displayName"
+                class="liked-avatar"
+              />
+            </div>
+            <span class="liked-text">
+              被 <strong>{{ likeCount }}</strong> 人赞过
+            </span>
+          </div>
         </article>
 
         <div v-if="currentPost.status === 'PUBLISHED'" ref="commentSectionRef" class="reply-section">
@@ -468,8 +511,8 @@ watch(currentPost, (post) => {
                 </div>
                 <div class="reply-body">{{ comment.content }}</div>
                 <div class="reply-actions">
-                  <button class="reply-action-btn" @click="handleLikeComment(comment.id)">
-                    <i class="far fa-thumbs-up"></i> {{ formatCount(comment.likeCount) }}
+                  <button class="reply-action-btn" :class="{ active: comment.isLiked }" @click="handleLikeComment(comment.id)">
+                    <i :class="comment.isLiked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up'"></i> {{ formatCount(comment.likeCount) }}
                   </button>
                   <button class="reply-action-btn" @click="startReply(comment.id, comment.author?.displayName || '匿名用户')">
                     <i class="far fa-comment"></i> 回复
@@ -512,8 +555,8 @@ watch(currentPost, (post) => {
                       </div>
                       <div class="nested-body">{{ reply.content }}</div>
                       <div class="reply-actions" style="margin-top:6px">
-                        <button class="reply-action-btn" @click="handleLikeComment(reply.id)">
-                          <i class="far fa-thumbs-up"></i> {{ formatCount(reply.likeCount) }}
+                        <button class="reply-action-btn" :class="{ active: reply.isLiked }" @click="handleLikeComment(reply.id)">
+                          <i :class="reply.isLiked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up'"></i> {{ formatCount(reply.likeCount) }}
                         </button>
                         <button class="reply-action-btn" @click="startReply(comment.id, reply.author?.displayName || '匿名用户')">
                           <i class="far fa-comment"></i> 回复
@@ -920,6 +963,43 @@ watch(currentPost, (post) => {
   gap: 8px;
 }
 
+.liked-users-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 28px;
+  border-top: 1px solid var(--wf-border-light);
+  background: #f8fafc;
+}
+
+.liked-avatars {
+  display: flex;
+  align-items: center;
+}
+
+.liked-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  margin-left: -6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.liked-avatar:first-child {
+  margin-left: 0;
+}
+
+.liked-text {
+  font-size: 13px;
+  color: var(--wf-text-muted);
+}
+
+.liked-text strong {
+  color: var(--wf-text-secondary);
+}
+
 .reply-section {
   background: var(--wf-bg-white);
   border: 1px solid var(--wf-border);
@@ -1102,6 +1182,8 @@ watch(currentPost, (post) => {
 }
 
 .reply-action-btn:hover { color: var(--wf-primary); }
+
+.reply-action-btn.active { color: var(--wf-primary); }
 
 .reply-action-btn i { font-size: 13px; }
 

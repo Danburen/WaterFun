@@ -17,6 +17,56 @@
     }
   ],
   "paths": {
+    "/api/user/userInfo": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get current user info",
+        "operationId": "getUserInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Update current user nickname",
+        "operationId": "updateNickname",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNicknameRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/user/updateProfile": {
       "put": {
         "tags": [
@@ -34,6 +84,89 @@
           },
           "required": true
         },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/settings": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get current user settings (privacy + notification)",
+        "operationId": "getSettings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserSettingsResp"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Update current user settings",
+        "operationId": "updateSettings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSettingsResp"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/follow": {
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Follow/ unFollower a user",
+        "description": "Follow a user if not followed, otherwise unFollow the user",
+        "operationId": "follow",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1116,6 +1249,37 @@
         }
       }
     },
+    "/api/auth/account/send-verify-code": {
+      "post": {
+        "tags": [
+          "auth-account-controller"
+        ],
+        "summary": "账户页发送验证码",
+        "operationId": "sendVerifyCode_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendCodeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/account/phone/change": {
       "post": {
         "tags": [
@@ -1364,20 +1528,251 @@
         }
       }
     },
-    "/api/user/userInfo": {
+    "/api/user/{uid}/profile": {
       "get": {
         "tags": [
           "user-controller"
         ],
-        "summary": "Get current user info",
-        "operationId": "getUserInfo",
+        "summary": "Get user public profile",
+        "operationId": "getUserProfile",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserInfoResponse"
+                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/likes": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user liked post IDs",
+        "operationId": "getLikedPosts",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/followings": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the following list of a user",
+        "operationId": "getFollowing",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/followers": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get the followers list of a user",
+        "operationId": "getFollower",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/card": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get user public card",
+        "operationId": "getUserCard",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{uid}/avatar": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "Get a user avatar",
+        "operationId": "getUserAvatar",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
                 }
               }
             }
@@ -1794,6 +2189,48 @@
         }
       }
     },
+    "/api/posts/hot": {
+      "get": {
+        "tags": [
+          "post-controller"
+        ],
+        "operationId": "listHotPosts",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePostCardResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/post/tags/{id}": {
       "get": {
         "tags": [
@@ -2033,6 +2470,48 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseOnlineUserStatsVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/online-users/list": {
+      "get": {
+        "tags": [
+          "online-user-controller"
+        ],
+        "operationId": "listOnlineUsers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 12
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
                 }
               }
             }
@@ -2348,6 +2827,65 @@
         }
       }
     },
+    "/api/comments/list": {
+      "get": {
+        "tags": [
+          "comment-controller"
+        ],
+        "summary": "List root comments of a post with cursor pagination",
+        "operationId": "listPostComments",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "includeRootId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/banners": {
       "get": {
         "tags": [
@@ -2456,6 +2994,48 @@
         }
       }
     },
+    "/api/announcements": {
+      "get": {
+        "tags": [
+          "announcement-controller"
+        ],
+        "operationId": "listAnnouncements",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePostCardResp"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/notifications/{id}": {
       "delete": {
         "tags": [
@@ -2517,1970 +3097,40 @@
           }
         }
       }
-    },
-    "/api/user/{uid}/profile": {
-      "get": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public profile",
-        "operationId": "getUserProfile",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public profile",
-        "operationId": "getUserProfile_2",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public profile",
-        "operationId": "getUserProfile_1",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public profile",
-        "operationId": "getUserProfile_3",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public profile",
-        "operationId": "getUserProfile_6",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "head": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public profile",
-        "operationId": "getUserProfile_5",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public profile",
-        "operationId": "getUserProfile_4",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicProfileResp"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/user/{uid}/followings": {
-      "get": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the following list of a user",
-        "operationId": "getFollowing",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the following list of a user",
-        "operationId": "getFollowing_2",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the following list of a user",
-        "operationId": "getFollowing_1",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the following list of a user",
-        "operationId": "getFollowing_3",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the following list of a user",
-        "operationId": "getFollowing_6",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "head": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the following list of a user",
-        "operationId": "getFollowing_5",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the following list of a user",
-        "operationId": "getFollowing_4",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/user/{uid}/followers": {
-      "get": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the followers list of a user",
-        "operationId": "getFollower",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the followers list of a user",
-        "operationId": "getFollower_2",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the followers list of a user",
-        "operationId": "getFollower_1",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the followers list of a user",
-        "operationId": "getFollower_3",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the followers list of a user",
-        "operationId": "getFollower_6",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "head": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the followers list of a user",
-        "operationId": "getFollower_5",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get the followers list of a user",
-        "operationId": "getFollower_4",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponsePageUserBrief"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/user/{uid}/follow": {
-      "get": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Follow/ unFollower a user",
-        "description": "Follow a user if not followed, otherwise unFollow the user",
-        "operationId": "follow",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Follow/ unFollower a user",
-        "description": "Follow a user if not followed, otherwise unFollow the user",
-        "operationId": "follow_2",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Follow/ unFollower a user",
-        "description": "Follow a user if not followed, otherwise unFollow the user",
-        "operationId": "follow_1",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Follow/ unFollower a user",
-        "description": "Follow a user if not followed, otherwise unFollow the user",
-        "operationId": "follow_3",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Follow/ unFollower a user",
-        "description": "Follow a user if not followed, otherwise unFollow the user",
-        "operationId": "follow_6",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "head": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Follow/ unFollower a user",
-        "description": "Follow a user if not followed, otherwise unFollow the user",
-        "operationId": "follow_5",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Follow/ unFollower a user",
-        "description": "Follow a user if not followed, otherwise unFollow the user",
-        "operationId": "follow_4",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/user/{uid}/card": {
-      "get": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public card",
-        "operationId": "getUserCard",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public card",
-        "operationId": "getUserCard_2",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public card",
-        "operationId": "getUserCard_1",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public card",
-        "operationId": "getUserCard_3",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public card",
-        "operationId": "getUserCard_6",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "head": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public card",
-        "operationId": "getUserCard_5",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get user public card",
-        "operationId": "getUserCard_4",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseUserPublicCardResp"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/user/{uid}/avatar": {
-      "get": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get a user avatar",
-        "operationId": "getUserAvatar",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get a user avatar",
-        "operationId": "getUserAvatar_2",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get a user avatar",
-        "operationId": "getUserAvatar_1",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get a user avatar",
-        "operationId": "getUserAvatar_3",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get a user avatar",
-        "operationId": "getUserAvatar_6",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "head": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get a user avatar",
-        "operationId": "getUserAvatar_5",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "Get a user avatar",
-        "operationId": "getUserAvatar_4",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCloudResPresignedUrlResp"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/comments/list": {
-      "get": {
-        "tags": [
-          "comment-controller"
-        ],
-        "summary": "List root comments of a post with cursor pagination",
-        "operationId": "listPostComments",
-        "parameters": [
-          {
-            "name": "postId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          },
-          {
-            "name": "includeRootId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "comment-controller"
-        ],
-        "summary": "List root comments of a post with cursor pagination",
-        "operationId": "listPostComments_2",
-        "parameters": [
-          {
-            "name": "postId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          },
-          {
-            "name": "includeRootId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "comment-controller"
-        ],
-        "summary": "List root comments of a post with cursor pagination",
-        "operationId": "listPostComments_1",
-        "parameters": [
-          {
-            "name": "postId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          },
-          {
-            "name": "includeRootId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "comment-controller"
-        ],
-        "summary": "List root comments of a post with cursor pagination",
-        "operationId": "listPostComments_3",
-        "parameters": [
-          {
-            "name": "postId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          },
-          {
-            "name": "includeRootId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "comment-controller"
-        ],
-        "summary": "List root comments of a post with cursor pagination",
-        "operationId": "listPostComments_6",
-        "parameters": [
-          {
-            "name": "postId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          },
-          {
-            "name": "includeRootId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
-                }
-              }
-            }
-          }
-        }
-      },
-      "head": {
-        "tags": [
-          "comment-controller"
-        ],
-        "summary": "List root comments of a post with cursor pagination",
-        "operationId": "listPostComments_5",
-        "parameters": [
-          {
-            "name": "postId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          },
-          {
-            "name": "includeRootId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "comment-controller"
-        ],
-        "summary": "List root comments of a post with cursor pagination",
-        "operationId": "listPostComments_4",
-        "parameters": [
-          {
-            "name": "postId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          },
-          {
-            "name": "includeRootId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseCursorPageCommentResponseString"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
+      "UpdateNicknameRequest": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 1
+          }
+        },
+        "required": [
+          "nickname"
+        ]
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+
+          }
+        }
+      },
       "UpdateUserProfileRequest": {
         "type": "object",
         "properties": {
@@ -4509,20 +3159,60 @@
           }
         }
       },
-      "ApiResponseVoid": {
+      "UserNotificationSettings": {
         "type": "object",
         "properties": {
-          "success": {
+          "messageNotifications": {
             "type": "boolean"
           },
-          "code": {
+          "commentNotifications": {
+            "type": "boolean"
+          },
+          "likeNotifications": {
+            "type": "boolean"
+          },
+          "followNotifications": {
+            "type": "boolean"
+          },
+          "eventNotifications": {
+            "type": "boolean"
+          },
+          "emailNotifications": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserPrivacySettings": {
+        "type": "object",
+        "properties": {
+          "profileVisibility": {
             "type": "string"
           },
-          "message": {
+          "workVisibility": {
             "type": "string"
           },
-          "data": {
-
+          "commentPermission": {
+            "type": "string"
+          },
+          "messagePermission": {
+            "type": "string"
+          },
+          "allowFollow": {
+            "type": "boolean"
+          },
+          "showActiveStatus": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserSettingsResp": {
+        "type": "object",
+        "properties": {
+          "notifications": {
+            "$ref": "#/components/schemas/UserNotificationSettings"
+          },
+          "privacy": {
+            "$ref": "#/components/schemas/UserPrivacySettings"
           }
         }
       },
@@ -4765,10 +3455,10 @@
               "OTHER"
             ]
           },
-          "targetValidForReport": {
+          "reasonValid": {
             "type": "boolean"
           },
-          "reasonValid": {
+          "targetValidForReport": {
             "type": "boolean"
           }
         },
@@ -4850,7 +3540,6 @@
           }
         },
         "required": [
-          "categoryId",
           "content",
           "title"
         ]
@@ -5310,6 +3999,298 @@
           "verify"
         ]
       },
+      "ApiResponseUserPublicProfileResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserPublicProfileResp"
+          }
+        }
+      },
+      "CloudResPresignedUrlResp": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "expireAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserBrief": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userType": {
+            "type": "string",
+            "enum": [
+              "COMMON",
+              "ADMIN",
+              "BOT",
+              "MODERATOR",
+              "VIP"
+            ]
+          }
+        }
+      },
+      "UserPublicProfileResp": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "userBrief": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN",
+              "OTHER"
+            ]
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date"
+          },
+          "residence": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "followers": {
+            "type": "string",
+            "format": "int64"
+          },
+          "followings": {
+            "type": "string",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "postCount": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponsePageLong": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "PageObject": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "string",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "offset": {
+            "type": "string",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "sorted": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponsePageUserBrief": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          }
+        }
+      },
+      "ApiResponseUserPublicCardResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserPublicCardResp"
+          }
+        }
+      },
+      "UserPublicCardResp": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "format": "int64"
+          },
+          "userBrief": {
+            "$ref": "#/components/schemas/UserBrief"
+          },
+          "followers": {
+            "type": "string",
+            "format": "int64"
+          },
+          "followings": {
+            "type": "string",
+            "format": "int64"
+          },
+          "likeCount": {
+            "type": "string",
+            "format": "int64"
+          },
+          "postCount": {
+            "type": "string",
+            "format": "int64"
+          }
+        }
+      },
+      "ApiResponseCloudResPresignedUrlResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
+          }
+        }
+      },
       "ApiResponseUserInfoResponse": {
         "type": "object",
         "properties": {
@@ -5324,18 +4305,6 @@
           },
           "data": {
             "$ref": "#/components/schemas/UserInfoResponse"
-          }
-        }
-      },
-      "CloudResPresignedUrlResp": {
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string"
-          },
-          "expireAt": {
-            "type": "string",
-            "format": "date-time"
           }
         }
       },
@@ -5368,6 +4337,23 @@
           },
           "passwordHash": {
             "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseUserSettingsResp": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserSettingsResp"
           }
         }
       },
@@ -5432,23 +4418,6 @@
           }
         }
       },
-      "ApiResponseCloudResPresignedUrlResp": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          }
-        }
-      },
       "ApiResponsePageUserTicketListResponse": {
         "type": "object",
         "properties": {
@@ -5463,161 +4432,6 @@
           },
           "data": {
             "$ref": "#/components/schemas/PageObject"
-          }
-        }
-      },
-      "PageObject": {
-        "type": "object",
-        "properties": {
-          "totalElements": {
-            "type": "string",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserTicketListResponse"
-            }
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
-          "first": {
-            "type": "boolean"
-          },
-          "last": {
-            "type": "boolean"
-          },
-          "numberOfElements": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageable": {
-            "$ref": "#/components/schemas/PageableObject"
-          },
-          "empty": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PageableObject": {
-        "type": "object",
-        "properties": {
-          "offset": {
-            "type": "string",
-            "format": "int64"
-          },
-          "sort": {
-            "$ref": "#/components/schemas/SortObject"
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "paged": {
-            "type": "boolean"
-          },
-          "unpaged": {
-            "type": "boolean"
-          }
-        }
-      },
-      "SortObject": {
-        "type": "object",
-        "properties": {
-          "empty": {
-            "type": "boolean"
-          },
-          "sorted": {
-            "type": "boolean"
-          },
-          "unsorted": {
-            "type": "boolean"
-          }
-        }
-      },
-      "UserTicketListResponse": {
-        "type": "object",
-        "properties": {
-          "ticketId": {
-            "type": "string",
-            "format": "int64"
-          },
-          "ticketType": {
-            "type": "string",
-            "enum": [
-              "CONTENT_REPORT",
-              "ACCOUNT_APPEAL",
-              "FEATURE_FEEDBACK",
-              "SUGGESTION"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "RESOLVED",
-              "REJECTED"
-            ]
-          },
-          "content": {
-            "type": "string"
-          },
-          "targetId": {
-            "type": "string"
-          },
-          "targetType": {
-            "type": "string",
-            "enum": [
-              "DEFAULT",
-              "USER_AVATAR",
-              "POST",
-              "POST_COVERAGE_IMAGE",
-              "POST_CONTENT_IMAGE",
-              "BANNER_IMAGE",
-              "COMMENT",
-              "USER_REPORT_ATTACHMENT",
-              "MODERATION_IMAGE",
-              "USER"
-            ]
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "auditAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "auditNote": {
-            "type": "string"
-          },
-          "rejectType": {
-            "type": "string"
-          },
-          "evidenceCount": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },
@@ -5838,6 +4652,10 @@
           },
           "disabled": {
             "type": "boolean"
+          },
+          "usageCount": {
+            "type": "string",
+            "format": "int64"
           }
         }
       },
@@ -5940,36 +4758,8 @@
             "type": "string",
             "enum": [
               "NONE",
-              "PENDING"
-            ]
-          }
-        }
-      },
-      "UserBrief": {
-        "type": "object",
-        "properties": {
-          "uid": {
-            "type": "string",
-            "format": "int64"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "avatar": {
-            "$ref": "#/components/schemas/CloudResPresignedUrlResp"
-          },
-          "level": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userType": {
-            "type": "string",
-            "enum": [
-              "COMMON",
-              "ADMIN",
-              "BOT",
-              "MODERATOR",
-              "VIP"
+              "PENDING",
+              "REJECTED"
             ]
           }
         }
@@ -6006,6 +4796,9 @@
           "coverageImgPresignedUrl": {
             "$ref": "#/components/schemas/CloudResPresignedUrlResp"
           },
+          "editedCoverImg": {
+            "type": "string"
+          },
           "editedCategoryId": {
             "$ref": "#/components/schemas/OptionVOLong"
           },
@@ -6025,7 +4818,8 @@
             "type": "string",
             "enum": [
               "NONE",
-              "PENDING"
+              "PENDING",
+              "REJECTED"
             ]
           }
         }
@@ -6073,6 +4867,10 @@
           "totalLikeCount": {
             "type": "string",
             "format": "int64"
+          },
+          "followerCount": {
+            "type": "string",
+            "format": "int64"
           }
         }
       },
@@ -6106,6 +4904,9 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          "keyword": {
+            "type": "string"
           },
           "page": {
             "type": "integer",
@@ -6571,6 +5372,40 @@
           }
         }
       },
+      "ApiResponseCursorPageCommentResponseString": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CursorPageCommentResponseString"
+          }
+        }
+      },
+      "CursorPageCommentResponseString": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentResponse"
+            }
+          },
+          "nextCursor": {
+            "type": "string"
+          },
+          "hasNext": {
+            "type": "boolean"
+          }
+        }
+      },
       "ApiResponseListBannerResponse": {
         "type": "object",
         "properties": {
@@ -6662,170 +5497,6 @@
           },
           "data": {
             "$ref": "#/components/schemas/AccountResp"
-          }
-        }
-      },
-      "ApiResponseUserPublicProfileResp": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/UserPublicProfileResp"
-          }
-        }
-      },
-      "UserPublicProfileResp": {
-        "type": "object",
-        "properties": {
-          "uid": {
-            "type": "string",
-            "format": "int64"
-          },
-          "userBrief": {
-            "$ref": "#/components/schemas/UserBrief"
-          },
-          "bio": {
-            "type": "string"
-          },
-          "gender": {
-            "type": "string",
-            "enum": [
-              "MALE",
-              "FEMALE",
-              "UNKNOWN",
-              "OTHER"
-            ]
-          },
-          "birthday": {
-            "type": "string",
-            "format": "date"
-          },
-          "residence": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "followers": {
-            "type": "string",
-            "format": "int64"
-          },
-          "followings": {
-            "type": "string",
-            "format": "int64"
-          },
-          "likeCount": {
-            "type": "string",
-            "format": "int64"
-          },
-          "postCount": {
-            "type": "string",
-            "format": "int64"
-          }
-        }
-      },
-      "ApiResponsePageUserBrief": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/PageObject"
-          }
-        }
-      },
-      "ApiResponseUserPublicCardResp": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/UserPublicCardResp"
-          }
-        }
-      },
-      "UserPublicCardResp": {
-        "type": "object",
-        "properties": {
-          "uid": {
-            "type": "string",
-            "format": "int64"
-          },
-          "userBrief": {
-            "$ref": "#/components/schemas/UserBrief"
-          },
-          "followers": {
-            "type": "string",
-            "format": "int64"
-          },
-          "followings": {
-            "type": "string",
-            "format": "int64"
-          },
-          "likeCount": {
-            "type": "string",
-            "format": "int64"
-          },
-          "postCount": {
-            "type": "string",
-            "format": "int64"
-          }
-        }
-      },
-      "ApiResponseCursorPageCommentResponseString": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "data": {
-            "$ref": "#/components/schemas/CursorPageCommentResponseString"
-          }
-        }
-      },
-      "CursorPageCommentResponseString": {
-        "type": "object",
-        "properties": {
-          "list": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CommentResponse"
-            }
-          },
-          "nextCursor": {
-            "type": "string"
-          },
-          "hasNext": {
-            "type": "boolean"
           }
         }
       }

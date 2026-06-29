@@ -9,6 +9,7 @@ public class PublicPostListReq {
     private Integer categoryId;
     private List<Integer> tagIds;
     private String keyword;
+    private Long authorId;
     private int page = 1;
     private int size = 10;
 }

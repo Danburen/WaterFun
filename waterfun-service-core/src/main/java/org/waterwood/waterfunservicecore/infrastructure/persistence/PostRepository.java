@@ -74,7 +74,7 @@ public interface PostRepository extends JpaRepository<Post, Long>,
 
     Long findAuthorUidById(Long id);
 
-    @Query("SELECT new org.waterwood.waterfunservicecore.entity.post.PostAuthorUidTitleDO(p.author.uid, p.title, p.coverageResource.id) " +
+    @Query("SELECT new org.waterwood.waterfunservicecore.entity.post.PostAuthorUidTitleDO(p.author.uid, p.title, p.coverageResource.uuid) " +
             "FROM Post p WHERE p.id = :id")
     Optional<PostAuthorUidTitleDO> findPostAuthorIdTitleDOById(@Param("id") Long id);
 
@@ -138,4 +138,7 @@ public interface PostRepository extends JpaRepository<Post, Long>,
         """,
         nativeQuery = true)
     Page<Long> findHotPostIds(Pageable pageable);
+
+    @Query("SELECT p.coverageResource.uuid FROM Post p WHERE p.id = :id")
+    String findCoverageResourceUuidById(@Param("id")Long id);
 }

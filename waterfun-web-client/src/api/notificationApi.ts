@@ -1,8 +1,9 @@
 import request from "../utils/axiosRequest";
 import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
+import type { CloudResPresignedUrlResp } from "./postApi";
 
 export interface InboxNotificationRes {
-  id: string;
+  id: number;
   title: string;
   noticeType: number;
   content: NotificationContent;
@@ -11,7 +12,13 @@ export interface InboxNotificationRes {
 }
 
 export interface NotificationContent {
-  displayText: string;
+  userUids?: number[]
+  replierUid?: number
+  replyContent?: string
+  nativeUrl?: string
+  text?: string
+  followerUid?: number
+  postCoverage?: CloudResPresignedUrlResp | null
 }
 
 export interface CursorPageLong<T> {
@@ -33,7 +40,7 @@ export interface ListNotificationParams {
 }
 
 export interface BatchMarkReadReq {
-  ids: (number | bigint)[];
+  ids: number[];
 }
 
 export interface BatchResult {
@@ -43,17 +50,43 @@ export interface BatchResult {
   failed: number;
 }
 
+export interface UnreadCountResp {
+  total: number;
+  tabs: Record<string, number>;
+}
+
+export function getNotificationText(item: InboxNotificationRes): string {
+  const c = item.content
+  if (!c) return ''
+  switch (item.noticeType) {
+    case 2:
+    case 3:
+      return c.replyContent || ''
+    case 1:
+      return `获得 ${c.userUids?.length ?? 1} 个赞`
+    case 5:
+      return `被 ${c.userUids?.length ?? 1} 人收藏`
+    case 4:
+      return '新关注者'
+    case 9:
+    case 10:
+      return c.text || ''
+    default:
+      return c.text || c.replyContent || ''
+  }
+}
+
 export const listNotifications = (
   params: ListNotificationParams
 ): PromiseResBody<CursorPageLong<InboxNotificationRes>> => {
   return request.get("/notifications/list", { params });
 };
 
-export const getUnreadCount = (): PromiseResBody<number> => {
+export const getUnreadCount = (): PromiseResBody<UnreadCountResp> => {
   return request.get("/notifications/unreadCount");
 };
 
-export const markNotificationRead = (id: string): PromiseResBody<void> => {
+export const markNotificationRead = (id: number): PromiseResBody<void> => {
   return request.post(`/notifications/read/${id}`);
 };
 
@@ -67,6 +100,6 @@ export const batchMarkNotificationsRead = (
   return request.post("/notifications/batchMarkRead", data);
 };
 
-export const deleteNotification = (id: string): PromiseResBody<void> => {
+export const deleteNotification = (id: number): PromiseResBody<void> => {
   return request.delete(`/notifications/${id}`);
 };

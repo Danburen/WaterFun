@@ -96,8 +96,8 @@ export interface PostSaveReq {
   summary?: string
   coverageImgId?: string
   newTags?: string[]
-  tagIds?: (number | bigint)[]
-  categoryId?: number | bigint | null
+  tagIds?: string[]
+  categoryId?: string | null
 }
 
 export interface CategoryResponse {
@@ -144,6 +144,16 @@ export interface PostListParams {
   categoryId?: string
   tagIds?: string[]
   keyword?: string
+  authorId?: string
+  page?: number
+  size?: number
+}
+
+export interface PublicPostListReq {
+  categoryId?: string
+  tagIds?: string[]
+  keyword?: string
+  authorId?: string
   page?: number
   size?: number
 }
@@ -155,6 +165,7 @@ export interface MyPostsStatsResp {
   pendingCount: number
   rejectedCount: number
   totalLikeCount: number
+  followerCount: number
 }
 
 export interface ContentPreviewReq {
@@ -275,12 +286,16 @@ export const previewContentAlone = (content: string): PromiseResBody<string> => 
   return request.post('/posts/content/preview', { content })
 }
 
-export const batchPublishPosts = (ids: (number | bigint)[]): PromiseResBody<void> => {
+export const batchPublishPosts = (ids: string[]): PromiseResBody<void> => {
   return request.post('/posts/me/batch-publish', ids)
 }
 
-export const batchDeletePosts = (ids: (number | bigint)[]): PromiseResBody<void> => {
+export const batchDeletePosts = (ids: string[]): PromiseResBody<void> => {
   return request.post('/posts/me/batch-delete', ids)
+}
+
+export const getPostLikedUsers = (id: string): PromiseResBody<UserBrief[]> => {
+  return request.get(`/posts/${id}/liked-users`)
 }
 
 export const reportPost = (id: string, data: CreateReportReq): PromiseResBody<{ taskId: string }> => {
@@ -289,4 +304,18 @@ export const reportPost = (id: string, data: CreateReportReq): PromiseResBody<{ 
 
 export const cancelReportPost = (id: string): PromiseResBody<void> => {
   return request.post(`/posts/${id}/report/cancel`)
+}
+
+export const fetchHotPosts = (params: {
+  page?: number
+  size?: number
+} = {}): PromiseResBody<PageResult<PostCardResp>> => {
+  return request.get('/posts/hot', { params })
+}
+
+export const fetchAnnouncements = (params: {
+  page?: number
+  size?: number
+} = {}): PromiseResBody<PageResult<PostCardResp>> => {
+  return request.get('/announcements', { params })
 }

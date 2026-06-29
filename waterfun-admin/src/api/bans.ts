@@ -27,7 +27,7 @@ export interface BanUserRequest {
   userUid: string;
   penaltyType: PenaltyType;
   banReasonType?: string;
-  penaltyDurationHours?: number;
+  penaltyDurationHours?: string;
   reasonText?: string;
 }
 
@@ -58,4 +58,23 @@ export const liftPenalty = (userUid: string | number, data: LiftPenaltyRequest):
 
 export const liftAllPenalties = (userUid: string | number): PromiseResBody<null> => {
   return request.post<null>(`/bans/${userUid}/lift-all`);
+};
+
+export interface BanStatusResponse {
+  userUid: string;
+  banned: boolean;
+  restrictions: ActiveRestriction[];
+}
+
+export interface ActiveRestriction {
+  permissionCode: string;
+  permissionName: string;
+  banReasonType: string | null;
+  expiresAt: string | null;
+  permanent: boolean;
+  createdAt: string;
+}
+
+export const getBanStatus = (userUid: string | number): PromiseResBody<BanStatusResponse> => {
+  return request.get<BanStatusResponse>("/bans/status", { params: { userUid: String(userUid) } });
 };

@@ -89,6 +89,7 @@ public final class EncryptionHelper {
      * @return decrypted field as a String
      */
     public static String decryptField(String encryptedFieldBase64, EncryptionDataKey dekKey){
+        if (encryptedFieldBase64 == null) return null;
         SecretKey dek = decryptDEK(dekKey);
         byte[] combined = Base64.getDecoder().decode(encryptedFieldBase64);
         return new String(decryptWithGCM(combined,dek), StandardCharsets.UTF_8);

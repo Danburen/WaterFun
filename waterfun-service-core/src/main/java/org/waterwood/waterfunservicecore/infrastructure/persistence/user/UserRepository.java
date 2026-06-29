@@ -32,7 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
 
 
     @Query("SELECT u.avatarResource.uuid FROM User u JOIN u.avatarResource WHERE u.uid = :uid")
-    String getUserAvatarByUid(@Param("uid") Long uid);
+    Optional<String> getUserAvatarByUid(@Param("uid") Long uid);
 
     @Query("SELECT u.avatarResource FROM User u WHERE u.uid IN :uid")
     List<Resource> findUserAvatarByUidIn(@Param("uid") List<Long> uid);

@@ -100,11 +100,13 @@ public class UserDatumCoreServiceImpl implements UserDatumCoreService {
         UserDatum ud = userDatumRepo.findUserDatumByUserUid(userUid)
                 .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
         EncryptionDataKey aesKey = encryptedKeyService.getKeyById(ud.getEncryptionKeyId());
-        String realEmail = EncryptionHelper.decryptField(ud.getEmailEncrypted(), aesKey);
-        String realPhone = EncryptionHelper.decryptField(ud.getPhoneEncrypted(), aesKey);
+        String realEmail = ud.getEmailEncrypted() != null
+                ? EncryptionHelper.decryptField(ud.getEmailEncrypted(), aesKey) : null;
+        String realPhone = ud.getPhoneEncrypted() != null
+                ? EncryptionHelper.decryptField(ud.getPhoneEncrypted(), aesKey) : null;
         return new AccountResp(
-                MaskUtil.maskPhone(realPhone),
-                MaskUtil.maskEmail(realEmail),
+                realPhone != null ? MaskUtil.maskPhone(realPhone) : null,
+                realEmail != null ? MaskUtil.maskEmail(realEmail) : null,
                 ud.getPhoneVerified(),
                 ud.getEmailVerified()
         );

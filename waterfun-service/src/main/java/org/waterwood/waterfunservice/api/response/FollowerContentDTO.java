@@ -11,8 +11,4 @@ public class FollowerContentDTO implements NotificationContent {
     private Long followerUid;
     private String nativeUrl;
 
-    @Override
-    public String getDisplayText() {
-        return "New follower";
-    }
 }
