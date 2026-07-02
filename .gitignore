@@ -30,6 +30,7 @@ docker-compose.yml
 /waterfun-common-lib/build/
 
 .omo
+.ai/
 
 # Docker dev data (bind mounts)
 .data/
