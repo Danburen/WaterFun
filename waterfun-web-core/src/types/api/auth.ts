@@ -28,7 +28,7 @@ interface PasswordLoginRequest extends BaseLoginRequest {
     captcha: string
 }
 
-interface CodeLoginRequest extends BaseLoginRequest, VerifyCodeDto {
+interface CodeLoginRequest extends BaseLoginRequest, Omit<VerifyCodeDto, 'deviceFp' | 'deviceInfo'> {
     scene: 'login'
 }
 
@@ -75,4 +75,5 @@ export interface SecurityVerifyCodeDto {
 export interface AccessTokenResponse {
     accessToken: string
     exp: number
+    isNewUser?: boolean
 }

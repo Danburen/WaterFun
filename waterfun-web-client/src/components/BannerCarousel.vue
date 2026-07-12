@@ -78,10 +78,13 @@ const handleMouseLeave = () => startAutoPlay()
 // Touch support
 let touchStartX = 0
 const handleTouchStart = (e: TouchEvent) => {
-  touchStartX = e.touches[0].clientX
+  const touch = e.touches[0]
+  if (touch) touchStartX = touch.clientX
 }
 const handleTouchEnd = (e: TouchEvent) => {
-  const diff = touchStartX - e.changedTouches[0].clientX
+  const touch = e.changedTouches[0]
+  if (!touch) return
+  const diff = touchStartX - touch.clientX
   if (Math.abs(diff) > 50) {
     diff > 0 ? handleNext() : handlePrev()
   }

@@ -2,8 +2,7 @@
 import { ref, reactive, watch } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { validateVerifyCode } from '~/utils/validator'
-import { activateEmail, activatePhone } from '~/api/accountApi'
-import { sendCode } from '~/api/authApi'
+import { activateEmail, activatePhone, sendVerifyCode } from '~/api/accountApi'
 import type { SecurityVerifyCodeDto, SecurityVerifyScene } from '~/api/authApi'
 
 const props = defineProps<{
@@ -41,7 +40,7 @@ const sendActivateCode = async () => {
     const { generateFingerprint } = await import('@waterfun/web-core/src/fingerprint')
     
     const channel = isEmail.value ? 'email' : 'sms'
-    await sendCode({
+    await sendVerifyCode({
       target: props.target,
       channel: channel,
       scene: 'activate' as SecurityVerifyScene,

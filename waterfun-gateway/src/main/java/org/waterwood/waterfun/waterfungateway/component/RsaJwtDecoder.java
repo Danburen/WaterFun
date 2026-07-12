@@ -77,9 +77,13 @@ public class RsaJwtDecoder implements ReactiveJwtDecoder {
     }
 
     private Mono<Jwt> validateToken(Claims claims, String token) {
+        Object didObj = claims.get("did");
+        if (didObj == null) {
+            return Mono.error(new AuthException(AuthCode.TOKEN_INVALID));
+        }
         String deviceKey = UserKeyBuilder.userAccessDevice(
                 Long.parseLong(claims.getSubject()),
-                claims.get("did").toString()
+                didObj.toString()
         );
 //        log.info("Validating token for user: {}, device: {}, jti: {}",
 //                claims.getSubject(), claims.get("did"), claims.getId());

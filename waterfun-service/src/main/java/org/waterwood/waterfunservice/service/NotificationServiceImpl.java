@@ -338,20 +338,14 @@ public class NotificationServiceImpl implements NotificationService {
         if (uuids.isEmpty()) return;
 
         Map<String, String> uuidToKey = new HashMap<>();
-        List<Resource> resources = resourceRepository.findByUuidInAndStatus(uuids, ResourceStatus.ACTIVE);
-        for (Resource r : resources) {
+        for (Resource r : resourceRepository.findByUuidInAndStatus(uuids, ResourceStatus.ACTIVE)) {
             uuidToKey.put(r.getUuid(), r.getResourceKey());
         }
-
-        Map<String, String> lookupMap = new HashMap<>();
-        for (String uuid : uuidToKey.keySet()) {
-            lookupMap.put(uuid, uuidToKey.get(uuid));
-        }
-        if (lookupMap.isEmpty()) return;
+        if (uuidToKey.isEmpty()) return;
 
         try {
             Map<String, CloudResPresignedUrlResp> resolved = cloudFileService.batchGetReadPublicUrlCached(
-                    CloudFSRoot.UPLOADS, lookupMap, TargetType.POST_COVERAGE_IMAGE
+                    CloudFSRoot.UPLOADS, uuidToKey, TargetType.POST_COVERAGE_IMAGE
             );
             for (int i = 0; i < dtos.size(); i++) {
                 Map<String, Object> content = inboxes.get(i).getContent();

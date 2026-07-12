@@ -102,7 +102,7 @@ public class ModerationInboxHandler {
 
     private Inbox buildInbox(ModerationConsumerMessage msg, Long targetUserUid, Object[] args) {
         ModerationTargetType type = ModerationTargetType.fromTargetType(msg.getTargetType());
-        String storedUserLocale = userPreferenceRepository.getLocaleByUserUid(msg.getSubmitterId());
+        String storedUserLocale = userPreferenceRepository.getLocaleByUserUid(targetUserUid);
         log.info(storedUserLocale);
         Locale locale = StringUtil.isBlank(storedUserLocale) ?  Locale.getDefault() : Locale.forLanguageTag(storedUserLocale);
 

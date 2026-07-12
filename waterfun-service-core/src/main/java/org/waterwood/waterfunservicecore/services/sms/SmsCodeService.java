@@ -15,6 +15,7 @@ import org.waterwood.waterfunservicecore.services.auth.code.CodeVerifier;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSender;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -36,8 +37,8 @@ public class SmsCodeService implements CodeVerifier, CodeSender {
         String code = generateVerifyCode();
         String uuid = UUID.randomUUID().toString();
         CodeResult result =
-//                smsService.sendSms(phoneNumber, smsCodeTemplate,
-//                Map.ofPending("code", code, "time", expireDuration));
+                smsService.sendSms(target, smsCodeTemplate,
+                Map.of("code", code, "time", expireDuration));
         new CodeResult(true, target,  VerifyChannel.SMS , uuid);
         result.setKey(uuid);
         log.info("send result key{}, code:{}",  result.getKey(), code);

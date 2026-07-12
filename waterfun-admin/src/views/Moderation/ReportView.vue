@@ -38,7 +38,7 @@ const penaltyColor = (p: string) => {
 const fetchData = async () => {
   loading.value = true;
   try {
-    const params: any = { page: (pageOpts.value.currentPage || 1) - 1, size: pageOpts.value.pageSize, ticketTypes: "CONTENT_REPORT" };
+    const params: any = { page: pageOpts.value.currentPage || 1, size: pageOpts.value.pageSize, ticketTypes: "CONTENT_REPORT" };
     if (filterStatus.value) params.status = filterStatus.value;
     const res = await listTickets(params);
     ticketList.value = res.data.content || [];
@@ -82,7 +82,7 @@ const confirmPenalty = async () => {
   if (!currentTicketId.value || !selectedPenalty.value) { ElMessage.warning("请选择处罚措施"); return; }
   try {
     const opt = penaltyMap[selectedPenalty.value];
-    await reviewTicket(currentTicketId.value, { action: "APPROVE", auditNote: `处罚: ${opt.label}`, penaltyType: opt.penaltyType as any, penaltyDurationHours: opt.hours != null ? String(opt.hours) : undefined });
+    await reviewTicket(currentTicketId.value, { action: "APPROVE", auditNote: `处罚: ${opt.label}`, penaltyType: opt.penaltyType as any, penaltyDurationHours: opt.hours ?? undefined });
     ElMessage.success("举报已采纳并执行处罚");
     showPenaltyModal.value = false;
     currentTicketId.value = null;

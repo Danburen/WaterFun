@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { getMemory, setMemory, revokeMemory } from '@waterfun/web-core/src/cache/imgMemoryLRU'
 import { getIDB, setIDB, clearExpired } from '@waterfun/web-core/src/cache/imgIDB'
-import type CacheItem from '@waterfun/web-core/src/cache/types'
+import type { CacheItem } from '@waterfun/web-core/src/cache/types'
 
 export const useCacheStore = defineStore('cacheStore',()=>{
     const map = new Map<string, string>()

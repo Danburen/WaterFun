@@ -51,7 +51,7 @@ public class PostController {
      * @return  page of posts
      */
     @GetMapping("/list")
-    @RateLimit(key = "listPublicPosts")
+    @RateLimit(key = "listPublicPosts", permits = 60)
     public ApiResponse<Page<PostCardResp>> listPublicPosts(PublicPostListReq req){
         return ApiResponse.success(postService.listPublicCardPosts(req));
     }
@@ -63,7 +63,7 @@ public class PostController {
         return ApiResponse.success(postService.listHotPosts(PageRequest.of(Math.max(page - 1, 0), size)));
     }
 
-    @RateLimit(key = "listPublicPosts")
+    @RateLimit(key = "listPublicPosts", permits = 60)
     @GetMapping("/{id}")
     public ApiResponse<PostDetailResp> getPostDetail(@PathVariable Long id){
         return ApiResponse.success(
@@ -175,19 +175,20 @@ public class PostController {
 
     @Operation(summary = "Create a new draft and save initial content",
             description = "Create a new draft post and save the provided content. Returns the newly created draft post ID.")
+    @BanCheck("ban:post")
     @PostMapping("/temp-save")
     public ApiResponse<Long> tempSaveNewPost(@Valid @RequestBody PostSaveReq req){
         return ApiResponse.success(postService.saveNewPost(req));
     }
 
-    @RateLimit(key = "post.like", permits = 20)
+    @RateLimit(key = "post.like", permits = 30)
     @PostMapping("/{id}/like")
     public ApiResponse<Void> like(@PathVariable Long id){
         postService.like(id);
         return ApiResponse.success();
     }
 
-    @RateLimit(key = "post.collection", permits = 20)
+    @RateLimit(key = "post.collection", permits = 30)
     @PostMapping("/{id}/collection")
     public ApiResponse<Void> collection(@PathVariable Long id) {
         postService.collection(id);
@@ -200,6 +201,7 @@ public class PostController {
         return ApiResponse.success(postService.getLikedUsers(id));
     }
 
+    @RateLimit(key = "user", permits = 5)
     @PostMapping("/{id}/report")
     public ApiResponse<ReportResponse> reportPost(@PathVariable Long id, @Valid @RequestBody CreateReportReq req) {
         AuthContext ctx = UserCtxHolder.safeGet()

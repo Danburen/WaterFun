@@ -45,6 +45,7 @@
 .status-pending { background: var(--warning-light); color: #b45309; }
 .status-resolved { background: var(--success-light); color: #15803d; }
 .status-rejected { background: var(--danger-light); color: #dc2626; }
+.status-cancelled { background: #e5e7eb; color: #6b7280; }
 
 /* ---- Review Body / Panel Label ---- */
 .review-body { padding: 24px; }

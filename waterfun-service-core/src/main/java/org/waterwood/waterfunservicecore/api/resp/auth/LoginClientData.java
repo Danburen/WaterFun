@@ -8,4 +8,5 @@ import java.io.Serializable;
 public class LoginClientData implements Serializable {
     String accessToken;
     Long exp;
+    Boolean isNewUser;
 }

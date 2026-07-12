@@ -44,6 +44,7 @@ export type SendCodeType = {
     scene: VerifyScene
     deviceFp?: string
     deviceInfo?: DeviceInfo
+    captcha?: string
 }
 
 export type SecuritySendCodeType = {

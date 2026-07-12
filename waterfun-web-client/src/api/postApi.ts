@@ -175,7 +175,6 @@ export interface ContentPreviewReq {
 export interface CreateReportReq {
   type: string
   reason?: string
-  reasonValid?: boolean
 }
 
 export interface MyPostListParams {

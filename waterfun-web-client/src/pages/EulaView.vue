@@ -32,7 +32,7 @@ const handleConfirm = () =>{
 }
 
 onMounted(()=>{
-  getEula(LangMap[i18n.locale.value]).then((response : DataApiResponse<FileResDataType>) => {
+  getEula(LangMap[i18n.locale.value] || 'zh_CN').then((response : DataApiResponse<FileResDataType>) => {
     legalDocProps.content = new TextDecoder('utf-8').decode(
         base64ToUint8Array(response.data.content)
     );

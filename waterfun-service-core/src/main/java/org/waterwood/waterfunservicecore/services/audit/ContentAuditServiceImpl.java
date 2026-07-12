@@ -61,6 +61,7 @@ public class ContentAuditServiceImpl implements ContentAuditService {
 
         task.setStatus(AuditStatus.PENDING);
         task.setPayload(payload.toJson());
+        task.setUpdatedAt(Instant.now());
         auditTaskRepository.save(task);
         synchronizeTaskResources(task, resourceUuids);
     }

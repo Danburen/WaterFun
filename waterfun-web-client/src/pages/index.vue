@@ -392,8 +392,8 @@ onMounted(async () => {
     <footer style="padding:32px 24px;text-align:center">
       <div style="display:flex;justify-content:center;gap:24px;margin-bottom:16px">
         <NuxtLink to="/about" style="font-size:14px;color:#64748b;text-decoration:none">关于我们</NuxtLink>
-        <a href="#" style="font-size:14px;color:#64748b;text-decoration:none">社区规范</a>
-        <a href="#" style="font-size:14px;color:#64748b;text-decoration:none">隐私政策</a>
+        <NuxtLink to="/legal/terms" style="font-size:14px;color:#64748b;text-decoration:none">服务条款</NuxtLink>
+        <NuxtLink to="/legal/privacy" style="font-size:14px;color:#64748b;text-decoration:none">隐私政策</NuxtLink>
         <a href="#" style="font-size:14px;color:#64748b;text-decoration:none">联系我们</a>
       </div>
       <div style="font-size:13px;color:#94a3b8">© 2026 WaterFun. All rights reserved.</div>

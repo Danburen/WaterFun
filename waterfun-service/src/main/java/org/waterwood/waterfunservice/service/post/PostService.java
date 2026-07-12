@@ -1,6 +1,5 @@
 package org.waterwood.waterfunservice.service.post;
 
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,14 +14,8 @@ import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 
 import java.util.List;
-import java.util.Set;
 
 public interface PostService {
-    /**
-     * Add a post
-     * @param entity post entity ofPending {@link  Post} to add
-     */
-    void add(Post entity, Set<Long> tagIds);
 
     /**
      * List posts ofPending target author for user.
@@ -186,4 +179,11 @@ public interface PostService {
      * @return list of user briefs
      */
     List<UserBrief> getLikedUsers(Long postId);
+
+    /**
+     * Build PostCardResp list from a page of post IDs.
+     * @param postPageIds page of post IDs (from any query)
+     * @return page of PostCardResp
+     */
+    Page<PostCardResp> listCardPostsByIds(Page<Long> postPageIds);
 }

@@ -3,7 +3,7 @@
  * A IDB cache for image memory.
  */
 
-import type CacheItem from './types.d.ts'
+import type { CacheItem } from './types'
 
 // Check if we're in a browser environment
 const isClient = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';

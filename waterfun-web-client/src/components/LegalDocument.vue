@@ -2,7 +2,8 @@
 export interface LegalDocPropsType {
   title: string,
   content: string,
-  lastUpdate: Date
+  lastUpdate: Date,
+  showConfirm?: boolean,
 }
 
 defineProps<LegalDocPropsType>()
@@ -26,7 +27,7 @@ const handleClick = () =>{
     <div class="content-text">
       {{content}}
     </div>
-    <div class="button-container">
+    <div v-if="showConfirm !== false" class="button-container">
       <el-button style="width: 80%" type="primary" @click="handleClick" size="large">{{$t('confirm.confirmReadLicences')}}</el-button>
     </div>
   </div>

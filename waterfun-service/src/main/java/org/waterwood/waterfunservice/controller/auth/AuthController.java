@@ -13,7 +13,9 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
+import org.waterwood.api.AuthCode;
 import org.waterwood.api.TokenPair;
+import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
@@ -90,18 +92,24 @@ public class AuthController {
      * @param response http response
      * @return send code result
      */
-    @Operation(summary = "发送无验证验证码")
+    @Operation(summary = "发送验证码（需图形验证码）")
     @PostMapping("/send-code")
-    public ApiResponse<Void> sendCode(@Valid @RequestBody SendCodeDto dto, HttpServletResponse response) {
+    public ApiResponse<Void> sendCode(@Valid @RequestBody SendCodeDto dto,
+                                       HttpServletRequest request,
+                                       HttpServletResponse response) {
+        String captchaKey = CookieUtil.getCookieValue(request.getCookies(), "CAPTCHA_KEY");
+        if (!captchaService.verifyCode(captchaKey, dto.getCaptcha())) {
+            throw new AuthException(AuthCode.CAPTCHA_INVALID);
+        }
         CodeResult result = verificationService.sendCode(dto);
         String cookieKey = dto.getChannel().name() + "_CODE_KEY";
-        ResponseUtil.setCookieAndNoCache(response,cookieKey, result.getKey(), 120);
+        ResponseUtil.setCookieAndNoCache(response, cookieKey, result.getKey(), 120);
         return ApiResponse.success();
     }
 
     @Operation(summary = "密码登陆")
     @PostMapping("/login-by-password")
-    @RateLimit(key = "ip", permits = 20)
+    @RateLimit(key = "ip", permits = 30)
     public ApiResponse<LoginClientData> loginByPassword(@Valid @RequestBody PwdLoginReq body, HttpServletRequest request, HttpServletResponse response) {
         try {
             Cookie[] cookies = request.getCookies();
@@ -109,7 +117,7 @@ public class AuthController {
             auditLogService.record(user.getUid(), user.getUsername(), AuditLogActionType.LOGIN,
                     request, body.getDeviceInfo());
             return ApiResponse.success(
-                    authService.BuildLoginResponse(response, user, body.getDeviceFp())
+                    authService.BuildLoginResponse(response, user, body.getDeviceFp(), false)
             );
         } catch (Exception e) {
             auditLogService.record(null, body.getUsername(), AuditLogActionType.LOGIN,
@@ -121,15 +129,15 @@ public class AuthController {
 
     @Operation(summary = "手机登陆")
     @PostMapping("/login-by-code")
-    @RateLimit(key = "ip", permits = 20)
+    @RateLimit(key = "ip", permits = 30)
     public ApiResponse<LoginClientData> loginByCode(@Valid @RequestBody VerifyCodeDto dto, HttpServletRequest request, HttpServletResponse response) {
         try {
             String codeKey = dto.getChannel() == VerifyChannel.SMS ? "SMS_CODE_KEY" : "EMAIL_CODE_KEY";
-            User user = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
-            auditLogService.record(user.getUid(), user.getUsername(), AuditLogActionType.LOGIN,
+            LoginService.LoginResult result = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
+            auditLogService.record(result.user().getUid(), result.user().getUsername(), AuditLogActionType.LOGIN,
                     request, dto.getDeviceInfo());
             return ApiResponse.success(
-                    authService.BuildLoginResponse(response, user, dto.getDeviceFp())
+                    authService.BuildLoginResponse(response, result.user(), dto.getDeviceFp(), result.isNewUser())
             );
         } catch (Exception e) {
             auditLogService.record(null, dto.getTarget(), AuditLogActionType.LOGIN,
@@ -140,7 +148,7 @@ public class AuthController {
 
     @Operation(summary = "注册")
     @PostMapping("/register")
-    @RateLimit(key = "ip", permits = 10)
+    @RateLimit(key = "ip", permits = 20)
     public ApiResponse<LoginClientData> register(@Valid @RequestBody RegisterRequest dto, HttpServletRequest request, HttpServletResponse response) {
         try {
             User user = registerService.register(
@@ -150,7 +158,7 @@ public class AuthController {
             auditLogService.record(user.getUid(), user.getUsername(), AuditLogActionType.REGISTER,
                     request, dto.getVerify().getDeviceInfo());
             return ApiResponse.success(
-                    authService.BuildLoginResponse(response, user, dto.getVerify().getDeviceFp())
+                    authService.BuildLoginResponse(response, user, dto.getVerify().getDeviceFp(), true)
             );
         } catch (Exception e) {
             auditLogService.record(null, dto.getUsername(), AuditLogActionType.REGISTER,
@@ -168,7 +176,7 @@ public class AuthController {
         CookieUtil.setTokenCookie(response, tokenPair);
         ResponseUtil.setNoCacheSecurityHeaders(response);
         return ApiResponse.success(new LoginClientData(
-                tokenPair.accessToken(), tokenPair.accessExp()
+                tokenPair.accessToken(), tokenPair.accessExp(), false
         ));
     }
 }

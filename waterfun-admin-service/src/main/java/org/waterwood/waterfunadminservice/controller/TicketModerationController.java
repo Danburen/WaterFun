@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunadminservice.api.request.ticket.TicketReviewRequest;
@@ -28,7 +29,7 @@ public class TicketModerationController {
             @RequestParam(required = false) String ticketTypes,
             @RequestParam(required = false) TicketAuditStatus status,
             @RequestParam(required = false) String targetId,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
         List<TicketType> types = null;
         if (ticketTypes != null && !ticketTypes.isBlank()) {
@@ -37,8 +38,9 @@ public class TicketModerationController {
                 types.add(TicketType.valueOf(s.trim()));
             }
         }
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.min(size, 100));
         return ApiResponse.success(
-                ticketModerationService.listTickets(types, status, targetId, PageRequest.of(page, size))
+                ticketModerationService.listTickets(types, status, targetId, pageable)
         );
     }
 

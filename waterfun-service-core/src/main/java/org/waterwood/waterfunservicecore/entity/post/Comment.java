@@ -73,7 +73,7 @@ public class Comment {
     private Boolean isPined = false;
 
     public boolean isDeleted() {
-        return status == CommentStatus.DELETED;
+        return status == CommentStatus.DELETED || status == CommentStatus.REJECTED;
     }
 
     public boolean isTopLevel() {

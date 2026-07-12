@@ -10,12 +10,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
+import org.jetbrains.annotations.Nullable;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -60,6 +62,7 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
+    @Nullable
     private User author;
 
     @ColumnDefault("'0'")
@@ -164,6 +167,13 @@ public class Post {
     @Column(name = "is_pinned")
     private Boolean isPinned = false;
 
+    public @Nullable Long getAuthorUid(){
+        return author == null ? null : author.getUid();
+    }
+
+    public Optional<Long> getAuthorUidOpt(){
+        return Optional.ofNullable(getAuthorUid());
+    }
     public boolean isSystem() {
         return type == PostType.NOTICE || author == null;
     }

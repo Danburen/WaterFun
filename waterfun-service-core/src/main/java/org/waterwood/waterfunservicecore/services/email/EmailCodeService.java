@@ -15,8 +15,13 @@ import org.waterwood.waterfunservicecore.services.auth.VerifyKeyBuilder;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeVerifier;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSender;
+import org.waterwood.waterfunservicecore.services.email.template.EmailTemplateFragment;
+import org.waterwood.waterfunservicecore.services.email.template.EmailTemplateLayout;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -38,25 +43,25 @@ public class EmailCodeService implements CodeVerifier, CodeSender {
     public CodeResult sendCode(String target, VerifyScene scene) {
         String code = generateVerifyCode();
         String uuid = UUID.randomUUID().toString();
-//        Locale locale = Locale.getDefault();
-//
-//        Map<String,Object> data = new HashMap<>();
-//        data.put("verificationCode",code);
-//        data.put("expireTime",expireDuration);
-//        data.put("supportEmail","support@mail.waterfun.top");
-//        data.put("action", messageSource.getMessage("action.verify", null, locale));
-//        EmailTemplateFragment fragment = EmailTemplateFragment.ofScene(scene);
-//        EmailTemplateLayout layout = EmailTemplateLayout.ofScene(scene);
-//        String subject = messageSource.getMessage(fragment.getSubject(), null, locale);
-//
-//        CodeResult sendResult= emailService.sendHtmlEmail(target, layout.getDefaultFrom(),
-//                subject,
-//                layout.getTemplateKey(),
-//                fragment.getTemplateKey() ,
-//                data);
-//        sendResult.setKey(uuid);
-        CodeResult sendResult = new CodeResult(true, target, VerifyChannel.SMS , uuid);
-        log.info("send result key{}, code:{}",  sendResult.getKey(), code);
+        Locale locale = Locale.getDefault();
+
+        Map<String,Object> data = new HashMap<>();
+        data.put("verificationCode",code);
+        data.put("expireTime",expireDuration);
+        data.put("supportEmail","support@mail.waterfun.top");
+        data.put("action", messageSource.getMessage("action.verify", null, locale));
+        EmailTemplateFragment fragment = EmailTemplateFragment.ofScene(scene);
+        EmailTemplateLayout layout = EmailTemplateLayout.ofScene(scene);
+        String subject = messageSource.getMessage(fragment.getSubject(), null, locale);
+
+        CodeResult sendResult= emailService.sendHtmlEmail(target, layout.getDefaultFrom(),
+                subject,
+                layout.getTemplateKey(),
+                fragment.getTemplateKey() ,
+                data);
+        sendResult.setKey(uuid);
+//        CodeResult sendResult = new CodeResult(true, target, VerifyChannel.SMS , uuid);
+//        log.info("send result key{}, code:{}",  sendResult.getKey(), code);
 
         if (sendResult.isSendSuccess()){
             redisHelper.set(

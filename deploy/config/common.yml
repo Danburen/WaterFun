@@ -86,7 +86,7 @@ mail:
 
 # -------- 设备指纹盐值 (非三方) --------
 device:
-  salt: ${DEVICE_SALT:这个是我固定的盐值}
+  salt: ${DEVICE_SALT}
 
 # -------- 日志级别 --------
 logging:

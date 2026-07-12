@@ -13,6 +13,7 @@ import org.waterwood.waterfunservicecore.api.resp.user.UserPublicCardResp;
 import org.waterwood.waterfunservice.api.request.UpdateNicknameRequest;
 import org.waterwood.waterfunservice.api.response.UserPublicProfileResp;
 import org.waterwood.waterfunservice.api.response.UserSettingsResp;
+import org.waterwood.waterfunservice.service.post.PostService;
 import org.waterwood.waterfunservice.service.user.UserService;
 import org.waterwood.waterfunservice.service.user.UserSettingsService;
 import org.waterwood.waterfunservicecore.api.req.user.UpdateUserProfileRequest;
@@ -20,6 +21,7 @@ import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
 import org.waterwood.waterfunservicecore.api.resp.user.UserProfileResponse;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
+import org.waterwood.waterfunservice.api.response.post.PostCardResp;
 import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserCoreMapper;
 import org.waterwood.waterfunservicecore.infrastructure.mapper.UserProfileCoreMapper;
@@ -44,6 +46,7 @@ public class UserController {
     private final UserProfileCoreMapper userProfileCoreMapper;
     private final UserService userService;
     private final UserSettingsService userSettingsService;
+    private final PostService postService;
 
     @Operation(summary = "Get current user info")
     @GetMapping("/userInfo")
@@ -102,6 +105,19 @@ public class UserController {
                                                    @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(size, 20));
         return ApiResponse.success(userService.getLikedPostIds(uid, pageable));
+    }
+
+    @Operation(summary = "Get user liked posts (full card data)")
+    @GetMapping("/{uid}/liked-posts")
+    public ApiResponse<Page<PostCardResp>> getLikedPostCards(@PathVariable long uid,
+                                                              @RequestParam(defaultValue = "1") int page,
+                                                              @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(size, 20));
+        Page<Long> postIds = userService.getLikedPostIds(uid, pageable);
+        if (postIds.isEmpty()) {
+            return ApiResponse.success(Page.empty(pageable));
+        }
+        return ApiResponse.success(postService.listCardPostsByIds(postIds));
     }
 
     @Operation(summary = "Get user public profile")

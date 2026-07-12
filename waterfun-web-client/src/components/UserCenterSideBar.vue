@@ -28,16 +28,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch } from 'vue';
+import { ref, shallowRef, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountPoolStore } from '~/stores/accountPoolStore';
+import { useUserInfoStore } from '~/stores/userInfoStore';
 import {
   User,
   Lock,
   Bell,
   Document,
   Headset,
-  Switch
+  Switch,
+  HomeFilled
 // @ts-ignore
 } from '@element-plus/icons-vue';
 
@@ -62,6 +64,7 @@ const router = useRouter();
 const accountPoolStore = useAccountPoolStore();
 const userProfileStore = useUserProfileStore();
 const userInfoStore = useUserInfoStore();
+const currentUid = computed(() => userInfoStore.userInfo?.uid || '')
 
 // Emits
 const emit = defineEmits(['tab-change']);
@@ -76,6 +79,7 @@ const navItems = shallowRef([
   { id: 'accounts', label: '账号管理', icon: Switch },
   { id: 'notification', label: '通知与隐私', icon: Bell },
   { id: 'posts', label: '我的帖子', icon: Document },
+  { id: 'personal-space', label: '个人空间', icon: HomeFilled },
   { id: 'customer-service', label: '客服中心', icon: Headset }
 ]);
 
@@ -83,6 +87,8 @@ const navItems = shallowRef([
 const handleNavClick = (item: { id: string }) => {
   if (item.id === 'customer-service') {
     router.push('/customer-service');
+  } else if (item.id === 'personal-space') {
+    router.push(`/User/${currentUid.value}`);
   } else {
     emit('tab-change', item.id);
   }

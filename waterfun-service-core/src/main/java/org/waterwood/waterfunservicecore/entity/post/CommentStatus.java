@@ -6,7 +6,8 @@ import lombok.Getter;
 @Getter
 public enum CommentStatus {
     DELETED(0),
-    NORMAL(1),;
+    NORMAL(1),
+    REJECTED(2),;
 
     private final short value;
     CommentStatus(int value) {

@@ -55,11 +55,9 @@ const fastAuthRules = reactive<FormRules<typeof fastLoginForm>>({
   verifyCode: [{validator: validateVerifyCode(false), trigger: "blur"}],
 })
 
-const resetForm = (passAuthForm: FormInstance | undefined,fastAuthForm: FormInstance | undefined) => {
-  if(!passAuthForm) return;
-  passAuthForm.resetFields();
-  if(!fastAuthForm) return;
-  fastAuthForm.resetFields();
+const resetForm = () => {
+  passAuthForm.value?.resetFields();
+  fastAuthForm.value?.resetFields();
 }
 
 const buildRequest= async (): Promise<LoginRequest> => {
@@ -88,21 +86,19 @@ const submitForm = (form:FormInstance | undefined) => {
     buttonLoad.value = true;
     if(valid){
       buildRequest().then(async (loginRes)=>{
-        console.log(loginRes.deviceFp);
         return tryLogin(loginRes, getLoginType()).then(()=>{
           const redirect = router.currentRoute.value.query.redirect as string | undefined;
           router.push(redirect || "/");
         }).catch(err=>{
-          console.log(err);
-          refreshCaptcha()
+          if (loginTab.value === 'password') refreshCaptcha()
         }).finally(()=>{
           buttonLoad.value = false;
         })
-      }).catch(err=>{
-        console.log(err)
+      }).catch(()=>{
+        buttonLoad.value = false;
       })
     }else{
-      console.error('error occurred when submit form');
+      buttonLoad.value = false;
     }
   })
 }
@@ -120,7 +116,6 @@ watch(()=>fastLoginForm.username,deBounce((value:string)=>{
 },300))
 
 const refreshCaptcha = throttle(()=>{
-  console.log('refreshCaptcha')
   if(! captchaLoading.value){ 
     captchaLoading.value = true;
     getCaptcha().then(res=>{
@@ -128,7 +123,6 @@ const refreshCaptcha = throttle(()=>{
       captchaImage.value = `data:image/jpeg;base64,${base64}`;
     }).catch(err=>{
       ElMessage.error(i18n.t('message.error.apiError'));
-      console.log(err);
     }).finally(()=>{
       captchaLoading.value = false;
     })
@@ -156,130 +150,225 @@ function getLoginType(){
 
 <template>
     <auth-box>
-      <el-tabs
-          type="border-card"
-          :stretch="true"
-          v-model="loginTab"
-          @tab-click="resetForm(passAuthForm,fastAuthForm)"
-          class="login-tab"
+      <div class="tab-switcher">
+        <button
+          class="tab-btn"
+          :class="{ active: loginTab === 'password' }"
+          @click="loginTab = 'password'; resetForm()"
+        >
+          {{ $t('auth.tabs.password') }}
+        </button>
+        <button
+          class="tab-btn"
+          :class="{ active: loginTab === 'fast-auth' }"
+          @click="loginTab = 'fast-auth'; resetForm()"
+        >
+          {{ $t('auth.tabs.emailPhone') }}
+        </button>
+      </div>
+
+      <el-form
+        v-show="loginTab === 'password'"
+        ref="passAuthForm"
+        :model="passLoginForm"
+        :rules="passAuthRules"
+        class="auth-form"
+        label-position="top"
+        size="large"
       >
-        <!--密码登录-->
-        <el-tab-pane :label="$t('auth.tabs.password')" name="password">
-          <el-form
-              ref = 'passAuthForm'
-              label-width="auto"
-              :model="passLoginForm"
-              :rules="passAuthRules"
-              class="auth-form"
+        <el-form-item prop="username">
+          <el-input
+            v-model="passLoginForm.username"
+            :placeholder="$t('auth.placeholder.username')"
+            class="login-input"
+          />
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input
+            v-model="passLoginForm.password"
+            type="password"
+            :placeholder="$t('auth.placeholder.password')"
+            class="login-input"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item prop="captcha">
+          <div class="captcha-container">
+            <el-input v-model="passLoginForm.captcha" :placeholder="$t('auth.placeholder.verifyCode')" />
+            <div class="captcha-image-wrap" @click="refreshCaptcha">
+              <el-image
+                v-loading="captchaLoading"
+                v-if="captchaImage"
+                :src="captchaImage"
+                class="captcha-image"
+                alt="Captcha"
+              />
+              <el-skeleton v-else :rows="1" animated style="width: 100px; height: 36px" />
+            </div>
+          </div>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            class="login-btn"
+            :loading="buttonLoad"
+            @click="submitForm(passAuthForm)"
           >
-            <el-form-item :label="$t('auth.username')" prop="username">
-              <el-input
-                  v-model="passLoginForm.username"
-                  :placeholder="$t('auth.placeholder.username')"
-                  class="login-input"
-              ></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('auth.password')"  prop="password">
-              <el-input
-                  v-model="passLoginForm.password"
-                  type="password"
-                  :placeholder="$t('auth.placeholder.password')"
-                  class="login-input"
-                  show-password
-              ></el-input>
-            </el-form-item>
-            <!--验证码-->
-            <el-form-item :label="$t('auth.verifyCode')" prop="captcha">
-              <div class="captcha-container">
-                <el-input v-model="passLoginForm.captcha" :placeholder="$t('auth.placeholder.verifyCode')" style="width: 60%" prop="verifyCode"></el-input>
-                  <el-image v-loading="captchaLoading" v-if="captchaImage" :src="captchaImage" @click="()=>{ refreshCaptcha();}" class="captcha-image" alt="Captcha"/>
-                  <el-skeleton v-else :rows="1" animated style="width: 120px; height: 20px" />
-              </div>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" class="login-btn" @click="submitForm(passAuthForm)">{{ $t('auth.btn.login') }}</el-button>
-              <div class="password-addition">
-                <el-button size="small" link>{{ $t('auth.forgetPassword') }}</el-button>
-                <el-button size="small" link class="to-register" @click.prevent="router.push('/register')" >{{ $t('auth.toRegister') }}</el-button>
-              </div>
-            </el-form-item>
-          </el-form>
-        </el-tab-pane>
-        <!--快捷登录-->
-        <el-tab-pane :label="$t('auth.tabs.emailPhone')" name="fast-auth">
-          <el-form
-              ref = 'fastAuthForm'
-              label-width="auto"
-              :model="fastLoginForm"
-              :rules="fastAuthRules"
-              class="auth-form"
+            {{ $t('auth.btn.login') }}
+          </el-button>
+        </el-form-item>
+        <div class="form-footer">
+          <el-button size="small" link>{{ $t('auth.forgetPassword') }}</el-button>
+          <el-button size="small" link class="to-register" @click.prevent="router.push('/register')">
+            {{ $t('auth.toRegister') }}
+          </el-button>
+        </div>
+      </el-form>
+
+      <el-form
+        v-show="loginTab === 'fast-auth'"
+        ref="fastAuthForm"
+        :model="fastLoginForm"
+        :rules="fastAuthRules"
+        class="auth-form"
+        label-position="top"
+        size="large"
+      >
+        <el-form-item prop="username">
+          <el-input
+            v-model="fastLoginForm.username"
+            :placeholder="$t('auth.placeholder.emailPhone')"
+            class="login-input"
+          />
+        </el-form-item>
+        <el-form-item prop="verifyCode">
+          <el-input
+            v-model="fastLoginForm.verifyCode"
+            :placeholder="$t('auth.placeholder.verifyCode')"
+            class="login-input"
           >
-            <el-form-item :label="$t('auth.email') + '/' + $t('auth.phone')" prop="username">
-              <el-input
-                  ref='usernameInputRef'
-                  v-model="fastLoginForm.username"
-                  :placeholder="$t('auth.placeholder.emailPhone')"
-                  class="login-input"
-              ></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('auth.verifyCode')" prop="verifyCode">
-              <el-input
-                  v-model="fastLoginForm.verifyCode"
-                  :placeholder="$t('auth.placeholder.verifyCode')"
-                  class="login-input"
-              >
-                <template #append>
-                  <VerifyingCodeButton 
-                    :username="fastLoginForm.username"
-                    :getType="fastLoginForm.username.includes('@') ? 'email'
-                    : 'sms'"
-                    :scene="'login'" 
-                  />
-                </template>
-              </el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button
-                  type="primary"
-                  class="login-btn"
-                  @click="submitForm(fastAuthForm)"
-                  :loading = "buttonLoad"
-              >{{ $t('auth.btn.login') }} / {{$t('auth.btn.register')}}</el-button>
-            </el-form-item>
-          </el-form>
-        </el-tab-pane>
-      </el-tabs>
+            <template #append>
+              <VerifyingCodeButton 
+                :username="fastLoginForm.username"
+                :getType="fastLoginForm.username.includes('@') ? 'email' : 'sms'"
+                :scene="'login'" 
+              />
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            class="login-btn"
+            @click="submitForm(fastAuthForm)"
+            :loading="buttonLoad"
+          >
+            {{ $t('auth.btn.login') }} / {{ $t('auth.btn.register') }}
+          </el-button>
+        </el-form-item>
+      </el-form>
+      <div class="legal-links">
+        <el-button size="small" link @click="router.push('/legal/terms')">
+          {{ $t('auth.terms') }}
+        </el-button>
+        <span style="color:#cbd5e1">|</span>
+        <el-button size="small" link @click="router.push('/legal/privacy')">
+          {{ $t('auth.privacy') }}
+        </el-button>
+      </div>
     </auth-box>
 </template>
 
 <style scoped>
-
-.auth-form{
-  font-size: small;
-  margin-top: 20px;
-}
-
-.password-addition{
+.tab-switcher {
   display: flex;
-  align-items: center;
-  width: 100%;
+  gap: 2px;
+  margin-bottom: 20px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 2px;
 }
 
-.password-addition .to-register{
-  margin-left: auto;
+.tab-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
-.login-btn{
-  width: 100%;
-  margin: 5px auto;
+.tab-btn:hover {
+  color: #1e293b;
+  background: rgba(255,255,255,0.5);
+}
+
+.tab-btn.active {
+  background: #fff;
+  color: #3b82f6;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.auth-form :deep(.el-form-item) {
+  margin-bottom: 18px;
+}
+
+.auth-form :deep(.el-input__wrapper) {
+  border-radius: 8px;
 }
 
 .captcha-container {
   display: flex;
   align-items: center;
   width: 100%;
+  gap: 10px;
 }
-:deep(.el-tabs__content) {
-  padding-bottom: 0;
+
+.captcha-image-wrap {
+  flex-shrink: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.captcha-image {
+  width: 100px;
+  height: 36px;
+  border-radius: 6px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 22px 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -4px;
+}
+
+.legal-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
 }
 </style>

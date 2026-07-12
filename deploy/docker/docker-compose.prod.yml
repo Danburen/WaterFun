@@ -1,0 +1,261 @@
+name: waterfun-prod
+
+# ============================================================
+# WaterFun 生产环境 Docker Compose
+# 使用方式：
+#   docker compose -f docker-compose.prod.yml up
+# 所有凭据通过 .env 文件或系统环境变量注入
+# 参考 .env.example 设置必需变量
+# ============================================================
+
+services:
+  # ====================== Infrastructure ======================
+  mysql:
+    image: mysql:8.0
+    container_name: waterfun-mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: waterfun
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - waterfun-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: waterfun-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - waterfun-net
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: waterfun-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - waterfun-net
+
+  # ====================== Java Services ======================
+  gateway:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.gateway
+    container_name: waterfun-gateway
+    ports:
+      - "${WATERFUN_GATEWAY_PORT:-8080}:8080"
+    environment:
+      CONFIG_PROFILE: prod
+      WATERFUN_GATEWAY_PORT: ${WATERFUN_GATEWAY_PORT:-8080}
+      WATERFUN_USER_SERVICE_URI: ${WATERFUN_USER_SERVICE_URI}
+      WATERFUN_ADMIN_SERVICE_URI: ${WATERFUN_ADMIN_SERVICE_URI}
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DATABASE: ${REDIS_DATABASE}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST}
+    volumes:
+      - ../../deploy/keys:/app/deploy/keys
+      - ../../deploy/config/common.yml:/app/deploy/config/common.yml
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - waterfun-net
+
+  user-service:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.service
+    container_name: waterfun-user-service
+    ports:
+      - "${WATERFUN_SERVICE_PORT:-8081}:8081"
+    environment:
+      CONFIG_PROFILE: prod
+      WATERFUN_SERVICE_PORT: ${WATERFUN_SERVICE_PORT:-8081}
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DATABASE: ${REDIS_DATABASE}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      DEVICE_SALT: ${DEVICE_SALT}
+      TENCENTCLOUD_SECRET_ID: ${TENCENTCLOUD_SECRET_ID}
+      TENCENTCLOUD_SECRET_KEY: ${TENCENTCLOUD_SECRET_KEY}
+      TENCENTCLOUD_REGION: ${TENCENTCLOUD_REGION:-ap-shanghai}
+      TENCENT_COS_BUCKET: ${TENCENT_COS_BUCKET}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      # Java System.getenv() 读取的变量（yaml 配置中未声明）
+      ALIBABA_CLOUD_ACCESS_KEY_ID: ${ALIBABA_CLOUD_ACCESS_KEY_ID}
+      ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
+      WATERFUN_KEK: ${WATERFUN_KEK}
+    volumes:
+      - type: bind
+        source: ${JWT_PRIVATE_KEY_FILE:-../../deploy/keys/private.key}
+        target: /app/deploy/keys/private.key
+        read_only: true
+      - ../../deploy/config/common.yml:/app/deploy/config/common.yml:ro
+      - ../../deploy/config/common-${CONFIG_PROFILE:-prod}.yml:/app/deploy/config/common-prod.yml:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - waterfun-net
+
+  admin-service:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.admin
+    container_name: waterfun-admin-service
+    ports:
+      - "${WATERFUN_ADMIN_SERVICE_PORT:-8082}:8082"
+    environment:
+      CONFIG_PROFILE: prod
+      WATERFUN_ADMIN_SERVICE_PORT: ${WATERFUN_ADMIN_SERVICE_PORT:-8082}
+      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DATABASE: ${REDIS_DATABASE}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VHOST: ${RABBITMQ_VHOST}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      DEVICE_SALT: ${DEVICE_SALT}
+      TENCENTCLOUD_SECRET_ID: ${TENCENTCLOUD_SECRET_ID}
+      TENCENTCLOUD_SECRET_KEY: ${TENCENTCLOUD_SECRET_KEY}
+      TENCENTCLOUD_REGION: ${TENCENTCLOUD_REGION:-ap-shanghai}
+      TENCENT_COS_BUCKET: ${TENCENT_COS_BUCKET}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      # Java System.getenv() 读取的变量（yaml 配置中未声明）
+      ALIBABA_CLOUD_ACCESS_KEY_ID: ${ALIBABA_CLOUD_ACCESS_KEY_ID}
+      ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
+      WATERFUN_KEK: ${WATERFUN_KEK}
+    volumes:
+      - type: bind
+        source: ${JWT_PRIVATE_KEY_FILE:-../../deploy/keys/private.key}
+        target: /app/deploy/keys/private.key
+        read_only: true
+      - ../../deploy/config/common.yml:/app/deploy/config/common.yml:ro
+      - ../../deploy/config/common-${CONFIG_PROFILE:-prod}.yml:/app/deploy/config/common-prod.yml:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - waterfun-net
+
+  # ====================== Nginx Reverse Proxy ======================
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: waterfun-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/waterfun.top.pem:/etc/nginx/ssl/waterfun.top.pem:ro
+      - ./nginx/waterfun.top.key:/etc/nginx/ssl/waterfun.top.key:ro
+      - ../../waterfun-admin/dist:/usr/share/nginx/html/admin:ro
+    depends_on:
+      - gateway
+    restart: unless-stopped
+    networks:
+      - waterfun-net
+
+  # ====================== Frontend (Nuxt SSR) ======================
+  # Uncomment when Nuxt container is ready:
+  # web-client:
+  #   build:
+  #     context: ../..
+  #     dockerfile: deploy/docker/Dockerfile.web-client
+  #   container_name: waterfun-web-client
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-//api.waterfun.top/api}
+  #   restart: unless-stopped
+  #   networks:
+  #     - waterfun-net
+
+networks:
+  waterfun-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  rabbitmq_data:

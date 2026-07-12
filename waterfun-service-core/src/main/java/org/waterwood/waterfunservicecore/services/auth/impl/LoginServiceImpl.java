@@ -9,7 +9,6 @@ import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
-import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
 import org.waterwood.common.exceptions.AuthException;
@@ -20,11 +19,13 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPer
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
+import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPayload;
 import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.services.auth.LoginService;
+import org.waterwood.waterfunservicecore.services.auth.RegisterService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
 import org.waterwood.waterfunservicecore.services.online.OnlineUserService;
@@ -46,6 +47,7 @@ public class LoginServiceImpl implements LoginService {
     private final AuditLogCoreService auditLogCoreService;
     private final OnlineUserService onlineUserService;
     private final UserPermRepo userPermRepo;
+    private final RegisterService registerService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -76,29 +78,40 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public User login(VerifyCodeDto dto, String codeKey) {
-        EncryptionDataKey key= encryptedKeyService.pickEncryptionKey(1);
+    public LoginResult login(VerifyCodeDto dto, String codeKey) {
         if(dto.getScene() != VerifyScene.LOGIN){
             throw new AuthException(AuthCode.INVALID_VERIFY_SCENE);
         }
-        UserDatum userDatum = null;
         VerifyChannel channel = dto.getChannel();
-        if(channel == VerifyChannel.SMS){
-            userDatum = userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(dto.getTarget(),key.getEncryptedKey()))
-                    .orElseThrow(() ->  new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
-        }else if(channel == VerifyChannel.EMAIL){
-            userDatum = userDatumRepo.findByEmailHash(HashUtil.Sha256HmacString(dto.getTarget(),key.getEncryptedKey()))
-                    .orElseThrow(() ->  new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
-        }
-        verificationService.verifyCode(dto.getTarget(),dto.getScene(),channel,codeKey,dto.getCode());
 
-        if(userDatum ==  null) throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
+        EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
+        UserDatum userDatum = null;
+        if(channel == VerifyChannel.SMS){
+            userDatum = userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(dto.getTarget(), hmacKey.getEncryptedKey()))
+                    .orElse(null);
+        }else if(channel == VerifyChannel.EMAIL){
+            userDatum = userDatumRepo.findByEmailHash(HashUtil.Sha256HmacString(dto.getTarget(), hmacKey.getEncryptedKey()))
+                    .orElse(null);
+        }
+
+        if (userDatum == null) {
+            User autoUser = registerService.autoRegister(
+                    dto.getTarget(), channel, dto.getScene(), codeKey, dto.getCode(), dto.getDeviceFp()
+            );
+            siteStatisticRecorder.recordLogin();
+            checkLoginBan(autoUser.getUid());
+            onlineUserService.updateLastActive(autoUser.getUid());
+            auditLogCoreService.record(autoUser.getUid(), autoUser.getUsername(), AuditLogActionType.LOGIN);
+            return new LoginResult(autoUser, true);
+        }
+
+        verificationService.verifyCode(dto.getTarget(),dto.getScene(),channel,codeKey,dto.getCode());
         siteStatisticRecorder.recordLogin();
         User user = userDatum.getUser();
         checkLoginBan(user.getUid());
         onlineUserService.updateLastActive(user.getUid());
         auditLogCoreService.record(user.getUid(), user.getUsername(), AuditLogActionType.LOGIN);
-        return user;
+        return new LoginResult(user, false);
     }
 
     private void checkLoginBan(Long userUid) {

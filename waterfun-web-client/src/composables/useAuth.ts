@@ -64,7 +64,9 @@ export const useAuth = () => {
         const loginRes = await login(loginRequest, type)
         return handleAuthSuccess(loginRes.data).then(() => {
             ElMessage({
-                message: translate("message.success.loginSuccess"),
+                message: loginRes.data.isNewUser
+                    ? translate("message.success.registerSuccess")
+                    : translate("message.success.loginSuccess"),
                 type: "success",
             })
         }).catch(err => {

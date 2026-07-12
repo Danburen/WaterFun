@@ -29,7 +29,7 @@ public class TicketResource {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "resource_uuid", nullable = false, referencedColumnName = "uuid")
-    private Resource resourceUuid;
+    private Resource resource;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP(3)")

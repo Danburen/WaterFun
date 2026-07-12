@@ -146,6 +146,11 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findByIdAndStatus(id, CommentStatus.NORMAL)
                 .orElseThrow(CommentNotFoundException::new);
 
+        Long currentUid = UserCtxHolder.getUserUid();
+        if (!comment.getAuthor().getUid().equals(currentUid)) {
+            throw new BizException(BaseResponseCode.FORBIDDEN, "You are not the author of this comment");
+        }
+
         int deletedReplies = 0;
         if (comment.getReplyCount() > 0) {
             deletedReplies = commentRepository.updateStatusByParentId(CommentStatus.DELETED, id);
@@ -153,7 +158,7 @@ public class CommentServiceImpl implements CommentService {
 
         comment.setStatus(CommentStatus.DELETED);
         commentRepository.save(comment);
-        userActivityLogService.record(UserCtxHolder.getUserUid(), UserActionType.DELETED, BusinessType.COMMENT, id);
+        userActivityLogService.record(currentUid, UserActionType.DELETED, BusinessType.COMMENT, id);
         if (comment.isTopLevel()) {
             postRepository.decreaseCommentCountById(comment.getPostId(), deletedReplies + 1);
         } else {
@@ -240,9 +245,9 @@ public class CommentServiceImpl implements CommentService {
                 comment.getLikeCount(),
                 comment.getReplyCount(),
                 comment.getCreatedAt(),
-                null, // first level comment won't have its parent replier
-                commentLikeRepository.existsById(new CommentLikeId(comment.getId(), UserCtxHolder.getUserUid())),
-                comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid())
+                null,
+                comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid()),
+                commentLikeRepository.existsById(new CommentLikeId(comment.getId(), UserCtxHolder.getUserUid()))
         ));
     }
 
@@ -315,8 +320,8 @@ public class CommentServiceImpl implements CommentService {
                     comment.getReplyCount(),
                     comment.getCreatedAt(),
                     isDirectReplyToRoot ? null : parentAuthorNameMap.get(parentId),
-                    commentLikeRepository.existsById(new CommentLikeId(comment.getId(), UserCtxHolder.getUserUid())),
-                    comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid())
+                    comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid()),
+                    commentLikeRepository.existsById(new CommentLikeId(comment.getId(), UserCtxHolder.getUserUid()))
             );
         });
     }
@@ -336,9 +341,9 @@ public class CommentServiceImpl implements CommentService {
                             comment.getLikeCount(),
                             comment.getReplyCount(),
                             comment.getCreatedAt(),
-                            null, // single comment won't show replacer display name,
-                            commentLikeRepository.existsById(new CommentLikeId(comment.getId(), UserCtxHolder.getUserUid())),
-                            comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid())
+                            null,
+                            comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid()),
+                            commentLikeRepository.existsById(new CommentLikeId(comment.getId(), UserCtxHolder.getUserUid()))
                     );
                 })
                 .orElseThrow(CommentNotFoundException::new);

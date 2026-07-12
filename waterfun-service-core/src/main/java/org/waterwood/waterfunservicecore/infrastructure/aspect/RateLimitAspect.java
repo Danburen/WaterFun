@@ -55,7 +55,7 @@ public class RateLimitAspect {
     private String getCurrentUserId() {
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         if (attrs instanceof ServletRequestAttributes servletAttrs) {
-            String userId = servletAttrs.getRequest().getHeader("X-User-Id");
+            String userId = servletAttrs.getRequest().getHeader("X-User-Uid");
             if (userId != null) return userId;
         }
         return "anon";

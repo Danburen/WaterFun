@@ -122,7 +122,11 @@ const handleSave = async () => {
       throw new Error(policyResponse.message || '获取上传策略失败');
     }
     
-    const { url: cosUrl, method, token } = policyResponse.data[0];
+    const policy = policyResponse.data[0];
+    if (!policy) {
+      throw new Error('获取上传策略失败');
+    }
+    const { url: cosUrl, method, token } = policy;
     console.log('获取上传策略成功:', { cosUrl, method, token });
     const response = await uploadFileToCos(cosUrl, method, selectedFile.value);
     console.log('上传到COS成功:', response);

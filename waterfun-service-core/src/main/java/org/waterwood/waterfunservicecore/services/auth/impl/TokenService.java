@@ -143,7 +143,11 @@ public class TokenService implements AuthTokenService {
     public void removeRefreshToken(long userUid, String dfp, String refreshToken) {
         String calculatedHashDid = deviceService.calculaateDid(userUid, dfp);
         String familyId = redisHelper.getValue(buildRtFamilyCacheKey(userUid, calculatedHashDid));
-        redisHelper.del(buildRefCacheKey(userUid, calculatedHashDid, familyId));
+        String key = buildRefCacheKey(userUid, calculatedHashDid, familyId);
+        String stored = redisHelper.getValue(key);
+        if (stored != null && stored.equals(refreshToken)) {
+            redisHelper.del(key);
+        }
     }
 
     @Override

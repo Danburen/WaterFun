@@ -14,16 +14,16 @@ export function previewImage(url: string) {
 
 /** Unified status label map — keyed by ticket type domain */
 const STATUS_LABEL_MAP: Record<string, Record<string, string>> = {
-  ACCOUNT_APPEAL: { PENDING: "待复核", RESOLVED: "已撤销", REJECTED: "已维持" },
-  CONTENT_REPORT: { PENDING: "待处理", RESOLVED: "已采纳", REJECTED: "已驳回" },
-  FEATURE_FEEDBACK: { PENDING: "未处理", RESOLVED: "已解决", REJECTED: "已拒绝" },
-  SUGGESTION: { PENDING: "未处理", RESOLVED: "已解决", REJECTED: "已拒绝" },
+  ACCOUNT_APPEAL: { PENDING: "待复核", RESOLVED: "已撤销", REJECTED: "已维持", CANCELLED: "已取消" },
+  CONTENT_REPORT: { PENDING: "待处理", RESOLVED: "已采纳", REJECTED: "已驳回", CANCELLED: "已取消" },
+  FEATURE_FEEDBACK: { PENDING: "未处理", RESOLVED: "已解决", REJECTED: "已拒绝", CANCELLED: "已取消" },
+  SUGGESTION: { PENDING: "未处理", RESOLVED: "已解决", REJECTED: "已拒绝", CANCELLED: "已取消" },
 };
 const STATUS_CHIP_MAP: Record<string, Record<string, string>> = {
-  ACCOUNT_APPEAL: { PENDING: "status-pending", RESOLVED: "status-resolved", REJECTED: "status-rejected" },
-  CONTENT_REPORT: { PENDING: "status-pending", RESOLVED: "status-resolved", REJECTED: "status-rejected" },
-  FEATURE_FEEDBACK: { PENDING: "status-new", RESOLVED: "status-resolved", REJECTED: "status-rejected" },
-  SUGGESTION: { PENDING: "status-new", RESOLVED: "status-resolved", REJECTED: "status-rejected" },
+  ACCOUNT_APPEAL: { PENDING: "status-pending", RESOLVED: "status-resolved", REJECTED: "status-rejected", CANCELLED: "status-cancelled" },
+  CONTENT_REPORT: { PENDING: "status-pending", RESOLVED: "status-resolved", REJECTED: "status-rejected", CANCELLED: "status-cancelled" },
+  FEATURE_FEEDBACK: { PENDING: "status-new", RESOLVED: "status-resolved", REJECTED: "status-rejected", CANCELLED: "status-cancelled" },
+  SUGGESTION: { PENDING: "status-new", RESOLVED: "status-resolved", REJECTED: "status-rejected", CANCELLED: "status-cancelled" },
 };
 
 export function statusLabel(status?: string, ticketType = "ACCOUNT_APPEAL"): string {

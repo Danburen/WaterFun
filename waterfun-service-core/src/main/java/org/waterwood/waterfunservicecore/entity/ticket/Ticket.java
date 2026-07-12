@@ -31,8 +31,6 @@ public class Ticket {
     private TargetType targetType = TargetType.DEFAULT;
 
     @ColumnDefault("'1'")
-    @Convert(disableConversion = true)
-    @Enumerated
     @Column(name = "status", columnDefinition = "tinyint UNSIGNED not null")
     private TicketAuditStatus status = TicketAuditStatus.PENDING;
 
@@ -54,7 +52,6 @@ public class Ticket {
     @Column(name = "audit_at")
     private Instant auditAt;
 
-    @Enumerated
     @Column(name = "reject_type", columnDefinition = "tinyint UNSIGNED")
     private TicketRejectType rejectType = TicketRejectType.NONE;
 
@@ -72,7 +69,6 @@ public class Ticket {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
-    @Enumerated
     @Column(name = "ticket_type", columnDefinition = "tinyint UNSIGNED not null")
     private TicketType ticketType;
 

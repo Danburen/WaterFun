@@ -1,10 +1,32 @@
+<script setup lang="ts">
+import { getAbout } from "~/api/resourceApi";
+import LegalDocument, {type LegalDocPropsType} from "~/components/LegalDocument.vue";
+import { base64ToUint8Array } from "@waterfun/web-core/src/dataMapper"
+import type {FileResDataType} from "@waterfun/web-core/src/types/api/response";
+import {LangMap} from "~/utils/consts";
+import type { DataApiResponse } from "@waterfun/web-core/src/types/api/response";
+const i18n = useI18n();
+
+const legalDocProps = reactive<LegalDocPropsType>({
+  title: '',
+  content: i18n.t('info.loading'),
+  lastUpdate: new Date(),
+  showConfirm: false,
+})
+
+onMounted(()=>{
+  legalDocProps.title = i18n.t('navbar.about');
+  getAbout(LangMap[i18n.locale.value] || 'zh_CN').then((response : DataApiResponse<FileResDataType>) => {
+    legalDocProps.content = new TextDecoder('utf-8').decode(
+        base64ToUint8Array(response.data.content)
+    );
+    legalDocProps.lastUpdate = new Date(response.data.lastModified);
+  }).catch(error => {
+    console.log(error);
+  })
+})
+</script>
+
 <template>
-  <div>
-    <HeaderNavMenu />
-    <div class="wf-placeholder-page">
-      <h1>关于我们</h1>
-      <p>关于页面正在建设中...</p>
-      <NuxtLink to="/">返回首页</NuxtLink>
-    </div>
-  </div>
+  <LegalDocument v-bind="legalDocProps"></LegalDocument>
 </template>

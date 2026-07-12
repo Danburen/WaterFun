@@ -3,7 +3,7 @@ import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
 export type TicketType = "CONTENT_REPORT" | "ACCOUNT_APPEAL" | "FEATURE_FEEDBACK" | "SUGGESTION";
-export type TicketStatus = "PENDING" | "RESOLVED" | "REJECTED";
+export type TicketStatus = "PENDING" | "RESOLVED" | "REJECTED" | "CANCELLED";
 export type ReviewAction = "APPROVE" | "REJECT";
 export type RejectType =
   | "NONE"
@@ -82,7 +82,13 @@ export interface TicketResponse {
   ticketType?: TicketType;
   status?: TicketStatus;
   submitter?: UserBriefWithStats;
-  auditor?: UserBriefWithStats | null;
+  auditor?: {
+    uid?: string;
+    displayName?: string;
+    avatar?: string | AvatarInfo | null;
+    level?: number;
+    userType?: string;
+  } | null;
   targetUser?: UserBriefWithStats;
   targetId?: string;
   targetType?: string;
@@ -114,7 +120,7 @@ export interface TicketReviewRequest {
   rejectType?: RejectType;
   auditNote?: string;
   penaltyType?: PenaltyType;
-  penaltyDurationHours?: string;
+  penaltyDurationHours?: number;
   banReasonType?: BanReasonType;
   replyContent?: string;
 }

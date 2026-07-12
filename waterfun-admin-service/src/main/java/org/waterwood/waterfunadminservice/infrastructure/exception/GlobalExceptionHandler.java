@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.waterwood.api.ErrorResponse;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.exceptions.AuthException;
+import org.waterwood.waterfunservicecore.exception.BanForbiddenException;
 import org.waterwood.waterfunservicecore.exception.BizException;
 
 import java.util.*;
@@ -171,10 +172,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
+    @ExceptionHandler(BanForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleBanForbidden(BanForbiddenException ex){
+        ErrorResponse response = new ErrorResponse(
+                ex.getErrorCode(),
+                msgSrc.getMessage(ex.getMessage(), null, "You are banned and temporarily unable to perform this operation", LOCALE),
+                null,
+                new Date()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
     /**
-     * Handle auth exception
-     * @param ex auth exception
-     * @return the {@link ResponseEntity} ofPending {@link ErrorResponse} body segment {@link}
+     * Handle business exception with dynamic HTTP status code
+     * @param ex business exception
+     * @return the {@link ResponseEntity} ofPending {@link ErrorResponse}
      */
     @ExceptionHandler(BizException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BizException ex){
@@ -187,6 +199,7 @@ public class GlobalExceptionHandler {
                 null,
                 new Date()
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        HttpStatus httpStatus = HttpStatus.resolve(ex.getHttpStatusCode());
+        return ResponseEntity.status(httpStatus != null ? httpStatus : HttpStatus.BAD_REQUEST).body(response);
     }
 }

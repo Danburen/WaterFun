@@ -14,6 +14,7 @@ import org.waterwood.waterfunservicecore.api.CursorPage;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.BanCheck;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.AuthContext;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.audit.ContentAuditService;
@@ -52,7 +53,8 @@ public class CommentController {
        return ApiResponse.success( commentService.getComment(commentId));
     }
 
-    @BanCheck("ban:comment")
+    @BanCheck({"ban:comment", "ban:create"})
+    @RateLimit(key = "user", permits = 20)
     @PostMapping
     public ApiResponse<Void> postComment(@RequestBody @Valid CreateCommentReq req){
         commentService.create(req);
@@ -71,6 +73,7 @@ public class CommentController {
         return ApiResponse.success();
     }
 
+    @RateLimit(key = "user", permits = 5)
     @PostMapping("/{id}/report")
     public ApiResponse<ReportResponse> reportComment(@PathVariable Long id, @Valid @RequestBody CreateReportReq req) {
         AuthContext ctx = UserCtxHolder.safeGet()

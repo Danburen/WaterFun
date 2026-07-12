@@ -24,25 +24,30 @@ public class BanCheckAspect {
     @Before("@annotation(banCheck)")
     @Transactional(readOnly = true)
     public void checkBan(BanCheck banCheck) {
-        long userUid = UserCtxHolder.getUserUid();
-        String requiredBan = banCheck.value();
+        long userUid = UserCtxHolder.safeGetUserId()
+                .orElseThrow(() -> new IllegalStateException("User context not available for ban check"));
+        String[] requiredBans = banCheck.value();
 
 
         for (UserPermission up : userPermRepo.findByUserUid(userUid)) {
             log.info(up.getCode());
             if (up.getPermission() == null || up.getPermission().getCode() == null) continue;
             if (up.getExpiresAt() != null && up.getExpiresAt().isBefore(Instant.now())) continue;
-            if (!matchesBan(up.getPermission().getCode(), requiredBan)) continue;
+            if (!matchesBan(up.getPermission().getCode(), requiredBans)) continue;
 
             log.warn("Ban check failed: uid={}, perm={}", userUid, up.getPermission().getCode());
             throw new BanForbiddenException();
         }
     }
 
-    private boolean matchesBan(String permCode, String requiredBan) {
-        if (requiredBan == null || requiredBan.isBlank()) {
+    private boolean matchesBan(String permCode, String[] requiredBans) {
+        if (requiredBans == null || requiredBans.length == 0 ||
+                (requiredBans.length == 1 && (requiredBans[0] == null || requiredBans[0].isBlank()))) {
             return permCode.startsWith("ban:");
         }
-        return permCode.equals(requiredBan);
+        for (String required : requiredBans) {
+            if (permCode.equals(required)) return true;
+        }
+        return false;
     }
 }

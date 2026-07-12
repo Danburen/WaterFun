@@ -29,11 +29,11 @@ public class AuthCoreServiceImpl implements AuthCoreService {
     private final CodeSenderFactory codeSenderFactory;
 
     @Override
-    public LoginClientData BuildLoginResponse(HttpServletResponse response, User user, String dfp) {
+    public LoginClientData BuildLoginResponse(HttpServletResponse response, User user, String dfp, Boolean isNewUser) {
         TokenPair tokenPair = createNewTokens(user.getUid(), dfp);
         CookieUtil.setTokenCookie(response,tokenPair);
         ResponseUtil.setNoCacheSecurityHeaders(response);
-        return new LoginClientData(tokenPair.accessToken(),tokenPair.accessExp());
+        return new LoginClientData(tokenPair.accessToken(), tokenPair.accessExp(), isNewUser);
     }
 
     @Override

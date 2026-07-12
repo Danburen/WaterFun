@@ -3,9 +3,8 @@ package org.waterwood.waterfunservice.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.waterwood.api.ApiResponse;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservice.api.response.MiniFileResData;
 import org.waterwood.waterfunservice.service.resource.ResourceService;
@@ -29,27 +28,22 @@ public class ResourceController {
     private CloudFileService cloudFileService;
 
     @GetMapping("legal/{type}/{lang}/{fileName}")
-    public ResponseEntity<?> getLegalResource(
+    public ApiResponse<MiniFileResData> getLegalResource(
             @PathVariable String type,
             @PathVariable String lang,
             @PathVariable String fileName) {
-        // White list validateAndRemove path
-        if (! LegalResourceConstants.VALID_TYPES.contains(type)
+        if (!LegalResourceConstants.VALID_TYPES.contains(type)
                 || !LegalResourceConstants.VALID_LANGS.contains(lang)) {
-            return ResponseEntity.badRequest().body(BaseResponseCode.REQUEST_NOT_IN_WHITELIST);
+            return ApiResponse.error(BaseResponseCode.REQUEST_NOT_IN_WHITELIST);
         }
-        // Standardized path
         if (!isSafePathSegment(type) || !isSafePathSegment(lang) || !isSafePathSegment(fileName)) {
-            return ResponseEntity.badRequest().body(BaseResponseCode.INVALID_PATH);
+            return ApiResponse.error(BaseResponseCode.INVALID_PATH);
         }
         try {
-
             MiniFileResData data = resourceService.getLegalFileContent(type, lang, fileName);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, "application/json")
-                    .body(data);
+            return ApiResponse.success(data);
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
+            return ApiResponse.error(BaseResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
 

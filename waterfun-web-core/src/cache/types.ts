@@ -3,5 +3,3 @@ export interface CacheItem {
     expiresAt: number;
     lastAccess: number;
 }
-
-export default CacheItem

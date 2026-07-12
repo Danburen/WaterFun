@@ -20,7 +20,6 @@ import org.waterwood.api.VO.OptionVO;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.ResourceType;
-import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.UserBizType;
 import org.waterwood.waterfunservice.api.UserUploadContext;
@@ -116,16 +115,6 @@ public class PostServiceImpl implements PostService {
     private Long userCollectExceedLimit;
 
     @Override
-    public void add(Post post, Set<Long> tagIds) {
-        List<Tag> tags = tagRepository.findAllById(tagIds);
-        post.setAuthor(userRepository.getReferenceById(UserCtxHolder.getUserUid()));
-        post.setSlug(identifierGenerator.generateSlug(post.getTitle(), postRepository));
-        post.setTags(tags);
-        postRepository.save(post);
-        userActivityLogService.record(post.getAuthor().getUid(), UserActionType.CREATE, BusinessType.POST, post.getId());
-    }
-
-    @Override
     public Page<Post> listPosts(Specification<Post> spec, Pageable pageable) {
         return postRepository.findAll(spec, pageable);
     }
@@ -135,7 +124,7 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long id) {
         Post p = postRepository.findById(id)
                 .orElseThrow(PostNotFoundException::new);
-        if(!Objects.equals(p.getAuthor().getUid(), UserCtxHolder.getUserUid())){
+        if(!Objects.equals(p.getAuthorUid(), UserCtxHolder.getUserUid())){
             throw new BizException(BaseResponseCode.FORBIDDEN);
         }
         if(p.getCategory() != null){
@@ -306,18 +295,20 @@ public class PostServiceImpl implements PostService {
                 throw new PostNotFoundException();
             }
             // Check author's work visibility
-            Long postAuthorUid = post.getAuthor().getUid();
-            UserSetting authorSetting = userSettingRepository.findById(postAuthorUid).orElse(null);
-            if (authorSetting != null) {
-                if (authorSetting.getWorkVisibility() == ProfileVisibility.PRIVATE) {
-                    throw new PostNotFoundException();
+            post.getAuthorUidOpt().ifPresent(uid -> {
+                UserSetting authorSetting = userSettingRepository.findById(uid).orElse(null);
+                if (authorSetting != null) {
+                    if (authorSetting.getWorkVisibility() == ProfileVisibility.PRIVATE) {
+                        throw new PostNotFoundException();
+                    }
+                    if (authorSetting.getWorkVisibility() == ProfileVisibility.FOLLOWERS
+                            && (currentUid == null
+                            || !userFollowerRepository.existsById(new UserFollowerId(uid, currentUid)))) {
+                        throw new PostNotFoundException();
+                    }
                 }
-                if (authorSetting.getWorkVisibility() == ProfileVisibility.FOLLOWERS
-                        && (currentUid == null
-                            || !userFollowerRepository.existsById(new UserFollowerId(postAuthorUid, currentUid)))) {
-                    throw new PostNotFoundException();
-                }
-            }
+            });
+
             postRepository.increaseViewCount(id, 1);
         }
 
@@ -496,7 +487,7 @@ public class PostServiceImpl implements PostService {
                 p.getEditedSubtitle(),
                 p.getEditedContent(),
                 p.getEditedSummary(),
-                p.getAuthor().getUid(),
+                p.getAuthorUid(),
                 p.getEditedCoverImg(),
                 p.getEditedCategory() != null ? p.getEditedCategory().getId() : null,
                 p.getEditedTagIds(),
@@ -575,6 +566,7 @@ public class PostServiceImpl implements PostService {
             res.setStatus(ResourceStatus.ACTIVE);
             resourceRepository.save(res);
             p.setEditedCoverImg(res.getUuid());
+            p.setCoverageResource(res);
         } else {
             p.setEditedCoverImg(null);
         }
@@ -1165,6 +1157,23 @@ public class PostServiceImpl implements PostService {
                 postPageIds.getTotalElements()
         );
     }
+    @Override
+    public Page<PostCardResp> listCardPostsByIds(Page<Long> postPageIds) {
+        return listCardPostsInternal(
+                postPageIds,
+                postMapper::toPostCardResponseDto,
+                (res, post, postTagMap, postCategoryMap, postCoverageImgMap, postUserBriefMap) -> {
+                    Long postId = post.getId();
+                    res.setTags(postTagMap.getOrDefault(postId, Collections.emptyList()));
+                    res.setCategory(postCategoryMap.get(postId));
+                    res.setCoverImage(postCoverageImgMap.get(postId));
+                    if (post.getAuthor() != null) {
+                        res.setUserBrief(postUserBriefMap.get(post.getAuthor().getUid()));
+                    }
+                }
+        );
+    }
+
     @Override
     public void ensurePostReportable(Long postId) {
         Post post = postRepository.findByIdAndIsDeleted(postId, false)

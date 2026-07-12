@@ -3,7 +3,7 @@ import { useRoute } from 'vue-router'
 import { usePostStore } from '~/stores/postStore'
 import { useAuthStore } from '~/stores/authStore'
 import { storeToRefs } from 'pinia'
-import { fetchUserPublicProfile, fetchFollowers, fetchFollowings, type UserPublicProfileResp } from '~/api/publicUserApi'
+import { fetchUserPublicProfile, fetchFollowers, fetchFollowings, fetchUserLikedPosts, type UserPublicProfileResp } from '~/api/publicUserApi'
 import { toggleFollowUser } from '~/api/publicUserApi'
 import { useUserInfoStore } from '~/stores/userInfoStore'
 import { createTicket } from '~/api/ticketApi'
@@ -12,6 +12,7 @@ import { getTagColor } from '@waterfun/web-core/src/tagColor'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import type { PostCardResp } from '~/api/postApi'
 
 definePageMeta({
   ssr: false
@@ -35,6 +36,8 @@ const followLoading = ref(false)
 const activeTab = ref<'posts' | 'followers' | 'followings' | 'likes'>('posts')
 const followers = ref<any[]>([])
 const followings = ref<any[]>([])
+const likedPosts = ref<PostCardResp[]>([])
+const likedPostsLoading = ref(false)
 const relationLoading = ref(false)
 
 const userInfoStore = (() => {
@@ -104,10 +107,21 @@ const loadFollowings = async () => {
   finally { relationLoading.value = false }
 }
 
+const loadLikedPosts = async () => {
+  if (activeTab.value !== 'likes') return
+  likedPostsLoading.value = true
+  try {
+    const res = await fetchUserLikedPosts(uid.value)
+    likedPosts.value = (res.data as any)?.content || []
+  } catch { /* ignore */ }
+  finally { likedPostsLoading.value = false }
+}
+
 const switchTab = (tab: 'posts' | 'followers' | 'followings' | 'likes') => {
   activeTab.value = tab
   if (tab === 'followers') loadFollowers()
   if (tab === 'followings') loadFollowings()
+  if (tab === 'likes') loadLikedPosts()
 }
 
 const goToUserPage = (targetUid: string) => {
@@ -207,6 +221,9 @@ onMounted(() => {
               <template v-if="isSelf">
                 <button class="btn btn-outline" @click="goToEditProfile">
                   <i class="fas fa-pen"></i> 编辑资料
+                </button>
+                <button class="btn btn-outline" @click="router.push('/profile')">
+                  <i class="fas fa-cog"></i> 个人中心
                 </button>
               </template>
               <template v-else>
@@ -384,10 +401,44 @@ onMounted(() => {
 
           <!-- Likes Panel -->
           <div v-show="activeTab === 'likes'" class="content-panel">
-            <div class="empty-state">
+            <div v-if="likedPostsLoading" class="empty-state">
+              <i class="fas fa-spinner fa-pulse"></i>
+              <h3>加载中...</h3>
+            </div>
+            <div v-else-if="likedPosts.length === 0" class="empty-state">
               <i class="far fa-heart"></i>
               <h3>暂无赞过的内容</h3>
               <p>去社区逛逛，发现精彩内容</p>
+            </div>
+            <div v-else class="post-list">
+              <div
+                v-for="post in likedPosts"
+                :key="post.id"
+                class="post-card"
+                @click="router.push(`/post/${post.id}`)"
+              >
+                <div class="post-header">
+                  <img :src="getAvatarUrl(post.userBrief?.avatar)" alt="avatar" class="post-author-avatar">
+                  <div class="post-meta">
+                    <div class="post-author-name">{{ post.userBrief?.displayName }}</div>
+                    <div class="post-time">{{ post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('zh-CN') : '' }}</div>
+                  </div>
+                  <span v-if="post.category" class="post-tag" :class="post.category?.name === '技术' ? 'tag-tech' : 'tag-life'">{{ post.category.name }}</span>
+                </div>
+                <div class="post-title-row">
+                  <div class="post-title">{{ post.title }}</div>
+                  <div v-if="post.tags?.length" class="post-card-tags">
+                    <span v-for="tag in post.tags" :key="tag.id" class="post-card-tag"
+                      :style="{ backgroundColor: getTagColor(tag.name) }">{{ tag.name }}</span>
+                  </div>
+                </div>
+                <div v-if="post.summary" class="post-excerpt">{{ post.summary }}</div>
+                <div class="post-footer">
+                  <span class="post-stat"><i class="far fa-comment"></i> {{ post.commentCount || 0 }}</span>
+                  <span class="post-stat"><i class="far fa-eye"></i> {{ formatNumber(post.viewCount) }}</span>
+                  <span class="post-stat"><i class="far fa-heart"></i> {{ post.likeCount || 0 }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

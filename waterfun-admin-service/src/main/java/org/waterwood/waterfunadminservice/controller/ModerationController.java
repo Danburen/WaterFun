@@ -40,7 +40,7 @@ public class ModerationController {
            ModerationBaseQuery query,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size){
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
         return ApiResponse.success(
                 moderationService.listPendingPostTasks(query, pageable)
         );
@@ -51,7 +51,7 @@ public class ModerationController {
             ModerationBaseQuery query,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
         return ApiResponse.success(
                 moderationService.listPendingImageTasks(query, pageable)
         );
@@ -62,7 +62,7 @@ public class ModerationController {
             ModerationBaseQuery query,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
         return ApiResponse.success(
                 moderationService.listPendingTextTasks(query, pageable)
         );

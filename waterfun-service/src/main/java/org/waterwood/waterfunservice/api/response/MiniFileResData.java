@@ -22,13 +22,15 @@ public class MiniFileResData {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private final LocalDateTime lastModified; // ISO 8601
     private final String fileType;
+    private final String contentType;
     private final String content;
-    public MiniFileResData(Path filePath, String fileType) throws IOException {
+    public MiniFileResData(Path filePath, String contentType) throws IOException {
         this.lastModified = LocalDateTime.ofInstant(
                 Files.getLastModifiedTime(filePath).toInstant(),
                 ZoneId.systemDefault()
         );
-        this.fileType = fileType;
+        this.fileType = contentType;
+        this.contentType = contentType;
         this.content =  Base64.getMimeEncoder().encodeToString(Files.readAllBytes(filePath));
         this.fileSize = Files.size(filePath);
         this.fileName = filePath.getFileName().toString();

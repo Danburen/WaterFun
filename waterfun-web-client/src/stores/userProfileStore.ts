@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useUserInfoStore } from './userInfoStore';
 import { getAvatar, getUserProfile, updateUserProfile as apiUpdateProfile } from '../api/userApi';
-import type CacheItem from '@waterfun/web-core/src/cache/types';
+import type { CacheItem } from '@waterfun/web-core/src/cache/types';
 
 interface UserProfile {
   bio: string;

@@ -17,6 +17,7 @@ public class CreateUserReportReqValidationTest {
     void contentReport_otherType_requiresReason() {
         CreateUserReportReq req = new CreateUserReportReq();
         req.setTicketType(TicketType.CONTENT_REPORT);
+        req.setType(AuditType.OTHER);
         req.setTargetId("123");
         req.setTargetType(TargetType.POST);
         // AuditType.OTHER + no reason → invalid

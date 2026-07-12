@@ -51,7 +51,7 @@ const fetchData = async () => {
   try {
     const query: any = {};
     if (filterStatus.value) query.status = filterStatus.value;
-    const res = await listImageModerations(query, (pageOpts.value.currentPage || 1) - 1, pageOpts.value.pageSize);
+    const res = await listImageModerations(query, pageOpts.value.currentPage || 1, pageOpts.value.pageSize);
     taskData.value = res.data.content || [];
     pageOpts.value.total = typeof res.data.totalElements === "number" ? res.data.totalElements
       : (res.data as any)?.page?.totalElements || 0;

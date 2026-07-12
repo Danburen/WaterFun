@@ -5,7 +5,6 @@ import {useAuthStore} from "~/stores/authStore";
 import {useUserInfoStore} from "~/stores/userInfoStore";
 import {useAccountPoolStore} from "~/stores/accountPoolStore";
 import { generateFingerprint } from "@waterfun/web-core/src/fingerprint";
-import type {ApiRes} from "@waterfun/web-core/src/types";
 import JSONBig from 'json-bigint'
 
 declare module 'axios' {
@@ -81,7 +80,6 @@ function normalizeRequestTypes(obj: any): any {
   return obj
 }
 
-const CSRF_SKIP_LIST: string[] = import.meta.env.VITE_CSRF_SKIP_LIST?.split(',') || [];
 const AUTH_SKIP_LIST: string[] = import.meta.env.VITE_AUTH_SKIP_LIST?.split(',') || [];
 const service = axios.create({
     baseURL: import.meta.env.VITE_API_BASE,
@@ -108,34 +106,15 @@ const service = axios.create({
         }
       },
     ],
-}) as ApiRes
+})
 
 // request interceptors
 service.interceptors.request.use(
-    async config => {
+    async (config: import('axios').InternalAxiosRequestConfig) => {
         const isAuthSkip = AUTH_SKIP_LIST.some((path: string) => config.url?.includes(path));
-        const isCsrfSkip = CSRF_SKIP_LIST.some((path: string) => config.url?.includes(path));
-        const needCSRF = config.meta?.needCSRF !== false && !isCsrfSkip;
         const needAuth = config.meta?.needAuth !== false && !isAuthSkip;
 
         const token = useAuthStore().accessData.token;
-        if (config.method !== 'GET' && needCSRF) {
-            let CSRFToken = getCsrfToken()
-            if (!CSRFToken) {
-                console.log('First request,now try get csrf token');
-                try {
-                    const response = await fetch(`${import.meta.env.VITE_API_BASE}/auth/csrf-token`, {
-                        credentials: 'include'
-                    });
-                    if (!response.ok) return Promise.reject(new Error(`Failed to fetch CSRF Token.Code ${response.status}`));
-                    CSRFToken = getCsrfToken();
-                } catch (error) {
-                    return Promise.reject(error);
-                }
-            }
-            config.headers['X-XSRF-TOKEN'] = CSRFToken;
-        }
-
         if(needAuth && token){
             config.headers['Authorization'] = `Bearer ${token}`;
         }
@@ -167,7 +146,7 @@ const addRefreshSubscriber = (cb: (token: string) => void) => {
 };
 
 service.interceptors.response.use(
-    response => {
+    (response: import('axios').AxiosResponse) => {
         if (response.status !== 200) {
             console.error(response);
             return Promise.reject(new Error(response.data.message || 'Error'))
@@ -235,20 +214,14 @@ service.interceptors.response.use(
 
                         (async () => {
                             try {
-                                const csrfTokenForFetch = getCsrfToken();
                                 const deviceFp = await generateFingerprint();
-                                const fetchOptions: RequestInit = {
+                                const res = await fetch(`${import.meta.env.VITE_API_BASE}/auth/refresh?deviceFp=${encodeURIComponent(deviceFp)}`, {
                                     method: 'POST',
                                     credentials: 'include',
                                     headers: {
                                         'Accept': 'application/json, text/plain, */*',
-                                    }
-                                };
-                                if (csrfTokenForFetch) {
-                                    (fetchOptions.headers as Record<string, string>)['X-XSRF-TOKEN'] = csrfTokenForFetch;
-                                }
-
-                                const res = await fetch(`${import.meta.env.VITE_API_BASE}/auth/refresh?deviceFp=${encodeURIComponent(deviceFp)}`, fetchOptions);
+                                    },
+                                });
                                 if (!res.ok) {
                                     throw new Error("refresh failed");
                                 }
@@ -306,12 +279,5 @@ service.interceptors.response.use(
         return Promise.reject(body);
     }
 )
-
-// get CSRF Token From cookie
-function getCsrfToken() {
-    return document.cookie.split(';')
-        .map(cookie=> cookie.trim())
-        .find(row => row.startsWith("XSRF-TOKEN="))?.split("=")[1];
-}
 
 export default service

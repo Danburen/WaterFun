@@ -1,6 +1,7 @@
 package org.waterwood.waterfunservicecore.entity.security;
 
 import lombok.Getter;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 
 @Getter
 public enum BanReasonType {
@@ -18,6 +19,18 @@ public enum BanReasonType {
 
     private final short value;
     private final String messageKey;
+
+    public AuditType toAuditType() {
+        return switch (this) {
+            case UNSPECIFIED, CHEATING, IMPERSONATION, PRIVACY, TROLLING -> AuditType.OTHER;
+            case VIOLATION_OF_GUIDELINES -> AuditType.VIOLATION_OF_GUIDELINES;
+            case INAPPROPRIATE_CONTENT -> AuditType.INAPPROPRIATE_CONTENT;
+            case ADVERTISEMENT -> AuditType.ADVERTISEMENT;
+            case VIOLENCE -> AuditType.VIOLENCE;
+            case SENSITIVE -> AuditType.SENSITIVE;
+            case OTHER -> AuditType.OTHER;
+        };
+    }
     private BanReasonType(final int value, final String messageKey) {
         this.value = (short) value;
         this.messageKey = messageKey;

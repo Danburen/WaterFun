@@ -68,7 +68,7 @@ public class BanPermissionMappingTest {
     @Test
     @DisplayName("PenaltyType 值应与 BanPermission 一一对应")
     void penaltyType_bijectionWithBanPermission() {
-        assertEquals(BanPermission.values().length, PenaltyType.values().length - 1, // -1 for OTHER
-                "BanPermission 与 PenaltyType 数量不匹配（不含 OTHER）");
+        assertEquals(BanPermission.values().length, PenaltyType.values().length - 2, // -2 for UNSPECIFIED and OTHER
+                "BanPermission 与 PenaltyType 数量不匹配（不含 UNSPECIFIED/OTHER）");
     }
 }

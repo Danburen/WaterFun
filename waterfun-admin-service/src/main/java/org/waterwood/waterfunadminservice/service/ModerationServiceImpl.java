@@ -169,6 +169,7 @@ public class ModerationServiceImpl implements ModerationService {
     }
 
     @Override
+    @Transactional
     public List<ModerationResourceRes> approve(Long id) {
         AuditTask task = auditTaskRepository.findByIdAndStatus(id, AuditStatus.PENDING)
                 .orElseThrow(AuditTaskNotFoundException::new);

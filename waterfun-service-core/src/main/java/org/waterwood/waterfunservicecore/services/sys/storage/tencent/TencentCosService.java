@@ -236,7 +236,7 @@ public class TencentCosService implements CloudFileService {
         String originFullPath = buildCosKey(originalRoot, originPath);
         String targetFullPath = buildCosKey(targetRoot, targetPath);
         cosClient.copyObject(bucketName, originFullPath, bucketName, targetFullPath);
-        removeFile(targetRoot, originFullPath);
+        removeFile(originalRoot, originPath);
     }
 
     @Override
@@ -252,10 +252,7 @@ public class TencentCosService implements CloudFileService {
     @Override
     public BizUploadPayload parseToken(String token) {
         return BizUploadPayload.fromMap(
-//                redisHelper.hGetAllAndDel(
-//                        buildUploadRedisKey(token)
-//                )
-                redisHelper.hashGetAll(
+                redisHelper.hGetAllAndDel(
                         buildUploadRedisKey(token)
                 )
         );

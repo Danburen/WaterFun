@@ -5,27 +5,21 @@ import org.waterwood.waterfunservicecore.entity.BanPermission;
 
 @Getter
 public enum PenaltyType {
-    UNSPECIFIED(0),
-    BAN_LOGIN(1),
-    BAN_POST(2),
-    BAN_COMMENT(3),
-    BAN_UPLOAD(4),
-    BAN_CHAT(5),
-    BAN_CREATE(6),
-    OTHER(99);
+    UNSPECIFIED(0, null),
+    BAN_LOGIN(1, BanPermission.BAN_LOGIN),
+    BAN_POST(2, BanPermission.BAN_POST),
+    BAN_COMMENT(3, BanPermission.BAN_COMMENT),
+    BAN_UPLOAD(4, BanPermission.BAN_UPLOAD),
+    BAN_CHAT(5, BanPermission.BAN_CHAT),
+    BAN_CREATE(6, BanPermission.BAN_CREATE),
+    OTHER(99, null);
 
     private final short value;
+    private final BanPermission banPermission;
 
-    PenaltyType(int value) {
+    PenaltyType(int value, BanPermission banPermission) {
         this.value = (short) value;
-    }
-
-    public BanPermission getBanPermission() {
-        try {
-            return BanPermission.valueOf(this.name());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        this.banPermission = banPermission;
     }
 
     public static PenaltyType fromValue(short value) {

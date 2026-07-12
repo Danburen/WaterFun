@@ -238,6 +238,7 @@ public class GlobalExceptionHandler {
                 null,
                 new Date()
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        HttpStatus httpStatus = HttpStatus.resolve(ex.getHttpStatusCode());
+        return ResponseEntity.status(httpStatus != null ? httpStatus : HttpStatus.BAD_REQUEST).body(response);
     }
 }

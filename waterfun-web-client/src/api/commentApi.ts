@@ -62,7 +62,7 @@ export const deleteComment = (id: string): PromiseResBody<void> => {
   return request.delete(`/comments/${id}`)
 }
 
-export const reportComment = (id: string, data: { type: string; reason?: string; reasonValid?: boolean }): PromiseResBody<{ taskId: string }> => {
+export const reportComment = (id: string, data: { type: string; reason?: string }): PromiseResBody<{ taskId: string }> => {
   return request.post(`/comments/${id}/report`, data)
 }
 

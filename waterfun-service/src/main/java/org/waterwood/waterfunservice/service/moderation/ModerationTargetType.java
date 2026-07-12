@@ -10,17 +10,17 @@ public enum ModerationTargetType {
     USER_AVATAR( "notification.audit.title",
             "notification.audit.avatar.approve",
             "notification.audit.avatar.reject_args",
-            Set.of(TargetType.USER_AVATAR)
+            Set.of(TargetType.USER_AVATAR, TargetType.USER)
     ),
     POST("notification.audit.title",
             "notification.audit.post.approve",
              "notification.audit.post.reject_args",
-             Set.of(TargetType.POST, TargetType.POST_CONTENT_IMAGE, TargetType.POST_COVERAGE_IMAGE)
+             Set.of(TargetType.POST, TargetType.POST_CONTENT_IMAGE, TargetType.POST_COVERAGE_IMAGE, TargetType.COMMENT, TargetType.BANNER_IMAGE, TargetType.MODERATION_IMAGE)
     ),
     TICKET("notification.audit.ticket.title",
             "notification.audit.ticket.approve",
             "notification.audit.ticket.reject_args",
-            Set.of(TargetType.DEFAULT)
+            Set.of(TargetType.DEFAULT, TargetType.USER_REPORT_ATTACHMENT)
     ),;
     private final String title;
     private final String approve;

@@ -13,7 +13,9 @@ public interface LoginService {
      * Login by code
      * @param dto verify code dto
      * @param codeKey code key
-     * @return  user
+     * @return  login result containing user and whether it was auto-registered
      */
-    User login(VerifyCodeDto dto, String codeKey);
+    LoginResult login(VerifyCodeDto dto, String codeKey);
+
+    record LoginResult(User user, boolean isNewUser) {}
 }

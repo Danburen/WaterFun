@@ -6,7 +6,7 @@ import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
 public interface AuthCoreService {
-    LoginClientData BuildLoginResponse(HttpServletResponse response, User user, String dfp);
+    LoginClientData BuildLoginResponse(HttpServletResponse response, User user, String dfp, Boolean isNewUser);
     TokenPair createNewTokens(long userUid, String deviceFingerprint);
     TokenPair refreshAccessToken(String refreshToken, String dfp);
 }

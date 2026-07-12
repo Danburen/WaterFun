@@ -162,7 +162,7 @@ const onTagInputKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Enter') {
     e.preventDefault()
     if (searchResults.value.length > 0) {
-      selectTagFromSearch(searchResults.value[0])
+      if (searchResults.value[0]) selectTagFromSearch(searchResults.value[0])
     } else {
       addNewTag()
     }
@@ -231,7 +231,12 @@ const uploadCoverImage = async (file: File) => {
       ElMessage.error('获取上传策略失败')
       return
     }
-    const { url: cosUrl, method, token } = policyResp.data[0]
+    const policy = policyResp.data[0]
+    if (!policy) {
+      ElMessage.error('获取上传策略失败')
+      return
+    }
+    const { url: cosUrl, method, token } = policy
     if (!token) {
       ElMessage.error('上传策略缺少 token')
       return
@@ -277,11 +282,12 @@ const insertImage = async () => {
           ElMessage.error('获取上传策略失败')
           continue
         }
-        const { url: cosUrl, method, token } = policyResp.data[0]
-        if (!token) {
+        const policy = policyResp.data[0]
+        if (!policy || !policy.token) {
           ElMessage.error('上传策略缺少 token')
           continue
         }
+        const { url: cosUrl, method, token } = policy
         const uploadResp = await uploadFileToCos(cosUrl, method, file)
         if (!uploadResp.ok) {
           ElMessage.error(`上传图片失败: ${file.name}`)

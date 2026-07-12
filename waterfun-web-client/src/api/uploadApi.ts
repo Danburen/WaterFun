@@ -1,5 +1,5 @@
 import request from "../utils/axiosRequest";
-import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response.d.ts";
+import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 

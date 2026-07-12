@@ -18,4 +18,5 @@ public class SendCodeDto {
     private DeviceInfoReq deviceInfo;
     @NotNull
     private VerifyScene scene;
+    private String captcha;
 }

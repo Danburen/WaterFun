@@ -1,4 +1,4 @@
-import { defineNuxtPlugin } from '#app';
+import { defineNuxtPlugin } from 'nuxt/app';
 import { useAuthStore } from '~/stores/authStore';
 import { useUserInfoStore } from '~/stores/userInfoStore';
 import { useUserAccountStore } from '~/stores/userAccountStore';

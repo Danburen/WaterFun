@@ -61,7 +61,7 @@ function detectOS(ua: string): string {
     }
     if (/mac os x/i.test(ua)) {
         const match = ua.match(/Mac OS X (\d+[._]\d+[._]?\d*)/)
-        if (match) return 'macOS ' + match[1].replace(/_/g, '.')
+        if (match) return 'macOS ' + (match[1] || '').replace(/_/g, '.')
         return 'macOS'
     }
     if (/linux/i.test(ua)) return 'Linux'
@@ -72,7 +72,7 @@ function detectOS(ua: string): string {
     }
     if (/iphone|ipad|ipod/i.test(ua)) {
         const match = ua.match(/OS (\d+[._]\d+[._]?\d*)/)
-        if (match) return 'iOS ' + match[1].replace(/_/g, '.')
+        if (match) return 'iOS ' + (match[1] || '').replace(/_/g, '.')
         return 'iOS'
     }
     return 'Unknown'

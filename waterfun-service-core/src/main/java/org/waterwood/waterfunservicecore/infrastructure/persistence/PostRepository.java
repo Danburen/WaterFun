@@ -141,4 +141,7 @@ public interface PostRepository extends JpaRepository<Post, Long>,
 
     @Query("SELECT p.coverageResource.uuid FROM Post p WHERE p.id = :id")
     String findCoverageResourceUuidById(@Param("id")Long id);
+
+    @Query("SELECT p.author.uid FROM Post p WHERE p.coverageResource.uuid = :resourceUuid")
+    Long findAuthorUidByCoverageResourceUuid(@Param("resourceUuid") String resourceUuid);
 }

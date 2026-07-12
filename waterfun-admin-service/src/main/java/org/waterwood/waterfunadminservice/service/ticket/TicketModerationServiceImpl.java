@@ -21,9 +21,11 @@ import org.waterwood.waterfunservicecore.api.message.TicketMessage;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.BanPermission;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunservicecore.entity.post.Comment;
+import org.waterwood.waterfunservicecore.entity.post.CommentDO;
 import org.waterwood.waterfunservicecore.entity.post.CommentStatus;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
@@ -35,6 +37,7 @@ import org.waterwood.waterfunservicecore.entity.ticket.TicketAuditStatus;
 import org.waterwood.waterfunservicecore.entity.ticket.TicketRejectType;
 import org.waterwood.waterfunservicecore.entity.ticket.TicketType;
 import org.waterwood.waterfunservicecore.entity.user.User;
+import org.waterwood.waterfunservicecore.entity.user.UserPenaltyHistory;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
 import org.waterwood.waterfunservicecore.exception.TicketNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentRepository;
@@ -215,9 +218,27 @@ public class TicketModerationServiceImpl implements TicketModerationService {
             targetUserUid = resolveTargetUserUid(ticket);
 
             if (penaltyType == PenaltyType.UNSPECIFIED) {
+                log.info("Ticket {} approved without user penalty – deleting reported content (targetId={}, targetType={})",
+                        ticket.getId(), ticket.getTargetId(), ticket.getTargetType());
                 deleteReportedContent(ticket);
             } else if (penaltyType == PenaltyType.OTHER) {
-                log.info("Warning issued for ticket {} target user {}", ticket.getId(), targetUserUid);
+                log.warn("Warning issued for ticket {} – recording penalty history without applying restrictions.", ticket.getId());
+                if (targetUserUid != null) {
+                    UserPenaltyHistory history = new UserPenaltyHistory();
+                    history.setUser(userRepository.getReferenceById(targetUserUid));
+                    history.setPenaltyType(PenaltyType.OTHER);
+                    history.setTargetId(ticket.getTargetId());
+                    history.setTargetType(ticket.getTargetType());
+                    history.setPenaltyReasonType(request.getBanReasonType() != null
+                            ? request.getBanReasonType().toAuditType()
+                            : AuditType.OTHER);
+                    history.setReason(request.getAuditNote());
+                    history.setOperator(UserCtxHolder.safeGetUserId()
+                            .map(userRepository::getReferenceById).orElse(null));
+                    history.setCreatedAt(Instant.now());
+                    userPenaltyHistoryRepository.save(history);
+                    log.info("Warning recorded in penalty history for user {} on ticket {}", targetUserUid, ticket.getId());
+                }
             } else if (targetUserUid != null) {
                 Instant expiresAt = request.getPenaltyDurationHours() != null
                         ? Instant.now().plusSeconds(request.getPenaltyDurationHours() * 3600)
@@ -238,7 +259,12 @@ public class TicketModerationServiceImpl implements TicketModerationService {
 
         if (ticket.getTicketType() == TicketType.ACCOUNT_APPEAL) {
             Long submitterUid = ticket.getSubmitter().getUid();
-            penaltyService.liftAllPenalties(submitterUid);
+            PenaltyType appealedPenalty = ticket.getPenaltyType();
+            if (appealedPenalty != null && appealedPenalty != PenaltyType.UNSPECIFIED && appealedPenalty != PenaltyType.OTHER) {
+                penaltyService.liftPenalty(submitterUid, appealedPenalty);
+            } else {
+                penaltyService.liftAllPenalties(submitterUid);
+            }
         }
 
         sendTicketMessage(ticket, request.getReplyContent(), penaltyType, targetUserUid, targetUserDisplayName);
@@ -252,18 +278,18 @@ public class TicketModerationServiceImpl implements TicketModerationService {
         try {
             if (ticket.getTargetType() == TargetType.POST) {
                 Long postId = Long.parseLong(ticket.getTargetId());
-                postRepository.deleteById(postId);
-                log.info("Deleted post {} reported in ticket {}", postId, ticket.getId());
+                postRepository.findByIdAndIsDeleted(postId, false).ifPresent(post -> {
+                    post.setIsDeleted(true);
+                    postRepository.save(post);
+                    log.info("Soft-deleted post {} reported in ticket {}", postId, ticket.getId());
+                });
             } else if (ticket.getTargetType() == TargetType.COMMENT) {
                 Long commentId = Long.parseLong(ticket.getTargetId());
                 Comment comment = commentRepository.findById(commentId).orElse(null);
-                if (comment != null && comment.getStatus() != CommentStatus.DELETED) {
-                    if (comment.getReplyCount() > 0) {
-                        commentRepository.updateStatusByParentId(CommentStatus.DELETED, commentId);
-                    }
+                if (comment != null && comment.getStatus() == CommentStatus.NORMAL) {
                     comment.setStatus(CommentStatus.DELETED);
                     commentRepository.save(comment);
-                    log.info("Deleted comment {} reported in ticket {}", commentId, ticket.getId());
+                    log.info("Deleted comment {} reported in ticket {} (replies preserved)", commentId, ticket.getId());
                 }
             } else {
                 log.warn("Unsupported target type {} for content deletion in ticket {}", ticket.getTargetType(), ticket.getId());
@@ -292,20 +318,16 @@ public class TicketModerationServiceImpl implements TicketModerationService {
 
     private void sendTicketMessage(Ticket ticket, String replyContent, PenaltyType penaltyType,
                                     Long targetUserUid, String targetUserDisplayName) {
-        try {
-            TicketMessage message = ticketMapper.toTicketMessage(ticket);
-            message.setReplyContent(replyContent);
-            message.setPenaltyType(penaltyType);
-            message.setTargetUserUid(targetUserUid);
-            message.setTargetUserDisplayName(targetUserDisplayName);
-            rabbitTemplate.convertAndSend(
-                    RabbitConstants.MODERATION_EXCHANGE,
-                    RabbitConstants.ROUTE_TICKET_RESULT,
-                    message
-            );
-        } catch (Exception e) {
-            log.error("Failed to send ticket notification for ticket {}. Penalty applied but user will not be notified. Reason: {}", ticket.getId(), e.getMessage(), e);
-        }
+        TicketMessage message = ticketMapper.toTicketMessage(ticket);
+        message.setReplyContent(replyContent);
+        message.setPenaltyType(penaltyType);
+        message.setTargetUserUid(targetUserUid);
+        message.setTargetUserDisplayName(targetUserDisplayName);
+        rabbitTemplate.convertAndSend(
+                RabbitConstants.MODERATION_EXCHANGE,
+                RabbitConstants.ROUTE_TICKET_RESULT,
+                message
+        );
     }
 
     private Long resolveTargetUserUid(Ticket ticket) {
@@ -313,15 +335,27 @@ public class TicketModerationServiceImpl implements TicketModerationService {
         if (ticket.getTargetUserUid() != null) {
             return ticket.getTargetUserUid();
         }
-        // Priority 2: fallback for legacy tickets — USER type stores UID in targetId
-        if (ticket.getTargetType() == TargetType.USER) {
-            try {
-                return Long.parseLong(ticket.getTargetId());
-            } catch (NumberFormatException e) {
-                log.warn("Invalid target user UID for ticket {}: {}", ticket.getId(), ticket.getTargetId());
-            }
+        // Priority 2: fallback for legacy tickets — resolve from target type
+        try {
+            return switch (ticket.getTargetType()) {
+                case USER, USER_AVATAR -> Long.parseLong(ticket.getTargetId());
+                case POST -> {
+                    Long postId = Long.parseLong(ticket.getTargetId());
+                    yield postRepository.findAuthorUidById(postId);
+                }
+                case POST_COVERAGE_IMAGE -> postRepository.findAuthorUidByCoverageResourceUuid(ticket.getTargetId());
+                case COMMENT -> commentRepository.findAuthorUidByIdAndStatus(
+                        Long.parseLong(ticket.getTargetId()), CommentStatus.NORMAL
+                ).map(CommentDO::getAuthorUid).orElse(null);
+                default -> {
+                    log.warn("Cannot resolve target user for ticket {} with targetType {}", ticket.getId(), ticket.getTargetType());
+                    yield null;
+                }
+            };
+        } catch (NumberFormatException e) {
+            log.warn("Invalid targetId format for ticket {} (type={}): {}", ticket.getId(), ticket.getTargetType(), ticket.getTargetId());
+            return null;
         }
-        return null;
     }
 
     /**
@@ -412,7 +446,7 @@ public class TicketModerationServiceImpl implements TicketModerationService {
         try {
             Map<String, String> uuidToKey = resourceRepository.findByUuidIn(allUuids).stream()
                     .filter(r -> r.getStatus() != ResourceStatus.DELETED)
-                    .collect(Collectors.toMap(Resource::getUuid, Resource::getResourceKey));
+                    .collect(Collectors.toMap(Resource::getUuid, Resource::getResourceKey, (a, b) -> a));
             Map<String, CloudResPresignedUrlResp> urlMap = cloudFileService.batchGetReadPublicUrlCached(
                     CloudFSRoot.UPLOADS, uuidToKey, TargetType.USER_REPORT_ATTACHMENT);
             Map<Long, List<String>> result = new HashMap<>();
@@ -487,15 +521,31 @@ public class TicketModerationServiceImpl implements TicketModerationService {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(TicketNotFoundException::new);
         if (ticket.getStatus() == TicketAuditStatus.PENDING) {
+            log.info("Ticket {} is already PENDING, no restore needed", ticketId);
             return;
         }
+
+        // Revert previously applied penalty on restore for content report tickets
+        if (ticket.getTicketType() == TicketType.CONTENT_REPORT
+                && ticket.getPenaltyType() != null
+                && ticket.getPenaltyType() != PenaltyType.UNSPECIFIED
+                && ticket.getPenaltyType() != PenaltyType.OTHER) {
+            Long penaltyTargetUid = resolveTargetUserUid(ticket);
+            if (penaltyTargetUid != null) {
+                penaltyService.liftPenalty(penaltyTargetUid, ticket.getPenaltyType());
+                log.info("Reverted penalty {} for user {} on ticket {} restore",
+                        ticket.getPenaltyType(), penaltyTargetUid, ticketId);
+            }
+        }
+
         ticket.setStatus(TicketAuditStatus.PENDING);
-        ticket.setAuditor(null);
-        ticket.setAuditNote(null);
-        ticket.setReplyContent(null);
-        ticket.setRejectType(null);
-        ticket.setAuditAt(null);
         ticket.setUpdatedAt(Instant.now());
+        // Preserve auditor, auditNote, auditAt, replyContent, rejectType
+        // so the audit trail is visible to the re-reviewing admin
+        log.info("Restored ticket {} to PENDING (previous auditor={}, rejectType={})",
+                ticketId,
+                ticket.getAuditor() != null ? ticket.getAuditor().getUid() : null,
+                ticket.getRejectType());
         ticketRepository.save(ticket);
     }
 

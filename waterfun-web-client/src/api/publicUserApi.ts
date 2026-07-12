@@ -1,6 +1,6 @@
 import request from "../utils/axiosRequest"
 import type { PromiseResBody, CloudResourceUrlResp } from "@waterfun/web-core/src/types/api/response"
-import type { UserBrief } from "~/api/postApi"
+import type { UserBrief, PostCardResp, PageResult } from "~/api/postApi"
 
 export interface UserPublicProfileResp {
   uid: string
@@ -58,4 +58,8 @@ export const fetchFollowings = (uid: string, page: number = 1, size: number = 20
 
 export const fetchFollowers = (uid: string, page: number = 1, size: number = 20): PromiseResBody<PageUserBrief> => {
   return request.get(`/user/${uid}/followers`, { params: { page, size } })
+}
+
+export const fetchUserLikedPosts = (uid: string, page: number = 1, size: number = 20): PromiseResBody<PageResult<PostCardResp>> => {
+  return request.get(`/user/${uid}/liked-posts`, { params: { page, size } })
 }

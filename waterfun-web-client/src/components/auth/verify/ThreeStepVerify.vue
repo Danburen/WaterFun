@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { changeEmail, changePhone } from '~/api/accountApi'
 import type { VerifyScene } from '~/api/authApi'
@@ -23,6 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const step = ref(1)
+const codeSent = ref(false)
 const verifyCodeKey = ref('')
 const newTarget = ref('') // 新邮箱地址
 const isProcessing = ref(false)
@@ -62,6 +63,7 @@ const handleFormSubmit = () => {
   }
   // 如果是新绑定且未验证过，直接跳到第三步（激活）
   if (props.isNewBinding && !props.target) {
+    codeSent.value = false
     step.value = 3
   } else {
     step.value = 2
@@ -90,6 +92,7 @@ const handleVerifySuccess = async (code: string) => {
                 })
             }
             // change请求成功后，后端会自动发送激活验证码
+            codeSent.value = true
             step.value = 3
         } catch (error: any) {
             ElMessage.error(error.response?.data?.message || '修改失败')
@@ -102,6 +105,7 @@ const handleVerifySuccess = async (code: string) => {
         isProcessing.value = true
         try {
             await sendAuthenticationCode({ channel, scene, deviceFp })
+            codeSent.value = true
             step.value = 3
         } catch (error: any) {
             ElMessage.error(error.response?.data?.message || '发送验证码失败')
@@ -121,6 +125,7 @@ const handleActivateSuccess = () => {
 const handleClose = () => {
   emit('update:visible', false)
   step.value = 1
+  codeSent.value = false
   verifyCodeKey.value = ''
   newTarget.value = ''
   isProcessing.value = false
@@ -131,18 +136,13 @@ const skipToStep2 = () => {
   step.value = 2
 }
 
-onMounted(() => {
-  // 如果是纯激活场景（未绑定且新绑定），跳过第一步
-  if (!props.target && props.isNewBinding) {
-    step.value = 2
-  }
-})
+
 </script>
 
 <template>
   <div>
     <!-- 第一步：填写新邮箱/手机号 -->
-    <div v-if="step === 1 && !(!props.target && props.isNewBinding)" class="step-container">
+    <div v-if="step === 1" class="step-container">
       <el-dialog
         :model-value="props.visible"
         :title="stepTitle"
@@ -188,7 +188,7 @@ onMounted(() => {
       :visible="props.visible"
       :type="props.type"
       :target="newTarget || props.target || ''"
-      :already-sent="true"
+      :already-sent="codeSent"
       @update:visible="handleClose"
       @activate-success="handleActivateSuccess"
     />

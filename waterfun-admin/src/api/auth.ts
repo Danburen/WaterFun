@@ -6,6 +6,6 @@ export const login = (data: LoginRequest): PromiseResBody<AccessTokenResponse> =
     return request.post<AccessTokenResponse>('/auth/login-by-password', data);
 }
 
-export const logout = (deviceId: string): PromiseResBody<null> => {
-    return request.post<null>('/auth/logout', { deviceId });
+export const logout = (deviceFp: string): PromiseResBody<null> => {
+    return request.post<null>('/auth/logout', { deviceFp });
 }

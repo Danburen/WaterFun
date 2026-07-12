@@ -93,8 +93,9 @@ public class ReportServiceImpl implements ReportService {
         if (!StringUtil.isNotBlank(targetId) || targetType == null || targetType == TargetType.DEFAULT) {
             throw new ReportTargetInvalidException();
         }
-        ticketRepository.findBySubmitterUidAndTargetIdAndTargetTypeAndTicketTypeAndStatus(
-                userUid, targetId, targetType, TicketType.CONTENT_REPORT, TicketAuditStatus.PENDING
+        ticketRepository.findBySubmitterUidAndTargetIdAndTargetTypeAndTicketTypeAndStatusIn(
+                userUid, targetId, targetType, TicketType.CONTENT_REPORT,
+                List.of(TicketAuditStatus.PENDING, TicketAuditStatus.RESOLVED, TicketAuditStatus.REJECTED)
         ).ifPresent(r -> { throw new ReportAlreadyExistException(); });
         return submitUserContent(
                 TicketType.CONTENT_REPORT,
@@ -153,9 +154,19 @@ public class ReportServiceImpl implements ReportService {
         Ticket ticket = ticketRepository.findById(reportId)
                 .orElseThrow(ReportNotFoundException::new);
         if (ticket.getStatus() != TicketAuditStatus.PENDING) {
-            throw new ReportNotFoundException();
+            throw new ServiceException("Ticket is not in PENDING status, cannot be cancelled");
         }
-        ticket.setStatus(TicketAuditStatus.REJECTED);
+
+        // Release evidence resources back to ORPHAN so the uploader can reuse them
+        List<TicketResource> ticketResources = ticketResourceRepository.findByIdTicketId(reportId);
+        if (!ticketResources.isEmpty()) {
+            List<String> releaseUuids = ticketResources.stream()
+                    .map(tr -> tr.getId().getResourceUuid())
+                    .toList();
+            resourceRepository.batchUpdateStatusFromTo(ResourceStatus.ACTIVE, ResourceStatus.ORPHAN, releaseUuids);
+        }
+
+        ticket.setStatus(TicketAuditStatus.CANCELLED);
         ticket.setUpdatedAt(Instant.now());
         ticketRepository.save(ticket);
     }
@@ -172,6 +183,12 @@ public class ReportServiceImpl implements ReportService {
             availableUuids = resourceRepository.findByUuidInAndUploaderIdAndStatus(
                     resourceUuids, userUid, ResourceStatus.ORPHAN
             ).stream().map(Resource::getUuid).toList();
+            if (availableUuids.size() != resourceUuids.size()) {
+                List<String> invalidUuids = new ArrayList<>(resourceUuids);
+                invalidUuids.removeAll(availableUuids);
+                log.warn("User {} submitted report with invalid resource UUIDs (not ORPHAN or not owned): {}", userUid, invalidUuids);
+                throw new ResourceReferenceInvalidException(String.join(",", invalidUuids));
+            }
             resourceRepository.batchUpdateStatusFromTo( ResourceStatus.ORPHAN, ResourceStatus.ACTIVE, availableUuids);
         }
         Ticket ticket = new Ticket();
@@ -217,38 +234,41 @@ public class ReportServiceImpl implements ReportService {
 
     /**
      * Resolve the target user UID for CONTENT_REPORT tickets.
-     * For USER targetType, the targetId IS the user's UID.
-     * For POST/COMMENT targetType, look up the content owner.
+     * For USER / USER_AVATAR targetType, the targetId IS the user's UID.
+     * For POST / POST_COVERAGE_IMAGE targetType, look up the content owner.
+     * For COMMENT targetType, look up the comment author.
      */
     private void resolveTargetUserUid(Ticket ticket) {
-        if (ticket.getTargetType() == TargetType.USER) {
-            try {
-                ticket.setTargetUserUid(Long.parseLong(ticket.getTargetId()));
-            } catch (NumberFormatException e) {
-                log.warn("Invalid target user UID for ticket {}: {}", ticket.getId(), ticket.getTargetId());
+        try {
+            switch (ticket.getTargetType()) {
+                case USER, USER_AVATAR -> ticket.setTargetUserUid(Long.parseLong(ticket.getTargetId()));
+                case POST -> {
+                    Long postId = Long.parseLong(ticket.getTargetId());
+                    ticket.setTargetUserUid(postRepository.findAuthorUidById(postId));
+                }
+                case POST_COVERAGE_IMAGE -> {
+                    String resourceUuid = ticket.getTargetId();
+                    ticket.setTargetUserUid(postRepository.findAuthorUidByCoverageResourceUuid(resourceUuid));
+                }
+                case COMMENT -> {
+                    Long commentId = Long.parseLong(ticket.getTargetId());
+                    commentRepository.findAuthorUidByIdAndStatus(commentId, CommentStatus.NORMAL)
+                            .map(CommentDO::getAuthorUid)
+                            .ifPresentOrElse(
+                                ticket::setTargetUserUid,
+                                () -> log.warn("Comment not found or not visible for ticket {}: {}", ticket.getId(), commentId)
+                            );
+                }
+                case POST_CONTENT_IMAGE, BANNER_IMAGE, MODERATION_IMAGE ->
+                    log.warn("Cannot resolve target user for targetType {} on ticket {}: no direct owner link",
+                            ticket.getTargetType(), ticket.getId());
+                default ->
+                    log.warn("Unsupported targetType {} for ticket {}", ticket.getTargetType(), ticket.getId());
             }
-        } else if (ticket.getTargetType() == TargetType.POST) {
-            try {
-                Long postId = Long.parseLong(ticket.getTargetId());
-                Long authorUid = postRepository.findAuthorUidById(postId);
-                ticket.setTargetUserUid(authorUid);
-            } catch (NumberFormatException e) {
-                log.warn("Invalid post ID for ticket {}: {}", ticket.getId(), ticket.getTargetId());
-            } catch (Exception e) {
-                log.warn("Failed to resolve post author for ticket {}: {}", ticket.getId(), e.getMessage());
-            }
-        } else if (ticket.getTargetType() == TargetType.COMMENT) {
-            try {
-                Long commentId = Long.parseLong(ticket.getTargetId());
-                commentRepository.findAuthorUidByIdAndStatus(commentId, CommentStatus.NORMAL)
-                        .map(CommentDO::getAuthorUid)
-                        .ifPresentOrElse(
-                            ticket::setTargetUserUid,
-                            () -> log.warn("Comment not found or not visible for ticket {}: {}", ticket.getId(), commentId)
-                        );
-            } catch (NumberFormatException e) {
-                log.warn("Invalid comment ID for ticket {}: {}", ticket.getId(), ticket.getTargetId());
-            }
+        } catch (NumberFormatException e) {
+            log.warn("Invalid targetId format for ticket {} (type={}): {}", ticket.getId(), ticket.getTargetType(), ticket.getTargetId());
+        } catch (Exception e) {
+            log.error("Failed to resolve target user for ticket {} (type={}): {}", ticket.getId(), ticket.getTargetType(), e.getMessage(), e);
         }
     }
 
@@ -465,9 +485,11 @@ public class ReportServiceImpl implements ReportService {
                         senderName = "System";
                     }
                 }
-                String text = inbox.getContent() != null
-                        ? String.valueOf(inbox.getContent().get("text"))
-                        : "";
+                String text = "";
+                if (inbox.getContent() != null) {
+                    Object textObj = inbox.getContent().get("text");
+                    text = textObj != null ? textObj.toString() : "";
+                }
                 return new UserTicketDetailResponse.ReplyItem(
                         inbox.getId(),
                         text,

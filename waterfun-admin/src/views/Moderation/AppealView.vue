@@ -34,7 +34,7 @@ const fetchData = async () => {
   loading.value = true;
   try {
     const params: any = {
-      page: (pageOpts.value.currentPage || 1) - 1,
+      page: pageOpts.value.currentPage || 1,
       size: pageOpts.value.pageSize,
       ticketTypes: "ACCOUNT_APPEAL",
     };

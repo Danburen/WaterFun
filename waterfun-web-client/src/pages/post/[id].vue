@@ -230,7 +230,7 @@ const submitReport = async () => {
   }
   reportSubmitting.value = true
   try {
-    const payload: { type: string; reason?: string; reasonValid?: boolean } = { type: reportType.value }
+    const payload: { type: string; reason?: string } = { type: reportType.value }
     if (reportReason.value.trim()) {
       payload.reason = reportReason.value.trim()
     }
@@ -313,7 +313,7 @@ watch(currentPost, (post) => {
     }
 
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !commentsLoaded) {
+      if (entries[0]?.isIntersecting && !commentsLoaded) {
         commentsLoaded = true
         fetchComments(true)
         observer.disconnect()

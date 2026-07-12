@@ -1,18 +1,12 @@
 export interface Page<T> {
     content: T[];
-    totalElements?: string;
+    totalElements?: number;
     totalPages?: number;
     number?: number;
     size?: number;
     first?: boolean;
     last?: boolean;
     empty?: boolean;
-    page?: {
-        size: number;
-        number: number;
-        totalElements: string;
-        totalPages: number;
-    };
 }
 
 export interface PageOptions {

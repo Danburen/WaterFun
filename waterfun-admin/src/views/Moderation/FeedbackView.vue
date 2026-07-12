@@ -32,7 +32,7 @@ const typeIcon = (t?: string) =>
 const fetchData = async () => {
   loading.value = true;
   try {
-    const params: any = { page: (pageOpts.value.currentPage || 1) - 1, size: pageOpts.value.pageSize };
+    const params: any = { page: pageOpts.value.currentPage || 1, size: pageOpts.value.pageSize };
     if (filterType.value) {
       params.ticketTypes = filterType.value;
     } else {

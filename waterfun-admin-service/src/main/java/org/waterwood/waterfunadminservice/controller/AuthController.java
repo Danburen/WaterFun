@@ -77,9 +77,12 @@ public class AuthController {
     }
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@RequestBody @Valid LogoutRequestBody req, HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = CookieUtil.getCookieValue(request.getCookies(),"REFRESH_TOKEN");
-        loginService.logout(refreshToken, req.getDeviceFp());
-        CookieUtil.cleanTokenCookie(response);
-        return ApiResponse.success();
+        try {
+            String refreshToken = CookieUtil.getCookieValue(request.getCookies(),"REFRESH_TOKEN");
+            loginService.logout(refreshToken, req.getDeviceFp());
+            return ApiResponse.success();
+        } finally {
+            CookieUtil.cleanTokenCookie(response);
+        }
     }
 }

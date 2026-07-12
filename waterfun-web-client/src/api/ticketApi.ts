@@ -3,7 +3,7 @@ import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response"
 
 export type TicketType = 'CONTENT_REPORT' | 'ACCOUNT_APPEAL' | 'FEATURE_FEEDBACK' | 'SUGGESTION'
 
-export type TicketStatus = 'PENDING' | 'RESOLVED' | 'REJECTED'
+export type TicketStatus = 'PENDING' | 'RESOLVED' | 'REJECTED' | 'CANCELLED'
 
 export type ReportType = 'VIOLATION_OF_GUIDELINES' | 'INAPPROPRIATE_CONTENT' | 'ADVERTISEMENT' | 'VIOLENCE' | 'SENSITIVE' | 'CASCADE' | 'OTHER'
 
@@ -77,8 +77,6 @@ export interface CreateUserReportReq {
   targetType?: TargetType
   resourceUuids?: string[]
   penaltyType?: PenaltyType
-  targetValidForReport?: boolean
-  reasonValid?: boolean
 }
 
 export interface ReportResponse {

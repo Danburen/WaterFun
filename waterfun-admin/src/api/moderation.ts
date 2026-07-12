@@ -219,9 +219,9 @@ export interface UserAuditStats {
 }
 
 export interface ModerationStatsResp {
-  pending?: string;
-  todayApproved?: string;
-  todayRejected?: string;
+  pending?: number;
+  todayApproved?: number;
+  todayRejected?: number;
 }
 
 export const listPostModerations = (query: ModerationBaseQuery, page?: number, size?: number): PromiseResBody<Page<AuditResponsePostAuditPayload>> => {

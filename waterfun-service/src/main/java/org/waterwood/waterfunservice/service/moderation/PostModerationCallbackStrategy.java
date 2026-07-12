@@ -24,6 +24,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.PostReposito
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 
 import java.time.Instant;
@@ -45,14 +46,11 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
     private final ResourceRepository resourceRepository;
+    private final UserCounterRepository userCounterRepository;
 
     @Override
     public Set<TargetType> getTargetTypes() {
-        return Set.of(
-                TargetType.POST,
-                TargetType.POST_CONTENT_IMAGE,
-                TargetType.POST_COVERAGE_IMAGE
-        );
+        return Set.of(TargetType.POST);
     }
 
     @Transactional
@@ -68,10 +66,7 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
             throw new IllegalStateException("Post not in pending state for id: " + task.getTargetId());
         }
         User u = p.getAuthor();
-        switch (msg.getTargetType()) {
-            case POST -> handlePostAuditCallback(msg, p, u.getUid());
-            default -> log.warn("Unexpected target type: " + msg.getTargetType());
-        }
+        handlePostAuditCallback(msg, p, u.getUid());
         moderationInboxHandler.handleModeration(msg, u.getUid());
     }
 
@@ -147,6 +142,10 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
             p.setVersion(p.getVersion() + 1);
             p.setStatus(PostStatus.PUBLISHED);
             p.setPublishedAt(Instant.now());
+            // Increment user post count only for new posts (not re-edits)
+            if (p.getEditStatus() == PostEditStatus.NONE) {
+                userCounterRepository.increaseUserPostCount(userUid, 1);
+            }
             postRepository.save(p);
         } else {
             if (p.getEditStatus() == PostEditStatus.PENDING) {
@@ -163,27 +162,8 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
     @Transactional
     @Override
     public void handleBatch(List<ModerationConsumerMessage> msgs) {
-        if (msgs.isEmpty()) return;
-        Map<TargetType, List<ModerationConsumerMessage>> byType = msgs.stream()
-                .collect(Collectors.groupingBy(ModerationConsumerMessage::getTargetType));
-        byType.forEach((type, typeMsgs) -> {
-            switch (type) {
-                case POST -> handlePostBatch(typeMsgs);
-                case POST_CONTENT_IMAGE -> handlePostContentImageBatch(typeMsgs);
-                case POST_COVERAGE_IMAGE -> handlePostCoverageImageBatch(typeMsgs);
-                default -> log.warn("Unhandled batch target type in batch: {}", type);
-            }
-        });
-
+        handlePostBatch(msgs);
         moderationInboxHandler.handleBatch(msgs);
-    }
-
-    private void handlePostCoverageImageBatch(List<ModerationConsumerMessage> typeMsgs) {
-        log.warn("Post coverage image moderation batch handling not implemented yet. Message count: {}", typeMsgs.size());
-    }
-
-    private void handlePostContentImageBatch(List<ModerationConsumerMessage> typeMsgs) {
-        log.warn("Post content image moderation batch handling not implemented yet. Message count: {}", typeMsgs.size());
     }
 
     @Transactional
@@ -322,7 +302,11 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
             promoteCoverImage(p);
             p.setEditStatus(PostEditStatus.NONE);
             p.setVersion(p.getVersion() + 1);
+            boolean isNewPost = p.getStatus() == PostStatus.PENDING;
             p.setStatus(PostStatus.PUBLISHED);
+            if (isNewPost) {
+                userCounterRepository.increaseUserPostCount(p.getAuthor().getUid(), 1);
+            }
         });
 
         postRepository.saveAll(posts);

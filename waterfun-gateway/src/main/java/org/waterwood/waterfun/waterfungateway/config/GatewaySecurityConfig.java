@@ -61,7 +61,8 @@ public class GatewaySecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/posts/me/**").authenticated()
                         .pathMatchers(HttpMethod.GET, "/api/post/tags/me").authenticated()
                         // Public GET read-only
-                        .pathMatchers(HttpMethod.GET, "/api/posts/*", "/api/posts/hot").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/posts/*", "/api/posts/hot", "/api/posts/*/liked-users").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/banners", "/api/banners/by-position").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/announcements").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/post/category/options").permitAll()

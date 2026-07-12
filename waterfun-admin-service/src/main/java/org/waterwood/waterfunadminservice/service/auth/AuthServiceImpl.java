@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
                 .map(r-> r.getRole().getCode()).toList();
 //        return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp()).getData();
         if(roles.contains("ADMIN")) {
-            return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp());
+            return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp(), false);
         }
         throw new AuthException();
     }

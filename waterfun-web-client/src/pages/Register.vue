@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {type FormInstance, type FormRules} from "element-plus";
 import VerifyingCodeButton from "~/components/auth/VerifyingCodeButton.vue";
-import type {ElInput} from "../../.nuxt/components";
-import {validateEmail, validatePassword, validatePhoneNumber} from "~/utils/validator";
+import {validateEmail, validatePassword, validatePhoneNumber, validateVerifyCode} from "~/utils/validator";
 import {validateUsername} from "~/utils/validator";
 import {useAuth} from "~/composables/useAuth";
 import { generateFingerprint } from "@waterfun/web-core/src/fingerprint";
@@ -53,16 +52,11 @@ const handleRegisterClick = async () => {
       },
     } as RegisterRequest).finally(()=> {
     buttonLoad.value = false;
-  }).catch(err=>{
-    console.log('注册错误:', err);
-  }).finally(()=>{
-    buttonLoad.value = false;
   })
 }
 
 watch(() => route.query.userAgreementConfirm, (val) => {
   if (val === 'true') {
-    console.log("User Agreement Confirm");
     licenceCheck.value = true;
     router.replace({ query: {} })
   }
@@ -70,99 +64,183 @@ watch(() => route.query.userAgreementConfirm, (val) => {
 </script>
 
 <template>
-  <auth-box>
+  <auth-box title="创建账号" subtitle="注册一个 WaterFun 账号开始探索">
     <el-form
       :model="registerForm"
-      label-width="auto"
-      label-position="right"
       ref="registerFormRef"
       class="register-form"
       :rules="regRules"
+      label-position="top"
+      size="large"
     >
-      <el-form-item :label = "$t('auth.username')" prop="username">
+      <el-form-item prop="username">
         <el-input
-            :placeholder="$t('auth.placeholder.username')"
-            v-model="registerForm.username"></el-input>
+          :placeholder="$t('auth.placeholder.username')"
+          v-model="registerForm.username"
+        />
       </el-form-item>
-      <el-form-item :label="$t('auth.phone')" prop="phone">
-        <el-input :placeholder="$t('auth.placeholder.phone')" v-model="registerForm.phone"></el-input>
+      <el-form-item prop="phone">
+        <el-input :placeholder="$t('auth.placeholder.phone')" v-model="registerForm.phone" />
       </el-form-item>
-      <el-form-item :label="$t('auth.verifyCode')" prop="smsCode">
+      <el-form-item prop="smsCode">
         <el-input
-            v-model="registerForm.smsCode"
-            :placeholder="$t('auth.placeholder.verifyCode')"
-            class="login-input">
+          v-model="registerForm.smsCode"
+          :placeholder="$t('auth.placeholder.verifyCode')"
+        >
           <template #append>
             <VerifyingCodeButton 
-                :username="registerForm.phone" 
-                :getType="registerForm.phone ? 'sms' : 'email'" 
-                :scene="'register'" 
+              :username="registerForm.phone" 
+              :getType="registerForm.phone ? 'sms' : 'email'" 
+              :scene="'register'" 
             />
           </template>
         </el-input>
       </el-form-item>
-      <!-- 补充信息 -->
-      <el-form-item class="supplementary-info-container">
-        <el-text tag="b">{{ $t('auth.supplementaryInfo') }}</el-text>
-        <el-tooltip :content="$t('message.tooltip.optionalField')" placement="right"><el-link underline="never" :icon="'InfoFilled'"></el-link></el-tooltip>
-        <el-link underline="never" href="" @click.prevent="expandShow = !expandShow" class="expand-btn">
-            {{ expandShow ? $t('auth.btn.collapse') : $t('auth.btn.expand') }}</el-link>
+      <el-form-item class="supplementary-header">
+        <div class="supplementary-toggle" @click="expandShow = !expandShow">
+          <el-text tag="b" size="small">{{ $t('auth.supplementaryInfo') }}</el-text>
+          <el-tag size="small" type="info" effect="plain">选填</el-tag>
+          <el-text type="primary" size="small">{{ expandShow ? $t('auth.btn.collapse') : $t('auth.btn.expand') }}</el-text>
+        </div>
       </el-form-item>
       <el-collapse-transition>
-        <div v-show="expandShow" class="supplementary-info-container">
-          <el-form-item :label="$t('auth.password')"  prop="password">
+        <div v-show="expandShow" class="supplementary-body">
+          <el-form-item prop="password">
             <el-input
-                type="password"
-                v-model="registerForm.password"
-                :placeholder="$t('auth.placeholder.password')"
-                class="login-input"
-                show-password></el-input>
+              type="password"
+              v-model="registerForm.password"
+              :placeholder="$t('auth.placeholder.password')"
+              show-password
+            />
           </el-form-item>
-          <el-form-item :label="$t('auth.email')" prop="email">
+          <el-form-item prop="email">
             <el-input
-                v-model="registerForm.email"
-                :placeholder="$t('auth.placeholder.email')"
-                class="login-input"></el-input>
+              v-model="registerForm.email"
+              :placeholder="$t('auth.placeholder.email')"
+            />
           </el-form-item>
         </div>
       </el-collapse-transition>
-      <el-form-item label-width="auto">
-        <el-button type="primary" class="login-btn" @click="handleRegisterClick" :loading="buttonLoad" :disabled="!licenceCheck">{{ $t('auth.btn.register') }}</el-button>
-        <div class="addition-container">
-          <el-checkbox size="small" v-model="licenceCheck">
-            {{ $t('confirm.confirmReadLicences')  + ' ' }}
-            <a @click.prevent="router.push('/legal/eulaView')" >{{ $t('confirm.userAgreement') }}</a>
-          </el-checkbox>
-          <el-button  size="small" link class="to-login" @click.prevent="router.push('/login')" >{{ $t('auth.toLogin') }}</el-button>
-        </div>
-
+      <el-form-item>
+        <el-button type="primary" class="login-btn" @click="handleRegisterClick" :loading="buttonLoad" :disabled="!licenceCheck">
+          {{ $t('auth.btn.register') }}
+        </el-button>
       </el-form-item>
-
+      <div class="form-footer">
+        <div class="agreement-area">
+          <el-checkbox size="small" v-model="licenceCheck">
+            {{ $t('confirm.confirmReadLicences') }}
+          </el-checkbox>
+          <div class="legal-links">
+            <el-button size="small" link @click="router.push('/legal/eulaView')">{{ $t('confirm.userAgreement') }}</el-button>
+            <span class="separator">|</span>
+            <el-button size="small" link @click="router.push('/legal/terms')">{{ $t('auth.terms') }}</el-button>
+            <span class="separator">|</span>
+            <el-button size="small" link @click="router.push('/legal/privacy')">{{ $t('auth.privacy') }}</el-button>
+          </div>
+        </div>
+        <el-button size="small" link class="to-login" @click.prevent="router.push('/login')">
+          {{ $t('auth.toLogin') }}
+        </el-button>
+      </div>
     </el-form>
   </auth-box>
 </template>
 
 <style scoped>
 .register-form {
-  width: 95%;
-  padding: 5px;
+  width: 100%;
+}
+
+.register-form :deep(.el-form-item) {
+  margin-bottom: 18px;
+}
+
+.register-form :deep(.el-input__wrapper) {
+  border-radius: 8px;
+}
+
+.supplementary-header {
+  margin-bottom: 0 !important;
+}
+
+.supplementary-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 0;
+  width: 100%;
+  user-select: none;
+}
+
+.supplementary-toggle:hover {
+  opacity: 0.8;
+}
+
+.supplementary-toggle :last-child {
+  margin-left: auto;
+}
+
+.supplementary-body {
+  padding-top: 4px;
 }
 
 .login-btn {
   width: 100%;
+  padding: 22px 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 4px;
 }
 
-.supplementary-info-container .expand-btn {
-  margin-left: auto;
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
-.addition-container {
+.form-footer {
   display: flex;
   align-items: center;
-  width: 100%;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: -4px;
 }
 
-.addition-container .to-login{
+.form-footer :deep(.el-checkbox__label) {
+  font-size: 12px;
+}
+
+.form-footer .to-login {
   margin-left: auto;
+  white-space: nowrap;
+}
+
+.agreement-area {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.legal-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 24px;
+}
+
+.legal-links :deep(.el-button) {
+  font-size: 12px;
+  padding: 0;
+  min-height: auto;
+  height: auto;
+  color: #3b82f6;
+}
+
+.separator {
+  color: #cbd5e1;
+  font-size: 12px;
 }
 </style>

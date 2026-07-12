@@ -37,10 +37,10 @@ public class BanController {
             @RequestParam(required = false) Long userUid,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String nickname,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
         Set<Integer> banPermIds = getBanPermissionIds();
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.min(size, 100), Sort.Direction.DESC, "createdAt");
         Page<UserPermission> permPage = userPermRepo.listPermUsersByPermIds(
                 banPermIds, userUid, username, nickname, pageable);
         return ApiResponse.success(permPage.map(this::toBanResponse));

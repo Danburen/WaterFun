@@ -25,6 +25,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
             @Param("targetType") TargetType targetType, @Param("ticketType") TicketType ticketType,
             @Param("status") TicketAuditStatus status);
 
+    @Query("SELECT t FROM Ticket t WHERE t.submitter.uid = :submitterUid AND t.targetId = :targetId " +
+            "AND t.targetType = :targetType AND t.ticketType = :ticketType AND t.status IN :statuses")
+    Optional<Ticket> findBySubmitterUidAndTargetIdAndTargetTypeAndTicketTypeAndStatusIn(
+            @Param("submitterUid") Long submitterUid, @Param("targetId") String targetId,
+            @Param("targetType") TargetType targetType, @Param("ticketType") TicketType ticketType,
+            @Param("statuses") List<TicketAuditStatus> statuses);
+
     @Query("SELECT t.ticketType, COUNT(t) FROM Ticket t GROUP BY t.ticketType")
     List<Object[]> countByTicketType();
 }

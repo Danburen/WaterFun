@@ -2,7 +2,7 @@
  * A LRU cache for image memory.
  * 
  */
-import type CacheItem from './types.d.ts'
+import type { CacheItem } from './types'
 
 const cache = new Map<String, CacheItem>();
 const MAX = 150;

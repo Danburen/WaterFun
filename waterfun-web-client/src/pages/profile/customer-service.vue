@@ -37,6 +37,7 @@ const ticketStatusOptions: { value: TicketStatus; label: string; cls: string }[]
   { value: 'PENDING', label: '待处理', cls: 'status-pending' },
   { value: 'RESOLVED', label: '已解决', cls: 'status-resolved' },
   { value: 'REJECTED', label: '已驳回', cls: 'status-rejected' },
+  { value: 'CANCELLED', label: '已取消', cls: 'status-cancelled' },
 ]
 
 const reportTypeOptions: { value: ReportType; label: string }[] = [
@@ -100,7 +101,7 @@ const isReasonRequired = computed(() =>
 const submitTicket = async () => {
   // CONTENT_REPORT: reason required only when type is OTHER
   // Other ticket types: reason always required
-  if (isReasonRequired.value && !createForm.reason.trim()) {
+  if (isReasonRequired.value && !(createForm.reason || '').trim()) {
     ElMessage.warning(isContentReportOther.value ? '请填写其他问题的详细描述' : '请填写问题描述')
     return
   }
@@ -121,8 +122,8 @@ const submitTicket = async () => {
       }
     }
     // Only send reason when provided; CONTENT_REPORT (non-OTHER) allows empty reason
-    if (createForm.reason.trim()) {
-      payload.reason = createForm.reason.trim()
+    if ((createForm.reason || '').trim()) {
+      payload.reason = (createForm.reason || '').trim()
     }
     await ticketStore.createTicket(payload)
     ElMessage.success('工单提交成功，请耐心等待处理')
@@ -195,7 +196,7 @@ onMounted(async () => {
         v-for="(item, idx) in statsItems"
         :key="idx"
         :class="['stat-card', item.cls]"
-        @click="handleFilterTypeChange(ticketTypeOptions[idx].value)"
+        @click="ticketTypeOptions[idx] && handleFilterTypeChange(ticketTypeOptions[idx].value)"
       >
         <div class="stat-icon"><i :class="item.icon"></i></div>
         <div class="stat-info">
@@ -381,7 +382,7 @@ onMounted(async () => {
                 placeholder="请详细描述你遇到的问题或建议..."
                 maxlength="2000"
               ></textarea>
-              <span class="wf-char-count">{{ createForm.reason.length }}/2000</span>
+              <span class="wf-char-count">{{ (createForm.reason || '').length }}/2000</span>
             </div>
           </div>
 
@@ -733,6 +734,7 @@ onMounted(async () => {
 .status-pending { background: #fffbeb; color: #f59e0b; }
 .status-resolved { background: #ecfdf5; color: #10b981; }
 .status-rejected { background: #fef2f2; color: #ef4444; }
+.status-cancelled { background: #e5e7eb; color: #6b7280; }
 
 .ticket-content {
   font-size: 14px;

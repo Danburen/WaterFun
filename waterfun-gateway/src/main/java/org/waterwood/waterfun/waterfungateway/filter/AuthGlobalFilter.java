@@ -63,6 +63,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
                         requestBuilder.header("X-Token-Jti", jti); // Consistency
                     }
 
+                    requestBuilder.header("X-Real-Client-Ip", clientIp);
                     return exchange.mutate().request(requestBuilder.build()).build();
                 })
                 .defaultIfEmpty(

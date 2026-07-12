@@ -2,7 +2,7 @@ import request from "../utils/axiosRequest";
 import type { 
     PromiseResBody,
     CloudResourceUrlResp,
- } from "@waterfun/web-core/src/types/api/response.d.ts";
+ } from "@waterfun/web-core/src/types/api/response";
 import { getUploadPolicy, uploadCallback, uploadFileToCos as genericUploadFileToCos, type PresignedResp, type UploadCallbackResp } from "./uploadApi";
 import type { UserBrief } from "~/api/postApi";
 

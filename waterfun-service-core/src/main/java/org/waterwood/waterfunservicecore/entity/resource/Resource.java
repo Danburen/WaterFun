@@ -38,7 +38,7 @@ public class Resource {
     @Column(name = "size_bytes")
     private Long sizeBytes;
 
-    @ColumnDefault("'0")
+    @ColumnDefault("'0'")
     @Column(name = "source_type", columnDefinition = "tinyint UNSIGNED not null")
     private SourceType sourceType = SourceType.SYSTEM;
 
