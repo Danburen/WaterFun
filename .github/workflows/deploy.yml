@@ -1,0 +1,200 @@
+# ============================================================
+# WaterFun 自动部署
+# 手动触发（workflow_dispatch），自动触发暂不启用
+# 
+# 流程：
+#   Build Admin 前端 → Build 后端 JAR → Build & Push Docker 镜像
+#   → SSH 登陆服务器 → 拉取新镜像 → 重启容器
+#
+# 前置条件:
+#   1. 服务器已安装 Docker + docker-compose
+#   2. 服务器已有 docker-compose.yml 引用这些镜像
+#   3. 在 GitHub 仓库配置以下 Secrets:
+#      - SSH_HOST      服务器 IP
+#      - SSH_USER      服务器 SSH 用户名
+#      - SSH_KEY       服务器 SSH 私钥
+#      - DEPLOY_DOMAIN 部署域名（替换前端 .env.production 占位符）
+# ============================================================
+
+name: Deploy
+
+on:
+  # ─── 手动触发 ───
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '镜像标签（默认 latest）'
+        required: false
+        default: 'latest'
+
+  # ─── 自动触发（暂不启用） ───
+  # push:
+  #   branches: [main]
+  #   paths-ignore:
+  #     - '.ai/**'
+  #     - 'docs/**'
+  #     - 'README.md'
+  #     - '.gitignore'
+  #     - 'LICENSE'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_TAG: ${{ inputs.tag || 'latest' }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # 防止并行部署冲突
+    concurrency: deploy
+
+    steps:
+      # ==================== Checkout ====================
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ==================== Build Admin Frontend ====================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.7.1
+
+      - name: Cache pnpm
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build admin frontend
+        run: |
+          # 替换域名占位符为真实域名
+          sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" waterfun-admin/.env.production
+          pnpm --filter @waterfun/admin build
+
+      # 打包前端静态文件，后续通过 SSH 传到服务器
+      - name: Archive admin dist
+        run: tar -czf admin-dist.tar.gz -C waterfun-admin/dist .
+
+      # ==================== Build Backend ====================
+      - name: Setup JDK 22
+        uses: actions/setup-java@v4
+        with:
+          java-version: '22'
+          distribution: temurin
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle*', 'gradle/') }}
+          restore-keys: gradle-
+
+      - name: Build backend JARs
+        run: |
+          chmod +x gradlew
+          ./gradlew build -x test
+
+      # ==================== Build & Push Docker Images ====================
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push gateway
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.gateway
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/gateway:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/gateway:${{ github.sha }}
+
+      - name: Build & push user-service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.service
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/user-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/user-service:${{ github.sha }}
+
+      - name: Build & push admin-service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.admin
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/admin-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/admin-service:${{ github.sha }}
+
+      # ==================== Deploy to Server ====================
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+
+            echo "=== Login GHCR ==="
+            # 使用 GITHUB_TOKEN（workflow 运行期间有效）
+            # 如需服务器长期可拉镜像，建议创建一个 GitHub PAT（read:packages）
+            # 设为服务器环境变量 CR_PAT，参考：
+            #   https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} \
+              -u ${{ github.actor }} --password-stdin
+
+            echo "=== Pull new images ==="
+            docker pull ${{ env.REGISTRY }}/${{ github.repository }}/gateway:${{ env.IMAGE_TAG }}
+            docker pull ${{ env.REGISTRY }}/${{ github.repository }}/user-service:${{ env.IMAGE_TAG }}
+            docker pull ${{ env.REGISTRY }}/${{ github.repository }}/admin-service:${{ env.IMAGE_TAG }}
+
+            echo "=== Restart service containers ==="
+            # 假设 docker-compose.deploy.yml 在 /opt/waterfun/ 目录下
+            cd /opt/waterfun
+            docker compose -f docker-compose.deploy.yml up -d --no-deps \
+              gateway user-service admin-service
+
+            echo "=== Cleanup old images ==="
+            docker image prune -af --filter "until=24h"
+
+      # ==================== Deploy Admin Static Files ====================
+      - name: Upload admin frontend to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: admin-dist.tar.gz
+          target: /tmp/
+          overwrite: true
+
+      - name: Extract admin frontend on server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # 解压到 Nginx 静态目录（假设宿主机 Nginx 配置了此路径）
+            ADMIN_DIR="/usr/share/nginx/html/admin"
+            mkdir -p "$ADMIN_DIR"
+            tar -xzf /tmp/admin-dist.tar.gz -C "$ADMIN_DIR"
+            rm -f /tmp/admin-dist.tar.gz
+            echo "Admin frontend deployed to $ADMIN_DIR"

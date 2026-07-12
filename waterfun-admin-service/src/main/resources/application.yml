@@ -68,9 +68,8 @@ expire:
   captcha: 2 # min
 
 # ---- Notification Configuration ----
+# support.email 和 resend.api-key 已移至 common.yml（环境变量注入）
 mail:
-  support:
-    email: support@mail.waterfun.top
   email-verify: https://waterfun.top/api/auth/email/activate?=
 
 # ---- OSS Configuration ----

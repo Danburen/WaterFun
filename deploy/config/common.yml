@@ -7,7 +7,7 @@
 # -------- JWT (非三方) --------
 jwt:
   issuer: waterfun
-  public-key: ${JWT_PUBLIC_KEY:file:./deploy/keys/public.key}
+  public-key: file:./deploy/keys/public.key
   private-key: ${JWT_PRIVATE_KEY:file:./deploy/keys/private.key}
 
 spring:
@@ -22,23 +22,23 @@ spring:
   data:
     redis:
       host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      database: ${REDIS_DATABASE:0}
-      username: ${REDIS_USERNAME:default}
+      port: 6379
+      database: 0
+      username: default
       password: ${REDIS_PASSWORD:}
 
   # -------- RabbitMQ (infra, 非三方) --------
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
+    port: 5672
     username: ${RABBITMQ_USERNAME:admin}
     password: ${RABBITMQ_PASSWORD:admin123}
-    virtual-host: ${RABBITMQ_VHOST:/}
+    virtual-host: /
 
   # -------- Spring Security 默认用户 (非三方) --------
   security:
     user:
-      name: ${SECURITY_USER_NAME:admin}
+      name: admin
       password: ${SECURITY_USER_PASSWORD:admin}
 
   # -------- 邮件服务器 (三方服务，值由 dev-secrets / 环境变量注入) --------

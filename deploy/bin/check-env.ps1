@@ -36,27 +36,20 @@ $vars = @(
 
     # ---- Redis (infra, has :default) ----
     @{Name="REDIS_HOST";           Category="default";    Desc="Redis host"}
-    @{Name="REDIS_PORT";           Category="default";    Desc="Redis port"}
-    @{Name="REDIS_DATABASE";       Category="default";    Desc="Redis database index"}
-    @{Name="REDIS_USERNAME";       Category="default";    Desc="Redis username"}
     @{Name="REDIS_PASSWORD";       Category="default";    Desc="Redis password"}
 
     # ---- RabbitMQ (infra, has :default) ----
     @{Name="RABBITMQ_HOST";        Category="default";    Desc="RabbitMQ host"}
-    @{Name="RABBITMQ_PORT";        Category="default";    Desc="RabbitMQ port"}
     @{Name="RABBITMQ_USERNAME";    Category="default";    Desc="RabbitMQ username"}
     @{Name="RABBITMQ_PASSWORD";    Category="default";    Desc="RabbitMQ password"}
-    @{Name="RABBITMQ_VHOST";       Category="default";    Desc="RabbitMQ virtual host"}
 
-    # ---- JWT (has :default) ----
-    @{Name="JWT_PUBLIC_KEY";       Category="default";    Desc="RSA public key path"}
+    # ---- JWT ----
     @{Name="JWT_PRIVATE_KEY";      Category="default";    Desc="RSA private key path"}
 
-    # ---- Device fingerprint (has :default) ----
-    @{Name="DEVICE_SALT";          Category="default";    Desc="Device fingerprint salt"}
+    # ---- Device fingerprint (required, no :default) ----
+    @{Name="DEVICE_SALT";          Category="required";    Desc="Device fingerprint salt"}
 
-    # ---- Spring Security (has :default) ----
-    @{Name="SECURITY_USER_NAME";   Category="default";    Desc="Actuator security user"}
+    # ---- Spring Security ----
     @{Name="SECURITY_USER_PASSWORD"; Category="default";  Desc="Actuator security password"}
 
     # ---- Mail - SMTP (required, no :default) ----

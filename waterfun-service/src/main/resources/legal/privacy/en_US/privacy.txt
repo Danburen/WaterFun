@@ -1,0 +1,55 @@
+WaterFun Privacy Policy
+
+Last Updated: July 1, 2026
+Effective Date: July 1, 2026
+
+Welcome to WaterFun. We take your privacy seriously. This Privacy Policy explains how we collect, use, store, and protect your personal information.
+
+==== 1. Information We Collect ====
+
+1.1 Information You Provide
+  • Registration: phone number, email, username, password
+  • Profile: avatar, nickname, bio, profile background
+  • Content: posts, comments, images you publish
+
+1.2 Automatically Collected Information
+  • Device info: model, OS version, device identifiers
+  • Log data: IP address, browser type, access time, browsing history
+  • Network info: network type, carrier
+
+==== 2. How We Use Information ====
+
+2.1 We use collected information to:
+  • Create and maintain your account
+  • Provide community features (posts, comments, likes, etc.)
+  • Send system notifications
+  • Improve platform experience
+  • Ensure account security
+  • Comply with legal obligations
+
+==== 3. Data Storage ====
+
+3.1 Your data is stored on servers within the People's Republic of China.
+3.2 We retain your data for the duration of your account.
+   Upon account deletion, we will delete your personal information.
+
+==== 4. Information Sharing ====
+
+4.1 We do not sell your personal information to third parties.
+4.2 We may share your information when:
+  • We have your explicit consent
+  • Required by law
+  • Protecting the rights of WaterFun or other users
+
+==== 5. Your Rights ====
+
+5.1 You have the right to:
+  • Access and correct your personal information
+  • Delete your personal information
+  • Withdraw consent
+  • Delete your account
+  • File complaints
+
+==== 6. Contact Us ====
+
+Website: https://waterfun.top

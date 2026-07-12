@@ -13,12 +13,9 @@ pnpm-lock.yaml
 !*.example.sql
 !/sqls/*.sql
 
-*.application.properties
-*.application.yml
-!*.example.application.properties
-!*.example.application.yml
-application-*.yml
+application.properties
 application-*.properties
+application-*.yml
 docker-compose.yml
 
 .gradle

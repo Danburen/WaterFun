@@ -48,27 +48,20 @@ VARS_DEF=(
 
     # Redis (infra, has :default)
     "REDIS_HOST:default:Redis host"
-    "REDIS_PORT:default:Redis port"
-    "REDIS_DATABASE:default:Redis database index"
-    "REDIS_USERNAME:default:Redis username"
     "REDIS_PASSWORD:default:Redis password"
 
     # RabbitMQ (infra, has :default)
     "RABBITMQ_HOST:default:RabbitMQ host"
-    "RABBITMQ_PORT:default:RabbitMQ port"
     "RABBITMQ_USERNAME:default:RabbitMQ username"
     "RABBITMQ_PASSWORD:default:RabbitMQ password"
-    "RABBITMQ_VHOST:default:RabbitMQ virtual host"
 
-    # JWT (has :default)
-    "JWT_PUBLIC_KEY:default:RSA public key path"
+    # JWT
     "JWT_PRIVATE_KEY:default:RSA private key path"
 
-    # Device (has :default)
-    "DEVICE_SALT:default:Device fingerprint salt"
+    # Device (required, no :default)
+    "DEVICE_SALT:required:Device fingerprint salt"
 
-    # Spring Security (has :default)
-    "SECURITY_USER_NAME:default:Actuator security user"
+    # Spring Security
     "SECURITY_USER_PASSWORD:default:Actuator security password"
 
     # Mail - SMTP (required, no :default)
