@@ -83,6 +83,7 @@ services:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
     volumes:
       - ./common.yml:/app/deploy/config/common.yml:ro
       - ./keys:/app/deploy/keys:ro
@@ -129,6 +130,7 @@ services:
       ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
       WATERFUN_KEK: ${WATERFUN_KEK}
       SUPPORT_EMAIL: ${SUPPORT_EMAIL}
+      JAVA_TOOL_OPTIONS: "-Xmx256m -Xms256m"
     volumes:
       - ./common.yml:/app/deploy/config/common.yml:ro
       - ./keys:/app/deploy/keys:ro
@@ -137,9 +139,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - waterfun-net
 
   admin-service:
     build:
@@ -175,6 +174,7 @@ services:
       ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
       WATERFUN_KEK: ${WATERFUN_KEK}
       SUPPORT_EMAIL: ${SUPPORT_EMAIL}
+      JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
     volumes:
       - ./common.yml:/app/deploy/config/common.yml:ro
       - ./keys:/app/deploy/keys:ro
