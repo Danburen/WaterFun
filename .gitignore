@@ -36,3 +36,4 @@ docker-compose.yml
 # ip2region xdb data files (downloaded by setup-ip2region scripts)
 deploy/utils/*.xdb
 /build
+*.code-workspace
