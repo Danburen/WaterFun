@@ -70,12 +70,12 @@ public class ModerationInboxHandler {
     public void handleBatch(List<ModerationConsumerMessage> msgs, Object... args) {
         if (msgs.isEmpty()) return;
         List<ModerationConsumerMessage> allowedMsgs = msgs.stream()
-                .filter(msg -> isEventNotificationAllowed(Long.parseLong(msg.getTargetId())))
+                .filter(msg -> isEventNotificationAllowed(msg.getSubmitterId()))
                 .toList();
         if (allowedMsgs.isEmpty()) return;
         List<Inbox> inboxes = allowedMsgs.stream()
                 .map(msg ->
-                        buildInbox(msg, Long.parseLong(msg.getTargetId()), args)
+                        buildInbox(msg, msg.getSubmitterId(), args)
                 ).toList();
         inboxRepository.saveAll(inboxes);
         inboxes.forEach(inbox ->

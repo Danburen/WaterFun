@@ -163,7 +163,6 @@ public class PostModerationCallbackStrategy implements ModerationCallbackStrateg
     @Override
     public void handleBatch(List<ModerationConsumerMessage> msgs) {
         handlePostBatch(msgs);
-        moderationInboxHandler.handleBatch(msgs);
     }
 
     @Transactional
