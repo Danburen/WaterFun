@@ -9,6 +9,34 @@
 
 $ErrorActionPreference = 'Stop'
 
+# ---------- 0. Load .env file (Docker Compose deployment) ----------
+$searchDirs = @(
+    (Get-Location).Path,
+    $PSScriptRoot,
+    (Join-Path $PSScriptRoot "..\..")
+)
+
+$envLoaded = $false
+foreach ($dir in $searchDirs) {
+    $candidate = Join-Path (Resolve-Path $dir -ErrorAction SilentlyContinue) ".env"
+    if ($candidate -and (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+        Get-Content -LiteralPath $candidate | ForEach-Object {
+            if ($_ -match '^\s*([A-Z][A-Z_0-9]+)\s*=\s*(.*?)\s*$') {
+                $key = $matches[1]
+                $value = $matches[2] -replace '^["'']|["'']$', ''   # strip surrounding quotes
+                [Environment]::SetEnvironmentVariable($key, $value, "Process")
+            }
+        }
+        Write-Host "[OK] Loaded $candidate" -ForegroundColor Cyan
+        $envLoaded = $true
+        break
+    }
+}
+if (-not $envLoaded) {
+    Write-Host "[..] No .env found (using system env vars only)" -ForegroundColor DarkYellow
+}
+Write-Host ""
+
 # ---------- 1. Load common-dev-secrets.yml ----------
 $secretsPath = Join-Path $PSScriptRoot "..\config\common-dev-secrets.yml"
 $secrets = @{}

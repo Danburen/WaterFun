@@ -4,12 +4,11 @@
 # 
 # 流程：
 #   Build Admin 前端 → Build 后端 JAR → Build & Push Docker 镜像
-#   → SSH 登陆服务器 → 拉取新镜像 → 重启容器
+#   → SSH 登陆服务器 → 拉取新镜像 → 重启容器 → 上传 Admin 静态文件
 #
 # 前置条件:
-#   1. 服务器已安装 Docker + docker-compose
-#   2. 服务器已有 docker-compose.yml 引用这些镜像
-#   3. 在 GitHub 仓库配置以下 Secrets:
+#   1. 服务器上已完成首次手动部署（infra + app compose 已启动）
+#   2. 在 GitHub 仓库配置以下 Secrets:
 #      - SSH_HOST      服务器 IP
 #      - SSH_USER      服务器 SSH 用户名
 #      - SSH_KEY       服务器 SSH 私钥
@@ -153,21 +152,16 @@ jobs:
             set -e
 
             echo "=== Login GHCR ==="
-            # 使用 GITHUB_TOKEN（workflow 运行期间有效）
-            # 如需服务器长期可拉镜像，建议创建一个 GitHub PAT（read:packages）
-            # 设为服务器环境变量 CR_PAT，参考：
-            #   https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+            # GITHUB_TOKEN 在 workflow 运行期间有效
+            # 如需服务器长期可拉镜像，建议创建 GitHub PAT（read:packages）
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} \
               -u ${{ github.actor }} --password-stdin
 
             echo "=== Pull new images ==="
-            docker pull ${{ env.REGISTRY }}/${{ github.repository }}/gateway:${{ env.IMAGE_TAG }}
-            docker pull ${{ env.REGISTRY }}/${{ github.repository }}/user-service:${{ env.IMAGE_TAG }}
-            docker pull ${{ env.REGISTRY }}/${{ github.repository }}/admin-service:${{ env.IMAGE_TAG }}
-
-            echo "=== Restart service containers ==="
-            # 假设 docker-compose.deploy.yml 在 /opt/waterfun/ 目录下
             cd /opt/waterfun
+            docker compose -f docker-compose.deploy.yml pull
+
+            echo "=== Restart updated services ==="
             docker compose -f docker-compose.deploy.yml up -d --no-deps \
               gateway user-service admin-service
 
@@ -192,9 +186,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # 解压到 Nginx 静态目录（假设宿主机 Nginx 配置了此路径）
-            ADMIN_DIR="/usr/share/nginx/html/admin"
-            mkdir -p "$ADMIN_DIR"
-            tar -xzf /tmp/admin-dist.tar.gz -C "$ADMIN_DIR"
+            ADMIN_DIST="/opt/waterfun/admin-dist"
+            mkdir -p "$ADMIN_DIST"
+            tar -xzf /tmp/admin-dist.tar.gz -C "$ADMIN_DIST"
             rm -f /tmp/admin-dist.tar.gz
-            echo "Admin frontend deployed to $ADMIN_DIR"
+            echo "Admin frontend deployed to $ADMIN_DIST"

@@ -13,6 +13,27 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SECRETS_FILE="$SCRIPT_DIR/../config/common-dev-secrets.yml"
 
+
+# ---------- 0. 加载 .env 文件（Docker Compose 部署用） ----------
+load_dotenv() {
+    local search_dirs=("$PWD" "$SCRIPT_DIR" "$SCRIPT_DIR/../..")
+    for dir in "${search_dirs[@]}"; do
+        local candidate="$(cd "$dir" 2>/dev/null && echo "$dir")/.env"
+        if [ -f "$candidate" ]; then
+            set -a
+            # shellcheck source=/dev/null
+            source "$candidate"
+            set +a
+            echo -e "${CYAN}[OK]${NC} Loaded $candidate"
+            return 0
+        fi
+    done
+    echo -e "${YELLOW}[..]${NC} No .env found (using system env vars only)"
+}
+
+load_dotenv
+echo ""
+
 # ---------- 颜色 ----------
 RED='\033[0;31m'
 GREEN='\033[0;32m'

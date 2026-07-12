@@ -1,46 +1,36 @@
 # ============================================================
-# WaterFun 部署编排（服务器上使用）
-# 用 CI/CD 推送的镜像，而不是本地构建
+# WaterFun CI/CD 部署编排
+# 仅包含后端 Java 服务（从 GHCR 拉取预构建镜像）
 #
-# 用法:
-#   # 先准备好 common.yml、keys/、.env（参考下面说明）
-#   # 创建外部网络（只需一次）:
-#   docker network create waterfun-net
+# 基础设施（MySQL/Redis/RabbitMQ）和反向代理（nginx-proxy + acme-companion）
+# 分别在 docker-compose.infra.yml 和 docker-compose.app.yml 中，手动部署一次后不动
 #
-#   # 部署:
+# 用法（由 CI/CD workflow 调用）:
+#   cd /opt/waterfun
 #   docker compose -f docker-compose.deploy.yml pull
-#   docker compose -f docker-compose.deploy.yml up -d
+#   docker compose -f docker-compose.deploy.yml up -d gateway user-service admin-service
 #
-# 环境变量优先级: shell env > .env 文件 > compose 默认值
-# 参考项目根目录 deploy/env-vars-reference.md
+# 环境变量通过同目录 .env 文件或 shell env 注入
 # ============================================================
 
 name: waterfun-deploy
 
 services:
-  # ====================== 后端服务 ======================
   gateway:
     image: ghcr.io/${GITHUB_REPOSITORY:-your-org/waterfun}/gateway:${IMAGE_TAG:-latest}
     container_name: waterfun-gateway
-    ports:
-      - "127.0.0.1:8080:8080"
     environment:
       WATERFUN_GATEWAY_PORT: 8080
-      WATERFUN_USER_SERVICE_URI: ${WATERFUN_USER_SERVICE_URI:-http://user-service:8081}
-      WATERFUN_ADMIN_SERVICE_URI: ${WATERFUN_ADMIN_SERVICE_URI:-http://admin-service:8082}
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
+      WATERFUN_USER_SERVICE_URI: http://user-service:8081
+      WATERFUN_ADMIN_SERVICE_URI: http://admin-service:8082
+      DB_URL: jdbc:mysql://mysql:3306/waterfun
+      DB_USERNAME: root
       DB_PASSWORD: ${DB_PASSWORD}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_DATABASE: ${REDIS_DATABASE}
-      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_HOST: redis
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
-      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_HOST: rabbitmq
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      RABBITMQ_VHOST: ${RABBITMQ_VHOST}
     volumes:
       - ./common.yml:/app/deploy/config/common.yml:ro
       - ./keys:/app/deploy/keys:ro
@@ -51,33 +41,27 @@ services:
   user-service:
     image: ghcr.io/${GITHUB_REPOSITORY:-your-org/waterfun}/user-service:${IMAGE_TAG:-latest}
     container_name: waterfun-user-service
-    ports:
-      - "127.0.0.1:8081:8081"
     environment:
       WATERFUN_SERVICE_PORT: 8081
-      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
+      JWT_PRIVATE_KEY: file:/app/deploy/keys/private.key
+      DB_URL: jdbc:mysql://mysql:3306/waterfun
+      DB_USERNAME: root
       DB_PASSWORD: ${DB_PASSWORD}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_DATABASE: ${REDIS_DATABASE}
-      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_HOST: redis
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
-      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_HOST: rabbitmq
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      RABBITMQ_VHOST: ${RABBITMQ_VHOST}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL}
       DEVICE_SALT: ${DEVICE_SALT}
+      TENCENT_COS_BUCKET: ${TENCENT_COS_BUCKET}
       TENCENTCLOUD_SECRET_ID: ${TENCENTCLOUD_SECRET_ID}
       TENCENTCLOUD_SECRET_KEY: ${TENCENTCLOUD_SECRET_KEY}
       TENCENTCLOUD_REGION: ${TENCENTCLOUD_REGION:-ap-shanghai}
-      TENCENT_COS_BUCKET: ${TENCENT_COS_BUCKET}
       RESEND_API_KEY: ${RESEND_API_KEY}
       ALIBABA_CLOUD_ACCESS_KEY_ID: ${ALIBABA_CLOUD_ACCESS_KEY_ID}
       ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
@@ -92,33 +76,27 @@ services:
   admin-service:
     image: ghcr.io/${GITHUB_REPOSITORY:-your-org/waterfun}/admin-service:${IMAGE_TAG:-latest}
     container_name: waterfun-admin-service
-    ports:
-      - "127.0.0.1:8082:8082"
     environment:
       WATERFUN_ADMIN_SERVICE_PORT: 8082
-      JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
+      JWT_PRIVATE_KEY: file:/app/deploy/keys/private.key
+      DB_URL: jdbc:mysql://mysql:3306/waterfun
+      DB_USERNAME: root
       DB_PASSWORD: ${DB_PASSWORD}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_DATABASE: ${REDIS_DATABASE}
-      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_HOST: redis
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
-      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_HOST: rabbitmq
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      RABBITMQ_VHOST: ${RABBITMQ_VHOST}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL}
       DEVICE_SALT: ${DEVICE_SALT}
+      TENCENT_COS_BUCKET: ${TENCENT_COS_BUCKET}
       TENCENTCLOUD_SECRET_ID: ${TENCENTCLOUD_SECRET_ID}
       TENCENTCLOUD_SECRET_KEY: ${TENCENTCLOUD_SECRET_KEY}
       TENCENTCLOUD_REGION: ${TENCENTCLOUD_REGION:-ap-shanghai}
-      TENCENT_COS_BUCKET: ${TENCENT_COS_BUCKET}
       RESEND_API_KEY: ${RESEND_API_KEY}
       ALIBABA_CLOUD_ACCESS_KEY_ID: ${ALIBABA_CLOUD_ACCESS_KEY_ID}
       ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
