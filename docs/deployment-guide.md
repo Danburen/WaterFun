@@ -95,8 +95,9 @@ dig admin.waterfun.top +short
 ## 四、服务器初始化
 
 ```bash
-# 4.1 系统更新
+# 4.1 系统更新 + 基础工具
 sudo apt update && sudo apt upgrade -y
+sudo apt install -y git curl
 
 # 4.2 安装 Docker
 curl -fsSL https://get.docker.com | sudo bash
@@ -104,10 +105,15 @@ sudo usermod -aG docker $USER
 # 退出重登录使组生效
 
 # 4.3 验证
-docker --version && docker compose version
+git --version                # 预期 git 2.34+
+docker --version             # 预期 Docker 27+
+docker compose version
 
-# 4.4 创建项目目录
-mkdir -p /opt/waterfun/{keys,admin-dist}
+# 4.4 克隆项目
+git clone https://github.com/你的/waterfun.git /opt/waterfun
+
+# 4.5 创建密钥与前端目录
+mkdir -p /opt/waterfun/deploy/docker/{admin-dist,keys}
 ```
 
 ---
