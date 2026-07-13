@@ -2,6 +2,19 @@
 
 > 适用于：**Ubuntu 22.04+**，全容器化部署，**无需在宿主机安装 Nginx/Certbot/Java/Node.js**
 
+### 什么是全容器化管理？
+
+部署后所有组件运行在 Docker 容器中，宿主机只需要三样东西：**Docker + 网络 + 防火墙放行 80/443**。
+
+| 以往的做法（宿主机依赖） | 现在的做法（全容器化） |
+|------------------------|---------------------|
+| 装 certbot + crontab 续签 SSL | acme-companion 容器自动申请/续签/reload |
+| 手动写 nginx 配置 + reload | nginx-proxy 容器根据环境变量自动生成配置 |
+| 装 Java 22 + 编译运行 JAR | 构建时打包为 Docker 镜像，直接 run |
+| 进程管理用 systemd 维护 | Docker 内置健康检查 + 自动重启 |
+
+**日常运维只需 `docker compose up -d` 和 `docker compose logs -f`，不需要 SSH 进去改任何系统配置。**
+
 ---
 
 ## 目录
@@ -47,6 +60,16 @@
           (容器)   (容器)    (容器)
 ```
 
+### 为什么用子域名，而不是单域名 + 路径（api.waterfun.top/api/）？
+
+| 对比项 | 子域名（当前方案） | 单域名 + 路径 |
+|--------|------------------|--------------|
+| DNS 记录 | 多配 2 条 A 记录（一次 30 秒） | 只需 1 条 |
+| SSL 证书 | **nginx-proxy + acme-companion 自动申请 + 自动续签，零维护** | 手动 certbot + crontab 续签，忘了用户看到安全警告 |
+| 增加新服务 | 容器加 `VIRTUAL_HOST` 环境变量即可 | 改 nginx 配置再 reload |
+
+为什么推荐子域名：**一次性的 30 秒 DNS 配置，换来 SSL 证书永远自动续签、永不失效。** 而单域名方案每次续签还得确保 crontab 不能炸。
+
 ### 域名规划
 
 | 域名 | 用途 | 指向 |
@@ -67,7 +90,7 @@
 
 ## 二、前置条件
 
-- 一台 Ubuntu 22.04+ 服务器（2C4G 以上）
+- 一台 Ubuntu 22.04+ 服务器（**2C2G 足够**，已内置低配调优）
 - 域名已解析到服务器 IP（见下节）
 - 以下端口未被占用：80, 443
 
@@ -126,14 +149,17 @@ mkdir -p /opt/waterfun/deploy/docker/{admin-dist,keys}
 docker network create waterfun-net
 ```
 
-### 5.2 上传配置文件
+### 5.2 确认配置文件就位
 
-将以下文件上传到服务器的 `/opt/waterfun/` 目录：
+§4.4 已通过 `git clone` 将完整仓库克隆到 `/opt/waterfun/`，所有部署配置文件已在仓库中，**无需额外上传**：
 
 ```bash
-# 从本地项目复制到服务器
-scp deploy/docker/docker-compose.infra.yml ubuntu@your-server:/opt/waterfun/
+ls -la /opt/waterfun/deploy/docker/docker-compose.infra.yml
+ls -la /opt/waterfun/deploy/config/common.yml
+ls -la /opt/waterfun/deploy/docker/nginx/admin-nginx.conf
 ```
+
+如果上述文件都存在，继续下一步。如果不存在，说明 clone 不完整，重新执行 §4.4。
 
 ### 5.3 创建环境变量文件
 
@@ -167,6 +193,7 @@ TENCENT_COS_BUCKET=waterfun-prod-1300000000
 # ---- 腾讯云 API（COS STS 临时密钥）----
 TENCENTCLOUD_SECRET_ID=你的腾讯云SecretId
 TENCENTCLOUD_SECRET_KEY=你的腾讯云SecretKey
+TENCENTCLOUD_REGION=ap-shanghai                              # 可选，默认 ap-shanghai（上海），华南用 ap-guangzhou
 
 # ---- 阿里云短信 ----
 ALIBABA_CLOUD_ACCESS_KEY_ID=你的阿里云AccessKey
@@ -178,9 +205,9 @@ ALIYUN_SMS_VERIFY_CODE_TEMPLATE=SMS_487295072
 RESEND_API_KEY=re_你的ResendKey
 
 # ---- 安全配置 ----
-DEVICE_SALT=$(openssl rand -hex 32)       # 设备指纹盐值，生成后固定
+DEVICE_SALT=你的设备指纹盐值                    # 部署后固定，不要改
 SECURITY_USER_PASSWORD=你的Actuator密码
-WATERFUN_KEK=$(openssl rand -base64 32)
+WATERFUN_KEK=你的KEK值                          # 部署后固定，不要改
 
 # ---- SSL 证书邮箱（用于 Let's Encrypt）----
 SSL_EMAIL=admin@waterfun.top
@@ -193,7 +220,11 @@ EOF
 chmod 600 /opt/waterfun/.env
 ```
 
-> **`DEVICE_SALT` 和 `WATERFUN_KEK`**：首次生成后固定下来，不要每次部署都重新生成，否则已有数据无法解密。
+> **`DEVICE_SALT` 和 `WATERFUN_KEK`**：首次部署时在服务器上生成，写入后固定，不要每次部署都重新生成：
+> ```bash
+> openssl rand -hex 32      # 生成 DEVICE_SALT（64 字符十六进制）
+> openssl rand -base64 32   # 生成 WATERFUN_KEK（44 字符 base64）
+> ```
 
 ### 5.4 环境变量检查（必做）
 
@@ -234,7 +265,7 @@ Result:
 
 ```bash
 cd /opt/waterfun
-docker compose -f docker-compose.infra.yml up -d
+docker compose -f deploy/docker/docker-compose.infra.yml up -d
 
 # 验证三个容器都健康
 docker ps
@@ -245,19 +276,14 @@ docker ps
 
 ## 六、初始化数据库
 
+SQL 脚本已在仓库中（§4.4 clone），直接执行即可：
+
 ```bash
-# 从本地复制 SQL 脚本到服务器
-scp sqls/CREATE_TABLES.sql ubuntu@your-server:/tmp/
-scp sqls/CREATE_TABLES_2.sql ubuntu@your-server:/tmp/
-scp sqls/CREATE_DATABASE_3.sql ubuntu@your-server:/tmp/
+cd /opt/waterfun
 
-# 在服务器上执行
-docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < /tmp/CREATE_TABLES.sql
-docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < /tmp/CREATE_TABLES_2.sql
-docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < /tmp/CREATE_DATABASE_3.sql
-
-# 验证表已创建
-docker exec waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun -e "SHOW TABLES;"
+docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < sqls/CREATE_TABLES.sql
+docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < sqls/CREATE_TABLES_2.sql
+docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < sqls/CREATE_DATABASE_3.sql
 ```
 
 ---
@@ -273,11 +299,11 @@ openssl rsa -pubout -in /opt/waterfun/keys/private.key -out /opt/waterfun/keys/p
 chmod 600 /opt/waterfun/keys/private.key
 ```
 
-### 7.2 上传配置模板
+### 7.2 确认配置模板就位
 
 ```bash
-# 从本地复制
-scp deploy/config/common.yml ubuntu@your-server:/opt/waterfun/
+# 仓库 clone 后已在 deploy/config/ 下，无需上传
+ls -la /opt/waterfun/deploy/config/common.yml
 ```
 
 ### 7.3 上传 Admin 前端（首次部署）
@@ -294,14 +320,13 @@ scp -r waterfun-admin/dist/* ubuntu@your-server:/opt/waterfun/admin-dist/
 
 ## 八、服务部署（后端 + Nginx 代理 + SSL）
 
-### 8.1 上传 docker-compose.app.yml
+### 8.1 确认编排文件就位
 
 ```bash
-scp deploy/docker/docker-compose.app.yml ubuntu@your-server:/opt/waterfun/
-scp -r deploy/docker/nginx ubuntu@your-server:/opt/waterfun/nginx/
+# 仓库 clone 后已在 deploy/docker/ 下，无需上传
+ls -la /opt/waterfun/deploy/docker/docker-compose.app.yml
+ls -la /opt/waterfun/deploy/docker/nginx/admin-nginx.conf
 ```
-
-> 注意：需要 server 上 `/opt/waterfun/nginx/` 下有 `admin-nginx.conf` 文件。
 
 ### 8.2 环境检查（必做）
 
@@ -318,23 +343,26 @@ bash deploy/bin/check-env.sh
 cd /opt/waterfun
 
 # 构建后端镜像（首次大约 5-10 分钟，后续有缓存）
-docker compose -f docker-compose.app.yml build
+docker compose -f deploy/docker/docker-compose.app.yml build
 
 # 启动所有服务
-docker compose -f docker-compose.app.yml up -d
+docker compose -f deploy/docker/docker-compose.app.yml up -d
 
 # 查看启动日志
-docker compose -f docker-compose.app.yml logs -f --tail=50
+docker compose -f deploy/docker/docker-compose.app.yml logs -f --tail=50
 ```
 
-### 8.4 关于 SSL 证书
+### 8.4 关于 SSL 证书（全自动，宿主机零操作）
 
 **nginx-proxy + acme-companion 会自动完成以下工作：**
 
 1. 检测 `LETSENCRYPT_HOST` 环境变量
 2. 为配置的域名自动申请 Let's Encrypt 证书
-3. 证书到期前自动续签
-4. 配置 301 HTTP → HTTPS 重定向
+3. **证书到期前自动续签（无需 cron、无需 systemd timer）**
+4. **续签后自动 reload nginx（无需手动操作）**
+5. 配置 301 HTTP → HTTPS 重定向
+
+**宿主机不需要安装 certbot，不需要写定时任务，不需要手动续签。** 证书永不过期。
 
 首次申请可能需要 **1-2 分钟**，证书就绪后 nginx-proxy 自动 reload：
 
@@ -377,7 +405,7 @@ curl -sI https://api.waterfun.top/api/public/banners
 - [ ] `curl -sI https://admin.waterfun.top/index.html` → 返回 HTML
 - [ ] 浏览器打开 `https://admin.waterfun.top` → 显示管理后台登录页
 - [ ] `docker logs waterfun-acme` → 无 SSL 错误日志
-- [ ] 各容器日志无异常：`docker compose -f docker-compose.app.yml logs --tail=30`
+- [ ] 各容器日志无异常：`docker compose -f deploy/docker/docker-compose.app.yml logs --tail=30`
 
 ---
 
@@ -425,9 +453,10 @@ GitHub → Actions → Deploy → Run workflow → 输入 tag（默认 latest）
 3. Build 后端 JAR（gradlew build -x test）
 4. Build & Push Docker 镜像到 ghcr.io（gateway / user-service / admin-service）
 5. SSH 登录服务器
+   → cd /opt/waterfun
    → docker login ghcr.io
-   → docker compose pull（拉取新镜像）
-   → docker compose up -d 重启 gateway / user-service / admin-service
+   → docker compose -f deploy/docker/docker-compose.deploy.yml pull（拉取新镜像）
+   → docker compose -f deploy/docker/docker-compose.deploy.yml up -d 重启 gateway / user-service / admin-service
 6. SCP 上传前端静态文件
    → 解压到 /opt/waterfun/admin-dist/（admin-nginx 容器自动加载）
 ```
@@ -455,19 +484,23 @@ on:
 ### 全部服务状态
 
 ```bash
+cd /opt/waterfun
+
 # 基础设施状态
-docker compose -f docker-compose.infra.yml ps
+docker compose -f deploy/docker/docker-compose.infra.yml ps
 
 # 应用服务状态
-docker compose -f docker-compose.app.yml ps
+docker compose -f deploy/docker/docker-compose.app.yml ps
 ```
 
 ### 查看日志
 
 ```bash
+cd /opt/waterfun
+
 # 某个服务日志
-docker compose -f docker-compose.app.yml logs -f gateway
-docker compose -f docker-compose.app.yml logs -f user-service
+docker compose -f deploy/docker/docker-compose.app.yml logs -f gateway
+docker compose -f deploy/docker/docker-compose.app.yml logs -f user-service
 
 # 反向代理日志
 docker logs waterfun-nginx-proxy --tail=50
@@ -482,8 +515,8 @@ docker logs waterfun-acme -f
 
 ```bash
 cd /opt/waterfun
-docker compose -f docker-compose.deploy.yml pull
-docker compose -f docker-compose.deploy.yml up -d --no-deps gateway user-service admin-service
+docker compose -f deploy/docker/docker-compose.deploy.yml pull
+docker compose -f deploy/docker/docker-compose.deploy.yml up -d --no-deps gateway user-service admin-service
 ```
 
 ### 更新 Admin 前端（手动）
@@ -501,8 +534,9 @@ scp -r waterfun-admin/dist/* ubuntu@your-server:/opt/waterfun/admin-dist/
 ### 备份数据库
 
 ```bash
-# 使用项目提供的备份脚本（需先复制到服务器）
-deploy/bin/backup_mysql.sh
+cd /opt/waterfun
+# 仓库 clone 后脚本已在 deploy/bin/ 下，直接运行
+bash deploy/bin/backup_mysql.sh
 ```
 
 或手动备份：
@@ -524,16 +558,18 @@ docker exec waterfun-acme acme.sh --list
 ### 停止/重启
 
 ```bash
+cd /opt/waterfun
+
 # 只重启后端服务（不碰 infra）
-docker compose -f docker-compose.app.yml restart gateway user-service admin-service
+docker compose -f deploy/docker/docker-compose.app.yml restart gateway user-service admin-service
 
 # 完整重启应用栈
-docker compose -f docker-compose.app.yml down
-docker compose -f docker-compose.app.yml up -d
+docker compose -f deploy/docker/docker-compose.app.yml down
+docker compose -f deploy/docker/docker-compose.app.yml up -d
 
 # 重启全部（包括 infra，谨慎操作）
-docker compose -f docker-compose.infra.yml restart
-docker compose -f docker-compose.app.yml restart
+docker compose -f deploy/docker/docker-compose.infra.yml restart
+docker compose -f deploy/docker/docker-compose.app.yml restart
 ```
 
 ---
