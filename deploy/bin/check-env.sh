@@ -10,6 +10,15 @@
 
 set -euo pipefail
 
+# ---------- 颜色 ----------
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+GRAY='\033[0;90m'
+WHITE='\033[1;37m'
+NC='\033[0m'
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SECRETS_FILE="$SCRIPT_DIR/../config/common-dev-secrets.yml"
 
@@ -33,15 +42,6 @@ load_dotenv() {
 
 load_dotenv
 echo ""
-
-# ---------- 颜色 ----------
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-GRAY='\033[0;90m'
-WHITE='\033[1;37m'
-NC='\033[0m'
 
 # ---------- 1. 加载 common-dev-secrets.yml ----------
 declare -A secrets
