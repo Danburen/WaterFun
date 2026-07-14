@@ -5,6 +5,7 @@
 *.key
 # deploy/ 目录 - 安全配置上 git，敏感文件单独排除
 deploy/config/common-dev-secrets.yml
+.env.prod.secrets
 # deploy/docker/docker-compose.prod.yml — 从 .gitignore 移除，生产部署文件应有版本控制
 
 node_modules
@@ -27,9 +28,6 @@ docker-compose.yml
 *.class
 /waterfun-common-lib/build/
 
-.omo
-.ai/
-
 # Docker dev data (bind mounts)
 .data/
 
@@ -37,3 +35,10 @@ docker-compose.yml
 deploy/utils/*.xdb
 /build
 *.code-workspace
+
+# agent
+AGENTS.md
+.opencode
+.omo
+.ai/
+.trellis/workspace/
