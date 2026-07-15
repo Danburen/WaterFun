@@ -121,21 +121,39 @@ dig admin.waterfun.top +short
 # 4.1 系统更新 + 基础工具
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y git curl
-
+```
 # 4.2 安装 Docker
+```bash
 curl -fsSL https://get.docker.com | sudo bash
 sudo usermod -aG docker $USER
+```
 # 退出重登录使组生效
 
 # 4.3 验证
+```bash
 git --version                # 预期 git 2.34+
 docker --version             # 预期 Docker 27+
 docker compose version
+```
 
 # 4.4 克隆项目
+这里推荐优先配置代理，国内有些服务器访问git会很慢：
+```bash
+Host github.com
+    HostName github.com
+    User git
+    Port 22
+    IdentityFile ~/.ssh/id_rsa # 你的ssh key 路径
+    # 使用 nc 通过 SOCKS5 代理(如果有的话）
+    # ProxyCommand nc -v -x 127.0.0.1:7890 %h %p
+```
+
+```bash
 git clone https://github.com/你的/waterfun.git /opt/waterfun
+```
 
 # 4.5 创建密钥与前端目录
+```bash
 mkdir -p /opt/waterfun/deploy/docker/{admin-dist,keys}
 ```
 

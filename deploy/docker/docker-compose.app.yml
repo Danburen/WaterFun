@@ -26,6 +26,7 @@ services:
       - nginx_certs:/etc/nginx/certs
       - nginx_vhost:/etc/nginx/vhost.d
       - nginx_html:/usr/share/nginx/html
+    mem_limit: 64m
     restart: unless-stopped
     networks:
       - waterfun-net
@@ -43,6 +44,7 @@ services:
       DEFAULT_EMAIL: ${SSL_EMAIL:-admin@waterfun.top}
     depends_on:
       - nginx-proxy
+    mem_limit: 64m
     restart: unless-stopped
     networks:
       - waterfun-net
@@ -58,6 +60,7 @@ services:
       VIRTUAL_HOST: ${ADMIN_DOMAIN:-admin.waterfun.top}
       LETSENCRYPT_HOST: ${ADMIN_DOMAIN:-admin.waterfun.top}
       LETSENCRYPT_EMAIL: ${SSL_EMAIL:-admin@waterfun.top}
+    mem_limit: 32m
     restart: unless-stopped
     networks:
       - waterfun-net
@@ -92,6 +95,7 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    mem_limit: 256m
     restart: unless-stopped
     networks:
       - waterfun-net
@@ -139,6 +143,7 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    mem_limit: 384m
 
   admin-service:
     build:
@@ -183,6 +188,7 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    mem_limit: 256m
     restart: unless-stopped
     networks:
       - waterfun-net
