@@ -294,14 +294,14 @@ docker ps
 
 ## 六、初始化数据库
 
-SQL 脚本已在仓库中（§4.4 clone），直接执行即可：
+无需手动执行 SQL。Flyway 在 `user-service` 首次启动时自动执行 `V1__baseline.sql` 创建全部表结构。
+
+确保 `application-prod.yml`（在 JAR 内）和 `common.yml`（挂载为 Volume）就位即可，启动后自动建表：
 
 ```bash
-cd /opt/waterfun
-
-docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < sqls/CREATE_TABLES.sql
-docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < sqls/CREATE_TABLES_2.sql
-docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < sqls/CREATE_DATABASE_3.sql
+# 启动后查看 Flyway 迁移日志
+docker logs waterfun-user-service --tail=30 | grep flyway
+# 预期输出: Successfully applied 1 migration to schema 'waterfun', now at version v1
 ```
 
 ---
@@ -311,10 +311,11 @@ docker exec -i waterfun-mysql mysql -uroot -p${DB_PASSWORD} waterfun < sqls/CREA
 ### 7.1 生成 RSA 密钥对
 
 ```bash
-# 在服务器上执行
-openssl genpkey -algorithm RSA -out /opt/waterfun/keys/private.key -pkeyopt rsa_keygen_bits:2048
-openssl rsa -pubout -in /opt/waterfun/keys/private.key -out /opt/waterfun/keys/public.key
-chmod 600 /opt/waterfun/keys/private.key
+# 在服务器上执行（路径与 docker volume 挂载一致）
+mkdir -p /opt/waterfun/deploy/keys
+openssl genpkey -algorithm RSA -out /opt/waterfun/deploy/keys/private.key -pkeyopt rsa_keygen_bits:2048
+openssl rsa -pubout -in /opt/waterfun/deploy/keys/private.key -out /opt/waterfun/deploy/keys/public.key
+chmod 600 /opt/waterfun/deploy/keys/private.key
 ```
 
 ### 7.2 确认配置模板就位
@@ -363,12 +364,14 @@ cd /opt/waterfun
 # 构建后端镜像（首次大约 5-10 分钟，后续有缓存）
 docker compose -f deploy/docker/docker-compose.app.yml build
 
-# 启动所有服务
+# 启动所有服务（compose 已内置 SPRING_PROFILES_ACTIVE=prod，自动加载 application-prod.yml）
 docker compose -f deploy/docker/docker-compose.app.yml up -d
 
 # 查看启动日志
 docker compose -f deploy/docker/docker-compose.app.yml logs -f --tail=50
 ```
+
+> `SPRING_PROFILES_ACTIVE=prod` 已在 `docker-compose.app.yml` / `docker-compose.prod.yml` / `docker-compose.deploy.yml` 三个编排文件中设置，生产环境使用 `prod` profile，自动关闭 Swagger 等开发功能。
 
 ### 8.4 关于 SSL 证书（全自动，宿主机零操作）
 
@@ -602,7 +605,8 @@ docker compose -f deploy/docker/docker-compose.app.yml restart
 | `deploy/docker/docker-compose.deploy.yml` | CI/CD 部署用（仅后端，引用 GHCR 镜像）|
 | `deploy/docker/docker-compose.prod.yml` | 全量参考编排（旧方案，已拆分为 infra + app）|
 | `deploy/docker/nginx/admin-nginx.conf` | Admin SPA Nginx 配置 |
-| `deploy/config/common.yml` | 统一配置模板 |
+| `deploy/config/common.yml` | 统一配置模板（生产安全，日志 INFO 级别） |
+| `waterfun-*/src/main/resources/application-prod.yml` | 生产 profile 配置（关闭 Swagger，内置在 JAR 中） |
 | `deploy/bin/gen-keys.sh` | RSA 密钥对生成脚本 |
 | `deploy/bin/check-env.sh` | 环境变量检查脚本 |
 | `deploy/bin/setup-ip2region.sh` | IP 地理库下载脚本 |

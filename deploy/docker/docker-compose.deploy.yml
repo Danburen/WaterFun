@@ -35,7 +35,7 @@ services:
       JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
-      - ./keys:/app/deploy/keys:ro
+      - ../keys:/app/deploy/keys:ro
     mem_limit: 256m
     restart: unless-stopped
     networks:
@@ -73,7 +73,7 @@ services:
       JAVA_TOOL_OPTIONS: "-Xmx256m -Xms256m"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
-      - ./keys:/app/deploy/keys:ro
+      - ../keys:/app/deploy/keys:ro
     mem_limit: 384m
     restart: unless-stopped
     networks:
@@ -111,7 +111,7 @@ services:
       JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
-      - ./keys:/app/deploy/keys:ro
+      - ../keys:/app/deploy/keys:ro
     mem_limit: 256m
     restart: unless-stopped
     networks:

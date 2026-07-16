@@ -90,7 +90,7 @@ services:
       JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
-      - ./keys:/app/deploy/keys:ro
+      - ../keys:/app/deploy/keys:ro
     depends_on:
       redis:
         condition: service_healthy
@@ -139,7 +139,7 @@ services:
       JAVA_TOOL_OPTIONS: "-Xmx256m -Xms256m"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
-      - ./keys:/app/deploy/keys:ro
+      - ../keys:/app/deploy/keys:ro
     depends_on:
       redis:
         condition: service_healthy
@@ -185,7 +185,7 @@ services:
       JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
-      - ./keys:/app/deploy/keys:ro
+      - ../keys:/app/deploy/keys:ro
     depends_on:
       redis:
         condition: service_healthy
