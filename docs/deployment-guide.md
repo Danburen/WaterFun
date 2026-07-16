@@ -327,12 +327,15 @@ ls -la /opt/waterfun/deploy/config/common.yml
 
 ### 7.3 上传 Admin 前端（首次部署）
 
+> 前端构建在本地（有 Node.js 的开发机）完成，**服务器不需要安装 Node.js**。  
+> 服务器通过 `admin-nginx` 容器挂载 `deploy/docker/admin-dist/` 目录提供静态文件。
+
 ```bash
-# 本地构建
+# 本地开发机执行：构建
 pnpm --filter @waterfun/admin build
 
-# 上传到服务器
-scp -r waterfun-admin/dist/* ubuntu@your-server:/opt/waterfun/admin-dist/
+# 上传到服务器（路径与 compose volume 挂载一致）
+scp -r waterfun-admin/dist/* ubuntu@your-server:/opt/waterfun/deploy/docker/admin-dist/
 ```
 
 ---
@@ -458,12 +461,12 @@ echo $CR_PAT | docker login ghcr.io -u 你的GitHub用户名 --password-stdin
 | `SSH_HOST` | 服务器 IP 地址 |
 | `SSH_USER` | SSH 用户名（如 `ubuntu`） |
 | `SSH_KEY` | SSH 私钥内容（`cat ~/.ssh/id_rsa`） |
-| `DEPLOY_DOMAIN` | 域名，如 `waterfun.top`（替换前端 .env.production 占位符） |
+| `DEPLOY_DOMAIN` | 部署域名，如 `waterfun.top`（替换前端 `VITE_API_BASE` 和 `.env.production` 中的 `YOUR_DOMAIN` 占位符） |
 
 ### 10.2 触发部署
 
 ```
-GitHub → Actions → Deploy → Run workflow → 输入 tag（默认 latest）→ Run
+GitHub → Actions → Deploy → Run workflow → Branch: main → 输入 tag（默认 latest）→ Run workflow
 ```
 
 ### 10.3 CI/CD 流程
@@ -474,29 +477,34 @@ GitHub → Actions → Deploy → Run workflow → 输入 tag（默认 latest）
 3. Build 后端 JAR（gradlew build -x test）
 4. Build & Push Docker 镜像到 ghcr.io（gateway / user-service / admin-service）
 5. SSH 登录服务器
-   → cd /opt/waterfun
    → docker login ghcr.io
+   → cd /opt/waterfun
+   → export GITHUB_REPOSITORY 和 IMAGE_TAG（传递给 compose）
    → docker compose -f deploy/docker/docker-compose.deploy.yml pull（拉取新镜像）
    → docker compose -f deploy/docker/docker-compose.deploy.yml up -d 重启 gateway / user-service / admin-service
-6. SCP 上传前端静态文件
-   → 解压到 /opt/waterfun/admin-dist/（admin-nginx 容器自动加载）
+   → docker image prune 清理旧镜像
+6. SCP 上传前端静态文件 /tmp/admin-dist.tar.gz
+   → 解压到 /opt/waterfun/deploy/docker/admin-dist/（admin-nginx 容器自动加载）
 ```
 
-### 10.4 启用自动触发
+### 10.4 触发方式说明
 
-编辑 `.github/workflows/deploy.yml`，取消 `push` 部分的注释：
+三种触发方式，按需使用：
 
-```yaml
-on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - '.ai/**'
-      - 'docs/**'
-      - 'README.md'
-      - '.gitignore'
-      - 'LICENSE'
-```
+| 触发方式 | 场景 | 镜像标签 |
+|---------|------|---------|
+| `workflow_dispatch` | 手动部署（紧急修复 / 回滚） | 自定义（默认 `latest`） |
+| `push` main 分支 | 日常 PR 合并到 main | `latest` |
+| `create` tag (v*) | 正式发版，可回滚 | 版本号（如 `v1.0.0`） |
+
+> **发版示例**：
+> ```bash
+> git checkout main
+> git tag v1.0.0
+> git push origin v1.0.0
+> ```
+> 会自动触发 CI/CD，构建并推送 `ghcr.io/你的/waterfun/gateway:v1.0.0` 到服务器。
+> 如需回滚，手动触发 workflow 输入旧版本号即可。
 
 ---
 
@@ -536,6 +544,8 @@ docker logs waterfun-acme -f
 
 ```bash
 cd /opt/waterfun
+export GITHUB_REPOSITORY=your-org/waterfun   # 替换为实际 org
+export IMAGE_TAG=latest
 docker compose -f deploy/docker/docker-compose.deploy.yml pull
 docker compose -f deploy/docker/docker-compose.deploy.yml up -d --no-deps gateway user-service admin-service
 ```
@@ -543,11 +553,11 @@ docker compose -f deploy/docker/docker-compose.deploy.yml up -d --no-deps gatewa
 ### 更新 Admin 前端（手动）
 
 ```bash
-# 本地构建
+# 本地开发机执行：构建
 pnpm --filter @waterfun/admin build
 
-# 上传到服务器
-scp -r waterfun-admin/dist/* ubuntu@your-server:/opt/waterfun/admin-dist/
+# 上传到服务器（路径与 compose volume 挂载一致）
+scp -r waterfun-admin/dist/* ubuntu@your-server:/opt/waterfun/deploy/docker/admin-dist/
 
 # 无需重启容器，nginx 立即加载新文件
 ```
@@ -599,10 +609,10 @@ docker compose -f deploy/docker/docker-compose.app.yml restart
 
 | 文件 | 用途 |
 |------|------|
-| `.github/workflows/deploy.yml` | CI/CD 自动部署 workflow |
+| `.github/workflows/deploy.yml` | CI/CD 自动部署 workflow（手动触发 workflow_dispatch） |
 | `deploy/docker/docker-compose.infra.yml` | 基础设施编排（MySQL/Redis/RabbitMQ）|
 | `deploy/docker/docker-compose.app.yml` | 服务编排（反向代理 + 后端 + Admin）|
-| `deploy/docker/docker-compose.deploy.yml` | CI/CD 部署用（仅后端，引用 GHCR 镜像）|
+| `deploy/docker/docker-compose.deploy.yml` | CI/CD 部署用（仅后端 3 服务，引用 GHCR 镜像，由 CI/CD 调用）|
 | `deploy/docker/docker-compose.prod.yml` | 全量参考编排（旧方案，已拆分为 infra + app）|
 | `deploy/docker/nginx/admin-nginx.conf` | Admin SPA Nginx 配置 |
 | `deploy/config/common.yml` | 统一配置模板（生产安全，日志 INFO 级别） |

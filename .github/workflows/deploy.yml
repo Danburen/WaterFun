@@ -1,7 +1,11 @@
 # ============================================================
 # WaterFun 自动部署
-# 手动触发（workflow_dispatch），自动触发暂不启用
-# 
+#
+# 触发方式:
+#   - develop 分支日常 PR 合并到 main → 自动部署 latest
+#   - 打 v* tag（如 v1.0.0）→ 自动部署对应版本
+#   - 手动触发 → 自定义镜像标签
+#
 # 流程：
 #   Build Admin 前端 → Build 后端 JAR → Build & Push Docker 镜像
 #   → SSH 登陆服务器 → 拉取新镜像 → 重启容器 → 上传 Admin 静态文件
@@ -26,19 +30,28 @@ on:
         required: false
         default: 'latest'
 
-  # ─── 自动触发（暂不启用） ───
-  # push:
-  #   branches: [main]
-  #   paths-ignore:
-  #     - '.ai/**'
-  #     - 'docs/**'
-  #     - 'README.md'
-  #     - '.gitignore'
-  #     - 'LICENSE'
+  # ─── main 分支 push（合并 PR / 直接提交）→ 部署 latest ───
+  push:
+    branches: [main]
+    paths-ignore:
+      - '.ai/**'
+      - 'docs/**'
+      - 'README.md'
+      - '.gitignore'
+      - 'LICENSE'
+
+  # ─── 创建 tag（发版）→ 部署版本号 ───
+  create:
+    tags:
+      - 'v*'
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_TAG: ${{ inputs.tag || 'latest' }}
+  # 镜像标签策略：
+  # - workflow_dispatch → 用户输入或 latest
+  # - push main → latest
+  # - create tag → tag 名称（如 v1.0.0）
+  IMAGE_TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || 'latest' }}
 
 jobs:
   deploy:
@@ -159,10 +172,12 @@ jobs:
 
             echo "=== Pull new images ==="
             cd /opt/waterfun
-            docker compose -f docker-compose.deploy.yml pull
+            export GITHUB_REPOSITORY="${{ github.repository }}"
+            export IMAGE_TAG="${{ env.IMAGE_TAG }}"
+            docker compose -f deploy/docker/docker-compose.deploy.yml pull
 
             echo "=== Restart updated services ==="
-            docker compose -f docker-compose.deploy.yml up -d --no-deps \
+            docker compose -f deploy/docker/docker-compose.deploy.yml up -d --no-deps \
               gateway user-service admin-service
 
             echo "=== Cleanup old images ==="
@@ -186,7 +201,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            ADMIN_DIST="/opt/waterfun/admin-dist"
+            ADMIN_DIST="/opt/waterfun/deploy/docker/admin-dist"
             mkdir -p "$ADMIN_DIST"
             tar -xzf /tmp/admin-dist.tar.gz -C "$ADMIN_DIST"
             rm -f /tmp/admin-dist.tar.gz
