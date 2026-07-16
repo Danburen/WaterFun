@@ -11,12 +11,12 @@ public enum UserActionType {
     INTERACTIVE(4),
     REPORT(5),;
 
-    private final short value;
+    private final byte value;
     UserActionType(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static UserActionType fromValue(final int value) {
+    public static UserActionType fromValue(final byte value) {
         for(final UserActionType type : UserActionType.values()) {
             if(type.value == value) {
                 return type;

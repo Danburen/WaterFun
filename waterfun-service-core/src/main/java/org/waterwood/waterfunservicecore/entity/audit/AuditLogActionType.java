@@ -9,15 +9,15 @@ public enum AuditLogActionType {
     REGISTER(2),
     CHANGE_PASSWORD(3),;
 
-    private final short value;
-    private AuditLogActionType(final int value) {
-        this.value = (short) value;
+    private final byte value;
+    AuditLogActionType(final int value) {
+        this.value = (byte) value;
     }
 
-    public static AuditLogActionType fromValue(final int value) {
-        for (final AuditLogActionType auditLogActionType : AuditLogActionType.values()) {
-            if (auditLogActionType.value == value) {
-                return auditLogActionType;
+    public static AuditLogActionType fromValue(final byte value) {
+        for (final AuditLogActionType t : AuditLogActionType.values()) {
+            if (t.value == value) {
+                return t;
             }
         }
         return UNKNOWN;

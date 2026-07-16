@@ -224,7 +224,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         CursorPage<Comment, String> page = CursorPage.of(list, limit, comment ->
-                new RootCommentCursor(comment.getIsPined(), comment.getLikeCount(), comment.getId()).encode()
+                new RootCommentCursor(comment.getIsPined(), comment.getLikeCount().longValue(), comment.getId()).encode()
         );
 
 
@@ -242,8 +242,8 @@ public class CommentServiceImpl implements CommentService {
                 null,
                 userBriefMap.get(comment.getAuthor().getUid()),
                 comment.getContent(),
-                comment.getLikeCount(),
-                comment.getReplyCount(),
+                comment.getLikeCount().longValue(),
+                comment.getReplyCount().longValue(),
                 comment.getCreatedAt(),
                 null,
                 comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid()),
@@ -316,8 +316,8 @@ public class CommentServiceImpl implements CommentService {
                     comment.getRoot() == null ? null : comment.getRoot().getId(),
                     userBriefMap.get(comment.getAuthor().getUid()),
                     comment.getContent(),
-                    comment.getLikeCount(),
-                    comment.getReplyCount(),
+                    comment.getLikeCount().longValue(),
+                    comment.getReplyCount().longValue(),
                     comment.getCreatedAt(),
                     isDirectReplyToRoot ? null : parentAuthorNameMap.get(parentId),
                     comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid()),
@@ -338,8 +338,8 @@ public class CommentServiceImpl implements CommentService {
                             comment.getRoot() == null ? null : comment.getRoot().getId(),
                             authorBrief,
                             comment.getContent(),
-                            comment.getLikeCount(),
-                            comment.getReplyCount(),
+                            comment.getLikeCount().longValue(),
+                            comment.getReplyCount().longValue(),
                             comment.getCreatedAt(),
                             null,
                             comment.getPost().getAuthor().getUid().equals(comment.getAuthor().getUid()),

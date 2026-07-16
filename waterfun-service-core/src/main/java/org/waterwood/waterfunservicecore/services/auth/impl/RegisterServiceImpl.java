@@ -14,7 +14,7 @@ import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.entity.user.*;
 import org.waterwood.waterfunservicecore.exception.UserNameAlreadyExistException;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
-import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
+import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
 import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
@@ -31,8 +31,6 @@ import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
 import org.waterwood.waterfunservicecore.services.auth.RegisterService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
-
-import java.util.UUID;
 
 import java.time.Duration;
 import java.time.Instant;

@@ -80,16 +80,16 @@ public class SiteStatisticRecorder {
         LocalDate date = old.date;
 
         if (loginCount > 0) {
-            applyDelta(date, now, loginCount, repository::incrementLoginCount, SiteStatistic::setLoginCount);
+            applyDelta(date, now, (int) loginCount, repository::incrementLoginCount, SiteStatistic::setLoginCount);
         }
         if (newUsers > 0) {
-            applyDelta(date, now, newUsers, repository::incrementNewUsers, SiteStatistic::setNewUsers);
+            applyDelta(date, now, (int) newUsers, repository::incrementNewUsers, SiteStatistic::setNewUsers);
         }
         if (newPosts > 0) {
-            applyDelta(date, now, newPosts, repository::incrementNewPosts, SiteStatistic::setNewPosts);
+            applyDelta(date, now, (int) newPosts, repository::incrementNewPosts, SiteStatistic::setNewPosts);
         }
         if (dailyPv > 0) {
-            applyDelta(date, now, dailyPv, repository::incrementDailyPv, SiteStatistic::setDailyPv);
+            applyDelta(date, now, (int) dailyPv, repository::incrementDailyPv, SiteStatistic::setDailyPv);
         }
         if (peakOnline >= 0) {
             int updated = repository.updatePeakOnline(date, peakOnline, now);
@@ -98,7 +98,7 @@ public class SiteStatisticRecorder {
                     SiteStatistic stat = new SiteStatistic();
                     stat.setId(date);
                     stat.setUpdatedAt(now);
-                    stat.setPeakOnline(peakOnline);
+                    stat.setPeakOnline((int) peakOnline);
                     repository.save(stat);
                 } catch (DataIntegrityViolationException e) {
                     repository.updatePeakOnline(date, peakOnline, now);
@@ -107,10 +107,10 @@ public class SiteStatisticRecorder {
         }
     }
 
-    private void applyDelta(LocalDate date, Instant now, long delta,
+    private void applyDelta(LocalDate date, Instant now, int delta,
                             IncrementFunction incrementFn,
-                            java.util.function.BiConsumer<SiteStatistic, Long> setter) {
-        int updated = incrementFn.apply(date, delta, now);
+                            java.util.function.BiConsumer<SiteStatistic, Integer> setter) {
+        int updated = incrementFn.apply(date, (long) delta, now);
         if (updated == 0) {
             try {
                 SiteStatistic stat = new SiteStatistic();
@@ -119,7 +119,7 @@ public class SiteStatisticRecorder {
                 setter.accept(stat, delta);
                 repository.save(stat);
             } catch (DataIntegrityViolationException e) {
-                incrementFn.apply(date, delta, now);
+                incrementFn.apply(date, (long) delta, now);
             }
         }
     }

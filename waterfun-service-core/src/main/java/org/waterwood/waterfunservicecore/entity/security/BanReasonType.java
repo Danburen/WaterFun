@@ -17,7 +17,7 @@ public enum BanReasonType {
     TROLLING(9, "ban.reason.trolling"),
     OTHER(99, "reject.reason.other");
 
-    private final short value;
+    private final byte value;
     private final String messageKey;
 
     public AuditType toAuditType() {
@@ -32,7 +32,7 @@ public enum BanReasonType {
         };
     }
     private BanReasonType(final int value, final String messageKey) {
-        this.value = (short) value;
+        this.value = (byte) value;
         this.messageKey = messageKey;
     }
 

@@ -9,9 +9,9 @@ public enum ResourceStatus {
     ORPHAN(2),
     DELETED(3),;
 
-    private final short value;
+    private final byte value;
     private ResourceStatus(int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
     public static ResourceStatus valueOf(short value) {

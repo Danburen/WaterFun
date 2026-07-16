@@ -4,15 +4,15 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class PenaltyTypeConverter implements AttributeConverter<PenaltyType, Short> {
+public class PenaltyTypeConverter implements AttributeConverter<PenaltyType, Byte> {
 
     @Override
-    public Short convertToDatabaseColumn(PenaltyType attribute) {
+    public Byte convertToDatabaseColumn(PenaltyType attribute) {
         return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public PenaltyType convertToEntityAttribute(Short dbData) {
+    public PenaltyType convertToEntityAttribute(Byte dbData) {
         return dbData == null ? null : PenaltyType.fromValue(dbData);
     }
 }

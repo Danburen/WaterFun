@@ -28,19 +28,19 @@ public class UserCounter {
 
     @ColumnDefault("0")
     @Column(name = "follower_cnt", columnDefinition = "int UNSIGNED")
-    private Long followerCnt = 0L;
+    private Integer followerCnt = 0;
 
     @ColumnDefault("0")
     @Column(name = "following_cnt", columnDefinition = "int UNSIGNED")
-    private Long followingCnt = 0L;
+    private Integer followingCnt = 0;
 
     @ColumnDefault("0")
     @Column(name = "like_cnt", columnDefinition = "int UNSIGNED")
-    private Long likeCnt = 0L;
+    private Integer likeCnt = 0;
 
     @ColumnDefault("0")
     @Column(name = "post_cnt", columnDefinition = "int UNSIGNED")
-    private Long postCnt = 0L;
+    private Integer postCnt = 0;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "updated_at")
@@ -48,22 +48,22 @@ public class UserCounter {
 
     @ColumnDefault("'0'")
     @Column(name = "collect_cnt", columnDefinition = "int UNSIGNED")
-    private Long collectCnt = 0L;
+    private Integer collectCnt = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "submit_cnt", columnDefinition = "int UNSIGNED")
-    private Long submitCnt = 0L;
+    private Integer submitCnt = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "reject_cnt", columnDefinition = "int UNSIGNED")
-    private Long rejectCnt = 0L;
+    private Integer rejectCnt = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "report_cnt", columnDefinition = "int UNSIGNED")
-    private Long reportCnt = 0L;
+    private Integer reportCnt = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "report_hit_cnt", columnDefinition = "int UNSIGNED")
-    private Long reportHitCnt = 0L;
+    private Integer reportHitCnt = 0;
 
 }

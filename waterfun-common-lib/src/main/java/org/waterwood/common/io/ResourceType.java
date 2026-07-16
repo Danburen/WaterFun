@@ -16,12 +16,12 @@ public enum ResourceType {
     EXECUTABLE(7),
     OTHER(99),;
 
-    private final short value;
+    private final byte value;
     ResourceType(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static ResourceType fromCode(Short value) {
+    public static ResourceType fromCode(Byte value) {
         for (ResourceType type : ResourceType.values()) {
             if (type.value == value) {
                 return type;

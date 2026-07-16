@@ -10,12 +10,12 @@ public enum UserType {
     MODERATOR(3),
     VIP(4),;
 
-    private final short value;
+    private final byte value;
     UserType(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static UserType fromValue(Short value) {
+    public static UserType fromValue(Byte value) {
         for (UserType userType : UserType.values()) {
             if (userType.value == value) {
                 return userType;

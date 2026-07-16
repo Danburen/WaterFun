@@ -67,7 +67,7 @@ public class Inbox {
 
     @ColumnDefault("'1'")
     @Column(name = "aggregate_count", columnDefinition = "int UNSIGNED")
-    private Long aggregateCount;
+    private Integer aggregateCount = 1;
 
     @NotNull
     @ColumnDefault("0")

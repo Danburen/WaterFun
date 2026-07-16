@@ -34,7 +34,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -182,7 +181,7 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             latest.setContent(payload.withUserUids(uniqueUserIds).toMap());
-            latest.setAggregateCount((long) (inboxes.size() + 1));
+            latest.setAggregateCount(inboxes.size() + 1);
             latest.setIsAggregated(Boolean.TRUE);
             latest.setIsDeleted(Boolean.FALSE);
             latest.setIsRead(Boolean.FALSE);

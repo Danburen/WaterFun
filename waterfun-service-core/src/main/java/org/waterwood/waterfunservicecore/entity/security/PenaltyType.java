@@ -14,15 +14,15 @@ public enum PenaltyType {
     BAN_CREATE(6, BanPermission.BAN_CREATE),
     OTHER(99, null);
 
-    private final short value;
+    private final byte value;
     private final BanPermission banPermission;
 
     PenaltyType(int value, BanPermission banPermission) {
-        this.value = (short) value;
+        this.value = (byte) value;
         this.banPermission = banPermission;
     }
 
-    public static PenaltyType fromValue(short value) {
+    public static PenaltyType fromValue(Byte value) {
         for (PenaltyType t : values()) {
             if (t.value == value) return t;
         }

@@ -30,15 +30,15 @@ public class UserPreference {
     @NotNull
     @ColumnDefault("'zh-CN'")
     @Column(name = "locale", nullable = false, length = 10)
-    private String locale;
+    private String locale = "zh-CN";
 
     @Size(max = 50)
     @ColumnDefault("'Asia/Shanghai'")
     @Column(name = "timezone", length = 50)
-    private String timezone;
+    private String timezone = "Asia/Shanghai";
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private Instant updatedAt = Instant.now();
 
 }

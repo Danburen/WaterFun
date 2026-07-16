@@ -15,7 +15,7 @@ public class OptionVO<ID extends Serializable> {
     private String code;
     private String name;
     private Boolean disabled = false;
-    private Long usageCount;
+    private Integer usageCount;
 
     public OptionVO(ID id, String code, String name, Boolean disabled) {
         this.id = id;
@@ -24,7 +24,7 @@ public class OptionVO<ID extends Serializable> {
         this.disabled = disabled;
     }
 
-    public OptionVO(ID id, String code, String name, Boolean disabled, Long usageCount) {
+    public OptionVO(ID id, String code, String name, Boolean disabled, Integer usageCount) {
         this.id = id;
         this.code = code;
         this.name = name;

@@ -46,7 +46,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditT
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.*;
 import org.waterwood.waterfunadminservice.service.user.UserAdminService;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
-import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
+import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import org.waterwood.waterfunservicecore.services.user.*;

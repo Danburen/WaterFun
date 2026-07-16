@@ -9,12 +9,12 @@ public enum CommentStatus {
     NORMAL(1),
     REJECTED(2),;
 
-    private final short value;
+    private final byte value;
     CommentStatus(int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static CommentStatus fromValue(short value) {
+    public static CommentStatus fromValue(Byte value) {
         for (CommentStatus status : CommentStatus.values()) {
             if (status.value == value) {
                 return status;

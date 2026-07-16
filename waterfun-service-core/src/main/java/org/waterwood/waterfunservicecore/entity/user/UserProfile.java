@@ -34,14 +34,12 @@ public class UserProfile {
     @ToString.Exclude
     private User user;
 
-    @Lob
     @Column(name = "bio")
     private String bio;
 
-    @ColumnDefault("'UNKNOWN'")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "gender")
-    private Gender gender;
+    @ColumnDefault("'3'")
+    @Column(name = "gender", columnDefinition = "tinyint UNSIGNED")
+    private Gender gender = Gender.UNKNOWN;
 
 
     @Size(max = 50)

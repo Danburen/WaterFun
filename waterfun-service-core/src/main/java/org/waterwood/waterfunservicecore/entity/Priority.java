@@ -9,12 +9,12 @@ public enum Priority {
     MEDIUM(2),
     LOW(3),;
 
-    private final short value;
+    private final byte value;
     private Priority(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static Priority fromCode(final short code) {
+    public static Priority fromCode(final byte code) {
         return switch (code) {
             case 0 -> EMERGENCY;
             case 1 -> HIGH;

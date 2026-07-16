@@ -888,7 +888,7 @@ public class PostServiceImpl implements PostService {
         long rejected = postRepository.countByAuthorUidAndStatusAndIsDeleted(userUid, PostStatus.REJECTED, false);
         long totalLikeCount = postRepository.sumLikeCountByAuthorUid(userUid);
         long followerCount = userCounterRepository.findByUserUid(userUid)
-                .map(UserCounter::getFollowerCnt).orElse(0L);
+                .map(UserCounter::getFollowerCnt).orElse(0).longValue();
         return MyPostsStatsResp.builder()
                 .totalCount(total)
                 .publishedCount(published)

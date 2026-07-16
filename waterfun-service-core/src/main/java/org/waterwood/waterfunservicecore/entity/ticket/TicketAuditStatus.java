@@ -9,12 +9,12 @@ public enum TicketAuditStatus {
     REJECTED(3),
     CANCELLED(4);
 
-    private final short value;
+    private final byte value;
     TicketAuditStatus(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static TicketAuditStatus fromValue(final int value) {
+    public static TicketAuditStatus fromValue(final byte value) {
         return switch (value) {
             case 1 -> PENDING;
             case 2 -> RESOLVED;

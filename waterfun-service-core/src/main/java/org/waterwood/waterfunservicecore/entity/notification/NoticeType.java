@@ -17,14 +17,14 @@ public enum NoticeType {
 
     private final NoticeGroup group;
     private final Priority priority;
-    private final short code;
+    private final byte code;
     NoticeType(final int code, final NoticeGroup group, final Priority priority) {
-        this.code = (short) code;
+        this.code = (byte) code;
         this.group = group;
         this.priority = priority;
     }
 
-    public static NoticeType fromCode(final short code) {
+    public static NoticeType fromCode(final byte code) {
         for (final NoticeType noticeType : NoticeType.values()) {
             if (noticeType.code == code) {
                 return noticeType;

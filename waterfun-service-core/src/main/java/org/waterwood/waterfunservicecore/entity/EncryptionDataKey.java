@@ -1,9 +1,10 @@
-package org.waterwood.waterfunservicecore.infrastructure.security;
+package org.waterwood.waterfunservicecore.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.waterwood.waterfunservicecore.infrastructure.security.Algorithm;
 
 import java.time.Instant;
 
@@ -21,22 +22,21 @@ public class EncryptionDataKey {
     @Column(name = "encrypted_key", nullable = false, length = 512)
     private String encryptedKey;
 
-    @ColumnDefault("'AES'")
-    @Column(name = "algorithm", nullable = false, length = 20)
-    private String algorithm;
+    @ColumnDefault("'0'")
+    @Column(name = "algorithm", columnDefinition = "tinyint UNSIGNED not null")
+    private Algorithm algorithm = Algorithm.AES;
 
     @ColumnDefault("256")
     @Column(name = "key_length", nullable = false)
-    private Integer keyLength;
+    private Short keyLength = 256;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "key_status", nullable = false, length = 20)
-    @ColumnDefault("'PENDING_ACTIVATION'")
-    private KeyStatus keyStatus;
+    @ColumnDefault("'0'")
+    @Column(name = "key_status", columnDefinition = "tinyint UNSIGNED not null")
+    private KeyStatus keyStatus = KeyStatus.PENDING_ACTIVATION;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @Column(name = "description")
     private String description;

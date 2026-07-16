@@ -19,7 +19,7 @@ import java.time.Instant;
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "int UNSIGNED not null")
+    @Column(name = "id", columnDefinition = "bigint UNSIGNED not null")
     private Long id;
 
     @Size(max = 30)
@@ -32,13 +32,12 @@ public class Tag {
     @Column(name = "slug", nullable = false, length = 50)
     private String slug;
 
-    @Lob
     @Column(name = "description")
     private String description;
 
     @ColumnDefault("'0'")
     @Column(name = "usage_count", columnDefinition = "int UNSIGNED")
-    private Long usageCount = 0L;
+    private Integer usageCount = 0;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -48,12 +47,12 @@ public class Tag {
     @CreationTimestamp
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @UpdateTimestamp
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "update_at", nullable = false)
-    private Instant updateAt;
+    private Instant updateAt = Instant.now();
 
     @ColumnDefault("0")
     @Column(name = "is_deleted")

@@ -59,10 +59,10 @@ public class UserServiceImpl implements UserService{
                         up.getBirthDate(),
                         up.getResidence(),
                         u.getCreatedAt(),
-                        uc.getFollowerCnt(),
-                        uc.getFollowingCnt(),
-                        uc.getPostCnt(),
-                        uc.getLikeCnt()
+                        uc.getFollowerCnt().longValue(),
+                        uc.getFollowingCnt().longValue(),
+                        uc.getPostCnt().longValue(),
+                        uc.getLikeCnt().longValue()
                 );
     }
 
@@ -78,10 +78,10 @@ public class UserServiceImpl implements UserService{
         return new UserPublicCardResp(
                 u.getUid(),
                 ub,
-                uc.getFollowerCnt(),
-                uc.getFollowingCnt(),
-                uc.getLikeCnt(),
-                uc.getPostCnt()
+                uc.getFollowerCnt().longValue(),
+                uc.getFollowingCnt().longValue(),
+                uc.getLikeCnt().longValue(),
+                uc.getPostCnt().longValue()
         );
     }
 

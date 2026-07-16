@@ -4,16 +4,16 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class AuditTriggerTypeConverter implements AttributeConverter<AuditTriggerType, Short> {
+public class AuditTriggerTypeConverter implements AttributeConverter<AuditTriggerType, Byte> {
 
 
     @Override
-    public Short convertToDatabaseColumn(AuditTriggerType attribute) {
+    public Byte convertToDatabaseColumn(AuditTriggerType attribute) {
         return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public AuditTriggerType convertToEntityAttribute(Short dbData) {
+    public AuditTriggerType convertToEntityAttribute(Byte dbData) {
         return dbData == null ? null : AuditTriggerType.fromValue(dbData);
     }
 }

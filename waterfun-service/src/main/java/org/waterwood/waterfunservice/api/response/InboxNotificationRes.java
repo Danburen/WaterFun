@@ -16,7 +16,7 @@ import java.time.Instant;
 public class InboxNotificationRes {
     private Long id;
     private String title;
-    private Short noticeType;
+    private Byte noticeType;
     private NotificationContent content;
     private Instant createdAt;
     private Boolean isRead;

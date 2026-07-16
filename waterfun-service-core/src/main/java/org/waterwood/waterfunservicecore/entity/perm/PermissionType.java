@@ -10,12 +10,12 @@ public enum PermissionType {
     DATA(3),
     BAM(4),;
 
-    private final short value;
+    private final byte value;
     PermissionType(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static PermissionType fromValue(final int value) {
+    public static PermissionType fromValue(final byte value) {
         for (PermissionType type : PermissionType.values()) {
             if (type.value == value) {
                 return type;

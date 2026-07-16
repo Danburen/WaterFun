@@ -38,8 +38,7 @@ public class Comment {
     private User author;
 
     @NotNull
-    @Lob
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "LONGTEXT", nullable = false)
     private String content;
 
     @ColumnDefault("'1'")
@@ -48,11 +47,11 @@ public class Comment {
 
     @ColumnDefault("'0'")
     @Column(name = "like_count", columnDefinition = "int UNSIGNED")
-    private Long likeCount = 0L;
+    private Integer likeCount = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "reply_count", columnDefinition = "int UNSIGNED")
-    private Long replyCount = 0L;
+    private Integer replyCount = 0;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP(3)")

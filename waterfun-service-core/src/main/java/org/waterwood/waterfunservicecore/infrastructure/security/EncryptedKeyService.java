@@ -4,6 +4,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
+import org.waterwood.waterfunservicecore.entity.KeyStatus;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.EncryptionKeyDataRepo;

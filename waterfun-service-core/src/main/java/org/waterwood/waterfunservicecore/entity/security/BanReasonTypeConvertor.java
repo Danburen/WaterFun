@@ -4,16 +4,16 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class BanReasonTypeConvertor implements AttributeConverter<BanReasonType, Short> {
+public class BanReasonTypeConvertor implements AttributeConverter<BanReasonType, Byte> {
 
 
     @Override
-    public Short convertToDatabaseColumn(BanReasonType attribute) {
+    public Byte convertToDatabaseColumn(BanReasonType attribute) {
         return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public BanReasonType convertToEntityAttribute(Short dbData) {
+    public BanReasonType convertToEntityAttribute(Byte dbData) {
         return dbData == null ? null : BanReasonType.fromValue(dbData);
     }
 }

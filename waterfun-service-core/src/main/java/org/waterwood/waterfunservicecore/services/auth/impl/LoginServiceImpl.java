@@ -19,7 +19,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPer
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
-import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
+import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPayload;
 import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
@@ -122,7 +122,7 @@ public class LoginServiceImpl implements LoginService {
                 BanReasonType reason = up.getBanReasonType() != null ? up.getBanReasonType() : BanReasonType.UNSPECIFIED;
                 String messageKey = reason.getMessageKey() != null ? reason.getMessageKey() : "http.forbidden";
                 log.warn("Login banned: uid={}, reason={}", userUid, reason);
-                throw new AuthException(org.waterwood.api.AuthCode.REAUTHORIZATION_REQUIRED);
+                throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
             }
         }
     }

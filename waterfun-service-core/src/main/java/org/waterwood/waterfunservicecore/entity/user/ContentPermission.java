@@ -8,12 +8,12 @@ public enum ContentPermission {
     FOLLOWERS(1),
     NONE(2),;
 
-    private final short value;
+    private final byte value;
     ContentPermission(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static ContentPermission fromValue(Short value) {
+    public static ContentPermission fromValue(Byte value) {
         for (ContentPermission v : ContentPermission.values()) {
             if (v.value == value) {
                 return v;

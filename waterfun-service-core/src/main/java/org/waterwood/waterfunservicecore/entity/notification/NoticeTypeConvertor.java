@@ -4,15 +4,15 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class NoticeTypeConvertor implements AttributeConverter<NoticeType, Short> {
+public class NoticeTypeConvertor implements AttributeConverter<NoticeType, Byte> {
 
     @Override
-    public Short convertToDatabaseColumn(NoticeType noticeType) {
+    public Byte convertToDatabaseColumn(NoticeType noticeType) {
         return noticeType.getCode();
     }
 
     @Override
-    public NoticeType convertToEntityAttribute(Short aShort) {
+    public NoticeType convertToEntityAttribute(Byte aShort) {
         return NoticeType.fromCode(aShort);
     }
 }

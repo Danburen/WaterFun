@@ -4,9 +4,9 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class AuditLogActionTypeConverter implements AttributeConverter<AuditLogActionType, Short> {
+public class AuditLogActionTypeConverter implements AttributeConverter<AuditLogActionType, Byte> {
     @Override
-    public Short convertToDatabaseColumn(AuditLogActionType attribute) {
+    public Byte convertToDatabaseColumn(AuditLogActionType attribute) {
         if (attribute == null) {
             return null;
         }
@@ -14,7 +14,7 @@ public class AuditLogActionTypeConverter implements AttributeConverter<AuditLogA
     }
 
     @Override
-    public AuditLogActionType convertToEntityAttribute(Short dbData) {
+    public AuditLogActionType convertToEntityAttribute(Byte dbData) {
         if (dbData == null) {
             return null;
         }

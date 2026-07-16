@@ -10,12 +10,12 @@ public enum AuditStatus {
     SUSPECT(4),
     CANCELED(5),;
 
-    private final short code;
+    private final byte code;
     private AuditStatus(int code) {
-        this.code = (short) code;
+        this.code = (byte) code;
     }
 
-    public static AuditStatus fromCode(Short code) {
+    public static AuditStatus fromCode(Byte code) {
         for (AuditStatus status : AuditStatus.values()) {
             if (status.getCode() == code.intValue()) {
                 return status;

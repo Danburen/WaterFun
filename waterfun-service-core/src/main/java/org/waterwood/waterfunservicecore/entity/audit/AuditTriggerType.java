@@ -13,13 +13,13 @@ public enum AuditTriggerType {
     USER_FEEDBACK(5),
     USER_APPEAL(6);
 
-    private final short value;
+    private final byte value;
 
     AuditTriggerType(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static AuditTriggerType fromValue(final int value) {
+    public static AuditTriggerType fromValue(final byte value) {
         for(final AuditTriggerType type : values()) {
             if(type.value == value) {
                 return type;

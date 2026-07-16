@@ -23,23 +23,23 @@ public class SiteStatistic {
 
     @ColumnDefault("'0'")
     @Column(name = "login_count", columnDefinition = "int UNSIGNED")
-    private Long loginCount = 0L;
+    private Integer loginCount = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "daily_pv", columnDefinition = "int UNSIGNED")
-    private Long dailyPv = 0L;
+    private Integer dailyPv = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "new_users", columnDefinition = "int UNSIGNED")
-    private Long newUsers = 0L;
+    private Integer newUsers = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "new_posts", columnDefinition = "int UNSIGNED")
-    private Long newPosts = 0L;
+    private Integer newPosts = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "peak_online", columnDefinition = "int UNSIGNED")
-    private Long peakOnline = 0L;
+    private Integer peakOnline = 0;
 
     @ColumnDefault("CURRENT_TIMESTAMP(3)")
     @Column(name = "updated_at")

@@ -43,8 +43,7 @@ public class Post {
     private String subtitle;
 
     @NotNull
-    @Lob
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "LONGTEXT", nullable = false)
     private String content;
 
     @Size(max = 500)
@@ -67,19 +66,19 @@ public class Post {
 
     @ColumnDefault("'0'")
     @Column(name = "view_count", columnDefinition = "int UNSIGNED")
-    private Long viewCount = 0L;
+    private Integer viewCount = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "like_count", columnDefinition = "int UNSIGNED")
-    private Long likeCount = 0L;
+    private Integer likeCount = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "comment_count", columnDefinition = "int UNSIGNED")
-    private Long commentCount = 0L;
+    private Integer commentCount = 0;
 
     @ColumnDefault("'0'")
     @Column(name = "collect_count", columnDefinition = "int UNSIGNED")
-    private Long collectCount = 0L;
+    private Integer collectCount = 0;
 
     @Size(max = 200)
     @Column(name = "slug", length = 200)
@@ -131,8 +130,7 @@ public class Post {
     @Column(name = "edited_subtitle", length = 64)
     private String editedSubtitle;
 
-    @Lob
-    @Column(name = "edited_content")
+    @Column(name = "edited_content", columnDefinition = "TEXT")
     private String editedContent;
 
     @Size(max = 500)
@@ -157,7 +155,7 @@ public class Post {
 
     @ColumnDefault("'1'")
     @Column(name = "version", columnDefinition = "int UNSIGNED")
-    private Long version = 1L;
+    private Integer version = 1;
 
     @ColumnDefault("'0'")
     @Column(name = "type", columnDefinition = "tinyint UNSIGNED")

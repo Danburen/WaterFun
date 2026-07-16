@@ -9,13 +9,13 @@ public enum TicketType {
     FEATURE_FEEDBACK(3),
     SUGGESTION(4),;
 
-    private final short value;
+    private final byte value;
 
     TicketType(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static TicketType fromValue(final int value) {
+    public static TicketType fromValue(final byte value) {
         for (final TicketType ticketType : TicketType.values()) {
             if (ticketType.value == value) {
                 return ticketType;

@@ -7,12 +7,12 @@ public enum VisibleStatus {
     SHOW(1),
     HIDE(2),;
 
-    private final short code;
+    private final byte code;
     private VisibleStatus(int code) {
-        this.code = (short) code;
+        this.code = (byte) code;
     }
 
-    public static VisibleStatus fromCode(short code) {
+    public static VisibleStatus fromCode(Byte code) {
       for (VisibleStatus visibleStatus : values()) {
             if (visibleStatus.code == code) {
                 return visibleStatus;

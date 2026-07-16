@@ -4,15 +4,15 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class PostTypeConverter implements AttributeConverter<PostType, Short> {
+public class PostTypeConverter implements AttributeConverter<PostType, Byte> {
 
     @Override
-    public Short convertToDatabaseColumn(PostType attribute) {
+    public Byte convertToDatabaseColumn(PostType attribute) {
         return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public PostType convertToEntityAttribute(Short dbData) {
+    public PostType convertToEntityAttribute(Byte dbData) {
         return dbData == null ? null : PostType.fromValue(dbData);
     }
 }

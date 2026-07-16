@@ -13,7 +13,7 @@ import org.waterwood.waterfunservicecore.api.resp.AccountResp;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
-import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
+import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
 
 @Service

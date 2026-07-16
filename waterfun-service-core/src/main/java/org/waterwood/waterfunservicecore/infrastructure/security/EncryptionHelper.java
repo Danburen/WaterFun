@@ -1,5 +1,8 @@
 package org.waterwood.waterfunservicecore.infrastructure.security;
 
+import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
+import org.waterwood.waterfunservicecore.entity.KeyStatus;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -47,8 +50,8 @@ public final class EncryptionHelper {
             String dekId = "dek-" + java.util.UUID.randomUUID();
             dekKey.setKeyId(dekId);
             dekKey.setEncryptedKey(Base64.getEncoder().encodeToString(combined));
-            dekKey.setAlgorithm("AES");
-            dekKey.setKeyLength(256);
+            dekKey.setAlgorithm(Algorithm.AES);
+            dekKey.setKeyLength((short) 256);
             dekKey.setCreatedAt(Instant.now());
             dekKey.setKeyStatus(KeyStatus.PENDING_ACTIVATION);
             dekKey.setDescription("Auto Generated DEK #" + i + 1);

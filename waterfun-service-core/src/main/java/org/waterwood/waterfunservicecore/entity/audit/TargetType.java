@@ -22,15 +22,15 @@ public enum TargetType {
     MODERATION_IMAGE(8, ResourceType.IMAGE.getAllowExtensions()),
     USER(9, Set.of()),;
 
-    private final short code;
+    private final byte code;
     private final Set<FileExtension> allowedExts;
 
     TargetType(final int code, Collection<FileExtension> allowedExts) {
-        this.code = (short) code;
+        this.code = (byte) code;
         this.allowedExts = new HashSet<>(allowedExts);
     }
 
-    public static TargetType fromCode(int code) {
+    public static TargetType fromCode(byte code) {
         for(int i = 0; i < values().length; i++) {
             if(values()[i].code == code) {
                 return values()[i];

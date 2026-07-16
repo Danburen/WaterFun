@@ -11,12 +11,12 @@ public enum AuditType {
     SENSITIVE(5),
     CASCADE(98),
     OTHER(99);
-    private final short code;
+    private final byte code;
     AuditType(int code) {
-        this.code = (short) code;
+        this.code = (byte) code;
     }
 
-    public static AuditType fromCode(int code) {
+    public static AuditType fromCode(byte code) {
         for (AuditType type : AuditType.values()) {
             if (type.code == code) {
                     return type;

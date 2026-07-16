@@ -8,12 +8,12 @@ public enum AuditContentFormat {
     RICH(1),
     IMAGE(2),
     TXT(3);
-    private final short value;
+    private final byte value;
     private AuditContentFormat(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static AuditContentFormat fromCode(Short dbData) {
+    public static AuditContentFormat fromCode(Byte dbData) {
        for (AuditContentFormat format : AuditContentFormat.values()) {
            if (format.getValue() == dbData) {
                return format;

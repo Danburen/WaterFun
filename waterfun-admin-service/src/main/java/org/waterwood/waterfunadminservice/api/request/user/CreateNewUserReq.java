@@ -21,5 +21,5 @@ public class CreateNewUserReq {
     @StrongPassword
     private String password;
     @NotNull
-    private Short userType;
+    private Byte userType;
 }

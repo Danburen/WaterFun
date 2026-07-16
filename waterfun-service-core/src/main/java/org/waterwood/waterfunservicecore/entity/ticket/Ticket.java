@@ -35,8 +35,7 @@ public class Ticket {
     private TicketAuditStatus status = TicketAuditStatus.PENDING;
 
     @NotNull
-    @Lob
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @NotNull

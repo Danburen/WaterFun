@@ -30,13 +30,12 @@ public class User {
     @Column(name = "username", nullable = false, length = 32)
     private String username;
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash")
     private String passwordHash;
 
-    @ColumnDefault("'ACTIVE'")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "account_status")
-    private AccountStatus accountStatus;
+    @ColumnDefault("'0'")
+    @Column(name = "account_status", columnDefinition = "tinyint UNSIGNED")
+    private AccountStatus accountStatus = AccountStatus.ACTIVE;
 
     @Column(name = "status_changed_at")
     private Instant statusChangedAt;

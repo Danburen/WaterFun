@@ -4,15 +4,15 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class ContentPermissionConverter implements AttributeConverter<ContentPermission, Short> {
+public class ContentPermissionConverter implements AttributeConverter<ContentPermission, Byte> {
 
     @Override
-    public Short convertToDatabaseColumn(ContentPermission attribute) {
+    public Byte convertToDatabaseColumn(ContentPermission attribute) {
         return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public ContentPermission convertToEntityAttribute(Short dbData) {
+    public ContentPermission convertToEntityAttribute(Byte dbData) {
         return dbData == null ? null : ContentPermission.fromValue(dbData);
     }
 }

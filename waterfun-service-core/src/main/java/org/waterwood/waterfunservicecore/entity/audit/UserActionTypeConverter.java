@@ -4,14 +4,14 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class UserActionTypeConverter implements AttributeConverter<UserActionType, Short> {
+public class UserActionTypeConverter implements AttributeConverter<UserActionType, Byte> {
     @Override
-    public Short convertToDatabaseColumn(UserActionType attribute) {
+    public Byte convertToDatabaseColumn(UserActionType attribute) {
         return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public UserActionType convertToEntityAttribute(Short dbData) {
+    public UserActionType convertToEntityAttribute(Byte dbData) {
         return dbData == null ? null : UserActionType.fromValue(dbData);
     }
 }

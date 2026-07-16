@@ -11,7 +11,6 @@ import org.waterwood.waterfunadminservice.service.StatisticService;
 import org.waterwood.waterfunservicecore.entity.user.UserType;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/online-users")

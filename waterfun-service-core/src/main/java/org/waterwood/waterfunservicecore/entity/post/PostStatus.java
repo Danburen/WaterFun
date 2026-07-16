@@ -13,12 +13,12 @@ public enum PostStatus {
     REJECTED(3),
     ARCHIVED(4);
 
-    private final short value;
+    private final byte value;
     PostStatus(int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static PostStatus fromCode(short code) {
+    public static PostStatus fromCode(Byte code) {
        for (PostStatus postStatus : PostStatus.values()) {
            if (postStatus.value == code) {
                return postStatus;

@@ -7,12 +7,12 @@ public enum AuditLogStatusType {
     FAIL(0),
     SUCCESS(1),;
 
-    private final short value;
+    private final byte value;
     AuditLogStatusType(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static AuditLogStatusType fromValue(final int value) {
+    public static AuditLogStatusType fromValue(final byte value) {
         for (AuditLogStatusType type : values()) {
             if (type.value == value) {
                 return type;

@@ -14,16 +14,16 @@ public enum TicketRejectType {
     APPEAL_ACCEPTED(7, "ticket.reject.appeal_accepted", true),
     OTHER(99, "ticket.reject.other", true);
 
-    private final short value;
+    private final byte value;
     private final String messageKey;
     private final boolean terminal;
     private TicketRejectType(final int value, final String messageKey, final boolean terminal) {
-        this.value = (short) value;
+        this.value = (byte) value;
         this.messageKey = messageKey;
         this.terminal = terminal;
     }
 
-    public static TicketRejectType fromValue(final int value) {
+    public static TicketRejectType fromValue(final byte value) {
         for (final TicketRejectType type : TicketRejectType.values()) {
             if (type.value == value) {
                 return type;

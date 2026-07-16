@@ -7,12 +7,12 @@ public enum BannerPosition {
     HOME(1),
     SIDE(2),;
 
-    private final short code;
+    private final byte code;
     private BannerPosition(int code) {
-        this.code = (short) code;
+        this.code = (byte) code;
     }
 
-    public static BannerPosition fromCode(short code) {
+    public static BannerPosition fromCode(Byte code) {
       for (BannerPosition position : BannerPosition.values()) {
           if (position.code == code) {
               return position;

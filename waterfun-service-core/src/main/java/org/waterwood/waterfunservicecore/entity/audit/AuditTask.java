@@ -80,8 +80,6 @@ public class AuditTask {
     private String triggerSource;
 
     @ColumnDefault("'2'")
-    @Convert(disableConversion = true)
-    @Enumerated
     @Column(name = "priority", columnDefinition = "tinyint UNSIGNED not null")
     private Priority priority = Priority.MEDIUM;
 

@@ -8,13 +8,13 @@ public enum SourceType {
     USER_UPLOADED(2),;
 
     @Getter
-    private final short value;
+    private final byte value;
 
     SourceType(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static SourceType fromCode(final short code) {
+    public static SourceType fromCode(final byte code) {
       for (final SourceType sourceType : SourceType.values()) {
           if (sourceType.value == code) {
               return sourceType;

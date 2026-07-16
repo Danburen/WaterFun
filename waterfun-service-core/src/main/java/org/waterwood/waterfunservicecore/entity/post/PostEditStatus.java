@@ -7,12 +7,12 @@ public enum PostEditStatus {
     NONE(0),
     PENDING(1),
     REJECTED(2);
-    private final short value;
+    private final byte value;
     PostEditStatus(int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static PostEditStatus fromCode(short code) {
+    public static PostEditStatus fromCode(Byte code) {
         for (PostEditStatus status : PostEditStatus.values()) {
             if (status.value == code) {
                 return status;

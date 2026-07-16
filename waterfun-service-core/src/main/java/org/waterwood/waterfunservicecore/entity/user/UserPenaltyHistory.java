@@ -30,8 +30,6 @@ public class UserPenaltyHistory {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Convert(disableConversion = true)
-    @Enumerated
     @Column(name = "penalty_type", columnDefinition = "tinyint UNSIGNED not null")
     private PenaltyType penaltyType = PenaltyType.UNSPECIFIED;
 
@@ -39,13 +37,9 @@ public class UserPenaltyHistory {
     @Column(name = "target_id", length = 64)
     private String targetId;
 
-    @Convert(disableConversion = true)
-    @Enumerated
     @Column(name = "target_type", columnDefinition = "tinyint UNSIGNED not null")
     private TargetType targetType = TargetType.DEFAULT;
 
-    @Convert(disableConversion = true)
-    @Enumerated
     @Column(name = "penalty_reason_type", columnDefinition = "tinyint UNSIGNED")
     private AuditType penaltyReasonType = AuditType.OTHER;
 

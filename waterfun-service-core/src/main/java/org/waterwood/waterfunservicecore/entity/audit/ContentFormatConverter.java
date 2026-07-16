@@ -4,15 +4,15 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class ContentFormatConverter implements AttributeConverter<AuditContentFormat, Short> {
+public class ContentFormatConverter implements AttributeConverter<AuditContentFormat, Byte> {
 
     @Override
-    public Short convertToDatabaseColumn(AuditContentFormat auditContentFormat) {
+    public Byte convertToDatabaseColumn(AuditContentFormat auditContentFormat) {
         return auditContentFormat == null ? null : auditContentFormat.getValue();
     }
 
     @Override
-    public AuditContentFormat convertToEntityAttribute(Short aShort) {
+    public AuditContentFormat convertToEntityAttribute(Byte aShort) {
         return aShort == null ? null : AuditContentFormat.fromCode(aShort);
     }
 }

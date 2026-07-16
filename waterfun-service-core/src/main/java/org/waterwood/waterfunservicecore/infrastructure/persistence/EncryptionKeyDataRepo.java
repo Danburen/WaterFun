@@ -1,8 +1,8 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
-import org.waterwood.waterfunservicecore.infrastructure.security.KeyStatus;
+import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
+import org.waterwood.waterfunservicecore.entity.KeyStatus;
 
 import java.util.List;
 import java.util.Optional;

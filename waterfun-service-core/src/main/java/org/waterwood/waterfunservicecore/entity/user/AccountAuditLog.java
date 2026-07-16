@@ -23,8 +23,7 @@ public class AccountAuditLog {
     @Column(name = "user_uid", nullable = false)
     private Long userUid;
 
-    @Lob
-    @Column(name = "action", nullable = false)
+    @Column(name = "action", columnDefinition = "LONGTEXT", nullable = false)
     private String action;
 
     @ColumnDefault("CURRENT_TIMESTAMP")

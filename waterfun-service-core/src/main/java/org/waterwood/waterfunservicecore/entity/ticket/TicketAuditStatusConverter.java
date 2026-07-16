@@ -4,15 +4,15 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
-public class TicketAuditStatusConverter implements AttributeConverter<TicketAuditStatus, Short> {
+public class TicketAuditStatusConverter implements AttributeConverter<TicketAuditStatus, Byte> {
 
     @Override
-    public Short convertToDatabaseColumn(TicketAuditStatus attribute) {
+    public Byte convertToDatabaseColumn(TicketAuditStatus attribute) {
         return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public TicketAuditStatus convertToEntityAttribute(Short dbData) {
+    public TicketAuditStatus convertToEntityAttribute(Byte dbData) {
         return dbData == null ? null : TicketAuditStatus.fromValue(dbData);
     }
 }

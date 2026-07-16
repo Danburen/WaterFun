@@ -8,8 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.*;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.waterwood.api.VO.OptionVO;
 import org.waterwood.api.VO.ToOptionVO;
 import org.waterwood.waterfunservicecore.entity.user.User;
 
@@ -26,7 +24,7 @@ import java.time.Instant;
 public class Category implements ToOptionVO<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "int UNSIGNED not null")
+    @Column(name = "id", columnDefinition = "bigint UNSIGNED not null")
     private Long id;
 
     @Size(max = 50)
@@ -39,7 +37,6 @@ public class Category implements ToOptionVO<Long> {
     @Column(name = "slug", nullable = false, length = 50)
     private String slug;
 
-    @Lob
     @Column(name = "description")
     private String description;
 
@@ -77,7 +74,7 @@ public class Category implements ToOptionVO<Long> {
 
     @ColumnDefault("'0'")
     @Column(name = "usage_count", columnDefinition = "int UNSIGNED")
-    private Long usageCount = 0L;
+    private Integer usageCount = 0;
 
     @Override
     public String getCode() {

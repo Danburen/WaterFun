@@ -16,7 +16,7 @@ import org.waterwood.waterfunservicecore.entity.user.UserDatum;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
-import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionDataKey;
+import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sms.SmsCodeService;

@@ -31,10 +31,8 @@ public class AuditLog {
     private String username;
 
     @ColumnDefault("'0'")
-    @Convert(disableConversion = true)
-    @Enumerated
     @Column(name = "action", columnDefinition = "tinyint UNSIGNED not null")
-    private AuditLogActionType  action = AuditLogActionType.UNKNOWN;
+    private AuditLogActionType action = AuditLogActionType.UNKNOWN;
 
     @Size(max = 45)
     @NotNull
@@ -58,7 +56,6 @@ public class AuditLog {
     private String city;
 
     @ColumnDefault("'1'")
-    @Enumerated
     @Column(name = "status", columnDefinition = "tinyint UNSIGNED not null")
     private AuditLogStatusType status = AuditLogStatusType.SUCCESS;
 

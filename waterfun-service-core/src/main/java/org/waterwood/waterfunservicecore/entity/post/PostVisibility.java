@@ -8,12 +8,12 @@ public enum PostVisibility {
     PRIVATE(1),
     FANS_ONLY(2),;
 
-    private final short code;
+    private final byte code;
     PostVisibility(int code) {
-        this.code = (short) code;
+        this.code = (byte) code;
     }
 
-    public static PostVisibility fromCode(short code) {
+    public static PostVisibility fromCode(Byte code) {
         for (PostVisibility postVisibility : PostVisibility.values()) {
             if (postVisibility.code == code) {
                 return postVisibility;

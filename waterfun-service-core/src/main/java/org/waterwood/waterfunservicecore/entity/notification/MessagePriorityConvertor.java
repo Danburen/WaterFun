@@ -4,15 +4,15 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.waterwood.waterfunservicecore.entity.Priority;
 
-@Converter(autoApply = true)
-public class MessagePriorityConvertor implements AttributeConverter<Priority, Short> {
+@Converter
+public class MessagePriorityConvertor implements AttributeConverter<Priority, Byte> {
     @Override
-    public Short convertToDatabaseColumn(Priority attribute) {
+    public Byte convertToDatabaseColumn(Priority attribute) {
         return attribute == null ? 3 : attribute.getValue();
     }
 
     @Override
-    public Priority convertToEntityAttribute(Short dbData) {
+    public Priority convertToEntityAttribute(Byte dbData) {
         return Priority.fromCode(dbData);
     }
 }

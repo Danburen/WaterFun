@@ -10,12 +10,12 @@ public enum BusinessType {
     USER(3),
     TICKET_REPLY(4),;
 
-    private final short value;
+    private final byte value;
     private BusinessType(final int value) {
-        this.value = (short) value;
+        this.value = (byte) value;
     }
 
-    public static BusinessType fromValue(final int value) {
+    public static BusinessType fromValue(final byte value) {
         for (final BusinessType type : BusinessType.values()) {
             if (type.value == value) {
                 return type;
