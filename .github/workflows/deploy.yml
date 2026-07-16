@@ -47,8 +47,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # 仓库全小写（Docker tag 必须小写，github.repository_owner 自动小写）
-  REPO_LOWER: ${{ github.repository_owner }}/waterfun
   # 镜像标签策略：
   # - workflow_dispatch → 用户输入或 latest
   # - push main → latest
@@ -66,11 +64,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Lowercase repo name for Docker tags
+        run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
       # ==================== Build Admin Frontend ====================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
