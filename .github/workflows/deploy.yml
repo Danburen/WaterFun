@@ -47,6 +47,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  # GitHub 仓库名转小写（Docker tag 必须小写）
+  REPO_LOWER: ${{ lower(github.repository) }}
   # 镜像标签策略：
   # - workflow_dispatch → 用户输入或 latest
   # - push main → latest
@@ -139,8 +141,8 @@ jobs:
           file: deploy/docker/Dockerfile.gateway
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/gateway:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/gateway:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway:${{ github.sha }}
 
       - name: Build & push user-service
         uses: docker/build-push-action@v6
@@ -149,8 +151,8 @@ jobs:
           file: deploy/docker/Dockerfile.service
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/user-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/user-service:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/user-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/user-service:${{ github.sha }}
 
       - name: Build & push admin-service
         uses: docker/build-push-action@v6
@@ -159,8 +161,8 @@ jobs:
           file: deploy/docker/Dockerfile.admin
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/admin-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/admin-service:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/admin-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/admin-service:${{ github.sha }}
 
       - name: Build & push web-client
         uses: docker/build-push-action@v6
@@ -169,8 +171,8 @@ jobs:
           file: deploy/docker/Dockerfile.web-client
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/web-client:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/web-client:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/web-client:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/web-client:${{ github.sha }}
 
       # ==================== Deploy to Server ====================
       - name: Deploy via SSH
@@ -190,7 +192,7 @@ jobs:
 
             echo "=== Pull new images ==="
             cd /opt/waterfun
-            export GITHUB_REPOSITORY="${{ github.repository }}"
+            export GITHUB_REPOSITORY="${{ env.REPO_LOWER }}"
             export IMAGE_TAG="${{ env.IMAGE_TAG }}"
             docker compose -f deploy/docker/docker-compose.deploy.yml pull
 
