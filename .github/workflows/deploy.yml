@@ -47,8 +47,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # GitHub 仓库名转小写（Docker tag 必须小写）
-  REPO_LOWER: ${{ lower(github.repository) }}
+  # 仓库全小写（Docker tag 必须小写，github.repository_owner 自动小写）
+  REPO_LOWER: ${{ github.repository_owner }}/waterfun
   # 镜像标签策略：
   # - workflow_dispatch → 用户输入或 latest
   # - push main → latest
