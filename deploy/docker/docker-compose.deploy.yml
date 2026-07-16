@@ -117,6 +117,20 @@ services:
     networks:
       - waterfun-net
 
+  web-client:
+    image: ghcr.io/${GITHUB_REPOSITORY:-your-org/waterfun}/web-client:${IMAGE_TAG:-latest}
+    container_name: waterfun-web-client
+    environment:
+      VIRTUAL_HOST: ${WEB_DOMAIN:-waterfun.top}
+      VIRTUAL_PORT: 3000
+      LETSENCRYPT_HOST: ${WEB_DOMAIN:-waterfun.top}
+      NUXT_PUBLIC_API_BASE: https://${API_DOMAIN:-api.waterfun.top}/
+      NUXT_PUBLIC_AVATAR_EXPIRE_TIME: '3600'
+    mem_limit: 256m
+    restart: unless-stopped
+    networks:
+      - waterfun-net
+
 networks:
   waterfun-net:
     external: true

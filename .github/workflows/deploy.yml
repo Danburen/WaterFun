@@ -85,15 +85,23 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build admin frontend
+      - name: Replace domain placeholders
         run: |
-          # 替换域名占位符为真实域名
-          sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" waterfun-admin/.env.production
-          pnpm --filter @waterfun/admin build
+          # 替换域名占位符为真实域名（admin + web-client）
+          sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" \
+            waterfun-admin/.env.production \
+            waterfun-web-client/.env.production
+
+      - name: Build admin frontend
+        run: pnpm --filter @waterfun/admin build
 
       # 打包前端静态文件，后续通过 SSH 传到服务器
       - name: Archive admin dist
         run: tar -czf admin-dist.tar.gz -C waterfun-admin/dist .
+
+      # ==================== Build Web Client (Nuxt 4 SSR) ====================
+      - name: Build web-client frontend
+        run: pnpm --filter @waterfun/web-client build
 
       # ==================== Build Backend ====================
       - name: Setup JDK 22
@@ -154,6 +162,16 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository }}/admin-service:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ github.repository }}/admin-service:${{ github.sha }}
 
+      - name: Build & push web-client
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.web-client
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/web-client:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/web-client:${{ github.sha }}
+
       # ==================== Deploy to Server ====================
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
@@ -178,7 +196,7 @@ jobs:
 
             echo "=== Restart updated services ==="
             docker compose -f deploy/docker/docker-compose.deploy.yml up -d --no-deps \
-              gateway user-service admin-service
+              gateway user-service admin-service web-client
 
             echo "=== Cleanup old images ==="
             docker image prune -af --filter "until=24h"
