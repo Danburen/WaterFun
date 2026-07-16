@@ -1,0 +1,8 @@
+# ---------- 管理服务生产环境配置 ----------
+# 激活方式: SPRING_PROFILES_ACTIVE=prod 或 --spring.profiles.active=prod
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

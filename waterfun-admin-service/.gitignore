@@ -32,19 +32,3 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
-
-### keys ###
-src/main/resources/keys/*
-
-### Sqls ###
-src/main/resources/sqls/*
-### VS Code ###
-.vscode/
-/src/main/resources/application-repositories.yml
-/src/main/resources/application.properties
-/src/main/resources/application-*.yml
-/src/main/resources/application-*.properties
-!src/main/resources/application.example.yml
-!src/main/resources/application.example-.yml
-!src/main/resources/application.example.properties
-!src/main/resources/application.example-.properties

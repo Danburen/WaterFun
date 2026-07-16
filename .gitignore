@@ -1,23 +1,21 @@
 .idea
 *.iml
 
+# deploy/ 目录 - 安全配置上 git，敏感文件单独排除
 *.env
 *.key
-# deploy/ 目录 - 安全配置上 git，敏感文件单独排除
 deploy/config/common-dev-secrets.yml
 .env.prod.secrets
-# deploy/docker/docker-compose.prod.yml — 从 .gitignore 移除，生产部署文件应有版本控制
 
 node_modules
 pnpm-lock.yaml
+
+# sql
 *.sql
 !*.example.sql
 !/sqls/*.sql
-
-application.properties
-application-*.properties
-application-*.yml
-docker-compose.yml
+!**/db/migration/*.sql
+*.dump.sql
 
 .gradle
 .vscode

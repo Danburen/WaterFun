@@ -13,7 +13,7 @@ jwt:
 spring:
   # -------- 数据库 (infra, 非三方) --------
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/waterfun}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/waterfun?createDatabaseIfNotExist=true}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -26,6 +26,8 @@ spring:
       database: 0
       username: default
       password: ${REDIS_PASSWORD:}
+      repositories:
+        enabled: false
 
   # -------- RabbitMQ (infra, 非三方) --------
   rabbitmq:
@@ -60,7 +62,43 @@ spring:
             class: javax.net.ssl.SSLSocketFactory
             port: ${MAIL_PORT}
 
-  # -------- 对象存储 - Tencent COS (三方服务，值由 dev-secrets / 环境变量注入) --------
+  # -------- JPA (Hibernate 7 自动识别方言，无需显式指定) --------
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 20
+
+  # -------- 缓存 (Redis) --------
+  cache:
+    type: redis
+    redis:
+      time-to-live: 30m
+      cache-null-values: false
+      key-prefix: "waterfun:"
+      use-key-prefix: true
+
+  # -------- Session (Redis) --------
+  session:
+    timeout: 30m
+    redis:
+      namespace: session
+
+  # -------- 消息源 --------
+  messages:
+    basename: messages
+    encoding: UTF-8
+    cache-duration: 3600s
+
+  # -------- Jackson --------
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
+
+# -------- 对象存储 - Tencent COS (三方服务，值由 dev-secrets / 环境变量注入) --------
 cloud:
   tencent:
     cos:
@@ -68,6 +106,7 @@ cloud:
       default-expires-seconds: 3600
       safety-marge-seconds: 300
       upload-expires-seconds: 300
+  biz-prefix: waterfun
 
 # -------- SMS - 阿里云 (三方服务，值由 dev-secrets / 环境变量注入) --------
 aliyun:
@@ -84,12 +123,63 @@ mail:
     email: ${SUPPORT_EMAIL}
   email-verify: https://waterfun.top/api/auth/email/activate?=
 
-# -------- 设备指纹盐值 (非三方) --------
+# -------- 设备指纹 (非三方) --------
 device:
   salt: ${DEVICE_SALT}
+  temp:
+    ttl: 3600      # 1 hour
+  short:
+    ttl: 604800    # 7 days
+  long:
+    ttl: 7776000   # 90 days
+
+# -------- 认证 & Token (非三方) --------
+token:
+  access:
+    expiration: 2592000  # 30 days
+  refresh:
+    rotate: 604800   # 7 days
+    family: 2592000  # 30 days
+
+expire:
+  email:
+    verify: 5                # min
+    unverified-expire-hours: 24
+  sms-code: 2  # min
+  captcha: 2   # min
+
+# -------- 业务公共 (非三方) --------
+ip2region:
+  db-location: file:./deploy/utils/ip2region_v4.xdb
+
+activity-log:
+  flush-interval-ms: 15000
+
+stat:
+  flush-interval-ms: 10000
+
+clean-up:
+  device:
+    max-days: 90
+
+generator:
+  uid:
+    epoch: 1735689600000
+    prefix: 1
+    length: 10
+
+# -------- Management --------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
 
 # -------- 日志级别 --------
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    root: INFO
+    org.springframework.security: WARN

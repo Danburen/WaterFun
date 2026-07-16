@@ -75,6 +75,7 @@ services:
       VIRTUAL_HOST: ${API_DOMAIN:-api.waterfun.top}
       LETSENCRYPT_HOST: ${API_DOMAIN:-api.waterfun.top}
       LETSENCRYPT_EMAIL: ${SSL_EMAIL:-admin@waterfun.top}
+      SPRING_PROFILES_ACTIVE: prod
       WATERFUN_GATEWAY_PORT: 8080
       WATERFUN_USER_SERVICE_URI: http://user-service:8081
       WATERFUN_ADMIN_SERVICE_URI: http://admin-service:8082
@@ -88,7 +89,7 @@ services:
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
     volumes:
-      - ./common.yml:/app/deploy/config/common.yml:ro
+      - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ./keys:/app/deploy/keys:ro
     depends_on:
       redis:
@@ -110,6 +111,7 @@ services:
       VIRTUAL_PORT: 8081
       LETSENCRYPT_HOST: ${API_DOMAIN:-api.waterfun.top}
       LETSENCRYPT_EMAIL: ${SSL_EMAIL:-admin@waterfun.top}
+      SPRING_PROFILES_ACTIVE: prod
       WATERFUN_SERVICE_PORT: 8081
       JWT_PRIVATE_KEY: file:/app/deploy/keys/private.key
       DB_URL: jdbc:mysql://mysql:3306/waterfun
@@ -136,7 +138,7 @@ services:
       SUPPORT_EMAIL: ${SUPPORT_EMAIL}
       JAVA_TOOL_OPTIONS: "-Xmx256m -Xms256m"
     volumes:
-      - ./common.yml:/app/deploy/config/common.yml:ro
+      - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ./keys:/app/deploy/keys:ro
     depends_on:
       redis:
@@ -155,6 +157,7 @@ services:
       VIRTUAL_PORT: 8082
       LETSENCRYPT_HOST: ${API_DOMAIN:-api.waterfun.top}
       LETSENCRYPT_EMAIL: ${SSL_EMAIL:-admin@waterfun.top}
+      SPRING_PROFILES_ACTIVE: prod
       WATERFUN_ADMIN_SERVICE_PORT: 8082
       JWT_PRIVATE_KEY: file:/app/deploy/keys/private.key
       DB_URL: jdbc:mysql://mysql:3306/waterfun
@@ -181,7 +184,7 @@ services:
       SUPPORT_EMAIL: ${SUPPORT_EMAIL}
       JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
     volumes:
-      - ./common.yml:/app/deploy/config/common.yml:ro
+      - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ./keys:/app/deploy/keys:ro
     depends_on:
       redis:

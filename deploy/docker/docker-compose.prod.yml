@@ -92,6 +92,7 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       WATERFUN_GATEWAY_PORT: 8080
       WATERFUN_USER_SERVICE_URI: http://user-service:8081
       WATERFUN_ADMIN_SERVICE_URI: http://admin-service:8082
@@ -125,6 +126,7 @@ services:
     ports:
       - "127.0.0.1:8081:8081"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       WATERFUN_SERVICE_PORT: 8081
       JWT_PRIVATE_KEY: file:/app/deploy/keys/private.key
       DB_URL: jdbc:mysql://mysql:3306/waterfun
@@ -168,6 +170,7 @@ services:
     ports:
       - "127.0.0.1:8082:8082"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       WATERFUN_ADMIN_SERVICE_PORT: 8082
       JWT_PRIVATE_KEY: file:/app/deploy/keys/private.key
       DB_URL: jdbc:mysql://mysql:3306/waterfun

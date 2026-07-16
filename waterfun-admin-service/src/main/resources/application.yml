@@ -1,114 +1,32 @@
+# ---------- 管理服务配置（开发环境） ----------
+# 共享配置见 deploy/config/common.yml
+
 spring:
   application:
     name: waterfun-admin-service
-  messages: # message source configuration
-    basename: messages
-    encoding: UTF-8
-    cache-duration: 3600s
-  data:
-    redis:
-      repositories:
-        enabled: false
-  cache:
-    type: redis
-    redis:
-      time-to-live: 30m
-      cache-null-values: false
-      key-prefix: "waterfun:"
-      use-key-prefix: true
-  session:
-    timeout: 30m
-    redis:
-      namespace: session
-  jpa:
-    hibernate:
-      ddl-auto: none
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+
   config:
     import:
       - optional:file:./deploy/config/common.yml
       - optional:file:./deploy/config/common-dev-secrets.yml
-  jackson:
-    mapper:
-      accept-case-insensitive-enums: true
+
 server:
   port: ${WATERFUN_ADMIN_SERVICE_PORT:8082}
 
+# -------- 业务独有配置 --------
+
+# 用户服务内网地址
 user-service:
   url: http://localhost:8081
 
-ip2region:
-  db-location: file:./deploy/utils/ip2region_v4.xdb
-activity-log:
-  flush-interval-ms: 15000
-stat:
-  flush-interval-ms: 10000
-
-# Cleanup Configuration
-clean-up:
-  device:
-    max-days: 90
-
-# ---- Auth Configuration (expiration, device TTL) ----
-device:
-  temp:
-    ttl: 3600  # 1 hour
-  short:
-    ttl: 604800  # 7 days
-  long:
-    ttl: 7776000  # 90 days
-expire:
-  email:
-    verify: 5 # min
-    unverified-expire-hours: 24 # hour
-  sms-code: 2 # min
-  captcha: 2 # min
-
-# ---- Notification Configuration ----
-# support.email 和 resend.api-key 已移至 common.yml（环境变量注入）
-mail:
-  email-verify: https://waterfun.top/api/auth/email/activate?=
-
-# ---- OSS Configuration ----
+# COS Token 过期时间（管理端上传）
 cloud:
   tencent:
     cos:
-      default-expires-seconds: 3600
-      safety-marge-seconds: 300
-      upload-expires-seconds: 300
       upload-token-expires-seconds: 420
-  biz-prefix: waterfun
 
-# ---- Token Configuration ----
-token:
-  access:
-    expiration: 2592000  # 30 days
-  refresh:
-    rotate: 604800  # 7 days
-    family: 2592000  # 30 days
-
-# ---- Logging ----
+# -------- 开发环境日志（覆盖 common.yml 的 INFO） --------
 logging:
   level:
-    org:
-      springframework:
-        security: WARN
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: never
-
-generator:
-  uid:
-    epoch: 1735689600000
-    prefix: 1
-    length: 10
-
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

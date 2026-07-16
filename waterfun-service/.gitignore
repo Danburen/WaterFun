@@ -60,19 +60,3 @@ out/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
-
-### keys ###
-src/main/resources/keys/*
-
-### Sqls ###
-src/main/resources/sqls/*
-
-### application properties
-/src/main/resources/application-repositories.yml
-/src/main/resources/application.properties
-/src/main/resources/application-*.yml
-/src/main/resources/application-*.properties
-!src/main/resources/application.example.yml
-!src/main/resources/application.example-.yml
-!src/main/resources/application.example.properties
-!src/main/resources/application.example-.properties

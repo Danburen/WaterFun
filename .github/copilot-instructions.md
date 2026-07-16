@@ -50,7 +50,59 @@
 - API artifacts are checked in under `docs/api_docs/*.json` and `reference/*.openapi.json`; update when changing external API shapes.
 - Admin frontend API files map directly to admin-service routes (e.g., `waterfun-admin/src/api/user.ts` <-> `/api/admin/users/**`).
 
-## Practical guardrails for agents
+## Enum convention
+All enum fields MUST use `tinyint UNSIGNED` in the database with a JPA `@Converter(autoApply = true)`.
+
+**Forbidden:**
+- ❌ `@Enumerated(EnumType.STRING)` — stores string names, brittle on rename
+- ❌ `@Enumerated(EnumType.ORDINAL)` — fragile when enum order changes
+- ❌ `@Convert(disableConversion = true)` — defeats the converter
+
+**Required pattern:**
+```java
+// 1. Enum with explicit values
+@Getter
+public enum AccountStatus {
+    ACTIVE(0),
+    SUSPENDED(1),
+    DEACTIVATED(2);
+
+    private final short value;
+    AccountStatus(final int value) { this.value = (short) value; }
+
+    public static AccountStatus fromValue(final int value) {
+        for (AccountStatus s : values()) {
+            if (s.value == value) return s;
+        }
+        throw new IllegalArgumentException("Unknown: " + value);
+    }
+}
+
+// 2. Converter with autoApply
+@Converter(autoApply = true)
+public class AccountStatusConverter implements AttributeConverter<AccountStatus, Short> {
+    @Override
+    public Short convertToDatabaseColumn(AccountStatus attribute) {
+        return attribute == null ? null : attribute.getValue();
+    }
+    @Override
+    public AccountStatus convertToEntityAttribute(Short dbData) {
+        return dbData == null ? null : AccountStatus.fromValue(dbData);
+    }
+}
+
+// 3. Entity field — no @Enumerated, converter auto-applies
+@ColumnDefault("'0'")
+@Column(name = "account_status", columnDefinition = "tinyint UNSIGNED")
+private AccountStatus accountStatus = AccountStatus.ACTIVE;
+```
+
+**Always add a COMMENT to the column** documenting each value:
+```sql
+account_status tinyint UNSIGNED DEFAULT 0 COMMENT '0=ACTIVE, 1=SUSPENDED, 2=DEACTIVATED'
+```
+
+Existing converters reside in the same package as their enum. All follow the pattern above.
 - Before changing auth behavior, inspect all 3 layers: gateway filter/security, downstream `GatewayUserContextFilter`, and front-end axios auth handling.
 - If adding new endpoint families, keep prefixing consistent (`/api/admin/...` vs `/api/...`) to avoid accidental route overlap.
 - There are very few meaningful tests currently; when fixing regressions, validate by running the affected module and smoke-testing endpoints/UI path.
