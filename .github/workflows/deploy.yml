@@ -33,17 +33,16 @@ on:
 
   # ─── main 分支 push → 部署 latest ───
   push:
-    branches: [main]
+    branches:
+      - main
+    tags:
+      - 'v*'
     paths-ignore:
       - '.ai/**'
       - 'docs/**'
       - 'README.md'
       - '.gitignore'
       - 'LICENSE'
-    # ─── 打 v* tag → 部署版本号 ───
-    tags:
-      - 'v*'
-
 env:
   REGISTRY: ghcr.io
   IMAGE_TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || 'latest' }}
@@ -70,11 +69,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: prepare env
-        run: |
-          echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-          sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" \
-            waterfun-admin/.env.production \
-            waterfun-web-client/.env.production
+        run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV && sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" waterfun-admin/.env.production waterfun-web-client/.env.production
 
       # ── Frontend ──
       - name: Setup frontend environment and build admin
