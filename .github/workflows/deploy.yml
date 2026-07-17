@@ -75,7 +75,6 @@ jobs:
           sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" \
             waterfun-admin/.env.production \
             waterfun-web-client/.env.production
-        
 
       # ── Frontend ──
       - name: Setup frontend environment and build admin
