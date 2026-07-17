@@ -194,10 +194,14 @@ jobs:
           script: |
             set -e
 
+            echo "=== Debug: check .env ==="
+            echo "Current dir: $(pwd)"
+            ls -la /opt/waterfun/.env 2>&1 || true
+            echo "--- opt/waterfun contents ---"
+            ls -la /opt/waterfun/ 2>&1 || echo "Directory /opt/waterfun/ not found"
             ENV_FILE=/opt/waterfun/.env
             if [ ! -f "$ENV_FILE" ]; then
               echo "ERROR: $ENV_FILE not found!"
-              echo "Create it with at least: REGISTRY=ghcr.1ms.run"
               exit 1
             fi
             echo "=== .env file found: $ENV_FILE ==="
