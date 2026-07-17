@@ -73,35 +73,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Lowercase repo name
-        run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-
-      # ── Frontend ──
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.7.1
-
-      - name: Cache pnpm
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/share/pnpm/store
-          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: pnpm-
-
-      - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Replace domain placeholders
-        run: |
+      - name: prepare env
+      - run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+      - run: |
           sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" \
             waterfun-admin/.env.production \
             waterfun-web-client/.env.production
+        
+
+      # ── Frontend ──
+      - name: Setup frontend environment and build admin
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.7.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @waterfun/admin buildss
+
+#      - name: Replace domain placeholders
+#        run: |
+#          sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" \
+#            waterfun-admin/.env.production \
+#            waterfun-web-client/.env.production
 
       - name: Build admin frontend
         run: pnpm --filter @waterfun/admin build
@@ -113,20 +111,12 @@ jobs:
         run: pnpm --filter @waterfun/web-client build
 
       # ── Backend ──
-      - name: Setup JDK 22
+      - name: Set Up JDK and Gradle Cache
         uses: actions/setup-java@v4
         with:
           java-version: '22'
           distribution: temurin
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ hashFiles('**/*.gradle*', 'gradle/') }}
-          restore-keys: gradle-
+          cache: 'gradle'
 
       - name: Build backend JARs
         run: |
@@ -217,15 +207,9 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          timeout: 1800s
           script: |
             set -e
-
-            echo "=== Login GHCR ==="
-            # GITHUB_TOKEN 在同一 workflow 内跨 job 仍然有效
-            # 如需服务器长期可拉镜像，创建 PAT（read:packages）并改为：
-            #   docker login ghcr.io -u ${{ github.actor }} --password-stdin <<< "${{ secrets.GHCR_PAT }}"
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} \
-              -u ${{ github.actor }} --password-stdin
 
             echo "=== Pull new images ==="
             cd /opt/waterfun
