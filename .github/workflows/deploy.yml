@@ -33,17 +33,16 @@ on:
 
   # ─── main 分支 push → 部署 latest ───
   push:
-    branches: [main]
+    branches:
+      - main
+    tags:
+      - 'v*'
     paths-ignore:
       - '.ai/**'
       - 'docs/**'
       - 'README.md'
       - '.gitignore'
       - 'LICENSE'
-    # ─── 打 v* tag → 部署版本号 ───
-    tags:
-      - 'v*'
-
 env:
   REGISTRY: ghcr.io
   IMAGE_TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || 'latest' }}
@@ -70,12 +69,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: prepare env
-        run: |
-          echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-          sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" \
-            waterfun-admin/.env.production \
-            waterfun-web-client/.env.production
-        
+        run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV && sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" waterfun-admin/.env.production waterfun-web-client/.env.production
 
       # ── Frontend ──
       - name: Setup frontend environment and build admin
@@ -200,14 +194,22 @@ jobs:
           script: |
             set -e
 
+            ENV_FILE=/opt/waterfun/.env
+            if [ ! -f "$ENV_FILE" ]; then
+              echo "ERROR: $ENV_FILE not found!"
+              echo "Create it with at least: REGISTRY=ghcr.1ms.run"
+              exit 1
+            fi
+            echo "=== .env file found: $ENV_FILE ==="
+
             echo "=== Pull new images from mirror ==="
             cd /opt/waterfun
             export GITHUB_REPOSITORY="${{ env.REPO_LOWER }}"
             export IMAGE_TAG="${{ env.IMAGE_TAG }}"
-            docker compose -f deploy/docker/docker-compose.deploy.yml pull
+            docker compose --env-file .env -f deploy/docker/docker-compose.deploy.yml pull
 
             echo "=== Restart updated services ==="
-            docker compose -f deploy/docker/docker-compose.deploy.yml up -d --no-deps \
+            docker compose --env-file .env -f deploy/docker/docker-compose.deploy.yml up -d --no-deps \
               gateway user-service admin-service web-client
 
             echo "=== Cleanup old images ==="
