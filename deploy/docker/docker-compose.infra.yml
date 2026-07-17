@@ -26,8 +26,9 @@ services:
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_unicode_ci
       --default-authentication-plugin=mysql_native_password
-      --innodb-buffer-pool-size=256M
-      --max-connections=50
+      --innodb-buffer-pool-size=128M
+      --max-connections=30
+      --performance-schema=OFF
       --tmp-table-size=32M
       --thread-cache-size=10
     healthcheck:
@@ -35,7 +36,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    mem_limit: 512m
+    mem_limit: 256m
     restart: unless-stopped
     networks:
       - waterfun-net

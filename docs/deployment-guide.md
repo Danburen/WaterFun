@@ -638,7 +638,5 @@ docker compose -f deploy/docker/docker-compose.app.yml restart
 | `deploy/bin/gen-keys.sh` | RSA 密钥对生成脚本 |
 | `deploy/bin/check-env.sh` | 环境变量检查脚本 |
 | `deploy/bin/setup-ip2region.sh` | IP 地理库下载脚本 |
-| `deploy/docker/Dockerfile.gateway` | Gateway Dockerfile |
-| `deploy/docker/Dockerfile.service` | User Service Dockerfile |
-| `deploy/docker/Dockerfile.admin` | Admin Service Dockerfile |
+| `Dockerfile` | 统一后端 Dockerfile（multi-target: `gateway`/`user-service`/`admin-service`） |
 | `deploy/docker/Dockerfile.web-client` | Web Client（Nuxt 4 SSR）Dockerfile |

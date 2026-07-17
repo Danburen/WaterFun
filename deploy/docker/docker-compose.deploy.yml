@@ -32,11 +32,11 @@ services:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
+      JAVA_TOOL_OPTIONS: "-Xmx48m -Xms48m -XX:+UseSerialGC"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ../keys:/app/deploy/keys:ro
-    mem_limit: 256m
+    mem_limit: 96m
     restart: unless-stopped
     networks:
       - waterfun-net
@@ -70,7 +70,7 @@ services:
       ALIBABA_CLOUD_ACCESS_KEY_ID: ${ALIBABA_CLOUD_ACCESS_KEY_ID}
       ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
       WATERFUN_KEK: ${WATERFUN_KEK}
-      JAVA_TOOL_OPTIONS: "-Xmx256m -Xms256m"
+      JAVA_TOOL_OPTIONS: "-Xmx256m -Xms256m -XX:+UseSerialGC -Dserver.tomcat.max-threads=100"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ../keys:/app/deploy/keys:ro
@@ -108,11 +108,11 @@ services:
       ALIBABA_CLOUD_ACCESS_KEY_ID: ${ALIBABA_CLOUD_ACCESS_KEY_ID}
       ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
       WATERFUN_KEK: ${WATERFUN_KEK}
-      JAVA_TOOL_OPTIONS: "-Xmx128m -Xms128m"
+      JAVA_TOOL_OPTIONS: "-Xmx96m -Xms96m -XX:+UseSerialGC -Dserver.tomcat.max-threads=30"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ../keys:/app/deploy/keys:ro
-    mem_limit: 256m
+    mem_limit: 160m
     restart: unless-stopped
     networks:
       - waterfun-net

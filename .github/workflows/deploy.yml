@@ -139,7 +139,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: deploy/docker/Dockerfile.gateway
+          file: Dockerfile
+          target: gateway
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway:${{ env.IMAGE_TAG }}
@@ -149,7 +150,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: deploy/docker/Dockerfile.service
+          file: Dockerfile
+          target: user-service
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/user-service:${{ env.IMAGE_TAG }}
@@ -159,7 +161,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: deploy/docker/Dockerfile.admin
+          file: Dockerfile
+          target: admin-service
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/admin-service:${{ env.IMAGE_TAG }}
