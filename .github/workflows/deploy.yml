@@ -2,13 +2,13 @@
 # WaterFun 自动部署
 #
 # 触发方式:
-#   - develop 分支日常 PR 合并到 main → 自动部署 latest
-#   - 打 v* tag（如 v1.0.0）→ 自动部署对应版本
+#   - main 分支 push → 自动构建 + 部署 latest
+#   - 打 v* tag → 自动构建 + 部署版本号
 #   - 手动触发 → 自定义镜像标签
 #
-# 流程：
-#   Build Admin 前端 → Build 后端 JAR → Build & Push Docker 镜像
-#   → SSH 登陆服务器 → 拉取新镜像 → 重启容器 → 上传 Admin 静态文件
+# Job 说明:
+#   build  — 编译 + 构建 Docker 镜像 + 推送到 GHCR
+#   deploy — SSH 登录服务器 → 拉新镜像 → 重启容器 → 上传前端
 #
 # 前置条件:
 #   1. 服务器上已完成首次手动部署（infra + app compose 已启动）
@@ -17,6 +17,9 @@
 #      - SSH_USER      服务器 SSH 用户名
 #      - SSH_KEY       服务器 SSH 私钥
 #      - DEPLOY_DOMAIN 部署域名（替换前端 .env.production 占位符）
+#      - GHCR_PAT      可选。服务器端 docker login 用，确保服务器可
+#                      在工作流之外独立拉取镜像。如果没有，会退化为
+#                      使用 GITHUB_TOKEN（仅 workflow 运行期间有效）
 # ============================================================
 
 name: Deploy
@@ -26,7 +29,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: '镜像标签（默认 latest）'
+        description: 'Image Tag'
         required: false
         default: 'latest'
 
@@ -47,27 +50,33 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # 镜像标签策略：
-  # - workflow_dispatch → 用户输入或 latest
-  # - push main → latest
-  # - create tag → tag 名称（如 v1.0.0）
   IMAGE_TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || 'latest' }}
 
 jobs:
-  deploy:
+  # ================================================================
+  # Job 1: Build — 编译 + 构建镜像 + 推送到 GHCR
+  # ================================================================
+  build:
     runs-on: ubuntu-latest
-    # 防止并行部署冲突
-    concurrency: deploy
+    concurrency:
+      group: ci-${{ github.ref }}
+      cancel-in-progress: true
+
+    # 显式授予写包权限，解决：
+    # "denied: installation not allowed to Create organization package"
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      # ==================== Checkout ====================
+      # ── Checkout ──
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Lowercase repo name for Docker tags
+      - name: Lowercase repo name
         run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
-      # ==================== Build Admin Frontend ====================
+      # ── Frontend ──
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -90,7 +99,6 @@ jobs:
 
       - name: Replace domain placeholders
         run: |
-          # 替换域名占位符为真实域名（admin + web-client）
           sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" \
             waterfun-admin/.env.production \
             waterfun-web-client/.env.production
@@ -98,15 +106,13 @@ jobs:
       - name: Build admin frontend
         run: pnpm --filter @waterfun/admin build
 
-      # 打包前端静态文件，后续通过 SSH 传到服务器
       - name: Archive admin dist
         run: tar -czf admin-dist.tar.gz -C waterfun-admin/dist .
 
-      # ==================== Build Web Client (Nuxt 4 SSR) ====================
       - name: Build web-client frontend
         run: pnpm --filter @waterfun/web-client build
 
-      # ==================== Build Backend ====================
+      # ── Backend ──
       - name: Setup JDK 22
         uses: actions/setup-java@v4
         with:
@@ -127,8 +133,8 @@ jobs:
           chmod +x gradlew
           ./gradlew build -x test
 
-      # ==================== Build & Push Docker Images ====================
-      - name: Login to GitHub Container Registry
+      # ── Docker Build & Push (4 个镜像) ──
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -178,7 +184,33 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/web-client:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/web-client:${{ github.sha }}
 
-      # ==================== Deploy to Server ====================
+      # ── 传递前端产物给 deploy job ──
+      - name: Upload admin-dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-dist
+          path: admin-dist.tar.gz
+          retention-days: 1
+
+  # ================================================================
+  # Job 2: Deploy — SSH 到服务器，拉镜像，重启，上传前端
+  # ================================================================
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+
+    steps:
+      - name: Lowercase repo name
+        run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Download admin-dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-dist
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -189,8 +221,9 @@ jobs:
             set -e
 
             echo "=== Login GHCR ==="
-            # GITHUB_TOKEN 在 workflow 运行期间有效
-            # 如需服务器长期可拉镜像，建议创建 GitHub PAT（read:packages）
+            # GITHUB_TOKEN 在同一 workflow 内跨 job 仍然有效
+            # 如需服务器长期可拉镜像，创建 PAT（read:packages）并改为：
+            #   docker login ghcr.io -u ${{ github.actor }} --password-stdin <<< "${{ secrets.GHCR_PAT }}"
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} \
               -u ${{ github.actor }} --password-stdin
 
