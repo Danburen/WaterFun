@@ -194,26 +194,22 @@ jobs:
           script: |
             set -e
 
-            echo "=== Debug: check .env ==="
-            echo "Current dir: $(pwd)"
-            ls -la /opt/waterfun/.env 2>&1 || true
-            echo "--- opt/waterfun contents ---"
-            ls -la /opt/waterfun/ 2>&1 || echo "Directory /opt/waterfun/ not found"
-            ENV_FILE=/opt/waterfun/.env
+            echo "=== Check .env ==="
+            ENV_FILE=/opt/waterfun/deploy/docker/.env
             if [ ! -f "$ENV_FILE" ]; then
               echo "ERROR: $ENV_FILE not found!"
               exit 1
             fi
-            echo "=== .env file found: $ENV_FILE ==="
+            echo "  .env exists at $ENV_FILE"
 
-            echo "=== Pull new images from mirror ==="
+            echo "=== Pull new images ==="
             cd /opt/waterfun
             export GITHUB_REPOSITORY="${{ env.REPO_LOWER }}"
             export IMAGE_TAG="${{ env.IMAGE_TAG }}"
-            docker compose --env-file .env -f deploy/docker/docker-compose.deploy.yml pull
+            docker compose -f deploy/docker/docker-compose.deploy.yml pull
 
             echo "=== Restart updated services ==="
-            docker compose --env-file .env -f deploy/docker/docker-compose.deploy.yml up -d --no-deps \
+            docker compose -f deploy/docker/docker-compose.deploy.yml up -d --no-deps \
               gateway user-service admin-service web-client
 
             echo "=== Cleanup old images ==="
