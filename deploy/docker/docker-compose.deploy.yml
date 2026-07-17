@@ -17,7 +17,7 @@ name: waterfun-deploy
 
 services:
   gateway:
-    image: ghcr.io/${GITHUB_REPOSITORY:-your-org/waterfun}/gateway:${IMAGE_TAG:-latest}
+    image: ${REGISTRY:-ghcr.io}/${GITHUB_REPOSITORY:-your-org/waterfun}/gateway:${IMAGE_TAG:-latest}
     container_name: waterfun-gateway
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -42,7 +42,7 @@ services:
       - waterfun-net
 
   user-service:
-    image: ghcr.io/${GITHUB_REPOSITORY:-your-org/waterfun}/user-service:${IMAGE_TAG:-latest}
+    image: ${REGISTRY:-ghcr.io}/${GITHUB_REPOSITORY:-your-org/waterfun}/user-service:${IMAGE_TAG:-latest}
     container_name: waterfun-user-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -80,7 +80,7 @@ services:
       - waterfun-net
 
   admin-service:
-    image: ghcr.io/${GITHUB_REPOSITORY:-your-org/waterfun}/admin-service:${IMAGE_TAG:-latest}
+    image: ${REGISTRY:-ghcr.io}/${GITHUB_REPOSITORY:-your-org/waterfun}/admin-service:${IMAGE_TAG:-latest}
     container_name: waterfun-admin-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -118,7 +118,7 @@ services:
       - waterfun-net
 
   web-client:
-    image: ghcr.io/${GITHUB_REPOSITORY:-your-org/waterfun}/web-client:${IMAGE_TAG:-latest}
+    image: ${REGISTRY:-ghcr.io}/${GITHUB_REPOSITORY:-your-org/waterfun}/web-client:${IMAGE_TAG:-latest}
     container_name: waterfun-web-client
     environment:
       VIRTUAL_HOST: ${WEB_DOMAIN:-waterfun.top}

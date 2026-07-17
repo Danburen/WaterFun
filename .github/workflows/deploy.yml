@@ -17,9 +17,7 @@
 #      - SSH_USER      服务器 SSH 用户名
 #      - SSH_KEY       服务器 SSH 私钥
 #      - DEPLOY_DOMAIN 部署域名（替换前端 .env.production 占位符）
-#      - GHCR_PAT      可选。服务器端 docker login 用，确保服务器可
-#                      在工作流之外独立拉取镜像。如果没有，会退化为
-#                      使用 GITHUB_TOKEN（仅 workflow 运行期间有效）
+#      - GHCR_PAT      可选。服务器端 docker login 用（已在服务器上手动 login 则不需要）
 # ============================================================
 
 name: Deploy
@@ -33,7 +31,7 @@ on:
         required: false
         default: 'latest'
 
-  # ─── main 分支 push（合并 PR / 直接提交）→ 部署 latest ───
+  # ─── main 分支 push → 部署 latest ───
   push:
     branches: [main]
     paths-ignore:
@@ -42,9 +40,7 @@ on:
       - 'README.md'
       - '.gitignore'
       - 'LICENSE'
-
-  # ─── 创建 tag（发版）→ 部署版本号 ───
-  create:
+    # ─── 打 v* tag → 部署版本号 ───
     tags:
       - 'v*'
 
@@ -73,35 +69,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Lowercase repo name
-        run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+      - name: prepare env
+        run: |
+          echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+          sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" \
+            waterfun-admin/.env.production \
+            waterfun-web-client/.env.production
+        
 
       # ── Frontend ──
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: Setup pnpm
+      - name: Setup frontend environment and build admin
         uses: pnpm/action-setup@v4
         with:
           version: 10.7.1
 
-      - name: Cache pnpm
-        uses: actions/cache@v4
+      - uses: actions/setup-node@v4
         with:
-          path: ~/.local/share/pnpm/store
-          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: pnpm-
+          node-version: '24'
+          cache: 'pnpm'
 
-      - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Replace domain placeholders
-        run: |
-          sed -i "s|YOUR_DOMAIN|${{ secrets.DEPLOY_DOMAIN }}|g" \
-            waterfun-admin/.env.production \
-            waterfun-web-client/.env.production
+      - run: pnpm install --frozen-lockfile
 
       - name: Build admin frontend
         run: pnpm --filter @waterfun/admin build
@@ -113,20 +100,12 @@ jobs:
         run: pnpm --filter @waterfun/web-client build
 
       # ── Backend ──
-      - name: Setup JDK 22
+      - name: Set Up JDK and Gradle Cache
         uses: actions/setup-java@v4
         with:
           java-version: '22'
           distribution: temurin
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ hashFiles('**/*.gradle*', 'gradle/') }}
-          restore-keys: gradle-
+          cache: 'gradle'
 
       - name: Build backend JARs
         run: |
@@ -217,17 +196,11 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          timeout: 1800s
           script: |
             set -e
 
-            echo "=== Login GHCR ==="
-            # GITHUB_TOKEN 在同一 workflow 内跨 job 仍然有效
-            # 如需服务器长期可拉镜像，创建 PAT（read:packages）并改为：
-            #   docker login ghcr.io -u ${{ github.actor }} --password-stdin <<< "${{ secrets.GHCR_PAT }}"
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} \
-              -u ${{ github.actor }} --password-stdin
-
-            echo "=== Pull new images ==="
+            echo "=== Pull new images from mirror ==="
             cd /opt/waterfun
             export GITHUB_REPOSITORY="${{ env.REPO_LOWER }}"
             export IMAGE_TAG="${{ env.IMAGE_TAG }}"
