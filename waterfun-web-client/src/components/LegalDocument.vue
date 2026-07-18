@@ -8,15 +8,19 @@ export interface LegalDocPropsType {
 
 defineProps<LegalDocPropsType>()
 
+const router = useRouter();
 const emit = defineEmits(['confirm'])
 
 const handleClick = () =>{
   emit('confirm')
 }
+
+const goBack = () => router.back();
 </script>
 
 <template>
   <div class="header-container">
+    <div class="back-btn" @click="goBack"><i class="fa-solid fa-arrow-left"></i></div>
     <div class="title" style="font-size: 30px">{{ title }}</div>
     <div class="content">{{$t('info.lastUpdateTime',
         { year:lastUpdate.getFullYear(),
@@ -48,7 +52,26 @@ const handleClick = () =>{
   align-items: center;
   flex-direction: column;
   gap: 10px;
+  position: relative;
 }
+
+.back-btn {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: white;
+  font-size: 18px;
+  transition: background 0.2s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.2); }
 
 .footer-container {
   background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
