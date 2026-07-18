@@ -49,6 +49,7 @@ services:
       - acme_state:/etc/acme.sh
     environment:
       DEFAULT_EMAIL: ${SSL_EMAIL:-admin@waterfun.top}
+      NGINX_PROXY_CONTAINER: waterfun-nginx-proxy
     depends_on:
       - nginx-proxy
     mem_limit: 64m
