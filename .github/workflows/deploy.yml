@@ -190,7 +190,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          timeout: 1800s
+          timeout: 30s
+          command_timeout: 30m
           script: |
             set -e
 
@@ -209,11 +210,11 @@ jobs:
             export GITHUB_REPOSITORY="${{ env.REPO_LOWER }}"
             export IMAGE_TAG="${{ env.IMAGE_TAG }}"
             echo "  Checking resolved image..."
-            docker compose -f deploy/docker/docker-compose.deploy.yml config | grep -A1 "image:.*gateway" || true
-            docker compose -f deploy/docker/docker-compose.deploy.yml pull
+            docker compose --env-file deploy/docker/.env -f deploy/docker/docker-compose.deploy.yml config | grep -A1 "image:.*gateway" || true
+            docker compose --env-file deploy/docker/.env -f deploy/docker/docker-compose.deploy.yml pull
 
             echo "=== Restart updated services ==="
-            docker compose -f deploy/docker/docker-compose.deploy.yml up -d --no-deps \
+            docker compose --env-file deploy/docker/.env -f deploy/docker/docker-compose.deploy.yml up -d --no-deps \
               gateway user-service admin-service web-client
 
             echo "=== Cleanup old images ==="
