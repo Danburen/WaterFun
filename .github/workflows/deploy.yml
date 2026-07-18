@@ -11,7 +11,7 @@
 #   deploy — SSH 登录服务器 → 拉新镜像 → 重启容器 → 上传前端
 #
 # 前置条件:
-#   1. 服务器上已完成首次手动部署（infra + app compose 已启动）
+#   1. 服务器上已完成首次手动部署（infra compose 已启动）
 #   2. 在 GitHub 仓库配置以下 Secrets:
 #      - SSH_HOST      服务器 IP
 #      - SSH_USER      服务器 SSH 用户名
@@ -46,6 +46,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || 'latest' }}
+  DEPLOY_ROOT: ${{ vars.DEPLOY_ROOT || '/opt/waterfun' }}
 
 jobs:
   # ================================================================
@@ -194,23 +195,44 @@ jobs:
           command_timeout: 30m
           script: |
             set -e
+            
+            echo "=== Git pull latest code ==="
+            cd ${{ env.DEPLOY_ROOT }}
+            git pull origin main
 
-            echo "=== Check .env ==="
-            ENV_FILE=/opt/waterfun/deploy/docker/.env
+            echo "=== Load .env ==="
+            
+            cd ${{ env.DEPLOY_ROOT }}
+            ENV_FILE="deploy/docker/.env"
             if [ ! -f "$ENV_FILE" ]; then
-              echo "ERROR: $ENV_FILE not found!"
-              exit 1
+                echo "ERROR: $ENV_FILE not found!"
+                exit 1
             fi
-            echo "  .env exists at $ENV_FILE"
-            echo "  REGISTRY=$(grep '^REGISTRY=' "$ENV_FILE" | head -1)"
-            echo ""
+            set -a
+            source "$ENV_FILE"
+            set +a
+            
+            if [ -z "${REGISTRY:-}" ]; then
+                echo "ERROR: REGISTRY is not set in .env!"
+                exit 1
+            fi
+            
+            echo "  REGISTRY=${REGISTRY:-}"
+            
+            echo "=== Check environment ==="
+            bash deploy/bin/check-env.sh || {
+              echo "ERROR: Environment check failed!"
+              exit 1
+            }
+
+            echo "=== Docker login ==="
+            echo "${{ secrets.REGISTRY_PAT }}" | docker login "$REGISTRY" -u ${{ secrets.REGISTRY_USER }} --password-stdin
 
             echo "=== Pull new images ==="
-            cd /opt/waterfun
+            cd ${{ env.DEPLOY_ROOT }}
             export GITHUB_REPOSITORY="${{ env.REPO_LOWER }}"
             export IMAGE_TAG="${{ env.IMAGE_TAG }}"
             echo "  Checking resolved image..."
-            docker compose --env-file deploy/docker/.env -f deploy/docker/docker-compose.deploy.yml config | grep -A1 "image:.*gateway" || true
             docker compose --env-file deploy/docker/.env -f deploy/docker/docker-compose.deploy.yml pull
 
             echo "=== Restart updated services ==="
@@ -238,7 +260,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            ADMIN_DIST="/opt/waterfun/deploy/docker/admin-dist"
+            ADMIN_DIST="${{ env.DEPLOY_ROOT }}/deploy/docker/admin-dist"
             mkdir -p "$ADMIN_DIST"
             tar -xzf /tmp/admin-dist.tar.gz -C "$ADMIN_DIST"
             rm -f /tmp/admin-dist.tar.gz
