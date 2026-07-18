@@ -160,7 +160,7 @@
       "saveSuccess": "保存成功",
       "commentSuccess": "评论成功",
       "replySuccess": "回复成功",
-      "publishSuccess": "发布成功",
+      "publishSuccess": "发布成功，待审核后正式发布",
       "draftSaved": "草稿已保存",
       "draftCreated": "草稿已创建",
       "followSuccess": "已关注",

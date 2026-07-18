@@ -137,22 +137,26 @@ onMounted(() => fetchBans())
   <div>
     <div class="page-header">
       <h2><i class="fa-solid fa-gavel"></i> 封禁管理</h2>
-      <button class="action-btn action-btn-pass" @click="openBanDialog()">
+      <button class="btn btn-danger" @click="openBanDialog()">
         <i class="fa-solid fa-ban"></i> 封禁用户
       </button>
     </div>
 
-    <div class="search-bar">
-      <div class="search-field">
-        <label>用户UID</label>
-        <input v-model.number="searchUid" type="number" placeholder="输入UID搜索" @keyup.enter="search" />
+    <div class="search-section">
+      <div class="search-form">
+        <div class="search-field">
+          <label>用户UID</label>
+          <input v-model.number="searchUid" type="number" placeholder="输入UID搜索" @keyup.enter="search" />
+        </div>
+        <div class="search-field">
+          <label>昵称</label>
+          <input v-model="searchNickname" placeholder="输入昵称搜索" @keyup.enter="search" />
+        </div>
+        <div class="search-actions">
+          <button class="btn btn-primary" @click="search"><i class="fa-solid fa-search"></i> 搜索</button>
+          <button class="btn btn-default" @click="searchUid = undefined; searchNickname = ''; search()"><i class="fa-solid fa-undo"></i> 重置</button>
+        </div>
       </div>
-      <div class="search-field">
-        <label>昵称</label>
-        <input v-model="searchNickname" placeholder="输入昵称搜索" @keyup.enter="search" />
-      </div>
-      <button class="action-btn action-btn-skip" @click="search"><i class="fa-solid fa-search"></i> 搜索</button>
-      <button class="action-btn action-btn-skip" @click="searchUid = undefined; searchNickname = ''; search()"><i class="fa-solid fa-undo"></i> 重置</button>
     </div>
 
     <div class="table-wrap">
@@ -239,17 +243,9 @@ onMounted(() => fetchBans())
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .page-header h2 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 
-.search-bar { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-.search-field { display: flex; flex-direction: column; gap: 4px; }
-.search-field label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-.search-field input, .search-field select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; width: 180px; }
-
 .table-wrap { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
-.data-table { width: 100%; border-collapse: collapse; }
-.data-table th { background: var(--bg); padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: left; border-bottom: 1px solid var(--border-light); }
-.data-table td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
 .data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: var(--bg); }
+
 .cell-mono { font-family: 'SF Mono', monospace; font-size: 13px; color: var(--text-secondary); }
 .cell-time { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
 .cell-actions { white-space: nowrap; }
@@ -260,19 +256,6 @@ onMounted(() => fetchBans())
 
 .pagination-bar { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; }
 .page-info { font-size: 13px; color: var(--text-muted); }
-.loading-wrap { text-align: center; padding: 40px; color: var(--text-muted); }
-
-.action-btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; border: none; display: inline-flex; align-items: center; gap: 6px; }
-.action-btn-pass { background: var(--success); color: white; }
-.action-btn-pass:hover { background: #059669; }
-.action-btn-reject { background: var(--danger); color: white; }
-.action-btn-reject:hover { background: #dc2626; }
-.action-btn-skip { background: var(--bg-white); color: var(--text-secondary); border: 1px solid var(--border); }
-.action-btn-skip:hover { background: var(--border-light); color: var(--text-primary); }
-.action-btn-sm { padding: 5px 12px; font-size: 12px; }
-.btn { padding: 6px 14px; border: 1px solid var(--border); background: var(--bg-white); border-radius: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
-.btn:hover { border-color: var(--primary); color: var(--primary); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; }
 .modal { background: var(--bg-white); border-radius: var(--radius); width: 480px; max-width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); overflow: hidden; }

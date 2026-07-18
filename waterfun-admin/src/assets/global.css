@@ -125,6 +125,14 @@ body {
   background: var(--bg);
 }
 
+/* ========== Search Section (card container for search form) ========== */
+.search-section {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+}
+
 /* ========== Search Form ========== */
 .search-form {
   display: flex;
@@ -195,8 +203,11 @@ body {
 .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
 .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35); color: white; }
 
-.btn-danger { color: var(--danger); border-color: var(--danger); }
-.btn-danger:hover { background: #fee2e2; color: #dc2626; }
+.btn-default { background: var(--bg-white); color: var(--text-secondary); border-color: var(--border); }
+.btn-default:hover { background: var(--bg); color: var(--text-primary); border-color: var(--text-muted); }
+
+.btn-danger { background: var(--danger); color: white; border-color: var(--danger); }
+.btn-danger:hover { background: #dc2626; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35); color: white; }
 
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn:disabled:hover { border-color: var(--border); color: var(--text-secondary); box-shadow: none; }
@@ -248,7 +259,20 @@ body {
 }
 
 .action-btn:hover { border-color: var(--primary); color: var(--primary); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .action-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: #fee2e2; }
+
+.action-btn-pass { background: var(--success); color: white; border-color: transparent; }
+.action-btn-pass:hover { background: #059669; color: white; }
+.action-btn-reject { background: var(--danger); color: white; border-color: transparent; }
+.action-btn-reject:hover { background: #dc2626; color: white; }
+.action-btn-skip { background: var(--bg-white); color: var(--text-secondary); border: 1px solid var(--border); }
+.action-btn-skip:hover { background: var(--border-light); color: var(--text-primary); border-color: var(--border); }
+.action-btn-warn { background: var(--warning); color: white; border-color: transparent; }
+.action-btn-warn:hover { background: #d97706; color: white; }
+.action-btn-sm { padding: 4px 10px; font-size: 11px; }
+.action-btn-detail { background: transparent; color: var(--text-muted); font-weight: 500; border-color: transparent; }
+.action-btn-detail:hover { color: var(--text-secondary); background: transparent; }
 
 /* ========== Dropdown ========== */
 .dropdown { position: relative; display: inline-block; }

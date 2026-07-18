@@ -20,9 +20,13 @@ import org.waterwood.waterfunadminservice.service.IpBanService;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLog;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
+import org.waterwood.waterfunservicecore.entity.security.IpAccessLog;
 import org.waterwood.waterfunservicecore.entity.security.IpBan;
 import org.waterwood.waterfunservicecore.entity.spec.AuditLogSpec;
+import org.waterwood.waterfunservicecore.entity.spec.IpAccessLogSpec;
 import org.waterwood.waterfunservicecore.entity.spec.IpBanSpec;
+import org.waterwood.waterfunadminservice.api.response.IpAccessLogResponse;
+import org.waterwood.waterfunadminservice.service.IpAccessLogService;
 
 import java.time.Instant;
 
@@ -32,6 +36,7 @@ import java.time.Instant;
 public class SecurityController {
     private final IpBanService ipBanService;
     private final AuditLogService auditLogService;
+    private final IpAccessLogService ipAccessLogService;
 
     @GetMapping("/list")
     public ApiResponse<Page<IpBanResponse>> listBanResponses(
@@ -108,5 +113,34 @@ public class SecurityController {
     public ApiResponse<Void> deleteAuditLog(@PathVariable Long id) {
         auditLogService.deleteAuditLog(id);
         return ApiResponse.success();
+    }
+
+    // ==================== IP 访问日志 ====================
+
+    @GetMapping("/access-log/list")
+    public ApiResponse<Page<IpAccessLogResponse>> listAccessLogs(
+            @RequestParam(required = false) String ip,
+            @RequestParam(required = false) Long userUid,
+            @RequestParam(required = false) String requestPath,
+            @RequestParam(required = false) String requestMethod,
+            @RequestParam(required = false) Integer httpStatus,
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) String province,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) Instant createdAtStart,
+            @RequestParam(required = false) Instant createdAtEnd,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "20") int size
+    ) {
+        Specification<IpAccessLog> spec = IpAccessLogSpec.of(ip, userUid, requestPath, requestMethod, httpStatus, country, province, city, createdAtStart, createdAtEnd);
+        Pageable pageable = PageRequest
+                .of(Math.max(page - 1, 0), Math.min(size, 100))
+                .withSort(Sort.Direction.DESC, "createdAt");
+        return ApiResponse.success(ipAccessLogService.listIpAccessLogs(spec, pageable));
+    }
+
+    @GetMapping("/access-log/{id}")
+    public ApiResponse<IpAccessLogResponse> getAccessLog(@PathVariable Long id) {
+        return ApiResponse.success(ipAccessLogService.getIpAccessLog(id));
     }
 }

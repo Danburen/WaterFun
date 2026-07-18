@@ -197,6 +197,25 @@ export const routes: RouteRecordRaw[] = [
                 ]
             },
             {
+                path: '/security',
+                component: () => import('@/layouts/EmptyLayout.vue'),
+                meta: { locale: '安全管理', icon: 'shield' },
+                children: [
+                    {
+                        path: 'ip-ban',
+                        name: 'securityIpBan',
+                        meta: { locale: 'IP封禁管理', icon: 'ban' },
+                        component: () => import('@/views/Security/IpBanView.vue'),
+                    },
+                    {
+                        path: 'access-log',
+                        name: 'securityAccessLog',
+                        meta: { locale: 'IP访问日志', icon: 'file-lines' },
+                        component: () => import('@/views/Security/IpAccessLogView.vue'),
+                    },
+                ]
+            },
+            {
                 path: '/content',
                 component: () => import('@/layouts/EmptyLayout.vue'),
                 meta: { locale: '内容管理', icon: 'content' },

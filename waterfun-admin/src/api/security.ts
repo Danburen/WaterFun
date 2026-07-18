@@ -97,3 +97,41 @@ export const deleteAuditLog = (id: number): PromiseResBody<null> => {
 export const deleteAuditLogs = (logIds: number[]): PromiseResBody<null> => {
   return request.delete<null>("/security/audit-log/list", { data: { logIds } });
 };
+
+// ==================== IP 访问日志 ====================
+
+export interface IpAccessLogResponse {
+  id: string;
+  ip: string;
+  requestPath: string;
+  requestMethod: string;
+  userUid?: string;
+  httpStatus?: number;
+  country?: string;
+  province?: string;
+  city?: string;
+  createdAt: ISOString;
+}
+
+export interface ListIpAccessLogParams {
+  page?: number;
+  size?: number;
+  ip?: string;
+  userUid?: string;
+  requestPath?: string;
+  requestMethod?: string;
+  httpStatus?: number;
+  country?: string;
+  province?: string;
+  city?: string;
+  createdAtStart?: ISOString;
+  createdAtEnd?: ISOString;
+}
+
+export const listIpAccessLogs = (params: ListIpAccessLogParams = {}): PromiseResBody<Page<IpAccessLogResponse>> => {
+  return request.get<Page<IpAccessLogResponse>>("/security/access-log/list", { params });
+};
+
+export const getIpAccessLog = (id: number): PromiseResBody<IpAccessLogResponse> => {
+  return request.get<IpAccessLogResponse>(`/security/access-log/${id}`);
+};
