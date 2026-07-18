@@ -201,11 +201,15 @@ jobs:
               exit 1
             fi
             echo "  .env exists at $ENV_FILE"
+            echo "  REGISTRY=$(grep '^REGISTRY=' "$ENV_FILE" | head -1)"
+            echo ""
 
             echo "=== Pull new images ==="
             cd /opt/waterfun
             export GITHUB_REPOSITORY="${{ env.REPO_LOWER }}"
             export IMAGE_TAG="${{ env.IMAGE_TAG }}"
+            echo "  Checking resolved image..."
+            docker compose -f deploy/docker/docker-compose.deploy.yml config | grep -A1 "image:.*gateway" || true
             docker compose -f deploy/docker/docker-compose.deploy.yml pull
 
             echo "=== Restart updated services ==="
