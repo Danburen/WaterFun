@@ -101,18 +101,18 @@ public class UserController {
     @Operation(summary = "Get user liked post IDs")
     @GetMapping("/{uid}/likes")
     public ApiResponse<Page<Long>> getLikedPosts(@PathVariable long uid,
-                                                   @RequestParam(defaultValue = "1") int page,
+                                                   @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(size, 20));
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 20));
         return ApiResponse.success(userService.getLikedPostIds(uid, pageable));
     }
 
     @Operation(summary = "Get user liked posts (full card data)")
     @GetMapping("/{uid}/liked-posts")
     public ApiResponse<Page<PostCardResp>> getLikedPostCards(@PathVariable long uid,
-                                                              @RequestParam(defaultValue = "1") int page,
+                                                              @RequestParam(defaultValue = "0") int page,
                                                               @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(size, 20));
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 20));
         Page<Long> postIds = userService.getLikedPostIds(uid, pageable);
         if (postIds.isEmpty()) {
             return ApiResponse.success(Page.empty(pageable));
@@ -138,9 +138,9 @@ public class UserController {
     @Operation(summary = "Get the followers list of a user")
     @GetMapping("/{uid}/followers")
     public ApiResponse<Page<UserBrief>> getFollower(@PathVariable long uid,
-                                                             @RequestParam(defaultValue = "1") int page,
+                                                             @RequestParam(defaultValue = "0") int page,
                                                              @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(size, 20));
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 20));
         return ApiResponse.success(
                 userService.listUserFollowers(uid, pageable)
         );
@@ -149,9 +149,9 @@ public class UserController {
     @Operation(summary = "Get the following list of a user")
     @GetMapping("/{uid}/followings")
     public ApiResponse<Page<UserBrief>> getFollowing(@PathVariable long uid,
-                                                      @RequestParam(defaultValue = "1") int page,
+                                                      @RequestParam(defaultValue = "0") int page,
                                                       @RequestParam(defaultValue = "20") int size){
-        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), Math.min(size, 20));
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(size, 20));
         return ApiResponse.success(
                 userService.listUserFollowing(uid, pageable)
         );

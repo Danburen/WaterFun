@@ -185,3 +185,11 @@ logging:
   level:
     root: INFO
     org.springframework.security: WARN
+    # 数据库操作日志（每条 SQL 的事务/会话，非常嘈杂，不需要看）
+    org.springframework.orm.jpa: WARN
+    org.springframework.transaction: WARN
+    org.springframework.jdbc: WARN
+    org.hibernate.engine.transaction: WARN
+    org.hibernate.engine.internal: WARN
+    org.hibernate.resource: WARN
+    com.zaxxer.hikari: WARN

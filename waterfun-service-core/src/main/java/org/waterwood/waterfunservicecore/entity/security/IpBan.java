@@ -35,7 +35,6 @@ public class IpBan {
     @Column(name = "banned_at", nullable = false)
     private Instant bannedAt = Instant.now();
 
-    @NotNull
     @Column(name = "expires_at")
     private Instant expiresAt;
 

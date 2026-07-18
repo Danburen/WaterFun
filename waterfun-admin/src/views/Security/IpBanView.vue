@@ -33,7 +33,7 @@ const fetchData = async () => {
   loading.value = true;
   try {
     const params: ListIpBanParams = {
-      page: (pageOpts.value.currentPage || 1) - 1,
+      page: pageOpts.value.currentPage || 1,
       size: pageOpts.value.pageSize,
     };
     if (searchForm.value.ip) params.ip = searchForm.value.ip;
@@ -45,7 +45,7 @@ const fetchData = async () => {
 
     const res = await listIpBans(params);
     banList.value = res.data.content || [];
-    pageOpts.value.total = res.data.totalElements ?? 0;
+    pageOpts.value.total = res.data.page?.totalElements ?? res.data.totalElements ?? 0;
   } catch {
     ElMessage.error('获取IP封禁列表失败');
   } finally {
@@ -325,29 +325,6 @@ onMounted(fetchData);
   display: flex;
   gap: 8px;
 }
-.ip-text {
-  font-family: 'SF Mono', 'Consolas', monospace;
-  font-size: 13px;
-  color: var(--text-secondary);
-  background: var(--bg);
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-.time-cell {
-  font-size: 13px;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-.empty-cell {
-  text-align: center;
-  padding: 40px !important;
-  color: var(--text-muted);
-}
-.table-actions {
-  display: flex;
-  gap: 6px;
-}
-
 /* Modal */
 .modal-overlay {
   position: fixed;

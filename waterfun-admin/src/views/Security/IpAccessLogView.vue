@@ -30,7 +30,7 @@ const fetchData = async () => {
   loading.value = true;
   try {
     const params: ListIpAccessLogParams = {
-      page: (pageOpts.value.currentPage || 1) - 1,
+      page: pageOpts.value.currentPage || 1,
       size: pageOpts.value.pageSize,
     };
     if (searchForm.value.ip) params.ip = searchForm.value.ip;
@@ -46,7 +46,7 @@ const fetchData = async () => {
 
     const res = await listIpAccessLogs(params);
     logList.value = res.data.content || [];
-    pageOpts.value.total = res.data.totalElements ?? 0;
+    pageOpts.value.total = res.data.page?.totalElements ?? res.data.totalElements ?? 0;
   } catch {
     ElMessage.error('获取IP访问日志失败');
   } finally {
@@ -193,13 +193,15 @@ onMounted(fetchData);
   display: flex;
   gap: 8px;
 }
-.ip-text {
-  font-family: 'SF Mono', 'Consolas', monospace;
+.time-cell {
   font-size: 13px;
   color: var(--text-secondary);
-  background: var(--bg);
-  padding: 2px 6px;
-  border-radius: 3px;
+  white-space: nowrap;
+}
+.empty-cell {
+  text-align: center;
+  padding: 40px !important;
+  color: var(--text-muted);
 }
 .path-cell {
   max-width: 280px;
@@ -210,11 +212,6 @@ onMounted(fetchData);
   color: var(--text-secondary);
 }
 .geo-cell {
-  font-size: 13px;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-.time-cell {
   font-size: 13px;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -246,9 +243,4 @@ onMounted(fetchData);
 }
 .status-ok { background: #d1fae5; color: #059669; }
 .status-error { background: #fee2e2; color: #dc2626; }
-.empty-cell {
-  text-align: center;
-  padding: 40px !important;
-  color: var(--text-muted);
-}
 </style>

@@ -16,12 +16,12 @@ public interface IpBanRepository extends JpaRepository<IpBan, Long>, JpaSpecific
   List<IpBan> findActiveList(Instant now);
 
   @Query("""
-        SELECT COUNT(b) > 0 FROM IpBan b
+        SELECT b FROM IpBan b
         WHERE b.ip = :ip AND (b.expiresAt IS NULL OR b.expiresAt > :now)
         """)
   Optional<IpBan> findActiveByIp(@Param("ip") String ip, @Param("now") Instant now);
 
   @Modifying
-  @Query("UPDATE IpBan b SET b.expiresAt = NOW()")
-  int unbanByIp(@Param("ip") String ip);
+  @Query("UPDATE IpBan b SET b.expiresAt = :now WHERE b.ip = :ip")
+  int unbanByIp(@Param("ip") String ip, @Param("now") Instant now);
 }

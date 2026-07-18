@@ -246,16 +246,9 @@ onMounted(() => fetchBans())
 .table-wrap { background: var(--bg-white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
 .data-table tr:last-child td { border-bottom: none; }
 
-.cell-mono { font-family: 'SF Mono', monospace; font-size: 13px; color: var(--text-secondary); }
-.cell-time { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
-.cell-actions { white-space: nowrap; }
-.empty-cell { text-align: center; padding: 40px !important; color: var(--text-muted); }
 .user-info { display: flex; align-items: center; gap: 8px; }
 .user-nickname { font-weight: 500; }
 .penalty-badge { display: inline-block; padding: 2px 8px; background: var(--danger-light); color: #dc2626; border-radius: 4px; font-size: 12px; font-weight: 500; }
-
-.pagination-bar { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; }
-.page-info { font-size: 13px; color: var(--text-muted); }
 
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; }
 .modal { background: var(--bg-white); border-radius: var(--radius); width: 480px; max-width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); overflow: hidden; }

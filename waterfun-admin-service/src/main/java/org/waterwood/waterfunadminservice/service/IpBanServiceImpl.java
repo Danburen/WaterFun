@@ -38,14 +38,15 @@ public class IpBanServiceImpl implements IpBanService {
         ban.setIp(ip);
         ban.setReason(reason != null ? reason : "");
         ban.setBannedAt(Instant.now());
-        ban.setExpiresAt(expiresAt != null ? expiresAt : Instant.now().plusSeconds(86400 * 7));
+        // null = 永久封禁；非 null = 到期时间
+        ban.setExpiresAt(expiresAt);
         return toResponse(ipBanRepository.save(ban));
     }
 
     @Override
     @Transactional
     public void unbanIp(String ip) {
-        ipBanRepository.unbanByIp(ip);
+        ipBanRepository.unbanByIp(ip, Instant.now());
     }
 
     @Override

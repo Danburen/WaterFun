@@ -265,13 +265,6 @@ onMounted(async () => {
 .queue-stat { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); }
 .queue-stat strong { color: var(--text-primary); font-size: 16px; }
 .queue-info-right { display: flex; align-items: center; gap: 8px; }
-.filter-btn {
-  padding: 6px 14px; border: 1px solid var(--border); background: var(--bg-white);
-  border-radius: 6px; font-size: 13px; color: var(--text-secondary);
-  cursor: pointer; transition: all 0.2s;
-}
-.filter-btn:hover, .filter-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
-
 .review-card {
   background: var(--bg-white); border: 1px solid var(--border);
   border-radius: var(--radius); overflow: hidden;
@@ -290,10 +283,7 @@ onMounted(async () => {
 .review-id { font-size: 13px; color: var(--text-muted); font-family: 'SF Mono', monospace; }
 .review-time { font-size: 13px; color: var(--text-muted); }
 .review-status-bar { display: flex; align-items: center; gap: 8px; }
-.status-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-.status-pending { background: var(--warning-light); color: #b45309; }
-.status-passed { background: var(--success-light); color: #15803d; }
-.status-rejected { background: var(--danger-light); color: #dc2626; }
+/* status-chip, status-pending/passed/rejected in global.css */
 
 .review-body { padding: 24px; }
 .author-info {
@@ -310,9 +300,7 @@ onMounted(async () => {
 .author-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
 .author-meta { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
 .author-risk { display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-.risk-low { background: var(--success-light); color: #15803d; }
-.risk-medium { background: var(--warning-light); color: #b45309; }
-.risk-high { background: var(--danger-light); color: #dc2626; }
+/* risk-low/medium/high in global.css */
 
 .single-review-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
 .resource-display { display: flex; flex-direction: column; gap: 16px; }
@@ -364,10 +352,7 @@ onMounted(async () => {
 .action-btn-reject:hover { background: #dc2626; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35); transform: translateY(-1px); }
 .action-btn-skip { background: var(--bg-white); color: var(--text-secondary); border: 1px solid var(--border); }
 
-.pagination-bar {
-  display: flex; align-items: center; justify-content: center; gap: 16px; padding: 16px 0;
-}
-.page-info { font-size: 13px; color: var(--text-muted); }
+/* pagination-bar, page-info in global.css */
 
 @media (max-width: 1200px) {
   .single-review-layout { grid-template-columns: 1fr; }

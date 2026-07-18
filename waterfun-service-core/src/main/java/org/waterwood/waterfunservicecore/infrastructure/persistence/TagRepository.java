@@ -86,5 +86,6 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
 """)
   void decreaseUsageCountInIds(@Param("ids") List<Long> removedTagIds, @Param("count") int count);
 
-  List<Long> findTagByIdIn(Set<Long> attr0);
+  @Query("SELECT t.id FROM Tag t WHERE t.id IN :tagIds")
+  List<Long> findTagByIdIn(@Param("tagIds") Set<Long> tagIds);
 }

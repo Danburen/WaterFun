@@ -55,10 +55,10 @@ public class TicketController {
     public ApiResponse<Page<UserTicketListResponse>> list(
             @RequestParam(required = false) TicketType ticketType,
             @RequestParam(required = false) TicketAuditStatus status,
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Long userUid = UserCtxHolder.getUserUid();
-        Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.min(size, 50));
+        Pageable pageable = PageRequest.of(Math.max(0, page), Math.min(size, 50));
         return ApiResponse.success(reportService.listUserTickets(userUid, ticketType, status, pageable));
     }
 

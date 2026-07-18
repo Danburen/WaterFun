@@ -29,7 +29,7 @@ public class TicketModerationController {
             @RequestParam(required = false) String ticketTypes,
             @RequestParam(required = false) TicketAuditStatus status,
             @RequestParam(required = false) String targetId,
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         List<TicketType> types = null;
         if (ticketTypes != null && !ticketTypes.isBlank()) {
@@ -38,7 +38,7 @@ public class TicketModerationController {
                 types.add(TicketType.valueOf(s.trim()));
             }
         }
-        Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.min(size, 100));
+        Pageable pageable = PageRequest.of(Math.max(0, page), Math.min(size, 100));
         return ApiResponse.success(
                 ticketModerationService.listTickets(types, status, targetId, pageable)
         );
