@@ -100,7 +100,6 @@ export const register = async (registerRequest: RegisterRequest): PromiseResBody
 export const getCaptcha = (): Promise<ArrayBuffer> => {
     return request.get<never, ArrayBuffer>('/auth/captcha', {
         responseType: 'arraybuffer',
-        meta: { needCSRF: false }
     });
 }
 
@@ -118,9 +117,6 @@ export const logout = async (deviceFp: string): PromiseResBody<void> => {
     return request.post('/user/security/logout', { deviceFp })
 }
 
-export const getCsrfToken = (): PromiseResBody<void> => {
-    return request.get('/auth/csrf-token');
-}
 
 export const refreshAccessToken = (deviceFp: string): PromiseResBody<AccessTokenResponse> => {
     return request.post('/auth/refresh', null, { params: { deviceFp } });

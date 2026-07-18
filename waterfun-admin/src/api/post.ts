@@ -83,7 +83,7 @@ export interface AssignTagsRequest {
 export const previewContent = (content: string): PromiseResBody<string> => {
   return request.post<string>("/posts/content/preview", content, {
     headers: { 'Content-Type': 'text/plain' },
-    meta: { needCSRF: false },
+
   });
 };
 

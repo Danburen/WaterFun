@@ -10,7 +10,6 @@ import JSONBig from 'json-bigint'
 declare module 'axios' {
     interface AxiosRequestConfig {
         meta?: {
-            needCSRF?: boolean;
             needAuth?: boolean;
         };
     }

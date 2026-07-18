@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.waterwood.waterfunadminservice.infrastructure.filter.GatewayUserContextFilter;
 
 @Configuration
@@ -30,32 +29,14 @@ public class SecurityConfig {
     @Value("${gateway.trusted-ips:}")
     private String trustedIps;
 
-    /**
-     * CSRF 保护开关。
-     * 开发环境（localhost:5173 <-> localhost:8080 跨域）必须关闭，
-     * 否则 SameSite=Lax 阻止跨域 POST 携带 XSRF-TOKEN cookie，导致 403。
-     * 生产环境通过 Nginx 同源代理时开启。
-     */
-    @Value("${waterfun.csrf.enabled:false}")
-    private boolean csrfEnabled;
-
     public SecurityConfig(GatewayUserContextFilter gatewayUserContextFilter) {
         this.gatewayUserContextFilter = gatewayUserContextFilter;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        if (csrfEnabled) {
-            CookieCsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-            csrfRepo.setHeaderName("X-XSRF-TOKEN");
-            http.csrf(csrf -> csrf
-                    .csrfTokenRepository(csrfRepo)
-            );
-        } else {
-            http.csrf(csrf -> csrf.disable());
-        }
-
         http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/admin/auth/**", "/error").permitAll()
                         .anyRequest().access(gatewayIpAuthorizationManager())

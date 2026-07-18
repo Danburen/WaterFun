@@ -9,13 +9,11 @@ let isRedirectingToLogin = false;
 declare module 'axios' {
     interface AxiosRequestConfig {
         meta?: {
-            needCSRF?: boolean;
             showError?: boolean;
             needAuth?: boolean;
         };
     }
 }
-const CSRF_SKIP_LIST: string[] = import.meta.env.VITE_CSRF_SKIP_LIST?.split(',') || [];
 const AUTH_SKIP_LIST: string[] = import.meta.env.VITE_AUTH_SKIP_LIST?.split(',') || [];
 const jsonBig = JSONBig({ storeAsString: true });
 
@@ -41,29 +39,9 @@ const service = axios.create({
 service.interceptors.request.use(
     async config => {
         const isAuthSkip = AUTH_SKIP_LIST.some((path: string) => config.url?.includes(path));
-        const isCsrfSkip = CSRF_SKIP_LIST.some((path: string) => config.url?.includes(path));
-        const needCSRF = config.meta?.needCSRF !== false && !isCsrfSkip;
         const needAuth = config.meta?.needAuth !== false && !isAuthSkip;
 
-
         const token = useAuthStore().accessData.token;
-        if (config.method !== 'GET' && needCSRF) {
-            let CSRFToken = getCsrfToken()
-            if (!CSRFToken) {
-                console.log('First request,now try get csrf token');
-                try {
-                    const response = await fetch(`${import.meta.env.VITE_API_BASE}/auth/csrf-token`, {
-                        credentials: 'include'
-                    });
-                    if (!response.ok) return Promise.reject(new Error(`Failed to fetch CSRF Token.Code ${response.status}`));
-                    CSRFToken = getCsrfToken();
-                } catch (error) {
-                    return Promise.reject(error);
-                }
-            }
-            config.headers['X-XSRF-TOKEN'] = CSRFToken;
-        }
-
         if (needAuth && token && token.trim().length > 0) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
@@ -120,13 +98,5 @@ service.interceptors.response.use(
         return Promise.reject(APIError.fromHttp({ code: 'general.unknown_error' }));
     }
 )
-
-// get CSRF Token From cookie
-function getCsrfToken() {
-    return document.cookie.split(';')
-        .map(cookie=> cookie.trim())
-        .find(row => row.startsWith("XSRF-TOKEN="))?.split("=")[1];
-}
-
 
 export default service;
