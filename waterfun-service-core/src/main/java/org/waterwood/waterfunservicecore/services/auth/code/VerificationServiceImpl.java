@@ -6,6 +6,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.RateLimitException;
+import org.waterwood.waterfunservicecore.exception.RegisterChannelUnsupportedException;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.req.auth.SecurityVerifyCodeDto;
@@ -13,6 +15,7 @@ import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
+import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
@@ -21,6 +24,7 @@ import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelpe
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sms.SmsCodeService;
 
+import java.time.Duration;
 import java.util.Arrays;
 
 @Slf4j
@@ -33,6 +37,7 @@ public class VerificationServiceImpl implements VerificationService {
     private final EncryptedKeyService encryptedKeyService;
     private final UserRepository userRepository;
     private final UserDatumRepo userDatumRepo;
+    private final RedisHelperHolder redisHelper;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -47,19 +52,57 @@ public class VerificationServiceImpl implements VerificationService {
             case EMAIL -> userDatum.getEmailEncrypted();
             default -> throw new BizException(BaseResponseCode.CHANNEL_NOT_SUPPORT, channel.getValue());
         };
-        return sender.sendCode(EncryptionHelper.decryptField(encryptedTarget, aesKey), scene);
+        String target = EncryptionHelper.decryptField(encryptedTarget, aesKey);
+        checkTargetNotRateLimited(target, channel);
+        CodeResult result = sender.sendCode(target, scene);
+        recordTargetRateLimit(target, channel);
+        return result;
     }
 
     @Override
     public CodeResult sendAuthenticationCode(String target, VerifyChannel channel, VerifyScene scene) {
+        if (channel == VerifyChannel.EMAIL && scene == VerifyScene.REGISTER) {
+            throw new RegisterChannelUnsupportedException();
+        }
+        checkTargetNotRateLimited(target, channel);
         CodeSender sender = codeSenderFactory.of(channel);
-        return sender.sendCode(target, scene);
+        CodeResult result = sender.sendCode(target, scene);
+        recordTargetRateLimit(target, channel);
+        return result;
     }
 
     @Override
     public CodeResult sendCode(SendCodeDto dto) {
-        CodeSender sender = codeSenderFactory.of(dto.getChannel());
-        return sender.sendCode(dto.getTarget(), dto.getScene());
+        if (dto.getChannel() == VerifyChannel.EMAIL && dto.getScene() == VerifyScene.REGISTER) {
+            throw new RegisterChannelUnsupportedException();
+        }
+        String target = dto.getTarget();
+        VerifyChannel channel = dto.getChannel();
+        checkTargetNotRateLimited(target, channel);
+        CodeSender sender = codeSenderFactory.of(channel);
+        CodeResult result = sender.sendCode(target, dto.getScene());
+        recordTargetRateLimit(target, channel);
+        return result;
+    }
+
+    /**
+     * Check if this target+channel combination is rate-limited (Redis hasKey).
+     * Must be paired with {@link #recordTargetRateLimit} after the actual send succeeds.
+     */
+    private void checkTargetNotRateLimited(String target, VerifyChannel channel) {
+        String redisKey = "rate:target:" + channel.name() + ":" + target;
+        if (Boolean.TRUE.equals(redisHelper.hasKey(redisKey))) {
+            throw new RateLimitException();
+        }
+    }
+
+    /**
+     * Record a rate-limit entry AFTER a successful code send, so a send failure
+     * does not falsely block the user for the window duration.
+     */
+    private void recordTargetRateLimit(String target, VerifyChannel channel) {
+        String redisKey = "rate:target:" + channel.name() + ":" + target;
+        redisHelper.set(redisKey, "1", Duration.ofMinutes(1));
     }
 
     @Override

@@ -1,12 +1,13 @@
 import request from "../utils/axiosRequest"
 import type { PromiseResBody, CloudResourceUrlResp } from "@waterfun/web-core/src/types/api/response"
 import type { UserBrief, PostCardResp, PageResult } from "~/api/postApi"
+import type { Gender } from "~/api/userApi"
 
 export interface UserPublicProfileResp {
   uid: string
   userBrief: UserBrief
   bio: string
-  gender: string
+  gender: Gender
   birthday: string
   residence: string
   createdAt: string | null

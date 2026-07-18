@@ -168,7 +168,7 @@ service.interceptors.response.use(
                     const onAuthPage = authPaths.some(p => window.location.pathname.includes(p))
                     if (onAuthPage) {
                         ElMessage({
-                            message: body.message || translate('message.error.unknownError'),
+                            message: body.message && body.message !== 'error' ? body.message : (body.code || translate('message.error.unknownError')),
                             type: 'error',
                             duration: 3000
                         })
@@ -260,7 +260,7 @@ service.interceptors.response.use(
                 }
             }
             ElMessage({
-                message: body.message || translate('message.error.unknownError'),
+                message: body.message && body.message !== 'error' ? body.message : (body.code || translate('message.error.unknownError')),
                 type: 'error',
                 duration: 3000
             })

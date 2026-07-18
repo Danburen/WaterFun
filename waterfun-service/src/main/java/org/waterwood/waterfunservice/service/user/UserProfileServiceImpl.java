@@ -93,6 +93,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 ResourceType.IMAGE
         );
         resourceRepository.save(newRes);
+        resourceRepository.flush(); // Force flush: ensure Resource UPDATE reaches DB before AuditResource INSERT
         // Update old resource status to orphan if exists
         List<String> uuidList =  userRepository.getUserAvatarByUid(bizId).map(
                 avatarUuid -> {

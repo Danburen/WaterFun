@@ -3,6 +3,7 @@ package org.waterwood.waterfunservicecore.entity.spec;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.waterwood.utils.StringUtil;
+import org.waterwood.waterfunservicecore.entity.user.AccountStatus;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserFollower;
 
@@ -19,7 +20,7 @@ public final class UserSpec {
        };
     }
 
-    public static Specification<User> of(String username, String nickname, String accountStatus, Instant createdStart, Instant createdEnd) {
+    public static Specification<User> of(String username, String nickname, AccountStatus accountStatus, Instant createdStart, Instant createdEnd) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> preds = new ArrayList<>();
             if(StringUtil.isNotBlank(username)) {
@@ -29,11 +30,11 @@ public final class UserSpec {
                 preds.add(criteriaBuilder.like(root.get("nickname"), "%" + nickname + "%"));
             }
 
-            if(StringUtil.isNotBlank(accountStatus)) {
-                preds.add(criteriaBuilder.equal(root.get("accountStatus"), accountStatus));
+            if(accountStatus != null) {
+                preds.add(criteriaBuilder.equal(root.get("accountStatus"), accountStatus.getValue()));
             }else{
                 //  default account is not deleted.
-                preds.add(criteriaBuilder.notEqual(root.get("accountStatus"), "DELETED"));
+                preds.add(criteriaBuilder.notEqual(root.get("accountStatus"),  AccountStatus.DEACTIVATED.getValue()));
             }
 
             if(createdStart != null) {

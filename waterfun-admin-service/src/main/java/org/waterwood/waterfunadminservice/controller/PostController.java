@@ -16,7 +16,6 @@ import org.waterwood.waterfunadminservice.api.request.content.AssignTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.CreatePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.PutPostReq;
 import org.waterwood.waterfunadminservice.api.response.content.PostResponse;
-import org.waterwood.waterfunadminservice.infrastructure.mapper.PostMapper;
 import org.waterwood.waterfunadminservice.service.content.PostService;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.spec.PostSpec;
@@ -28,7 +27,6 @@ import java.util.List;
 @RequestMapping("/api/admin/posts")
 public class PostController {
     private final PostService postService;
-    private final PostMapper postMapper;
 
     @GetMapping("/list")
     public ApiResponse<Page<PostResponse>> listPosts(@RequestParam(required = false) String title,
@@ -39,10 +37,7 @@ public class PostController {
                                                      @RequestParam(required = false) String slug,
                                                      @PageableDefault(sort = {"isPinned", "type"}, direction = Sort.Direction.DESC) Pageable pageable) {
         Specification<Post> spec = PostSpec.of(title, status, categoryId, authorId, tagIds, slug);
-        Page<Post> posts = postService.listPosts(spec, pageable);
-        return ApiResponse.success(
-                posts.map(postMapper::toPostResponseDto)
-        );
+        return ApiResponse.success(postService.listPosts(spec, pageable));
     }
 
     @GetMapping("/{id}")

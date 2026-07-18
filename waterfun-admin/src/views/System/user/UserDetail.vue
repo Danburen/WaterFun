@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { formatISOData } from "@waterfun/web-core/src/timer";
 import { useRoute, useRouter } from "vue-router";
-import { getUserDetail, type AccountStatus, type UserDetailDto } from "~/api/user";
+import { getUserDetail, AccountStatusLabel, AccountStatusBadge, type AccountStatus, type UserDetailDto } from "~/api/user";
 import { ElMessage } from "element-plus";
 import UserEditDialog from "./components/UserEditDialog.vue";
 
@@ -15,7 +15,7 @@ const editDialogVisible = ref(false);
 const collapseRoles = ref(true);
 const collapsePerms = ref(true);
 
-const statusBadgeClass: Record<AccountStatus, string> = { ACTIVE: "badge-green", SUSPENDED: "badge-yellow", DEACTIVATED: "badge-red", DELETED: "badge-gray" };
+const statusBadgeClass: Record<AccountStatus, string> = AccountStatusBadge;
 
 const isValidUid = computed(() => uid.value != null && uid.value !== '' && uid.value !== '0');
 
@@ -61,7 +61,7 @@ onMounted(async () => { await fetchDetail(); });
               <td class="label">昵称</td>
               <td class="value">{{ detail.info.nickname || '无' }}</td>
               <td class="label">用户状态</td>
-              <td class="value"><span :class="['badge', statusBadgeClass[detail.info.accountStatus]]">{{ detail.info.accountStatus.toLowerCase() }}</span></td>
+               <td class="value"><span :class="['badge', statusBadgeClass[detail.info.accountStatus]]">{{ AccountStatusLabel[detail.info.accountStatus] }}</span></td>
             </tr>
             <tr>
               <td class="label">创建时间</td>

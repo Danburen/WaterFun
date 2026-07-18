@@ -385,6 +385,7 @@ onMounted(async () => {
         <div class="footer-links">
           <router-link to="/about">关于我们</router-link>
           <a href="#">帮助中心</a>
+          <router-link to="/EulaView">用户协议</router-link>
           <router-link to="/legal/terms">服务条款</router-link>
           <router-link to="/legal/privacy">隐私政策</router-link>
           <a href="#">联系客服</a>

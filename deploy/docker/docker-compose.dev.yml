@@ -17,6 +17,8 @@ services:
     volumes:
       - ../../sqls/init:/docker-entrypoint-initdb.d
       - ./.data/mysql:/var/lib/mysql
+      - ./mysql/keyring.cnf:/etc/mysql/conf.d/keyring.cnf:ro
+      - ./.data/mysql-keyring:/var/lib/mysql-keyring
     environment:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: waterfun

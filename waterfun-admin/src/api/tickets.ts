@@ -2,6 +2,9 @@ import type { ISOString, PromiseResBody } from "@waterfun/web-core/src/types/api
 import type { Page } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
+import type { TargetType } from "~/api/moderation";
+import type { UserType } from "~/api/user";
+
 export type TicketType = "CONTENT_REPORT" | "ACCOUNT_APPEAL" | "FEATURE_FEEDBACK" | "SUGGESTION";
 export type TicketStatus = "PENDING" | "RESOLVED" | "REJECTED" | "CANCELLED";
 export type ReviewAction = "APPROVE" | "REJECT";
@@ -59,13 +62,13 @@ export interface UserBriefWithStats {
 export interface TicketTimeline {
   submittedAt?: string;
   reviewedAt?: string | null;
-  status?: string;
+  status?: TicketStatus;
 }
 
 export interface ActiveRestriction {
   permissionCode: string;
   permissionName: string;
-  banReasonType: string | null;
+  banReasonType: BanReasonType | null;
   expiresAt: string | null;
   permanent: boolean;
   createdAt: string;
@@ -87,11 +90,11 @@ export interface TicketResponse {
     displayName?: string;
     avatar?: string | AvatarInfo | null;
     level?: number;
-    userType?: string;
+    userType?: UserType;
   } | null;
   targetUser?: UserBriefWithStats;
   targetId?: string;
-  targetType?: string;
+  targetType?: TargetType;
   content?: string;
   rejectType?: RejectType;
   auditNote?: string | null;

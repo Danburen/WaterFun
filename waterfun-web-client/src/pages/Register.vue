@@ -1,12 +1,53 @@
 <script setup lang="ts">
 import {type FormInstance, type FormRules} from "element-plus";
 import VerifyingCodeButton from "~/components/auth/VerifyingCodeButton.vue";
-import {validateEmail, validatePassword, validatePhoneNumber, validateVerifyCode} from "~/utils/validator";
-import {validateUsername} from "~/utils/validator";
 import {useAuth} from "~/composables/useAuth";
 import { generateFingerprint } from "@waterfun/web-core/src/fingerprint";
 import type { RegisterRequest } from "~/api/authApi";
 import { useI18n } from "vue-i18n";
+import {REGEX} from "@waterfun/web-core/src/regex";
+import {translate} from "~/utils/translator";
+
+const createFieldValidator = (options: { regex?: RegExp, emptyErrorKey: string, invalidErrorKey?: string, allowEmpty?: boolean }) => {
+  return (_: any, value: any, callback: any) => {
+    if (!value && !options.allowEmpty) { callback(new Error(translate('auth.validate.' + options.emptyErrorKey))); return; }
+    if (options.allowEmpty && !value) { callback(); return; }
+    if (options.regex && options.invalidErrorKey && !options.regex.test(value)) { callback(new Error(translate('auth.validate.' + options.invalidErrorKey))); return; }
+    callback();
+  }
+}
+
+const validateUsername = (allowEmpty?: boolean) => {
+  return (rule: any, value: any, callback: any) => {
+    if (!value && !allowEmpty) { callback(new Error(translate('auth.validate.usernameEmpty'))); return; }
+    if (allowEmpty && !value) { callback(); return; }
+    if (value.length < 4 || value.length > 20) { callback(new Error(translate('auth.validate.usernameOutOfLength'))); return; }
+    if (!REGEX.username.test(value)) { callback(new Error(translate('auth.validate.invalidUsername'))); return; }
+    callback();
+  }
+}
+
+const validatePhoneNumber = (allowEmpty?: boolean) => createFieldValidator({ regex: REGEX.phone, emptyErrorKey: 'phoneEmpty', invalidErrorKey: 'invalidPhone', allowEmpty })
+
+const validateEmail = (allowEmpty?: boolean) => createFieldValidator({ regex: REGEX.email, emptyErrorKey: 'emailEmpty', invalidErrorKey: 'invalidEmail', allowEmpty })
+
+const validatePassword = (allowEmpty?: boolean) => {
+  return (rule: any, value: any, callback: any) => {
+    if (!value && !allowEmpty) { callback(new Error(translate('auth.validate.passwordEmpty'))); return; }
+    if (allowEmpty && !value) { callback(); return; }
+    if (value.length < 8) { callback(new Error(translate('auth.validate.passwordTooShort'))); return; }
+    if (!/[a-z]/.test(value) || !/[A-Z]/.test(value) || !/[0-9]/.test(value)) { callback(new Error(translate('auth.validate.passwordInvalid'))); return; }
+    callback();
+  }
+}
+
+const validateVerifyCode = (allowEmpty: boolean) => {
+  return (rule: any, value: any, callback: any) => {
+    if (!value && !allowEmpty) callback(new Error(translate('auth.validate.verifyCodeEmpty')));
+    else callback();
+  }
+}
+
 const registerFormRef = ref<FormInstance>()
 const i18n = useI18n();
 const buttonLoad = ref(false);
@@ -73,16 +114,16 @@ watch(() => route.query.userAgreementConfirm, (val) => {
       label-position="top"
       size="large"
     >
-      <el-form-item prop="username">
+      <el-form-item :label="$t('auth.username')" prop="username">
         <el-input
           :placeholder="$t('auth.placeholder.username')"
           v-model="registerForm.username"
         />
       </el-form-item>
-      <el-form-item prop="phone">
+      <el-form-item :label="$t('auth.phone')" prop="phone">
         <el-input :placeholder="$t('auth.placeholder.phone')" v-model="registerForm.phone" />
       </el-form-item>
-      <el-form-item prop="smsCode">
+      <el-form-item :label="$t('auth.verifyCode')" prop="smsCode">
         <el-input
           v-model="registerForm.smsCode"
           :placeholder="$t('auth.placeholder.verifyCode')"
@@ -105,7 +146,7 @@ watch(() => route.query.userAgreementConfirm, (val) => {
       </el-form-item>
       <el-collapse-transition>
         <div v-show="expandShow" class="supplementary-body">
-          <el-form-item prop="password">
+          <el-form-item :label="$t('auth.password')" prop="password">
             <el-input
               type="password"
               v-model="registerForm.password"
@@ -113,7 +154,7 @@ watch(() => route.query.userAgreementConfirm, (val) => {
               show-password
             />
           </el-form-item>
-          <el-form-item prop="email">
+          <el-form-item :label="$t('auth.email')" prop="email">
             <el-input
               v-model="registerForm.email"
               :placeholder="$t('auth.placeholder.email')"
@@ -132,7 +173,7 @@ watch(() => route.query.userAgreementConfirm, (val) => {
             {{ $t('confirm.confirmReadLicences') }}
           </el-checkbox>
           <div class="legal-links">
-            <el-button size="small" link @click="router.push('/legal/eulaView')">{{ $t('confirm.userAgreement') }}</el-button>
+            <el-button size="small" link @click="router.push({ path: '/EulaView', query: { from: route.path } })">{{ $t('confirm.userAgreement') }}</el-button>
             <span class="separator">|</span>
             <el-button size="small" link @click="router.push('/legal/terms')">{{ $t('auth.terms') }}</el-button>
             <span class="separator">|</span>

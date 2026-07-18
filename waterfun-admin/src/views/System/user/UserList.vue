@@ -3,7 +3,7 @@ import { formatISOData } from "@waterfun/web-core/src/timer";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import ListPage from "~/components/ListPage.vue";
-import { deleteUser, deleteUsers, getUserList, type AccountStatus, type UserAdminDto, type UserType } from "~/api/user";
+import { deleteUser, deleteUsers, getUserList, AccountStatusLabel, AccountStatusBadge, type AccountStatus, type UserAdminDto, type UserType } from "~/api/user";
 import type { PageOptions } from "~/types";
 import UserEditDialog from "./components/UserEditDialog.vue";
 
@@ -20,7 +20,7 @@ const searchForm = ref<{ username: string; nickname: string; accountStatus: "" |
 });
 const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
 
-const statusLabel = (s: AccountStatus) => ({ ACTIVE: '正常', SUSPENDED: '已停用', DEACTIVATED: '已注销', DELETED: '已删除' })[s];
+const statusLabel = (s: AccountStatus) => AccountStatusLabel[s];
 const userTypeLabel = (t: UserType) => ({ COMMON: '普通用户', ADMIN: '管理员', BOT: '机器人', MODERATOR: '审核员', VIP: 'VIP用户' })[t] ?? '未知';
 
 const fetchData = async () => {
@@ -121,10 +121,9 @@ onMounted(fetchData);
           <label>用户状态</label>
           <select v-model="searchForm.accountStatus">
             <option value="">全部</option>
-            <option value="ACTIVE">正常</option>
-            <option value="SUSPENDED">已停用</option>
-            <option value="DEACTIVATED">已注销</option>
-            <option value="DELETED">已删除</option>
+            <option :value="0">正常</option>
+            <option :value="1">已停用</option>
+            <option :value="2">已注销</option>
           </select>
         </div>
         <div class="search-actions">
@@ -158,7 +157,7 @@ onMounted(fetchData);
           <td><a class="link" @click="gotoDetail(row.uid)">{{ row.username }}</a></td>
           <td>{{ row.nickname || '无' }}</td>
           <td><span :class="['badge', row.userType === 'ADMIN' || row.userType === 'MODERATOR' ? 'badge-red' : row.userType === 'VIP' ? 'badge-yellow' : row.userType === 'BOT' ? 'badge-blue' : 'badge-gray']">{{ userTypeLabel(row.userType) }}</span></td>
-          <td><span :class="['badge', row.accountStatus === 'ACTIVE' ? 'badge-green' : row.accountStatus === 'SUSPENDED' ? 'badge-yellow' : 'badge-gray']">{{ statusLabel(row.accountStatus) }}</span></td>
+          <td><span :class="['badge', AccountStatusBadge[row.accountStatus] || 'badge-gray']">{{ statusLabel(row.accountStatus) }}</span></td>
           <td>{{ formatISOData(row.createdAt) }}</td>
           <td>
             <div class="table-actions">

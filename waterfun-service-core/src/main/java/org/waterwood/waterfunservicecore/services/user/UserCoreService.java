@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.waterwood.waterfunservicecore.entity.perm.PermissionType;
 import org.waterwood.waterfunservicecore.entity.perm.Permission;
+import org.waterwood.waterfunservicecore.entity.user.AccountStatus;
 import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
@@ -62,7 +63,7 @@ public interface UserCoreService {
     /**
      * List users
      */
-    Page<User> listUsers(String username, String nickname, String accountStatus, Instant createdStart, Instant updatedStart, Pageable pageable);
+    Page<User> listUsers(String username, String nickname, AccountStatus accountStatus, Instant createdStart, Instant updatedStart, Pageable pageable);
 
     /**
      * Update user' ofUser

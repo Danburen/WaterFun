@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservice.service.account.AccountService;
 import org.waterwood.waterfunservicecore.api.req.auth.SecuritySendCodeDto;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
@@ -33,6 +34,7 @@ public class UserSecurityController {
 
     @Operation(summary = "发送验证后验证码")
     @PostMapping("/send-verify-code")
+    @RateLimit(key = "ip", permits = 5, window = 300)
     public ApiResponse<Void> sendVerifyCode(@Valid @RequestBody SecuritySendCodeDto dto, HttpServletResponse response) {
         CodeResult result = verificationService.sendAutoTargetAuthenticationCode(
                 dto.getChannel(),

@@ -36,8 +36,6 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     @Query("SELECT p FROM Post p WHERE p.id = :id AND p.author.uid = :authorUid AND p.isDeleted = :isDeleted")
     Optional<Post> findByIdAndAuthorUidAndIsDeleted(@Param("id") Long id, @Param("authorUid") Long authorUid,@Param("isDeleted")  boolean isDeleted);
 
-    Optional<Post> findByIdAndAuthorUidAndIsDeletedAndStatus(Long id, Long authorUid, Boolean isDeleted, PostStatus status);
-
     @EntityGraph(attributePaths = { "author", "category", "tags"})
     Optional<Post> findByIdAndIsDeleted(@NotNull Long id, Boolean isDeleted);
 
@@ -72,7 +70,8 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     @Query("UPDATE Post p SET p.viewCount = p.viewCount + :count WHERE p.id = :postId")
     void increaseViewCount(@Param("postId") Long postId,@Param("count") int count);
 
-    Long findAuthorUidById(Long id);
+    @Query("SELECT p.author.uid FROM Post p WHERE p.id = :id")
+    Long findAuthorUidById(@Param("id") Long id);
 
     @Query("SELECT new org.waterwood.waterfunservicecore.entity.post.PostAuthorUidTitleDO(p.author.uid, p.title, p.coverageResource.uuid) " +
             "FROM Post p WHERE p.id = :id")
@@ -81,11 +80,14 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     @Query("SELECT COALESCE(SUM(p.likeCount), 0) FROM Post p WHERE p.author.uid = :authorUid AND p.isDeleted = false")
     Long sumLikeCountByAuthorUid(@Param("authorUid") Long authorUid);
 
-    long countByAuthorUidAndStatusAndIsDeleted(Long authorUid, PostStatus status, Boolean isDeleted);
+    @Query("SELECT COUNT(p) FROM Post p WHERE p.author.uid = :authorUid AND p.status = :status AND p.isDeleted = :isDeleted")
+    long countByAuthorUidAndStatusAndIsDeleted(@Param("authorUid") Long authorUid, @Param("status") PostStatus status, @Param("isDeleted") Boolean isDeleted);
 
-    long countByAuthorUidAndIsDeleted(Long authorUid, Boolean isDeleted);
+    @Query("SELECT COUNT(p) FROM Post p WHERE p.author.uid = :authorUid AND p.isDeleted = :isDeleted")
+    long countByAuthorUidAndIsDeleted(@Param("authorUid") Long authorUid, @Param("isDeleted") Boolean isDeleted);
 
-    List<Post> findAllByIdInAndAuthorUidAndIsDeleted(List<Long> ids, Long authorUid, Boolean isDeleted);
+    @Query("SELECT p FROM Post p WHERE p.id IN :ids AND p.author.uid = :authorUid AND p.isDeleted = :isDeleted")
+    List<Post> findAllByIdInAndAuthorUidAndIsDeleted(@Param("ids") List<Long> ids, @Param("authorUid") Long authorUid, @Param("isDeleted") Boolean isDeleted);
 
     @Query(value = """
         SELECT p.id FROM post p

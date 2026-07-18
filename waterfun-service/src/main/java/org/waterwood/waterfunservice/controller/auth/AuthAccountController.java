@@ -11,6 +11,7 @@ import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunservice.api.request.PhoneChangeActivateDto;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
+import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.api.resp.AccountResp;
 import org.waterwood.waterfunservice.api.request.EmailChangeDto;
 import org.waterwood.waterfunservice.api.request.ResetPasswordDto;
@@ -37,6 +38,7 @@ public class AuthAccountController {
     private final UserDatumCoreService userDatumCoreService;
     private final AuditLogService auditLogService;
 
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     @GetMapping
     public ApiResponse<AccountResp> get(){
         return ApiResponse.success(
@@ -46,6 +48,7 @@ public class AuthAccountController {
 
     @Operation(summary = "账户页发送验证码")
     @PostMapping("/send-verify-code")
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> sendVerifyCode(@Valid @RequestBody SendCodeDto dto, HttpServletResponse response) {
         CodeResult result = verificationService.sendCode(dto);
         String cookieKey = dto.getChannel().name() + "_CODE_KEY";
@@ -55,6 +58,7 @@ public class AuthAccountController {
 
     @Operation(summary = "重置密码")
     @PostMapping("/password/reset")
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> resetPassword(@Valid @RequestBody ResetPasswordDto dto, HttpServletRequest request) {
         long userUid = UserCtxHolder.getUserUid();
         try {
@@ -73,6 +77,7 @@ public class AuthAccountController {
 
     @Operation(summary = "设置密码")
     @PostMapping("/password/set")
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> setPassword(@Valid @RequestBody SetPasswordDto dto, HttpServletRequest request) {
         long userUid = UserCtxHolder.getUserUid();
         try {
@@ -90,6 +95,7 @@ public class AuthAccountController {
     }
     @Operation(summary = "绑定邮箱")
     @PostMapping("/email/bind")
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> bindEmail(@Valid @RequestBody EmailBindActivateDto dto, HttpServletRequest req, HttpServletResponse res) {
         CodeResult result =  accountService.bindEmail(
                 CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), req.getCookies()),
@@ -101,6 +107,7 @@ public class AuthAccountController {
     }
     @Operation(summary = "激活邮箱")
     @PostMapping("/email/activate")
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> activateEmail(@Valid @RequestBody EmailBindActivateDto dto, HttpServletRequest req){
         accountService.activateEmail(
                 CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), req.getCookies()),
@@ -112,6 +119,7 @@ public class AuthAccountController {
 
     @Operation(summary = "修改邮箱")
     @PostMapping("/email/change")
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> changeEmail(@Valid @RequestBody EmailChangeDto dto, HttpServletRequest req, HttpServletResponse res) {
         VerifyChannel channel = dto.getVerify().getChannel();
         CodeResult result = accountService.changeEmail(
@@ -125,6 +133,7 @@ public class AuthAccountController {
 
     @Operation(summary = "修改手机号")
     @PostMapping("/phone/change")
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> changePhone(@Valid @RequestBody PhoneChangeActivateDto dto, HttpServletRequest req, HttpServletResponse res) {
         CodeResult result = accountService.changePhone(
                 CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), req.getCookies()),
@@ -137,6 +146,7 @@ public class AuthAccountController {
 
     @Operation(summary = "激活手机号")
     @PostMapping("/phone/activate")
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> activatePhone(@Valid @RequestBody PhoneChangeActivateDto dto, HttpServletRequest req) {
         accountService.activatePhone(
                 CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), req.getCookies()),
@@ -147,6 +157,7 @@ public class AuthAccountController {
 
     @Operation(summary = "解绑邮箱")
     @PostMapping("/email/unbind")
+    @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> unbindEmail(@Valid @RequestBody EmailBindActivateDto dto, HttpServletRequest req,
                                          HttpServletResponse res) {
         accountService.unbindEmail(

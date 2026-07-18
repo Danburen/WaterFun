@@ -1,23 +1,61 @@
 <script setup lang="ts">
 import request from "../utils/axiosRequest";
-import {onBeforeMount, reactive, ref, watch} from "vue";
+import {computed, onBeforeMount, reactive, ref, watch} from "vue";
 import {ElMessage, type FormInstance, type FormRules} from "element-plus";
 import {deBounce, throttle} from "@waterfun/web-core/src/triggerControl"
 import VerifyingCodeButton from "~/components/auth/VerifyingCodeButton.vue";
 import AuthBox from "~/components/auth/AuthBox.vue";
-import {validateAuthname, validatePassword, validateVerifyCode} from "~/utils/validator";
+import {REGEX} from "@waterfun/web-core/src/regex";
+import {translate} from "~/utils/translator";
 import {getCaptcha} from "~/api/authApi";
 import {useAuth} from "~/composables/useAuth";
 import type { LoginRequest } from "~/api/authApi";
 import {useI18n} from "vue-i18n";
-import {useRouter} from "vue-router";
+import {useRouter, useRoute} from "vue-router";
 import { generateFingerprint } from "@waterfun/web-core/src/fingerprint";
 import { convertArrayBufferToBase64 } from "@waterfun/web-core/src/dataMapper";
 
 type LoginTabType = 'password'|'fast-auth';
 
+const validateAuthname = (loginType: string) => {
+  return (rule: any, value: any, callback: any) => {
+    if (value === '') { callback(new Error(translate('auth.validate.usernameEmpty'))); return; }
+    switch (loginType) {
+      case 'email':
+        if (!REGEX.email.test(value)) callback(new Error(translate('auth.validate.invalidEmail')));
+        break;
+      case 'sms':
+        if (!REGEX.phone.test(value)) callback(new Error(translate('auth.validate.invalidPhone')));
+        break;
+      case 'password':
+        if (value.length < 4 || value.length > 20) { callback(new Error(translate('auth.validate.usernameOutOfLength'))); return; }
+        else if (!REGEX.username.test(value)) { callback(new Error(translate('auth.validate.invalidUsername'))); return; }
+        break;
+    }
+    callback();
+  }
+}
+
+const validatePassword = (allowEmpty?: boolean) => {
+  return (rule: any, value: any, callback: any) => {
+    if (!value && !allowEmpty) { callback(new Error(translate('auth.validate.passwordEmpty'))); return; }
+    if (allowEmpty && !value) { callback(); return; }
+    if (value.length < 8) { callback(new Error(translate('auth.validate.passwordTooShort'))); return; }
+    if (!/[a-z]/.test(value) || !/[A-Z]/.test(value) || !/[0-9]/.test(value)) { callback(new Error(translate('auth.validate.passwordInvalid'))); return; }
+    callback();
+  }
+}
+
+const validateVerifyCode = (allowEmpty: boolean) => {
+  return (rule: any, value: any, callback: any) => {
+    if (!value && !allowEmpty) callback(new Error(translate('auth.validate.verifyCodeEmpty')));
+    else callback();
+  }
+}
+
 const i18n = useI18n();
 const router = useRouter();
+const route = useRoute();
 
 const { tryLogin } = useAuth()
 
@@ -135,6 +173,8 @@ onBeforeMount(() => {
   refreshCaptcha();
 });
 
+const isEmailLogin = computed(() => loginTab.value === 'fast-auth' && fastLoginForm.username.includes('@'));
+
 function getLoginType(){
   if(loginTab.value === 'password'){
     return 'password'
@@ -176,14 +216,14 @@ function getLoginType(){
         label-position="top"
         size="large"
       >
-        <el-form-item prop="username">
+        <el-form-item :label="$t('auth.username')" prop="username">
           <el-input
             v-model="passLoginForm.username"
             :placeholder="$t('auth.placeholder.username')"
             class="login-input"
           />
         </el-form-item>
-        <el-form-item prop="password">
+        <el-form-item :label="$t('auth.password')" prop="password">
           <el-input
             v-model="passLoginForm.password"
             type="password"
@@ -192,7 +232,7 @@ function getLoginType(){
             show-password
           />
         </el-form-item>
-        <el-form-item prop="captcha">
+        <el-form-item :label="$t('auth.verifyCode')" prop="captcha">
           <div class="captcha-container">
             <el-input v-model="passLoginForm.captcha" :placeholder="$t('auth.placeholder.verifyCode')" />
             <div class="captcha-image-wrap" @click="refreshCaptcha">
@@ -234,14 +274,14 @@ function getLoginType(){
         label-position="top"
         size="large"
       >
-        <el-form-item prop="username">
+        <el-form-item :label="$t('auth.username')" prop="username">
           <el-input
             v-model="fastLoginForm.username"
             :placeholder="$t('auth.placeholder.emailPhone')"
             class="login-input"
           />
         </el-form-item>
-        <el-form-item prop="verifyCode">
+        <el-form-item :label="$t('auth.verifyCode')" prop="verifyCode">
           <el-input
             v-model="fastLoginForm.verifyCode"
             :placeholder="$t('auth.placeholder.verifyCode')"
@@ -263,11 +303,15 @@ function getLoginType(){
             @click="submitForm(fastAuthForm)"
             :loading="buttonLoad"
           >
-            {{ $t('auth.btn.login') }} / {{ $t('auth.btn.register') }}
+            {{ isEmailLogin ? $t('auth.btn.login') : ($t('auth.btn.login') + ' / ' + $t('auth.btn.register')) }}
           </el-button>
         </el-form-item>
       </el-form>
       <div class="legal-links">
+        <el-button size="small" link @click="router.push({ path: '/EulaView', query: { from: route.path } })">
+          {{ $t('confirm.userAgreement') }}
+        </el-button>
+        <span style="color:#cbd5e1">|</span>
         <el-button size="small" link @click="router.push('/legal/terms')">
           {{ $t('auth.terms') }}
         </el-button>

@@ -1,5 +1,11 @@
 import request from "../utils/axiosRequest"
 import type { PromiseResBody, CloudResourceUrlResp } from "@waterfun/web-core/src/types/api/response";
+import type { ReportType } from "~/api/ticketApi";
+
+export type PostType = 'COMMON' | 'NOTICE'
+export type PostVisibility = 'PUBLIC' | 'PRIVATE' | 'FANS_ONLY'
+export type PostStatus = 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
+export type EditStatus = 'NONE' | 'PENDING' | 'REJECTED'
 
 export interface CloudResPresignedUrlResp {
   url: string
@@ -29,14 +35,14 @@ export interface PostCardResp {
   collectCount: number
   slug: string
   publishedAt: string | null
-  type?: 'COMMON' | 'NOTICE'
+  type?: PostType
   isPinned?: boolean
 }
 
 export interface PostAuthorCardResp extends PostCardResp {
-  visibility: 'PUBLIC' | 'PRIVATE' | 'FANS_ONLY'
-  status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
-  editStatus: 'NONE' | 'PENDING' | 'REJECTED'
+  visibility: PostVisibility
+  status: PostStatus
+  editStatus: EditStatus
   updatedAt: string | null
   editedTitle?: string
   editedContent?: string
@@ -59,14 +65,14 @@ export interface PostDetailResp {
   slug: string
   publishedAt: string | null
   updatedAt: string | null
-  type: 'COMMON' | 'NOTICE'
+  type: PostType
   isPinned: boolean
   userBrief: UserBrief | null
   isLiked: boolean
   isCollected: boolean
-  visibility: 'PUBLIC' | 'PRIVATE' | 'FANS_ONLY'
-  status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED'
-  editStatus: 'NONE' | 'PENDING' | 'REJECTED'
+  visibility: PostVisibility
+  status: PostStatus
+  editStatus: EditStatus
 }
 
 export interface PostDraftResp {
@@ -78,7 +84,7 @@ export interface PostDraftResp {
   editedCategoryId: OptionVOLong | null
   editedTagIds: OptionVOLong[]
   editedNewTagIds: string[]
-  editedStatus: 'NONE' | 'PENDING'
+  editedStatus: EditStatus
 }
 
 export interface OptionVOLong {
@@ -173,14 +179,14 @@ export interface ContentPreviewReq {
 }
 
 export interface CreateReportReq {
-  type: string
+  type: ReportType
   reason?: string
 }
 
 export interface MyPostListParams {
   title?: string
-  status?: string
-  visibility?: string
+  status?: PostStatus
+  visibility?: PostVisibility
   categoryId?: string
   tagIds?: string[]
   page?: number

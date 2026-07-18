@@ -18,9 +18,9 @@ public interface PostService {
      * List posts ofPending target author for user.
      * @param spec specification ofPending post
      * @param pageable pageable
-     * @return Page ofPending Posts
+     * @return Page ofPending PostResponse DTOs
      */
-    Page<Post> listPosts(Specification<Post> spec, Pageable pageable);
+    Page<PostResponse> listPosts(Specification<Post> spec, Pageable pageable);
 
     /**
      * Get a post

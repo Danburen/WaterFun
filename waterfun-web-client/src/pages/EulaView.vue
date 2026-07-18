@@ -18,7 +18,7 @@ const legalDocProps = reactive<LegalDocPropsType>({
 })
 
 const returnPath = computed(() => {
-  return router.getRoutes().at(-1)?.path ?? '/';
+  return (route.query.from as string) || '/register';
 })
 
 const handleConfirm = () =>{

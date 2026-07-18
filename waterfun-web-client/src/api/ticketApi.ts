@@ -11,6 +11,8 @@ export type TargetType = 'DEFAULT' | 'USER_AVATAR' | 'POST' | 'POST_COVERAGE_IMA
 
 export type PenaltyType = 'UNSPECIFIED' | 'BAN_LOGIN' | 'BAN_POST' | 'BAN_COMMENT' | 'BAN_UPLOAD' | 'BAN_CHAT' | 'BAN_CREATE' | 'OTHER'
 
+export type RejectType = 'NONE' | 'INSUFFICIENT_EVIDENCE' | 'NO_VIOLATION' | 'DUPLICATE_REPORT' | 'MALICIOUS_REPORT' | 'BEYOND_SCOPE' | 'FALSE_POSITIVE' | 'APPEAL_ACCEPTED' | 'OTHER'
+
 export interface UserTicketListResponse {
   ticketId: string
   ticketType: TicketType
@@ -22,7 +24,7 @@ export interface UserTicketListResponse {
   updatedAt: string
   auditAt: string | null
   auditNote: string | null
-  rejectType: string | null
+  rejectType: RejectType | null
   evidenceCount: number
 }
 
@@ -37,7 +39,7 @@ export interface UserTicketDetailResponse {
   updatedAt: string
   auditAt: string | null
   auditNote: string | null
-  rejectType: string | null
+  rejectType: RejectType | null
   evidence: EvidenceItem[]
   timeline: Timeline | null
   replies: ReplyItem[]
@@ -52,7 +54,7 @@ export interface EvidenceItem {
 export interface Timeline {
   submittedAt: string
   reviewedAt: string | null
-  status: string
+  status: TicketStatus
 }
 
 export interface ReplyItem {

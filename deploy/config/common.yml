@@ -66,7 +66,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    open-in-view: false
+#    # TODO: 当前开发阶段暂无并发压力，先注释掉等后面积累到一定用户量再开启
+#    # 开启后需要确保所有访问 lazy 字段的方法都有 @Transactional 配合
+#    open-in-view: false
     properties:
       hibernate:
         jdbc:
@@ -136,7 +138,7 @@ device:
 # -------- 认证 & Token (非三方) --------
 token:
   access:
-    expiration: 2592000  # 30 days
+    expiration: 86400  # 1 day
   refresh:
     rotate: 604800   # 7 days
     family: 2592000  # 30 days

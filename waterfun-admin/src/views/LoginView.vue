@@ -113,8 +113,8 @@ const submitLoginForm = () => {
 
 .login-card {
   display: flex;
-  width: 820px;
-  min-height: 500px;
+  width: 960px;
+  min-height: 540px;
   background: var(--bg-white);
   border-radius: 16px;
   overflow: hidden;
@@ -223,7 +223,7 @@ const submitLoginForm = () => {
 
 .login-form-inner {
   width: 100%;
-  max-width: 320px;
+  max-width: 360px;
 }
 
 .form-title {

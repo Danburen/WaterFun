@@ -10,11 +10,7 @@ import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.entity.perm.PermissionType;
 import org.waterwood.waterfunservicecore.entity.perm.Permission;
-import org.waterwood.waterfunservicecore.entity.user.Role;
-import org.waterwood.waterfunservicecore.entity.user.RolePermission;
-import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.waterfunservicecore.entity.user.UserPermission;
-import org.waterwood.waterfunservicecore.entity.user.UserRole;
+import org.waterwood.waterfunservicecore.entity.user.*;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PermissionRepo;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
@@ -116,7 +112,7 @@ public class UserCoreServiceImpl implements UserCoreService {
     }
 
     @Override
-    public Page<User> listUsers(String username, String nickname, String accountStatus, Instant createdStart, Instant createdEnd, Pageable pageable) {
+    public Page<User> listUsers(String username, String nickname, AccountStatus accountStatus, Instant createdStart, Instant createdEnd, Pageable pageable) {
         Specification<User> spec = UserSpec.of(username, nickname, accountStatus, createdStart, createdEnd);
         return userRepository.findAll(spec, pageable);
     }

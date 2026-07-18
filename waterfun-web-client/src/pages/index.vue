@@ -392,6 +392,7 @@ onMounted(async () => {
     <footer style="padding:32px 24px;text-align:center">
       <div style="display:flex;justify-content:center;gap:24px;margin-bottom:16px">
         <NuxtLink to="/about" style="font-size:14px;color:#64748b;text-decoration:none">关于我们</NuxtLink>
+        <NuxtLink to="/EulaView" style="font-size:14px;color:#64748b;text-decoration:none">用户协议</NuxtLink>
         <NuxtLink to="/legal/terms" style="font-size:14px;color:#64748b;text-decoration:none">服务条款</NuxtLink>
         <NuxtLink to="/legal/privacy" style="font-size:14px;color:#64748b;text-decoration:none">隐私政策</NuxtLink>
         <a href="#" style="font-size:14px;color:#64748b;text-decoration:none">联系我们</a>

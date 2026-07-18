@@ -37,8 +37,7 @@ public class SmsCodeService implements CodeVerifier, CodeSender {
         String code = generateVerifyCode();
         String uuid = UUID.randomUUID().toString();
         CodeResult result =
-                smsService.sendSms(target, smsCodeTemplate,
-                Map.of("code", code, "time", expireDuration));
+//                smsService.sendSms(target, smsCodeTemplate, Map.of("code", code, "time", expireDuration));
         new CodeResult(true, target,  VerifyChannel.SMS , uuid);
         result.setKey(uuid);
         log.info("send result key{}, code:{}",  result.getKey(), code);

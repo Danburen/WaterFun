@@ -65,8 +65,8 @@ defineProps<{
 
 .login-card {
   display: flex;
-  width: 820px;
-  min-height: 520px;
+  width: 960px;
+  min-height: 540px;
   background: var(--wf-bg-white, #fff);
   border-radius: 16px;
   overflow: hidden;
@@ -186,7 +186,7 @@ defineProps<{
 
 .login-form-inner {
   width: 100%;
-  max-width: 340px;
+  max-width: 360px;
 }
 
 .form-title {

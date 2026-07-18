@@ -2,7 +2,10 @@ import type { ISOString, OptionResItem, PromiseResBody } from "@waterfun/web-cor
 import type { Page, BatchResult } from "~/types/api";
 import request from "~/utils/axiosRequest";
 
-export type AccountStatus = "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
+export type AccountStatus = 0 | 1 | 2;
+
+export const AccountStatusLabel: Record<AccountStatus, string> = { 0: '正常', 1: '已停用', 2: '已注销' };
+export const AccountStatusBadge: Record<AccountStatus, string> = { 0: 'badge-green', 1: 'badge-yellow', 2: 'badge-red' };
 export type Gender = "MALE" | "FEMALE" | "OTHER" | "UNKNOWN";
 export type UserType = "COMMON" | "ADMIN" | "BOT" | "MODERATOR" | "VIP";
 export type Uid = string;

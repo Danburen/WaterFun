@@ -17,6 +17,7 @@ import org.waterwood.waterfunadminservice.api.response.user.UserAdminDetail;
 import org.waterwood.waterfunadminservice.api.response.user.UserInfoARes;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.UserAdminMapper;
 import org.waterwood.waterfunadminservice.service.user.UserAdminService;
+import org.waterwood.waterfunservicecore.entity.user.AccountStatus;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
@@ -36,7 +37,7 @@ public class UserAdminController {
     public ApiResponse<Page<UserInfoARes>> list(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String nickname,
-            @RequestParam(required = false) String accountStatus,
+            @RequestParam(required = false) AccountStatus accountStatus,
             @RequestParam(required = false) Instant createdStart,
             @RequestParam(required = false) Instant createdEnd,
             @PageableDefault Pageable pageable){

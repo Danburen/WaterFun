@@ -94,6 +94,7 @@ public class AuthController {
      */
     @Operation(summary = "发送验证码（需图形验证码）")
     @PostMapping("/send-code")
+    @RateLimit(key = "auth.send.code", permits = 3, window = 60)
     public ApiResponse<Void> sendCode(@Valid @RequestBody SendCodeDto dto,
                                        HttpServletRequest request,
                                        HttpServletResponse response) {
@@ -109,7 +110,7 @@ public class AuthController {
 
     @Operation(summary = "密码登陆")
     @PostMapping("/login-by-password")
-    @RateLimit(key = "ip", permits = 30)
+    @RateLimit(key = "auth.login.password", permits = 10, window = 300)
     public ApiResponse<LoginClientData> loginByPassword(@Valid @RequestBody PwdLoginReq body, HttpServletRequest request, HttpServletResponse response) {
         try {
             Cookie[] cookies = request.getCookies();
@@ -129,7 +130,7 @@ public class AuthController {
 
     @Operation(summary = "手机登陆")
     @PostMapping("/login-by-code")
-    @RateLimit(key = "ip", permits = 30)
+    @RateLimit(key = "auth.login.code", permits = 10, window = 300)
     public ApiResponse<LoginClientData> loginByCode(@Valid @RequestBody VerifyCodeDto dto, HttpServletRequest request, HttpServletResponse response) {
         try {
             String codeKey = dto.getChannel() == VerifyChannel.SMS ? "SMS_CODE_KEY" : "EMAIL_CODE_KEY";
@@ -148,7 +149,7 @@ public class AuthController {
 
     @Operation(summary = "注册")
     @PostMapping("/register")
-    @RateLimit(key = "ip", permits = 20)
+    @RateLimit(key = "auth.register", permits = 5, window = 300)
     public ApiResponse<LoginClientData> register(@Valid @RequestBody RegisterRequest dto, HttpServletRequest request, HttpServletResponse response) {
         try {
             User user = registerService.register(

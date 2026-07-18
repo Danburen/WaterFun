@@ -7,10 +7,10 @@ import java.util.Base64;
 @Value
 public class RootCommentCursor {
     Boolean isPined;
-    Long likeCount;
+    Integer likeCount;
     Long id;
     public static RootCommentCursor first() {
-        return new RootCommentCursor(false, Long.MAX_VALUE, Long.MAX_VALUE);
+        return new RootCommentCursor(false, Integer.MAX_VALUE, Long.MAX_VALUE);
     }
 
     public String encode() {
@@ -23,7 +23,7 @@ public class RootCommentCursor {
         String[] parts = raw.split(":");
         return new RootCommentCursor(
                 "1".equals(parts[0]),
-                Long.parseLong(parts[1]),
+                Integer.parseInt(parts[1]),
                 Long.parseLong(parts[2])
         );
     }

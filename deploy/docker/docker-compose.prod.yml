@@ -22,6 +22,8 @@ services:
       - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./mysql/keyring.cnf:/etc/mysql/conf.d/keyring.cnf:ro
+      - mysql_keyring:/var/lib/mysql-keyring
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: waterfun
@@ -218,5 +220,6 @@ networks:
 
 volumes:
   mysql_data:
+  mysql_keyring:
   redis_data:
   rabbitmq_data:

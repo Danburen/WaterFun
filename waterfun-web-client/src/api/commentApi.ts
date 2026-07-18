@@ -1,6 +1,7 @@
 import request from "../utils/axiosRequest"
 import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response"
 import type { UserBrief } from "~/api/postApi"
+import type { ReportType } from "~/api/ticketApi"
 
 export interface CommentResponse {
   id: string
@@ -62,7 +63,7 @@ export const deleteComment = (id: string): PromiseResBody<void> => {
   return request.delete(`/comments/${id}`)
 }
 
-export const reportComment = (id: string, data: { type: string; reason?: string }): PromiseResBody<{ taskId: string }> => {
+export const reportComment = (id: string, data: { type: ReportType; reason?: string }): PromiseResBody<{ taskId: string }> => {
   return request.post(`/comments/${id}/report`, data)
 }
 

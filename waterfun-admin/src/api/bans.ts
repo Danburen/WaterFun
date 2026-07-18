@@ -1,5 +1,6 @@
 import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type { Page } from "~/types/api";
+import type { BanReasonType } from "~/api/tickets";
 import request from "~/utils/axiosRequest";
 
 export interface BanUserResponse {
@@ -26,7 +27,7 @@ export type PenaltyType =
 export interface BanUserRequest {
   userUid: string;
   penaltyType: PenaltyType;
-  banReasonType?: string;
+  banReasonType?: BanReasonType;
   penaltyDurationHours?: string;
   reasonText?: string;
 }
@@ -69,7 +70,7 @@ export interface BanStatusResponse {
 export interface ActiveRestriction {
   permissionCode: string;
   permissionName: string;
-  banReasonType: string | null;
+  banReasonType: BanReasonType | null;
   expiresAt: string | null;
   permanent: boolean;
   createdAt: string;

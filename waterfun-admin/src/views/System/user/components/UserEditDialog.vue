@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createUser, getUserDetail, updateUserDatum, updateUserInfo, updateUserProfile, type AccountStatus, type Gender, type UserType } from "~/api/user";
+import { createUser, getUserDetail, updateUserDatum, updateUserInfo, updateUserProfile, AccountStatusLabel, type AccountStatus, type Gender, type UserType } from "~/api/user";
 import { ElMessage } from "element-plus";
 import BaseDialog from "~/components/BaseDialog.vue";
 
@@ -15,7 +15,7 @@ const isValidUid = computed(() => props.uid != null && props.uid !== '');
 // Create form
 const phone = ref(''); const username = ref(''); const password = ref(''); const createUserType = ref(0);
 // Edit forms
-const editUsername = ref(''); const editNickname = ref(''); const editAvatarUrl = ref(''); const editUserType = ref<UserType>('COMMON'); const editAccountStatus = ref<AccountStatus>('ACTIVE');
+const editUsername = ref(''); const editNickname = ref(''); const editAvatarUrl = ref(''); const editUserType = ref<UserType>('COMMON'); const editAccountStatus = ref<AccountStatus>(0);
 const editBio = ref(''); const editGender = ref<Gender>('UNKNOWN'); const editBirthDate = ref(''); const editResidence = ref('');
 const editEmail = ref(''); const editPhone = ref('');
 const datumEmailInit = ref(''); const datumPhoneInit = ref('');
@@ -23,14 +23,14 @@ const datumEmailInit = ref(''); const datumPhoneInit = ref('');
 // Validation errors
 const phoneErr = ref(''); const usernameErr = ref(''); const passwordErr = ref(''); const userTypeErr = ref('');
 
-const statusOpts = [['ACTIVE', '正常'], ['SUSPENDED', '已停用'], ['DEACTIVATED', '已注销'], ['DELETED', '已删除']] as const;
+const statusOpts: [AccountStatus, string][] = [[0, '正常'], [1, '已停用'], [2, '已注销']];
 const genderOpts = [['MALE', '男'], ['FEMALE', '女'], ['OTHER', '其他'], ['UNKNOWN', '未知']] as const;
 const createUserTypeOpts = [[0, '普通用户'], [1, '测试用户'], [2, '管理员'], [3, '系统用户'], [4, '超管']] as const;
 const userTypeLabel = (t: UserType) => ({ COMMON: '普通用户', ADMIN: '管理员', BOT: '机器人', MODERATOR: '审核员', VIP: 'VIP用户' })[t] ?? '未知';
 
 const resetForms = () => {
   phone.value = ''; username.value = ''; password.value = ''; createUserType.value = 0;
-  editUsername.value = ''; editNickname.value = ''; editAvatarUrl.value = ''; editUserType.value = 'COMMON'; editAccountStatus.value = 'ACTIVE';
+  editUsername.value = ''; editNickname.value = ''; editAvatarUrl.value = ''; editUserType.value = 'COMMON'; editAccountStatus.value = 0;
   editBio.value = ''; editGender.value = 'UNKNOWN'; editBirthDate.value = ''; editResidence.value = '';
   editEmail.value = ''; editPhone.value = '';
   datumEmailInit.value = ''; datumPhoneInit.value = '';

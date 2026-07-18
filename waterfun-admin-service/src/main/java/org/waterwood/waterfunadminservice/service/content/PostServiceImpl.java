@@ -62,8 +62,10 @@ public class PostServiceImpl implements PostService {
     private final CloudFileService cloudFileService;
 
     @Override
-    public Page<Post> listPosts(Specification<Post> spec, Pageable pageable) {
-        return postRepository.findAll(spec, pageable);
+    @Transactional
+    public Page<PostResponse> listPosts(Specification<Post> spec, Pageable pageable) {
+        return postRepository.findAll(spec, pageable)
+                .map(postMapper::toPostResponseDto);
     }
 
     @Override
@@ -73,6 +75,7 @@ public class PostServiceImpl implements PostService {
         );
     }
 
+    @Transactional
     public PostResponse getPostDetailResponse(Long id) {
         Post p = getPostById(id);
         PostResponse resp = postMapper.toPostResponseDto(p);

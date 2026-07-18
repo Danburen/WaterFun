@@ -107,6 +107,7 @@ public enum BaseResponseCode implements ResponseCode {
 
     INVALID_VERIFY_SCENE("verify.invalid.scene"),
     CHANNEL_NOT_SUPPORT("error.channel.not.supported" ),
+    REGISTER_CHANNEL_UNSUPPORTED("register.channel.unsupported"),
     OLD_PASSWORD_INCORRECT("user.verify.old_password_incorrect" ),
     NEED_FILE_TYPE("valid.file_type_required"),
     USER_ROLE_NOT_FOUND("user.role.not_found"),

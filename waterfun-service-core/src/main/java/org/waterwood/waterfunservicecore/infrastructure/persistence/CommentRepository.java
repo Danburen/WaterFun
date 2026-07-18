@@ -1,7 +1,6 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -95,7 +94,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             @Param("postId") Long postId,
             @Param("cursor") Long cursor,
             @Param("isPinedCursor") Boolean isPinedCursor,
-            @Param("likeCursor") Long likeCursor,
+            @Param("likeCursor") Integer likeCursor,
             @Param("idCursor") Long idCursor,
             Pageable pageable
     );

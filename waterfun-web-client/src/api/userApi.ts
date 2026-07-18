@@ -9,12 +9,17 @@ import type { UserBrief } from "~/api/postApi";
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
+export type AccountStatus = 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED';
+export type Gender = 'MALE' | 'FEMALE' | 'OTHER' | 'UNKNOWN';
+export type ProfileVisibility = 'PUBLIC' | 'FOLLOWERS' | 'PRIVATE';
+export type ContentPermission = 'ALL' | 'FOLLOWERS' | 'NONE';
+
 export interface UserInfoResponse {
     uid: string;
     username: string;
     nickname: string;
     avatar: CloudResourceUrlResp;
-    accountStatus: string;
+    accountStatus: AccountStatus;
     createdAt: string;
     passwordHash: boolean;
 }
@@ -23,7 +28,7 @@ export interface UserProfileDto {
     avatar?: CloudResourceUrlResp;
     nickname?: string;
     bio: string;
-    gender: string;
+    gender: Gender;
     birthday: string; // ISO 8601 格式日期字符串
     residence: string;
 }
@@ -31,7 +36,7 @@ export interface UserProfileDto {
 /** 符合 OpenAPI UpdateUserProfileRequest 规范 */
 export interface UpdateProfileRequest {
     bio: string;
-    gender: string;
+    gender: Gender;
     birthday: string;
     residence: string;
 }
@@ -46,10 +51,10 @@ export interface UserNotificationSettings {
 }
 
 export interface UserPrivacySettings {
-    profileVisibility: string;
-    workVisibility: string;
-    commentPermission: string;
-    messagePermission: string;
+    profileVisibility: ProfileVisibility;
+    workVisibility: ProfileVisibility;
+    commentPermission: ContentPermission;
+    messagePermission: ContentPermission;
     allowFollow: boolean;
     showActiveStatus: boolean;
 }

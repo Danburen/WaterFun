@@ -12,6 +12,7 @@ import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.entity.user.*;
+import org.waterwood.waterfunservicecore.exception.RegisterChannelUnsupportedException;
 import org.waterwood.waterfunservicecore.exception.UserNameAlreadyExistException;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
 import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
@@ -138,6 +139,10 @@ public class RegisterServiceImpl implements RegisterService {
     @Transactional
     @Override
     public User autoRegister(String target, VerifyChannel channel, VerifyScene scene, String codeKey, String code, String deviceFp) {
+        if (channel == VerifyChannel.EMAIL) {
+            throw new RegisterChannelUnsupportedException();
+        }
+
         EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
 
         verificationService.verifyCode(target, scene, channel, codeKey, code);

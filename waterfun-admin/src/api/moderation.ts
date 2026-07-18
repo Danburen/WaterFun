@@ -25,6 +25,8 @@ export type ModerateRejectType =
   | "OTHER";
 
 export type AuditStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPECT" | "CANCELED";
+export type TriggerType = "UNKNOWN" | "USER_SUBMIT" | "SYSTEM_DETECTED" | "USER_REPORT" | "USER_SUGGESTION" | "USER_FEEDBACK" | "USER_APPEAL";
+export type Priority = "EMERGENCY" | "HIGH" | "MEDIUM" | "LOW";
 
 export interface PostAuditPayload {
   title?: string;
@@ -107,8 +109,8 @@ export const rejectModerations = (data: BatchModerateRejectRequest): PromiseResB
 };
 
 export interface ModerationBaseQuery {
-  triggerType?: "UNKNOWN" | "USER_SUBMIT" | "SYSTEM_DETECTED" | "USER_REPORT" | "USER_SUGGESTION" | "USER_FEEDBACK" | "USER_APPEAL";
-  priority?: "EMERGENCY" | "HIGH" | "MEDIUM" | "LOW";
+  triggerType?: TriggerType;
+  priority?: Priority;
   status?: AuditStatus;
   submitterUid?: string;
   submitAtStart?: string;
@@ -152,10 +154,10 @@ export interface ImageAuditPayload {
 
 export interface AuditResponseImageAuditPayload {
   taskId?: string;
-  targetType?: string;
-  triggerType?: string;
+  targetType?: TargetType;
+  triggerType?: TriggerType;
   triggerSource?: string;
-  priority?: string;
+  priority?: Priority;
   format?: "DEFAULT" | "RICH" | "IMAGE" | "TXT";
   status?: AuditStatus;
   rejectType?: ModerateRejectType;
@@ -170,10 +172,10 @@ export interface AuditResponseImageAuditPayload {
 
 export interface AuditResponsePostAuditPayload {
   taskId?: string;
-  targetType?: string;
-  triggerType?: string;
+  targetType?: TargetType;
+  triggerType?: TriggerType;
   triggerSource?: string;
-  priority?: string;
+  priority?: Priority;
   format?: "DEFAULT" | "RICH" | "IMAGE" | "TXT";
   status?: AuditStatus;
   rejectType?: ModerateRejectType;
@@ -196,10 +198,10 @@ export interface ReplyPayload {
 
 export interface AuditResponseReplyPayload {
   taskId?: string;
-  targetType?: string;
-  triggerType?: string;
+  targetType?: TargetType;
+  triggerType?: TriggerType;
   triggerSource?: string;
-  priority?: string;
+  priority?: Priority;
   format?: "DEFAULT" | "RICH" | "IMAGE" | "TXT";
   status?: AuditStatus;
   rejectType?: ModerateRejectType;

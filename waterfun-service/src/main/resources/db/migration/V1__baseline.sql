@@ -10,10 +10,10 @@ SET FOREIGN_KEY_CHECKS = 0;
 CREATE TABLE IF NOT EXISTS user (
     uid BIGINT UNSIGNED PRIMARY KEY,
     username VARCHAR(32) UNIQUE NOT NULL,
-    nickname    varchar(12) DEFAULT NULL,
-    avatar_resource_uuid varchar(36) NULL,
+    nickname    VARCHAR(12) DEFAULT NULL,
+    avatar_resource_uuid VARCHAR(36) NULL,
     password_hash        VARCHAR(64) NULL,
-    account_status        tinyint UNSIGNED DEFAULT 0 COMMENT '0=ACTIVE, 1=SUSPENDED, 2=DEACTIVATED',
+    account_status        TINYINT UNSIGNED DEFAULT 0 COMMENT '0=ACTIVE, 1=SUSPENDED, 2=DEACTIVATED',
     user_type TINYINT UNSIGNED DEFAULT 0 COMMENT '用户类型: 0=普通用户, 1=管理员, 2=机器人, 3=版主, 4=VIP, 5-9=预留',
     level           TINYINT UNSIGNED DEFAULT 1,
     exp             INT UNSIGNED     DEFAULT 0,
@@ -82,8 +82,8 @@ CREATE TABLE IF NOT EXISTS role_permission (
 CREATE TABLE IF NOT EXISTS user_profile
 (
     user_uid    BIGINT UNSIGNED NOT NULL,
-    bio        text        NULL,
-    gender     tinyint UNSIGNED DEFAULT 3 COMMENT '0=MALE, 1=FEMALE, 2=OTHER, 3=UNKNOWN',
+    bio        TEXT        NULL,
+    gender     TINYINT UNSIGNED DEFAULT 3 COMMENT '0=MALE, 1=FEMALE, 2=OTHER, 3=UNKNOWN',
     birth_date    DATE    NULL COMMENT '出生日期',
     residence    VARCHAR(50) NULL COMMENT '居住地',
     update_at TIMESTAMP(3) NULL ON UPDATE CURRENT_TIMESTAMP(3),
@@ -155,11 +155,11 @@ CREATE TABLE IF NOT EXISTS user_setting (
 
 CREATE TABLE IF NOT EXISTS user_data (
     user_uid BIGINT UNSIGNED NOT NULL,
-    email_encrypted    VARCHAR(50) NULL,
+    email_encrypted    VARCHAR(128) NULL,
     email_hash        VARCHAR(65) NULL,
     email_verified    BOOLEAN    DEFAULT FALSE,
     email_expire_at   TIMESTAMP(3) NULL,
-    phone_encrypted   VARCHAR(50) NULL,
+    phone_encrypted   VARCHAR(128) NULL,
     phone_hash        VARCHAR(65) NULL,
     phone_verified    BOOLEAN    DEFAULT FALSE,
     encryption_key_id VARCHAR(50) NOT NULL,
@@ -225,8 +225,8 @@ CREATE TABLE IF NOT EXISTS user_penalty_history(
 ) ENGINE=InnoDB COMMENT '用户处罚历史表';
 
 CREATE TABLE IF NOT EXISTS account_audit_log (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_uid BIGINT NOT NULL,
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_uid BIGINT UNSIGNED NOT NULL,
     action LONGTEXT NOT NULL,
     action_time TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     performed_by VARCHAR(50),
@@ -242,9 +242,9 @@ CREATE TABLE IF NOT EXISTS encryption_data_key (
     id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     key_id VARCHAR(50) unique ,
     encrypted_key VARCHAR(512) NOT NULL,
-    algorithm   tinyint UNSIGNED DEFAULT 0 NOT NULL COMMENT '0=AES, 1=SM4',
+    algorithm   TINYINT UNSIGNED DEFAULT 0 NOT NULL COMMENT '0=AES, 1=SM4',
     key_length SMALLINT UNSIGNED NOT NULL DEFAULT 256,
-    key_status tinyint UNSIGNED DEFAULT 0 NOT NULL COMMENT '0=PENDING_ACTIVATION, 1=ACTIVE, 2=DECRYPT_ONLY, 3=SUSPENDED, 4=DEACTIVATED, 5=DESTROYED',
+    key_status TINYINT UNSIGNED DEFAULT 0 NOT NULL COMMENT '0=PENDING_ACTIVATION, 1=ACTIVE, 2=DECRYPT_ONLY, 3=SUSPENDED, 4=DEACTIVATED, 5=DESTROYED',
     key_purpose VARCHAR(30) NULL,
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     description VARCHAR(255)
@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS encryption_data_key (
 
 CREATE TABLE IF NOT EXISTS resource (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    uuid CHAR(36) NOT NULL COMMENT '资源UUID',
+    uuid VARCHAR(36) NOT NULL COMMENT '资源UUID',
     resource_key VARCHAR(255) NOT NULL COMMENT 'COS对象Key',
     resource_type TINYINT UNSIGNED NOT NULL COMMENT '资源类型',
     mime_type VARCHAR(128) NULL COMMENT 'MIME类型',
@@ -273,7 +273,7 @@ CREATE TABLE IF NOT EXISTS resource (
 
 CREATE TABLE IF NOT EXISTS post_resource (
     post_id        BIGINT UNSIGNED NOT NULL COMMENT '帖子ID',
-    resource_uuid  CHAR(36) NOT NULL COMMENT '资源UUID',
+    resource_uuid  VARCHAR(36) NOT NULL COMMENT '资源UUID',
     created_at     TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) NOT NULL,
     PRIMARY KEY (post_id, resource_uuid),
     INDEX idx_resource_uuid (resource_uuid),
@@ -319,7 +319,7 @@ CREATE TABLE IF NOT EXISTS tag(
 CREATE TABLE IF NOT EXISTS post(
     id BIGINT UNSIGNED PRIMARY KEY NOT NULL COMMENT '帖子ID',
     title VARCHAR(32) NOT NULL COMMENT '帖子标题',
-    subtitle varchar(64) DEFAULT NULL COMMENT '帖子副标题',
+    subtitle VARCHAR(64) DEFAULT NULL COMMENT '帖子副标题',
     content LONGTEXT COMMENT '帖子内容',
     summary VARCHAR(500) DEFAULT NULL COMMENT '内容摘要',
     coverage_resource_uuid VARCHAR(36) DEFAULT NULL COMMENT '封面图片',
@@ -448,7 +448,7 @@ CREATE TABLE IF NOT EXISTS ticket (
 
 CREATE TABLE IF NOT EXISTS ticket_resource (
     ticket_id BIGINT UNSIGNED NOT NULL COMMENT '工单ID',
-    resource_uuid CHAR(36) NOT NULL COMMENT '资源UUID',
+    resource_uuid VARCHAR(36) NOT NULL COMMENT '资源UUID',
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) NOT NULL,
     PRIMARY KEY (ticket_id, resource_uuid),
     FOREIGN KEY (ticket_id) REFERENCES ticket(id) ON DELETE CASCADE,
@@ -504,8 +504,8 @@ CREATE TABLE IF NOT EXISTS audit_task_resource (
 )ENGINE=InnoDB COMMENT '审计任务资源表';
 
 CREATE TABLE IF NOT EXISTS audit_log (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id BIGINT,
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED,
     username VARCHAR(50),
     action TINYINT UNSIGNED DEFAULT 0 NOT NULL,
     ip VARCHAR(45) NOT NULL,
@@ -523,11 +523,11 @@ CREATE TABLE IF NOT EXISTS audit_log (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS user_activity_log (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id BIGINT NOT NULL,
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NOT NULL,
     action_type TINYINT UNSIGNED NOT NULL COMMENT '操作类型',
     business_type TINYINT UNSIGNED NOT NULL COMMENT '业务类型',
-    target_id BIGINT COMMENT '操作对象ID',
+    target_id BIGINT UNSIGNED COMMENT '操作对象ID',
     ip VARCHAR(45) NOT NULL COMMENT '操作IP地址',
     created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
     INDEX idx_user_time (user_id, created_at),
@@ -572,7 +572,7 @@ CREATE TABLE IF NOT EXISTS site_statistics (
 -- ==================== 安全模块 ====================
 
 CREATE TABLE IF NOT EXISTS ip_ban (
-    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     ip          VARCHAR(45) NOT NULL COMMENT 'IP地址，支持IPv6',
     reason      VARCHAR(100) NOT NULL DEFAULT '' COMMENT '封禁原因',
     banned_at   TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

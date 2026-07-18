@@ -42,13 +42,13 @@ public class UserDatum {
     @UpdateTimestamp
     private Instant updatedAt;
 
-    @Column(name = "email_encrypted", length = 50)
+    @Column(name = "email_encrypted", length = 128)
     private String emailEncrypted;
 
     @Column(name = "email_hash", length = 65)
     private String emailHash;
 
-    @Column(name = "phone_encrypted", length = 50)
+    @Column(name = "phone_encrypted", length = 128)
     private String phoneEncrypted;
 
     @Column(name = "phone_hash", length = 65)

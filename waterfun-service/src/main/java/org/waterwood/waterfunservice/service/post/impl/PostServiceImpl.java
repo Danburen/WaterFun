@@ -139,6 +139,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PostCardResp> listCardPosts(Specification<Post> spec, Pageable pageable) {
         return listCardPostsInternal(
                 spec,
@@ -163,6 +164,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PostCardResp> listAnnouncements(Pageable pageable) {
         Specification<Post> spec = (root, query, cb) -> {
             query.orderBy(cb.desc(root.get("publishedAt")));
@@ -176,6 +178,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PostCardResp> listHotPosts(Pageable pageable) {
         Page<Long> hotIds = postRepository.findHotPostIds(pageable);
         return listCardPostsInternal(hotIds, postMapper::toPostCardResponseDto, (res, post, postTagMap, postCategoryMap, postCoverageImgMap, postUserBriefMap) -> {
@@ -190,6 +193,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PostCardResp> listPublicCardPosts(PublicPostListReq req) {
         if (StringUtil.isNotBlank(req.getKeyword())) {
             Pageable searchPageable = PageRequest.of(
@@ -258,6 +262,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PostAuthorCardResp> listAuthorCardPosts(Specification<Post> spec, Pageable pageable) {
         return listCardPostsInternal(
                 spec,
@@ -565,6 +570,7 @@ public class PostServiceImpl implements PostService {
                     .orElseThrow(() -> new ResourceReferenceInvalidException(newCoverageImgId));
             res.setStatus(ResourceStatus.ACTIVE);
             resourceRepository.save(res);
+            resourceRepository.flush(); // Force flush: ensure Resource UPDATE reaches DB before PostResource/AuditResource INSERT
             p.setEditedCoverImg(res.getUuid());
             p.setCoverageResource(res);
         } else {
@@ -751,6 +757,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PostDraftResp getEditPostDraft(Long id) {
         Post p = postRepository.findByIdAndAuthorUidAndIsDeleted(
                 id, UserCtxHolder.getUserUid(), false
@@ -1158,6 +1165,7 @@ public class PostServiceImpl implements PostService {
         );
     }
     @Override
+    @Transactional(readOnly = true)
     public Page<PostCardResp> listCardPostsByIds(Page<Long> postPageIds) {
         return listCardPostsInternal(
                 postPageIds,
