@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import MarkdownIt from 'markdown-it'
+
 export interface LegalDocPropsType {
   title: string,
   content: string,
@@ -6,7 +9,10 @@ export interface LegalDocPropsType {
   showConfirm?: boolean,
 }
 
-defineProps<LegalDocPropsType>()
+const props = defineProps<LegalDocPropsType>()
+
+const md = new MarkdownIt()
+const renderedContent = computed(() => md.render(props.content))
 
 const router = useRouter();
 const emit = defineEmits(['confirm'])
@@ -28,9 +34,7 @@ const goBack = () => router.back();
           date: lastUpdate.getDate()  })}}</div>
   </div>
   <div class="content-container">
-    <div class="content-text">
-      {{content}}
-    </div>
+    <div class="content-text" v-html="renderedContent"></div>
     <div v-if="showConfirm !== false" class="button-container">
       <el-button style="width: 80%" type="primary" @click="handleClick" size="large">{{$t('confirm.confirmReadLicences')}}</el-button>
     </div>
@@ -90,7 +94,6 @@ const goBack = () => router.back();
   box-shadow: 0 0 15px rgba(173, 216, 230, 0.2); /* 淡蓝色阴影柔和过渡 */
   margin: 10px auto;
   max-width: 1200px; /* 限制内容宽度避免过宽 */
-  white-space: pre-wrap; /* 换行 */
 
   display: flex;
   flex-direction: column;

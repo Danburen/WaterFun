@@ -5,21 +5,21 @@ import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
 import type {LanguageTypes} from "~/types/sys/lang";
 
 export const getEula = (lang:LanguageTypes): PromiseResBody<FileResDataType> => {
-    return request.get(`/resource/legal/licence/${lang}/eula.txt`);
+    return request.get(`/resource/legal/licence/${lang}/eula.md`);
 }
 
 export const getAbout = (lang:LanguageTypes): PromiseResBody<FileResDataType> => {
-    return request.get(`/resource/legal/about/${lang}/about.txt`);
+    return request.get(`/resource/legal/about/${lang}/about.md`);
 }
 
 export const getPrivacy = (lang:LanguageTypes): PromiseResBody<FileResDataType> => {
-    return request.get(`/resource/legal/privacy/${lang}/privacy.txt`);
+    return request.get(`/resource/legal/privacy/${lang}/privacy.md`);
 }
 
 export const getTerms = (lang:LanguageTypes): PromiseResBody<FileResDataType> => {
-    return request.get(`/resource/legal/terms/${lang}/terms.txt`);
+    return request.get(`/resource/legal/terms/${lang}/terms.md`);
 }
 
 export const getContact = (lang:LanguageTypes): PromiseResBody<FileResDataType> => {
-    return request.get(`/resource/legal/contact/${lang}/contact.txt`);
+    return request.get(`/resource/legal/contact/${lang}/contact.md`);
 }

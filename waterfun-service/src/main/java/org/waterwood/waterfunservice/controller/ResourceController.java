@@ -12,6 +12,7 @@ import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservice.api.response.MiniFileResData;
 import org.waterwood.waterfunservice.service.resource.LegalResourceConstants;
 import org.waterwood.waterfunservice.service.resource.ResourceService;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 
 import java.io.IOException;
@@ -39,6 +40,11 @@ public class ResourceController {
                 || !LegalResourceConstants.VALID_LANGS.contains(lang)) {
             return ApiResponse.error(BaseResponseCode.REQUEST_NOT_IN_WHITELIST);
         }
+        // 受保护的资源类型需要认证才能访问（白名单模式）
+        if (LegalResourceConstants.PROTECTED_TYPES.contains(type)
+                && UserCtxHolder.getUserUid() == null) {
+            return ApiResponse.error(BaseResponseCode.HTTP_UNAUTHORIZED);
+        }
         if (!isSafePathSegment(type) || !isSafePathSegment(lang) || !isSafePathSegment(fileName)) {
             return ApiResponse.error(BaseResponseCode.INVALID_PATH);
         }
@@ -51,7 +57,7 @@ public class ResourceController {
     }
 
     private boolean isSafePathSegment(String segment) {
-        return segment != null && segment.matches("^[a-zA-Z0-9_\\-.]++$");
+        return segment != null && segment.matches("^(?!\\.\\.)[a-zA-Z0-9_\\-.]++$");
     }
 
     private String detectContentType(String fileName) throws IOException {
