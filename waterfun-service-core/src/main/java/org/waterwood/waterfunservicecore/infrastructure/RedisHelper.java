@@ -130,11 +130,11 @@ public class RedisHelper implements RedisHelperHolder {
 
     public <T> boolean validateAndRemove(String pKey, T value) {
         String stored = getValue(pKey);
-        log.info("key: {}, stored: {}, value: {}, equal:{}",
-                pKey ,
-                StringUtil.noNullStringArray(stored),
-                value,
-                stored != null && stored.equals(value));
+//        log.info("key: {}, stored: {}, value: {}, equal:{}",
+//                pKey ,
+//                StringUtil.noNullStringArray(stored),
+//                value,
+//                stored != null && stored.equals(value));
         if (stored == null || !stored.equals(value)) {
             return false;
         }

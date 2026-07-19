@@ -88,7 +88,7 @@ public class SSEController {
     public SseEmitter subscribe() {
         Long uid = UserCtxHolder.getUserUid();
         String ip = UserCtxHolder.getClientIp();
-        log.info("User {} with IP {} is subscribing to SSE", uid, ip);
+//        log.info("User {} with IP {} is subscribing to SSE", uid, ip);
         return sseService.subscribe(uid, ip);
     }
 }
