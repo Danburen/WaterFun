@@ -28,5 +28,5 @@ cloud:
 # -------- 开发环境日志（覆盖 common.yml 的 INFO） --------
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
