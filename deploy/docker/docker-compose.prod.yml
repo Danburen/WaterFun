@@ -159,6 +159,7 @@ services:
     volumes:
       - ../../deploy/keys:/app/deploy/keys:ro
       - ../../deploy/config/common.yml:/app/deploy/config/common.yml:ro
+      - ../../deploy/resource:/app/deploy/resource:ro
     depends_on:
       redis:
         condition: service_healthy

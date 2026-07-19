@@ -67,7 +67,7 @@ public class GatewaySecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/post/tags/hot", "/api/post/tags/search/**", "/api/post/tags/*").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/user/*/profile", "/api/user/*/card", "/api/user/*/avatar").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/user/*/followers", "/api/user/*/followings").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/resource/legal/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/resource/*").permitAll()
                         .anyExchange().authenticated()
                 )
                 .build();

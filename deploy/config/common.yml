@@ -137,7 +137,7 @@ device:
 # -------- 认证 & Token (非三方) --------
 token:
   access:
-    expiration: 60   # 1 hour (short-lived, refresh token mechanism handles renewal)
+    expiration: 7200   # 2 hour (short-lived, refresh token mechanism handles renewal)
   refresh:
     rotate: 604800   # 7 days
     family: 2592000  # 30 days
@@ -150,6 +150,14 @@ expire:
   captcha: 2   # min
 
 # -------- 业务公共 (非三方) --------
+app:
+  resources:
+    path: ${APP_RESOURCES_PATH:./deploy/resource}
+
+thirdparty:
+  communication:
+    mock: true
+
 ip2region:
   db-location: file:./deploy/utils/ip2region_v4.xdb
 

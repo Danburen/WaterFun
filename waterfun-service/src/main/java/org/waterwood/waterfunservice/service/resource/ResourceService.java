@@ -1,13 +1,20 @@
 package org.waterwood.waterfunservice.service.resource;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservice.api.response.MiniFileResData;
 import org.waterwood.waterfunservicecore.exception.BizException;
+import org.waterwood.waterfunservicecore.exception.io.FilePathInvalidException;
+import org.waterwood.waterfunservicecore.exception.notfound.ResourceNotFoundException;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -19,12 +26,67 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Slf4j
 public class ResourceService {
     @Autowired
     ResourceLoader resourceLoader;
 
     private final Set<String> allowedMimeTypes = Set.of("text/plain", "text/html");
 
+    @Value("${app.resources.path:./deploy/resource}")
+    private String resourceBasePath;
+
+    private Path resolvedBasePath;
+
+    @PostConstruct
+    public void init() {
+        this.resolvedBasePath = Paths.get(resourceBasePath).toAbsolutePath().normalize();
+    }
+
+    // ────────────── New: Flat resource file reader ──────────────
+
+    /**
+     * Read a resource file from the external config path (deploy/resource/ mounted volume).
+     * <p>
+     * Includes: filename validation, protected-file auth check, path traversal prevention.
+     * Exceptions are handled by {@link org.waterwood.waterfunservice.infrastructure.GlobalExceptionHandler}.
+     *
+     * @param fileName e.g. "contact.md", "about_en_US.md"
+     * @return MiniFileResData
+     */
+    public MiniFileResData getResourceFile(String fileName) {
+        // Filename safety: only allow [a-zA-Z0-9_-] + '.' + extension
+        if (fileName == null || !fileName.matches("^[\\w\\-]+\\.[a-zA-Z]+$")) {
+            throw new FilePathInvalidException();
+        }
+
+        // Protected files require authentication
+        if (LegalResourceConstants.PROTECTED_FILES.contains(fileName)
+                && UserCtxHolder.getUserUid() == null) {
+            throw new BizException(BaseResponseCode.HTTP_UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+        }
+
+        // Path traversal prevention
+        Path fullPath = resolvedBasePath.resolve(fileName).normalize();
+        if (!fullPath.startsWith(resolvedBasePath)) {
+            throw new FilePathInvalidException();
+        }
+
+        // File existence check
+        if (!Files.exists(fullPath) || Files.isDirectory(fullPath)) {
+            throw new ResourceNotFoundException();
+        }
+
+        try {
+            String contentType = detectContentType(fullPath.toString());
+            return new MiniFileResData(fullPath, contentType);
+        } catch (IOException e) {
+            log.error("Failed to read resource file: {}", fileName, e);
+            throw new BizException(BaseResponseCode.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // ────────────── Old: classpath legal resource reader (deprecated, kept for compat) ──────────────
 
     public Resource loadResource(String filename) {
         return new ClassPathResource(filename);
@@ -35,7 +97,7 @@ public class ResourceService {
     }
 
     public MiniFileResData getLegalFileContent(String type, String lang, String fileName) throws IOException {
-        // 优先尝试精确文件名，不满足则尝试扩展名 fallback（.md ↔ .txt）
+        // Try exact fileName first, then fallback (.md ↔ .txt)
         String relativePath = "legal/" + type + "/" + lang + "/" + fileName;
         Resource resource = resourceLoader.getResource("classpath:" + relativePath);
         if (!resource.exists()) {
@@ -51,7 +113,7 @@ public class ResourceService {
             }
         }
 
-        // 安全校验：确保解析后的文件仍在 legal/ 目录下（防路径穿越）
+        // Safety: ensure resolved file stays under legal/ (path traversal prevention)
         Path resolvedPath = resource.getFile().toPath().toRealPath();
         String resolved = resolvedPath.toString().replace('\\', '/');
         if (!resolved.contains("/legal/") || !resolved.endsWith("/" + fileName)) {
@@ -63,8 +125,7 @@ public class ResourceService {
     }
 
     public boolean isPathValid(String type, String lang) {
-        return LegalResourceConstants.VALID_TYPES.contains(type)
-                && LegalResourceConstants.VALID_LANGS.contains(lang);
+        return false; // deprecated, old type/lang validation is no longer valid
     }
 
     public String getContent(String filePath, Charset charset) throws IOException {

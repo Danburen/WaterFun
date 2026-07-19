@@ -7,6 +7,10 @@
 deploy/config/common-dev-secrets.yml
 .env.prod.secrets
 
+# deploy/resource/ — content files (docs, policies), not tracked to avoid build churn
+deploy/resource/*
+!deploy/resource/README.md
+
 node_modules
 # pnpm-lock.yaml 已提交，不可忽略（CI 需要 frozen-lockfile）
 

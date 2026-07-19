@@ -33,10 +33,17 @@ public class ApiResponse<T>{
         return new ApiResponse<>(false, code, message, data);
     }
 
+    @Deprecated
+    /*
+      Using global exception holder
+     */
     public static <T> ApiResponse<T> error(BaseResponseCode baseResponseCode) {
         return new ApiResponse<>(false, "error", baseResponseCode.getCode(), null);
     }
-
+    @Deprecated
+    /*
+      Using global exception holder
+     */
     public static <T> ApiResponse<T> error(String code, String message) {
         return new ApiResponse<>(false, code, message, null);
     }

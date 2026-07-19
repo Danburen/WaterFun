@@ -154,6 +154,7 @@ services:
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ../keys:/app/deploy/keys:ro
+      - ../resource:/app/deploy/resource:ro
     mem_limit: 384m
     restart: unless-stopped
     networks:
