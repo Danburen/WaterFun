@@ -8,7 +8,6 @@ import org.waterwood.waterfunservicecore.api.req.auth.SecurityVerifyCodeDto;
 
 @Data
 public class ResetPasswordDto {
-    @NotBlank
     private String oldPwd;
     @NotBlank
     @StrongPassword

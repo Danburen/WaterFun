@@ -154,7 +154,7 @@ app:
   resources:
     path: ${APP_RESOURCES_PATH:./deploy/resource}
 
-thirdparty:
+third-party:
   communication:
     mock: true
 

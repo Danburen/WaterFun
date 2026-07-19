@@ -34,7 +34,7 @@ public class AuthAccountController {
     private final UserDatumCoreService userDatumCoreService;
     private final AuditLogService auditLogService;
 
-    @RateLimit(key = "account.default", permits = 5, window = 300)
+    @RateLimit(key = "account.default", permits = 10, window = 300)
     @GetMapping
     public ApiResponse<AccountResp> get(){
         return ApiResponse.success(

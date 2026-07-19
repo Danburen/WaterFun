@@ -145,6 +145,9 @@ onMounted(async () => {
   if (isPasswordSet && isSetMode.value) {
     router.push('/account/password?mode=reset');
   }
+  if (!isPasswordSet && !isSetMode.value) {
+    router.push('/account/password?mode=set');
+  }
 });
 </script>
 

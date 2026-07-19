@@ -66,7 +66,8 @@ public class AccountServiceImpl implements AccountService {
         if(! dto.getConfirmPwd().equals(dto.getNewPwd())){
             throw new BizException(BaseResponseCode.PASSWORD_TWO_PASSWORD_NOT_EQUAL);
         }
-        if(! encoder.matches(dto.getOldPwd(), user.getPasswordHash())){
+        // Skip old-password verification for users who registered without a password (e.g., quick login)
+        if(user.getPasswordHash() != null && !encoder.matches(dto.getOldPwd(), user.getPasswordHash())){
             throw new BizException(BaseResponseCode.OLD_PASSWORD_INCORRECT);
         }
         userCoreService.changePwd(userUid, dto.getNewPwd());

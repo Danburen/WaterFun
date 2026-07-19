@@ -29,8 +29,8 @@ server:
 
 # SSE 推送
 sse:
-  emitter-timeout-ms: 1800000
-  heartbeat-interval-ms: 30000
+  emitter-timeout-ms: 600000
+  heartbeat-interval-ms: 60000
 
 # IP 黑名单
 ip-ban:

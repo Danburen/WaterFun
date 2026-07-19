@@ -57,6 +57,7 @@ public class AuthController {
 
     @Operation(summary = "获取图形验证码")
     @GetMapping("/captcha")
+    @RateLimit(key = "auth.captcha", permits = 30, window = 60)
     public void getCaptcha(HttpServletResponse response) throws IOException{
         LineCaptchaResult result = captchaService.generateCaptcha();
         Cookie cookie = new Cookie("CAPTCHA_KEY",result.uuid());
@@ -98,7 +99,6 @@ public class AuthController {
      */
     @Operation(summary = "发送验证码（需图形验证码）")
     @PostMapping("/send-code")
-    @RateLimit(key = "auth.send.code", permits = 1, window = 60)
     public ApiResponse<Void> sendCode(@Valid @RequestBody SendCodeDto dto,
                                        HttpServletRequest request,
                                        HttpServletResponse response) {

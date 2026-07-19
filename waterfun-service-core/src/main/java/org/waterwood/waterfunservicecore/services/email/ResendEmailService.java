@@ -16,6 +16,9 @@ import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 @Service
 public class ResendEmailService extends EmailServiceBase {
     private final Resend resend;
+    @Value("${third-party.communication.mock}")
+    private boolean mockMode;
+
     protected ResendEmailService(SpringTemplateEngine templateEngine, @Value("${mail.resend.api-key}") String apiKey) {
         super(templateEngine);
         this.resend = new Resend(apiKey);
@@ -24,27 +27,59 @@ public class ResendEmailService extends EmailServiceBase {
 
     @Override
     public CodeResult sendHtmlEmail(String to, String from, String subject, String html) {
+        if (mockMode) {
+            log.info("[MOCK] Skipping real email to {}, subject: {}", to, subject);
+            return CodeResult.builder()
+                    .sendSuccess(true)
+                    .target(to)
+                    .channel(VerifyChannel.EMAIL)
+                    .build();
+        }
+        return sendHtmlEmailReal(to, from, subject, html);
+    }
+
+    @Override
+    public CodeResult sendSimpleEmail(String to, String from, String subject, String text) {
+        if (mockMode) {
+            log.info("[MOCK] Skipping real simple email to {}, subject: {}", to, subject);
+            return CodeResult.builder()
+                    .sendSuccess(true)
+                    .target(to)
+                    .channel(VerifyChannel.EMAIL)
+                    .build();
+        }
+        return sendSimpleEmailReal(to, from, subject, text);
+    }
+
+    /**
+     * Always sends real HTML email via Resend, bypassing mock mode.
+     * Public for testing and scenarios that require actual delivery.
+     */
+    public CodeResult sendHtmlEmailReal(String to, String from, String subject, String html) {
         CreateEmailOptions params = CreateEmailOptions.builder()
                 .from(from)
                 .to(to)
                 .subject(subject)
                 .html(html)
                 .build();
-        return sendEmail(params,to);
+        return sendEmailReal(params, to);
     }
 
-    @Override
-    public CodeResult sendSimpleEmail(String to, String from, String subject, String text) {
+    /**
+     * Always sends real simple email via Resend, bypassing mock mode.
+     * Public for testing and scenarios that require actual delivery.
+     */
+    public CodeResult sendSimpleEmailReal(String to, String from, String subject, String text) {
         CreateEmailOptions params = CreateEmailOptions.builder()
                 .from(from)
                 .to(to)
                 .subject(subject)
                 .text(text)
                 .build();
-        return sendHtmlEmail(to, from, subject, text);
+        return sendHtmlEmailReal(to, from, subject, text);
     }
 
-    private CodeResult sendEmail(CreateEmailOptions params,String to) {
+    private CodeResult sendEmailReal(CreateEmailOptions params, String to) {
         try{
             CreateEmailResponse res = resend.emails().send(params);
             return  CodeResult.builder()

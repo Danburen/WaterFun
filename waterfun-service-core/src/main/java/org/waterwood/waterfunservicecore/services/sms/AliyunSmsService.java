@@ -21,6 +21,8 @@ public class AliyunSmsService implements SmsService {
     private Client client;
     @Value("${aliyun.sms.sign-name}")
     private String signName;
+    @Value("${third-party.communication.mock}")
+    private boolean mockMode;
     public AliyunSmsService() {
         try{
             client = AliyunSmsConfig.getClient();
@@ -32,6 +34,22 @@ public class AliyunSmsService implements SmsService {
 
     @Override
     public CodeResult sendSms(String phoneNumber, String templateCode, Map<String, Object> params) {
+        if (mockMode) {
+            log.info("[MOCK] Skipping real SMS to {}, template: {}, params: {}", phoneNumber, templateCode, params);
+            return CodeResult.builder()
+                    .sendSuccess(true)
+                    .target(phoneNumber)
+                    .channel(VerifyChannel.SMS)
+                    .build();
+        }
+        return sendSmsReal(phoneNumber, templateCode, params);
+    }
+
+    /**
+     * Always sends real SMS via Aliyun, bypassing mock mode.
+     * Public for testing and scenarios that require actual delivery.
+     */
+    public CodeResult sendSmsReal(String phoneNumber, String templateCode, Map<String, Object> params) {
         if(client == null){
             log.error("Fail send Sms code to {},cause:{}",phoneNumber,"Can't get client instance");
             return CodeResult.builder()

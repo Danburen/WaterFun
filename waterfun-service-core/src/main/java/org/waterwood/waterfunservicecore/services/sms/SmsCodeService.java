@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.waterwood.utils.MaskUtil;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.common.cache.RedisKeyBuilder;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
+import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.auth.VerifyKeyBuilder;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeVerifier;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSender;
@@ -37,10 +39,14 @@ public class SmsCodeService implements CodeVerifier, CodeSender {
         String code = generateVerifyCode();
         String uuid = UUID.randomUUID().toString();
         CodeResult result =
-//                smsService.sendSms(target, smsCodeTemplate, Map.of("code", code, "time", expireDuration));
-        new CodeResult(true, target,  VerifyChannel.SMS , uuid);
+                smsService.sendSms(target, smsCodeTemplate, Map.of("code", code, "time", expireDuration));
         result.setKey(uuid);
-        log.info("send result key{}, code:{}",  result.getKey(), code);
+        log.info("Sms send to phone{} user {} send result key{}, code:{}",
+                MaskUtil.maskPhone(target),
+                UserCtxHolder.safeGetUserId().map(String::valueOf).orElse("anonymous"),
+                result.getKey(),
+                code
+        );
         if(result.isSendSuccess()) {
             redisHelper.set(
                     RedisKeyBuilder.buildKey(

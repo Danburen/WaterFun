@@ -90,6 +90,12 @@ public class VerificationServiceImpl implements VerificationService {
     /** Per-target hourly limit: max 10 sends per rolling hour (cost-sensitive channels). */
     private static final int TARGET_HOURLY_LIMIT = 10;
 
+    /** Max failed verification attempts before temporary lockout. */
+    private static final int VERIFY_MAX_ATTEMPTS = 5;
+
+    /** Lockout duration (minutes) after exceeding max failed attempts. */
+    private static final long VERIFY_LOCK_MINUTES = 15;
+
     /**
      * Check if this target+channel combination is rate-limited (Redis hasKey).
      * Dual-window: 1/min (all channels) + 10/hour (cost-sensitive).
@@ -126,10 +132,23 @@ public class VerificationServiceImpl implements VerificationService {
 
     @Override
     public void verifyCode(String target, VerifyScene scene, VerifyChannel channel, String key, String code) {
+        // Check brute-force lockout: too many failed attempts?
+        String failKey = "vfail:" + channel.name() + ":" + target + ":" + scene.name();
+        String val = redisHelper.getValue(failKey);
+        if (val != null && Integer.parseInt(val) >= VERIFY_MAX_ATTEMPTS) {
+            throw new BizException(BaseResponseCode.RATE_LIMIT_EXCEEDED);
+        }
+
         CodeVerifier verifier = codeVerifierFactory.of(channel);
         if(! verifier.verifyCode(target, scene, key, code)){
+            // Atomic increment — TTL is set only on first creation (count == 1),
+            // so the lockout window starts from the first failed attempt.
+            redisHelper.increment(failKey, Duration.ofMinutes(VERIFY_LOCK_MINUTES));
             throw new BizException(BaseResponseCode.VERIFY_CODE_INVALID);
         }
+
+        // Success — clear fail counter
+        redisHelper.del(failKey);
     }
 
     @Override
