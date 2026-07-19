@@ -3,6 +3,7 @@ package org.waterwood.waterfunadminservice.service.auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunadminservice.api.response.user.AdminUserInfoResponse;
 import org.waterwood.waterfunservicecore.api.resp.user.UserInfoResponse;
 import org.waterwood.waterfunservicecore.entity.user.User;
@@ -17,6 +18,7 @@ import org.waterwood.waterfunservicecore.services.user.UserProfileCoreService;
 import org.waterwood.waterfunservicecore.services.user.UserRoleCoreService;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
 public class UserServiceImpl implements UserService {

@@ -4,6 +4,7 @@ import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.services.auth.CaptchaService;
 import org.waterwood.waterfunservicecore.services.auth.LineCaptchaResult;
@@ -13,6 +14,7 @@ import java.time.Duration;
 import java.util.UUID;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CaptchaServiceImpl implements CaptchaService {
     private final RedisHelperHolder redisHelper;

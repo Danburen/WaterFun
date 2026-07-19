@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.api.req.auth.DeviceInfoReq;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLog;
@@ -23,11 +24,13 @@ public class AuditLogService {
     private final AuditLogRepository auditLogRepository;
     private final IpLocationService ipLocationService;
 
+    @Transactional
     public void record(Long userId, String username, AuditLogActionType action,
                        HttpServletRequest request, DeviceInfoReq deviceInfo) {
         record(userId, username, action, AuditLogStatusType.SUCCESS, null, request, deviceInfo);
     }
 
+    @Transactional
     public void record(Long userId, String username, AuditLogActionType action,
                        AuditLogStatusType status, String failReason,
                        HttpServletRequest request, DeviceInfoReq deviceInfo) {

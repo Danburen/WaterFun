@@ -19,10 +19,12 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.CategoryRepo
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
@@ -31,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final UserCoreService userCoreService;
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public void create(CreateCategoryRequest req) {
         Category category = categoryMapper.toEntity(req);
@@ -54,11 +57,13 @@ public class CategoryServiceImpl implements CategoryService {
         );
     }
 
+    @Transactional
     @Override
     public void removeById(Long id) {
         categoryRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public void update(Long id, UpdateCategoryRequest req) {
         Category category = getById(id);
@@ -70,6 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.save(category);
     }
 
+    @Transactional
     @Override
     public BatchResult deleteCategories(RemoveCategoriesRequest req) {
         int removed = 0;

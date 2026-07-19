@@ -49,6 +49,7 @@ import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 @Slf4j
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final InboxRepository inboxRepository;

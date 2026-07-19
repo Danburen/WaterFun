@@ -17,6 +17,7 @@ import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserDatumCoreServiceImpl implements UserDatumCoreService {
     private final UserDatumRepo userDatumRepo;

@@ -18,5 +18,10 @@ public interface UserLikeRepository extends JpaRepository<UserLike, UserLikeId> 
     @Query("SELECT ul.id.userId FROM UserLike ul WHERE ul.id.postId = :postId ORDER BY ul.createdAt DESC")
     List<Long> findUserIdsByPostId(@Param("postId") Long postId);
 
+    @Query("SELECT ul.id.userId FROM UserLike ul WHERE ul.id.postId = :postId ORDER BY ul.createdAt DESC")
+    List<Long> findUserIdsByPostId(@Param("postId") Long postId, Pageable pageable);
+
+    long countByIdPostId(Long postId);
+
     long countByIdUserId(Long userId);
 }

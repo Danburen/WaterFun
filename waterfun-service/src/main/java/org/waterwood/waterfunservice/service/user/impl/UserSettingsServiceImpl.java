@@ -12,6 +12,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRep
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserSettingsServiceImpl implements UserSettingsService {
 

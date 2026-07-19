@@ -1,6 +1,7 @@
 package org.waterwood.waterfunadminservice.service.user.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
 import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
@@ -10,6 +11,7 @@ import org.waterwood.waterfunadminservice.service.user.UserProfileService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 @Service
+@Transactional(readOnly = true)
 public class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileRepository upRepo;
     private final UserRepository userRepository;
@@ -19,11 +21,13 @@ public class UserProfileServiceImpl implements UserProfileService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     @Override
     public void addUserProfile(UserProfile up) {
         upRepo.save(up);
     }
 
+    @Transactional
     @Override
     public void updateProfile(UserProfile profile) {
         User u = userRepository.findUserByUid(UserCtxHolder.getUserUid()).orElseThrow(

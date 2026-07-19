@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PermissionServiceImpl implements PermissionService {
     private final PermissionRepo permissionRepo;
@@ -54,6 +55,7 @@ public class PermissionServiceImpl implements PermissionService {
         return permissionRepo.findAll(spec, pageable);
     }
 
+    @Transactional
     @Override
     public Permission addPermission(CreatePermRequest req) {
         Permission perm = new Permission();
@@ -68,6 +70,7 @@ public class PermissionServiceImpl implements PermissionService {
         return permissionRepo.save(perm);
     }
 
+    @Transactional
     @Override
     public Permission fullUpdate(int id, UpdatePermRequest req) {
         Permission perm = getPermission(id);
@@ -87,6 +90,7 @@ public class PermissionServiceImpl implements PermissionService {
         return permissionRepo.save(perm);
     }
 
+    @Transactional
     @Override
     public void deletePerm(Integer id) {
         Permission perm = permissionRepo.findById(id)
@@ -97,6 +101,7 @@ public class PermissionServiceImpl implements PermissionService {
         permissionRepo.deleteById(id);
     }
 
+    @Transactional
     @Override
     public BatchResult assignPermToUsers(Integer id, List<Long> items, Instant expireAt) {
         Permission perm = getPermission(id);
@@ -157,6 +162,7 @@ public class PermissionServiceImpl implements PermissionService {
         });
     }
 
+    @Transactional
     @Override
     public BatchResult replacePermUsers(int id, List<Long> userUids, Instant expiresAt) {
         int removed = userPermRepo.deleteByPermissionId(id);
@@ -164,6 +170,7 @@ public class PermissionServiceImpl implements PermissionService {
         return BatchResult.of(userUids.size(), removed + inserted);
     }
 
+    @Transactional
     @Override
     public BatchResult removePermUsers(int id, @NotNull List<Long> userUids) {
         int removed = userPermRepo.deleteByPermissionIdAndUserUidIn(id, userUids);

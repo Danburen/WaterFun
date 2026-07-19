@@ -2,6 +2,7 @@ package org.waterwood.waterfunadminservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunadminservice.api.response.DashboardRecentActivityVO;
 import org.waterwood.waterfunadminservice.api.response.TrendPointVO;
 import org.waterwood.waterfunadminservice.api.response.DashboardOverviewVO;
@@ -24,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class DashboardService {
 

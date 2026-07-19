@@ -39,6 +39,7 @@ import java.util.Locale;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
     private final AuthCoreServiceImpl authService;

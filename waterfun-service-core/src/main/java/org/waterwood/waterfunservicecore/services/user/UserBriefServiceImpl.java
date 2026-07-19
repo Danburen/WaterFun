@@ -3,6 +3,7 @@ package org.waterwood.waterfunservicecore.services.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
@@ -14,6 +15,7 @@ import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 import java.util.*;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserBriefServiceImpl implements UserBriefService {
     private final UserRepository userRepository;

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunadminservice.api.response.SiteStatisticResponse;
 import org.waterwood.waterfunservicecore.entity.SiteStatistic;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
@@ -12,6 +13,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.SiteStatisti
 import java.time.LocalDate;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class StatisticServiceImpl implements StatisticService {
     private final SiteStatisticRepository siteStatisticRepository;

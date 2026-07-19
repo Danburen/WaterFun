@@ -66,9 +66,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-#    # TODO: 当前开发阶段暂无并发压力，先注释掉等后面积累到一定用户量再开启
-#    # 开启后需要确保所有访问 lazy 字段的方法都有 @Transactional 配合
-#    open-in-view: false
+    # 关闭 OSIV，需要确保所有访问 lazy 字段的方法都有 @Transactional 配合
+    open-in-view: false
     properties:
       hibernate:
         jdbc:

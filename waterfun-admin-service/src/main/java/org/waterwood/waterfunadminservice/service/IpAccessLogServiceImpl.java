@@ -5,12 +5,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunadminservice.api.response.IpAccessLogResponse;
 import org.waterwood.waterfunservicecore.entity.security.IpAccessLog;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.IpAccessLogRepository;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class IpAccessLogServiceImpl implements IpAccessLogService {
 

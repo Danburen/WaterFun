@@ -3,6 +3,7 @@ package org.waterwood.waterfunservicecore.services.user;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunservicecore.entity.user.UserRole;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.RoleRepo;
@@ -11,6 +12,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRol
 import java.util.Set;
 
 @Service
+@Transactional(readOnly = true)
 @AllArgsConstructor
 public class UserRoleCoreServiceImpl implements UserRoleCoreService{
     private final UserRoleRepo userRoleRepo;

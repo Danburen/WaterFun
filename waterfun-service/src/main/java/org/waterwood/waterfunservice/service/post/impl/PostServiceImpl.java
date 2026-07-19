@@ -29,10 +29,10 @@ import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.service.NotificationService;
 import org.waterwood.waterfunservicecore.api.UploadItem;
 import org.waterwood.waterfunservicecore.api.moderation.AuditPayload;
+import org.waterwood.waterfunservice.api.response.post.LikedUsersResp;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservice.infrastructure.mapper.PostMapper;
-import org.waterwood.waterfunservice.service.post.TagService;
 import org.waterwood.waterfunservicecore.api.moderation.PostAuditPayload;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.entity.post.PostResource;
@@ -47,7 +47,6 @@ import org.waterwood.waterfunservicecore.exception.reference.CategoryReferenceIn
 import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.*;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserCounterRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserFollowerRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
@@ -81,6 +80,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class PostServiceImpl implements PostService {
@@ -96,8 +96,6 @@ public class PostServiceImpl implements PostService {
     private final AuditTaskRepository auditTaskRepository;
     private final UserRepository userRepository;
     private final ResourceRepository resourceRepository;
-    private final AuditTaskResourceRepository auditTaskResourceRepository;
-    private final TagService tagService;
     private final PostResourceRepository postResourceRepository;
     private final UserBriefService userBriefService;
     private final UserCounterRepository userCounterRepository;
@@ -111,6 +109,8 @@ public class PostServiceImpl implements PostService {
     private final UserFollowerRepository userFollowerRepository;
     private final PostSearchService postSearchService;
 
+
+    private static final int LIKED_USERS_PREVIEW_SIZE = 5;
     @Value("${user.quota.collect:10000}")
     private Long userCollectExceedLimit;
 
@@ -834,13 +834,18 @@ public class PostServiceImpl implements PostService {
                             }
                         }
                 );
-    }
+    };
 
     @Override
-    public List<UserBrief> getLikedUsers(Long postId) {
-        List<Long> userIds = userLikeRepository.findUserIdsByPostId(postId);
-        if (userIds.isEmpty()) return Collections.emptyList();
-        return userBriefService.listUseBriefs(userIds);
+    public LikedUsersResp getLikedUsers(Long postId) {
+        long totalCount = userLikeRepository.countByIdPostId(postId);
+        if (totalCount == 0) {
+            return new LikedUsersResp(0, Collections.emptyList());
+        }
+        Pageable topN = PageRequest.of(0, LIKED_USERS_PREVIEW_SIZE);
+        List<Long> userIds = userLikeRepository.findUserIdsByPostId(postId, topN);
+        List<UserBrief> previewUsers = userBriefService.listUseBriefs(userIds);
+        return new LikedUsersResp(totalCount, previewUsers);
     }
 
     @Transactional

@@ -3,12 +3,14 @@ package org.waterwood.waterfunservicecore.services.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunservicecore.entity.user.UserBriefDO;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserQueryServiceImpl implements UserQueryService {
     private final UserRepository userRepository;

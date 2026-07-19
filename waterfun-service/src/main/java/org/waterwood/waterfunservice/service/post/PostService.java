@@ -10,6 +10,7 @@ import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.post.*;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
+import org.waterwood.waterfunservice.api.response.post.LikedUsersResp;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 
@@ -174,11 +175,12 @@ public interface PostService {
     void ensurePostReportable(Long postId);
 
     /**
-     * Get users who liked a post.
+     * Get preview of users who liked a post (first N avatars + total count).
+     * Avoids returning the full list for performance on highly-liked posts.
      * @param postId target post id
-     * @return list of user briefs
+     * @return preview with total count and first N user briefs
      */
-    List<UserBrief> getLikedUsers(Long postId);
+    LikedUsersResp getLikedUsers(Long postId);
 
     /**
      * Build PostCardResp list from a page of post IDs.

@@ -27,6 +27,7 @@ import org.waterwood.waterfunservicecore.services.user.*;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 

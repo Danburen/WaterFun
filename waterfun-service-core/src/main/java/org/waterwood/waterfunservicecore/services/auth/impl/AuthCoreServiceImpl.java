@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.AuthCode;
 import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
@@ -20,6 +21,7 @@ import org.waterwood.waterfunservicecore.services.auth.AuthCoreService;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSenderFactory;
 
 @Service
+@Transactional(readOnly = true)
 @Slf4j
 @RequiredArgsConstructor
 public class AuthCoreServiceImpl implements AuthCoreService {

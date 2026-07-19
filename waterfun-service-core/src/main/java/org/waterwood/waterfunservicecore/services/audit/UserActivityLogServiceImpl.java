@@ -21,6 +21,7 @@ import java.util.Set;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserActivityLogServiceImpl implements UserActivityLogService {
 

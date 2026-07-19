@@ -1,9 +1,9 @@
 package org.waterwood.waterfunservice.service.post.impl;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.request.CreateCommentReq;
 import org.waterwood.waterfunservice.api.response.CommentResponse;
@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final UserBriefService userBriefService;

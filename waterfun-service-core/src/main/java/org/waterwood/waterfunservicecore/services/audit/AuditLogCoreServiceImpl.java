@@ -3,6 +3,7 @@ package org.waterwood.waterfunservicecore.services.audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLog;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AuditLogCoreServiceImpl implements AuditLogCoreService {
 

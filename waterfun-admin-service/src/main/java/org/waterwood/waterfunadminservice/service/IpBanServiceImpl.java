@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.Instant;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class IpBanServiceImpl implements IpBanService {
     private final IpBanRepository ipBanRepository;

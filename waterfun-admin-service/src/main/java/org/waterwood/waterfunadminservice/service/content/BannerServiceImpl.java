@@ -44,6 +44,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BannerServiceImpl implements BannerService {
     private final BannerRepository bannerRepository;
@@ -80,6 +81,7 @@ public class BannerServiceImpl implements BannerService {
         );
     }
 
+    @Transactional
     @Override
     public void createCallback(CreateBannerRequest req) {
         Banner banner = bannerMapper.toEntity(req);
@@ -149,6 +151,7 @@ public class BannerServiceImpl implements BannerService {
         return resp;
     }
 
+    @Transactional
     @Override
     public List<PresignedResp> handleBannerUpload(AdminUploadPolicyReq request) {
 //        Long bannerId = Long.valueOf(request.getBizId());
@@ -179,6 +182,7 @@ public class BannerServiceImpl implements BannerService {
         );
     }
 
+    @Transactional
     @Override
     public void handleBannerUploadCallback(CloudPutCallbackReq request, AdminUploadContext<Long> ctx) {
 //        Long bannerId = Long.parseLong(payload.getBizId());
@@ -201,6 +205,7 @@ public class BannerServiceImpl implements BannerService {
         resourceRepository.save(res);
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         Banner banner = getById(id);

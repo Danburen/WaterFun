@@ -1,7 +1,7 @@
 package org.waterwood.waterfunadminservice.service.content;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +25,7 @@ import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
@@ -33,6 +34,7 @@ public class TagServiceImpl implements TagService {
     private final UserCoreService userCoreService;
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public void createTag(CreateTagRequest req) {
         Tag tag = tagMapper.toEntity(req);
@@ -46,11 +48,13 @@ public class TagServiceImpl implements TagService {
         return tagRepository.findAll(spec, pageable);
     }
 
+    @Transactional
     @Override
     public void deleteTagById(Long id) {
         tagRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public void updateTag(Long id, UpdateTagReq req) {
         Tag tag = getTag(id);

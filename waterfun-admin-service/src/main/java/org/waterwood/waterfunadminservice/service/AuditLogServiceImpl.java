@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.waterfunadminservice.api.response.AuditLogResponse;
@@ -15,6 +16,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.AuditLogRepo
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AuditLogServiceImpl implements AuditLogService {
     private final AuditLogRepository auditLogRepository;
@@ -31,11 +33,13 @@ public class AuditLogServiceImpl implements AuditLogService {
                 .orElseThrow(() -> new NotFoundException("AuditLog ID: " + id)));
     }
 
+    @Transactional
     @Override
     public void deleteAuditLog(Long id) {
         auditLogRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public BatchResult deleteAuditLogs(List<Long> ids) {
         int removed = 0;

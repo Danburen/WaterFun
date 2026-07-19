@@ -20,6 +20,7 @@ import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHol
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;

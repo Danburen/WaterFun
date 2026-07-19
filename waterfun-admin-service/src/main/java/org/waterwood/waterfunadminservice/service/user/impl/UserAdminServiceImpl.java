@@ -62,6 +62,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserAdminServiceImpl implements UserAdminService {
     private final UserRepository userRepository;
@@ -116,11 +117,13 @@ public class UserAdminServiceImpl implements UserAdminService {
         return userRepository.existsById(userId);
     }
 
+    @Transactional
     @Override
     public User addUser(User user) {
         return userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public User update(User user){
         return addUser(user);
@@ -161,6 +164,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         }
     }
 
+    @Transactional
     @Override
     public void replace(long Uid, List<UserRoleItemDto> replacements) {
         User user = this.getUserById(Uid);
@@ -291,6 +295,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         );
     }
 
+    @Transactional
     @Override
     public void updateUserInfo(long uid, UserInfoAUpdateReq body) {
         User u = userRepository.findById(uid).orElseThrow(
@@ -300,6 +305,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         userRepository.save(u);
     }
 
+    @Transactional
     @Override
     public void updateUserProfile(long uid, UserProfileUpdateAReq body) {
         UserProfile p = userProfileCoreService.getUserProfile(uid);
@@ -307,6 +313,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         userProfileCoreService.update(p);
     }
 
+    @Transactional
     @Override
     public void updateUserDatum(long uid, UserDatumUpdateAReq body) {
         // TODO: send sms & email verification notification to target user;
@@ -374,6 +381,7 @@ public class UserAdminServiceImpl implements UserAdminService {
         return user;
     }
 
+    @Transactional
     @Override
     public BatchResult batchDeleteUsers(List<Long> userUids) {
         if (CollectionUtil.isEmpty(userUids)) {

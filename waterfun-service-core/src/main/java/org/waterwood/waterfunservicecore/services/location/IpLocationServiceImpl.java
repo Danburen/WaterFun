@@ -8,6 +8,7 @@ import org.lionsoul.ip2region.xdb.Searcher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.utils.StringUtil;
 
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class IpLocationServiceImpl implements IpLocationService {
 
     private final Cache<String, Map<String, String>> locationCache = Caffeine.newBuilder()

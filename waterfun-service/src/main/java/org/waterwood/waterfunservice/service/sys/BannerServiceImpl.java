@@ -1,6 +1,7 @@
 package org.waterwood.waterfunservice.service.sys;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.waterfunservice.api.response.BannerResponse;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class BannerServiceImpl implements BannerService {
     private final BannerRepository bannerRepository;
     private final CloudFileService cloudFileService;

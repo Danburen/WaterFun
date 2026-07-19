@@ -27,6 +27,7 @@ import org.waterwood.waterfunservicecore.services.content.TextFilterService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserProfileCoreServiceImpl implements UserProfileCoreService {
     private final UserProfileRepository upRepo;
