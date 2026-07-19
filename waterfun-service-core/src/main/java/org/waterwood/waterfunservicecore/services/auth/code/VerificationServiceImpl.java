@@ -87,13 +87,25 @@ public class VerificationServiceImpl implements VerificationService {
         return result;
     }
 
+    /** Per-target hourly limit: max 10 sends per rolling hour (cost-sensitive channels). */
+    private static final int TARGET_HOURLY_LIMIT = 10;
+
     /**
      * Check if this target+channel combination is rate-limited (Redis hasKey).
+     * Dual-window: 1/min (all channels) + 10/hour (cost-sensitive).
      * Must be paired with {@link #recordTargetRateLimit} after the actual send succeeds.
      */
     private void checkTargetNotRateLimited(String target, VerifyChannel channel) {
-        String redisKey = "rate:target:" + channel.name() + ":" + target;
-        if (Boolean.TRUE.equals(redisHelper.hasKey(redisKey))) {
+        // 1-minute window
+        String minKey = "rate:target:" + channel.name() + ":" + target;
+        if (Boolean.TRUE.equals(redisHelper.hasKey(minKey))) {
+            throw new RateLimitException();
+        }
+
+        // 1-hour window
+        String hourKey = "rate:target:" + channel.name() + ":hour:" + target;
+        String val = redisHelper.getValue(hourKey);
+        if (val != null && Integer.parseInt(val) >= TARGET_HOURLY_LIMIT) {
             throw new RateLimitException();
         }
     }
@@ -103,8 +115,13 @@ public class VerificationServiceImpl implements VerificationService {
      * does not falsely block the user for the window duration.
      */
     private void recordTargetRateLimit(String target, VerifyChannel channel) {
-        String redisKey = "rate:target:" + channel.name() + ":" + target;
-        redisHelper.set(redisKey, "1", Duration.ofMinutes(1));
+        // 1-minute window
+        String minKey = "rate:target:" + channel.name() + ":" + target;
+        redisHelper.set(minKey, "1", Duration.ofMinutes(1));
+
+        // 1-hour window (atomic INCR)
+        String hourKey = "rate:target:" + channel.name() + ":hour:" + target;
+        redisHelper.increment(hourKey, Duration.ofHours(1));
     }
 
     @Override

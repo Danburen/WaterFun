@@ -66,6 +66,15 @@ public interface RedisHelperHolder {
      */
     List<Long> multiGetExpire(List<String> keys);
 
+    /**
+     * Atomically increment a key and set TTL on first creation.
+     *
+     * @param key    redis key
+     * @param expire key expiration duration (TTL set only when key is first created)
+     * @return value after increment, or null if the key cannot be incremented
+     */
+    Long increment(String key, Duration expire);
+
     Cursor<String> scan(ScanOptions options);
 
     boolean hasKey(String key);

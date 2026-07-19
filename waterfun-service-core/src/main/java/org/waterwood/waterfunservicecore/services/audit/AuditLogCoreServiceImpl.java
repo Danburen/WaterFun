@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class AuditLogCoreServiceImpl implements AuditLogCoreService {
 

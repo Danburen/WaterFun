@@ -142,6 +142,15 @@ public class RedisHelper implements RedisHelperHolder {
         return true;
     }
 
+    @Override
+    public Long increment(String key, Duration expire) {
+        Long count = redisTemplate.opsForValue().increment(key);
+        if (count != null && count == 1) {
+            redisTemplate.expire(key, expire);
+        }
+        return count;
+    }
+
     public Long getExpire(String key) {
         return redisTemplate.getExpire(key);
     }

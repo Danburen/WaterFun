@@ -80,6 +80,7 @@ public class UserCoreServiceImpl implements UserCoreService {
     }
 
     @Override
+    @Transactional
     public User changePwd(long userUid, String newPwd) {
         User u = getUser(userUid);
         if(u.getPasswordHash() == null) return u;
@@ -120,6 +121,7 @@ public class UserCoreServiceImpl implements UserCoreService {
     }
 
     @Override
+    @Transactional
     public int updateAvatarResourceUuid(Long userUid, String uuid) {
         int updated = userRepository.updateAvatarResourceByUid(
                 uuid == null ? null : resourceRepository.getReferenceByUuid(uuid),
@@ -133,6 +135,7 @@ public class UserCoreServiceImpl implements UserCoreService {
     }
 
     @Override
+    @Transactional
     public void updateNickname(long userUid, String nickname) {
         User user = userRepository.findById(userUid)
                 .orElseThrow(() -> new NotFoundException("User not found: " + userUid));
