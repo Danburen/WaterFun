@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,8 @@ public class UserAdminController {
             @RequestParam(required = false) Instant createdStart,
             @RequestParam(required = false) Instant createdEnd,
             @PageableDefault Pageable pageable){
+        // frontend sends 1-based page, Spring Data Pageable is 0-based
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         Page<User> users = userCoreService.listUsers(username, nickname, accountStatus, createdStart, createdEnd, pageable);
         return ApiResponse.success(
                 users.map(userAdminMapper::toDto)
@@ -111,6 +114,7 @@ public class UserAdminController {
                                                             @RequestParam(required = false) String name,
                                                             @RequestParam(required = false) String code,
                                                             @PageableDefault Pageable pageable){
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         return ApiResponse.success(userAdminService.listAssignedRoles(uid, roleId, code, name, pageable));
     }
 
@@ -121,6 +125,7 @@ public class UserAdminController {
                                                                         @RequestParam(required = false) String name,
                                                                         @RequestParam(required = false) String code,
                                                                         @PageableDefault Pageable pageable){
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         return ApiResponse.success(userAdminService.listAssignedPermissions(uid, permId, name, code, pageable));
     }
 

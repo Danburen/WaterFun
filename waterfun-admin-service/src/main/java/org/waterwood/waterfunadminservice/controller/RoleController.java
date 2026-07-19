@@ -3,6 +3,7 @@ package org.waterwood.waterfunadminservice.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
@@ -38,7 +39,8 @@ public class RoleController {
             @RequestParam(required = false) Integer parentId,
             @PageableDefault() Pageable pageable
     ){
-
+        // frontend sends 1-based page, Spring Data Pageable is 0-based
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         Specification<Role> spec = RoleSpec.of(name, code, parentId);
         Page<RoleResp> roles = roleService.listRoles(spec, pageable)
                 .map(roleMapper::toRoleResp);
@@ -101,6 +103,7 @@ public class RoleController {
                                                             @RequestParam(required = false) String username,
                                                             @RequestParam(required = false) String nickname,
                                                             @PageableDefault() Pageable pageable){
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         return ApiResponse.success(roleService.getRoleUsers(id, userUid, username, nickname, pageable));
     }
 
@@ -110,6 +113,7 @@ public class RoleController {
                                                                  @RequestParam(required = false) String code,
                                                                  @RequestParam(required = false) String name,
                                                                  @PageableDefault Pageable pageable){
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         return ApiResponse.success(roleService.getRolePerms(id, permId, code, name, pageable));
     }
     @PostMapping("/{id}/users")

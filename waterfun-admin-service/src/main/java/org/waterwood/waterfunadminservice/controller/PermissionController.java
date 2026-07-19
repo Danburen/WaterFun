@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
@@ -38,6 +39,8 @@ public class PermissionController {
             @RequestParam(required = false) String resource,
             @RequestParam(required = false) Integer parentId,
             @PageableDefault(page = 0, size = 10) Pageable pageable){
+        // frontend sends 1-based page, Spring Data Pageable is 0-based
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         Specification<Permission> spec = PermSpec.of(name, code, type, resource, parentId);
         Page<PermissionResp> perms = permissionService.listPermissions(spec, pageable)
                 .map(permissionMapper::toPermissionResp);
@@ -81,6 +84,7 @@ public class PermissionController {
                                                             @RequestParam(required = false) String username,
                                                             @RequestParam(required = false) String nickname,
                                                             @PageableDefault Pageable pageable){
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         return ApiResponse.success(permissionService.listPermUsers(id, userUid, username, nickname, pageable));
     }
 

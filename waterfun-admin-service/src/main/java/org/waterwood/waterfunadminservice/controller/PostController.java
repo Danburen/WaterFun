@@ -3,6 +3,7 @@ package org.waterwood.waterfunadminservice.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +37,8 @@ public class PostController {
                                                      @RequestParam(required = false) List<Integer> tagIds,
                                                      @RequestParam(required = false) String slug,
                                                      @PageableDefault(sort = {"isPinned", "type"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        // frontend sends 1-based page, Spring Data Pageable is 0-based
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         Specification<Post> spec = PostSpec.of(title, status, categoryId, authorId, tagIds, slug);
         return ApiResponse.success(postService.listPosts(spec, pageable));
     }

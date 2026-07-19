@@ -3,6 +3,7 @@ package org.waterwood.waterfunadminservice.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
@@ -42,6 +43,8 @@ public class TagController {
                                                    @RequestParam(required = false) Instant createdStart,
                                                    @RequestParam(required = false) Instant createdEnd,
                                                    @PageableDefault Pageable pageable) {
+        // frontend sends 1-based page, Spring Data Pageable is 0-based
+        pageable = PageRequest.of(Math.max(0, pageable.getPageNumber() - 1), pageable.getPageSize(), pageable.getSort());
         Specification<Tag> spec = TagSpec.of(name, slug, creatorId, createdStart, createdEnd);
         Page<Tag> tags = tagService.list(spec, pageable);
         return ApiResponse.success(tags.map(tagMapper::toResponseDto));
