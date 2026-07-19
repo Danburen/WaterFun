@@ -286,26 +286,9 @@ onMounted(async () => {
 /* status-chip, status-pending/passed/rejected in global.css */
 
 .review-body { padding: 24px; }
-.author-info {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light);
-}
-.author-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
-.author-avatar-placeholder {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: var(--bg); border: 2px solid var(--border);
-  display: flex; align-items: center; justify-content: center; color: var(--text-muted);
-}
-.author-details { flex: 1; }
-.author-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
-.author-meta { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
-.author-risk { display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-/* risk-low/medium/high in global.css */
 
 .single-review-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
 .resource-display { display: flex; flex-direction: column; gap: 16px; }
-.panel-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
-.panel-label i { font-size: 11px; }
 
 .text-review-box {
   padding: 20px; background: var(--bg); border-radius: var(--radius-sm);
@@ -320,20 +303,6 @@ onMounted(async () => {
   font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;
 }
 .text-context strong { color: var(--text-primary); font-weight: 600; }
-
-.source-card {
-  padding: 16px; background: var(--bg);
-  border-radius: var(--radius-sm); border: 1px solid var(--border-light);
-}
-.source-card-title { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-.source-card-title i { font-size: 11px; }
-.source-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
-.source-item:last-child { border-bottom: none; padding-bottom: 0; }
-.source-item:first-child { padding-top: 0; }
-.source-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-.source-info { flex: 1; min-width: 0; }
-.source-name { font-size: 14px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.source-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
 .review-actions {
   display: flex; align-items: center; justify-content: space-between;
@@ -358,7 +327,17 @@ onMounted(async () => {
   .single-review-layout { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  .review-actions { flex-direction: column; }
-  .review-actions-left, .review-actions-right { width: 100%; justify-content: center; }
+  .queue-info { flex-direction: column; gap: 12px; }
+  .queue-info-left { flex-wrap: wrap; gap: 12px; }
+  .queue-info-right { flex-wrap: wrap; }
+  .review-card-header { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 16px; }
+  .review-meta { flex-wrap: wrap; gap: 8px; }
+  .review-body { padding: 16px; }
+  .author-info { flex-wrap: wrap; }
+  .review-actions { flex-direction: column; gap: 8px; }
+  .review-actions-left, .review-actions-right { width: 100%; }
+  .review-actions-right { flex-wrap: wrap; }
+  .action-btn { flex: 1; justify-content: center; padding: 12px 16px; min-height: 44px; font-size: 15px; }
+  .text-review-box { font-size: 14px; padding: 16px; }
 }
 </style>

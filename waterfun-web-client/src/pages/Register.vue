@@ -60,7 +60,7 @@ const route = useRoute();
 const { tryRegister } = useAuth();
 
 definePageMeta({
-  ssr: false ,
+  ssr: false,
 })
 
 const registerForm = reactive({

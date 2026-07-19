@@ -43,7 +43,7 @@ watch(() => route.query.q, (newQ) => {
 <template>
   <div>
     <HeaderNavMenu />
-    <div style="max-width:960px;margin:0 auto;padding:24px">
+    <div class="page-container" style="max-width:960px">
       <div style="margin-bottom:20px">
         <h2 style="font-size:20px;font-weight:600;color:#1e293b;margin:0 0 4px">
           搜索"{{ keyword }}"

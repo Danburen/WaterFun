@@ -327,7 +327,7 @@ watch(currentPost, (post) => {
 <template>
   <div>
     <HeaderNavMenu />
-    <div style="max-width:1280px;margin:0 auto;padding:24px">
+    <div class="page-container">
       <el-row :gutter="24">
         <el-col :xs="24" :md="17">
           <div class="main" style="max-width:none;margin:0;padding:0">

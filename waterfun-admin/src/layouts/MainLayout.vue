@@ -9,11 +9,22 @@ import { useTagStore } from "~/stores/tagStore"
 import { useAuthStore } from '@/stores/authStore'
 
 const menuCollapse = ref(false)
+const mobileMenuOpen = ref(false)
+const isMobile = ref(false)
 const tagStore = useTagStore()
 const activeTags = ref<string>('dashboard')
 const authStore = useAuthStore()
 const router = useRouter()
 let isMounted = false
+let mediaQuery: MediaQueryList | null = null
+const onMediaChange = (e: MediaQueryListEvent) => {
+  isMobile.value = e.matches
+  if (!e.matches) mobileMenuOpen.value = false
+}
+
+const handleMobileToggle = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
 
 const tagList = ref<TagNavItemType[]>([])
 const breadList = computed(() => {
@@ -67,14 +78,22 @@ const handleOrderUpdated = ({ from, to }: { from: number; to: number }) => {
 
 onBeforeMount(() => {
   tagStore.addTag(dashboardTagItem)
+  mediaQuery = window.matchMedia('(max-width: 768px)')
+  isMobile.value = mediaQuery.matches
 })
 
 onMounted(() => {
   isMounted = true
+  mediaQuery = window.matchMedia('(max-width: 768px)')
+  isMobile.value = mediaQuery.matches
+  mediaQuery.addEventListener('change', onMediaChange)
 })
 
 onUnmounted(() => {
   isMounted = false
+  if (mediaQuery) {
+    mediaQuery.removeEventListener('change', onMediaChange)
+  }
 })
 
 // Defer tag updates to after component lifecycle settles
@@ -105,9 +124,10 @@ watch(() => tagStore.getTags, (newTags) => {
 
 <template>
   <div class="admin-layout">
-    <AsideNavBar :collapse="menuCollapse" />
+    <AsideNavBar :collapse="menuCollapse" :drawer-open="mobileMenuOpen" :mobile="isMobile" />
     <div class="main-content">
-      <MainNavBar @collapse="menuCollapse = !menuCollapse" />
+      <MainNavBar :mobile="isMobile" @collapse="menuCollapse = !menuCollapse" @toggle-mobile="handleMobileToggle" />
+      <div v-if="isMobile && mobileMenuOpen" class="mobile-backdrop" @click="mobileMenuOpen = false" />
       <div class="content-header default-border-bottom">
         <TagNavigation
           v-model="activeTags"
@@ -175,5 +195,12 @@ watch(() => tagStore.getTags, (newTags) => {
   align-items: center;
   width: 100%;
   min-width: 0;
+}
+
+.mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1000;
 }
 </style>

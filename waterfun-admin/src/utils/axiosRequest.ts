@@ -68,16 +68,26 @@ service.interceptors.request.use(
 )
 
 // response interceptors — with refresh token rotation
-let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+/** 共享的 refresh Promise：所有并发 401 等待同一个，消除 race condition */
+let refreshPromise: Promise<boolean> | null = null;
 
-const onRefreshed = (token: string) => {
-    refreshSubscribers.splice(0).forEach(cb => cb(token));
-};
-
-const addRefreshSubscriber = (cb: (token: string) => void) => {
-    refreshSubscribers.push(cb);
-};
+async function doRefresh(): Promise<boolean> {
+    try {
+        const deviceFp = await generateFingerprint();
+        const res = await refreshService.post('/auth/refresh', null, {
+            params: { deviceFp },
+        });
+        const data = res.data as any;
+        const newAccess = data.data.accessToken;
+        const newExp = Date.now() + data.data.exp * 1000;
+        useAuthStore().setToken(newAccess, newExp);
+        return true;
+    } catch (err) {
+        console.error('Token refresh failed', err);
+        useAuthStore().removeToken();
+        return false;
+    }
+}
 
 service.interceptors.response.use(
     response => {
@@ -119,53 +129,40 @@ service.interceptors.response.use(
                     return Promise.reject(apiError);
                 }
 
-                if (!isRefreshing) {
-                    isRefreshing = true;
-
-                    if (!authStore.accessData.token) {
-                        authStore.removeToken();
+                if (!authStore.accessData.token) {
+                    authStore.removeToken();
+                    if (window.location.pathname !== '/login') {
                         window.location.replace('/login');
-                        isRefreshing = false;
-                        return Promise.reject(apiError);
                     }
-
-                    (async () => {
-                            try {
-                                const deviceFp = await generateFingerprint();
-                                const res = await refreshService.post('/auth/refresh', null, {
-                                    params: { deviceFp },
-                                });
-                                const data = res.data as any;
-                                const newAccess = data.data.accessToken;
-                                const newExp = Date.now() + data.data.exp * 1000;
-                                authStore.setToken(newAccess, newExp);
-                                onRefreshed(newAccess);
-                        } catch (err) {
-                            console.error('Token refresh failed', err);
-                            onRefreshed('');
-                            authStore.removeToken();
-                            if (window.location.pathname !== '/login') {
-                                window.location.replace('/login');
-                            }
-                        } finally {
-                            isRefreshing = false;
-                        }
-                    })();
+                    return Promise.reject(apiError);
                 }
 
-                return new Promise((resolve, reject) => {
-                    addRefreshSubscriber((newToken: string) => {
-                        if (!newToken) {
-                            reject(apiError);
-                            return;
+                // 共享 Promise：所有 401 等待同一个 refresh
+                if (!refreshPromise) {
+                    refreshPromise = doRefresh();
+                }
+                const captured = refreshPromise;
+
+                return captured.then(success => {
+                    if (!success) {
+                        if (window.location.pathname !== '/login') {
+                            window.location.replace('/login');
                         }
-                        if (originalRequest) {
-                            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-                            resolve(service(originalRequest));
-                        } else {
-                            reject(apiError);
+                        return Promise.reject(apiError);
+                    }
+                    const token = authStore.accessData.token;
+                    if (!token) {
+                        if (window.location.pathname !== '/login') {
+                            window.location.replace('/login');
                         }
-                    });
+                        return Promise.reject(apiError);
+                    }
+                    originalRequest.headers['Authorization'] = `Bearer ${token}`;
+                    return service(originalRequest);
+                }).finally(() => {
+                    if (refreshPromise === captured) {
+                        refreshPromise = null;
+                    }
                 });
             }
 

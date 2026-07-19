@@ -4,10 +4,18 @@ import type { BreadNavItemType } from "@/types/ui/tagNav.js"
 import { useBreadcrumbs } from "@/composables/useBreadcrumbs.js"
 import UserMenu from "@/layouts/main/UserMenu.vue"
 
-const emit = defineEmits(['collapse'])
+const props = defineProps<{
+  mobile?: boolean
+}>()
+
+const emit = defineEmits(['collapse', 'toggle-mobile'])
 const menuCollapse = ref(false)
 
 const collapseButtonClick = () => {
+  if (props.mobile) {
+    emit('toggle-mobile')
+    return
+  }
   menuCollapse.value = !menuCollapse.value
   emit('collapse')
 }
@@ -19,7 +27,7 @@ const bcStore = useBreadcrumbs()
   <header class="top-bar">
     <div class="top-bar-left">
       <button class="collapse-btn" @click="collapseButtonClick">
-        <i :class="menuCollapse ? 'fa-solid fa-chevron-right' : 'fa-solid fa-bars'"></i>
+        <i :class="mobile ? 'fa-solid fa-bars' : (menuCollapse ? 'fa-solid fa-chevron-right' : 'fa-solid fa-bars')"></i>
       </button>
       <div class="breadcrumb">
         <span v-for="(item, idx) in bcStore.breadcrumbs.value" :key="idx" class="breadcrumb-item">

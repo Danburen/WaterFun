@@ -19,6 +19,7 @@ const router = useRouter()
 const route = useRoute()
 
 const searchQuery = ref('')
+const mobileDrawer = ref(false)
 const userAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png')
 
 const userName = computed(() => userInfoStore.userInfo.nickname || userInfoStore.userInfo.username || '未登录')
@@ -36,6 +37,10 @@ const navItems = [
 const isActive = (path: string) => {
   if (path === '/') return route.path === '/'
   return route.path.startsWith(path)
+}
+
+const toggleDrawer = () => {
+  mobileDrawer.value = !mobileDrawer.value
 }
 
 const handleSearch = () => {
@@ -91,6 +96,9 @@ onMounted(async () => {
           {{ $t(`navbar.${item.key}`) }}
         </NuxtLink>
       </nav>
+      <button class="hamburger-btn" @click="toggleDrawer">
+        <i :class="mobileDrawer ? 'fas fa-times' : 'fas fa-bars'"></i>
+      </button>
       <div class="header-spacer" />
       <div class="search-box">
         <input v-model="searchQuery" type="text" :placeholder="$t('option.search')" @keyup.enter="handleSearch">
@@ -137,6 +145,24 @@ onMounted(async () => {
           </template>
         </ClientOnly>
       </div>
+    </div>
+    <div v-if="mobileDrawer" class="mobile-drawer-backdrop" @click="mobileDrawer = false" />
+    <div :class="['mobile-drawer', { open: mobileDrawer }]">
+      <div class="mobile-drawer-header">
+        <img :src="logoSrc" alt="WaterFun" class="mobile-logo-img">
+        <span class="mobile-logo-text">WaterFun</span>
+      </div>
+      <nav class="mobile-nav">
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.key"
+          :to="item.path"
+          :class="['mobile-nav-link', { active: isActive(item.path) }]"
+          @click="mobileDrawer = false"
+        >
+          {{ $t(`navbar.${item.key}`) }}
+        </NuxtLink>
+      </nav>
     </div>
   </header>
 </template>
@@ -363,6 +389,95 @@ onMounted(async () => {
   object-fit: cover;
 }
 
+/* Hamburger button */
+.hamburger-btn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.hamburger-btn:hover {
+  color: #3b82f6;
+  background: #eff6ff;
+}
+
+/* Mobile drawer backdrop */
+.mobile-drawer-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+}
+
+/* Mobile drawer panel */
+.mobile-drawer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  background: #ffffff;
+  z-index: 201;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+}
+.mobile-drawer.open {
+  transform: translateX(0);
+}
+
+.mobile-drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.mobile-logo-img {
+  width: 28px;
+  height: 32px;
+  object-fit: contain;
+}
+.mobile-logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  gap: 2px;
+}
+.mobile-nav-link {
+  display: block;
+  padding: 12px 16px;
+  color: #475569;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+.mobile-nav-link:hover,
+.mobile-nav-link.active {
+  color: #3b82f6;
+  background: #eff6ff;
+}
+
 @media (max-width: 1024px) {
   .search-box {
     width: 200px;
@@ -371,16 +486,26 @@ onMounted(async () => {
 
 @media (max-width: 768px) {
   .header-inner {
-    padding: 0 16px;
-    gap: 12px;
+    padding: 0 12px;
+    gap: 8px;
   }
   .nav {
     display: none;
   }
+  .hamburger-btn {
+    display: flex;
+  }
+  .mobile-drawer-backdrop,
+  .mobile-drawer {
+    display: flex;
+  }
   .search-box {
-    width: 160px;
+    width: 120px;
   }
   .user-name {
+    display: none;
+  }
+  .logo-text {
     display: none;
   }
 }

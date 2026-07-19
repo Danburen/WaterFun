@@ -150,16 +150,47 @@ service.interceptors.request.use(
 )
 
 // response interceptors
-let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+/** 共享的 refresh Promise：所有并发 401 等待同一个，消除 race condition */
+let refreshPromise: Promise<boolean> | null = null;
 
-const onRefreshed = (token: string) => {
-    refreshSubscribers.splice(0).forEach(cb => cb(token));
-};
+async function doRefresh(): Promise<boolean> {
+    try {
+        const deviceFp = await generateFingerprint();
+        const res = await refreshService.post('/auth/refresh', null, {
+            params: { deviceFp },
+        });
+        const data = res.data as any;
+        const newAccess = data.data.accessToken;
+        const newExp = Date.now() + data.data.exp * 1000;
+        useAuthStore().setToken(newAccess, newExp);
 
-const addRefreshSubscriber = (cb: (token: string) => void) => {
-    refreshSubscribers.push(cb);
-};
+        useUserInfoStore().fetchAndUpdateUserInfo().catch(console.error);
+        const poolStore = useAccountPoolStore();
+        if (poolStore.activeUid) {
+            poolStore.updateToken(poolStore.activeUid, newAccess, newExp);
+        }
+
+        return true;
+    } catch (err) {
+        console.error('Token refresh failed', err);
+        return false;
+    }
+}
+
+function showMessageAndRedirect() {
+    const authStore = useAuthStore();
+    const hasToken = !!authStore.accessData.token;
+    authStore.removeToken();
+    const msg = hasToken
+        ? '登录已过期，请重新登录'
+        : '该功能需要登录才能使用，正在跳转到登录界面';
+    ElMessage.warning(msg);
+    setTimeout(() => {
+        if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+        }
+    }, 1500);
+}
 
 service.interceptors.response.use(
     (response: import('axios').AxiosResponse) => {
@@ -191,76 +222,33 @@ service.interceptors.response.use(
                         return Promise.reject(body)
                     }
 
-                    function showMessageAndRedirect() {
-                        const hasToken = !!authStore.accessData.token
-                        authStore.removeToken()
-                        const msg = hasToken
-                            ? '登录已过期，请重新登录'
-                            : '该功能需要登录才能使用，正在跳转到登录界面'
-                        ElMessage.warning(msg)
-                        setTimeout(() => {
-                            if (!window.location.pathname.includes('/login')) {
-                                window.location.href = '/login'
-                            }
-                        }, 1500)
+                    if (!authStore.accessData.token) {
+                        showMessageAndRedirect()
+                        return Promise.reject(body)
                     }
 
-                    if (!isRefreshing) {
-                        isRefreshing = true;
-
-                        if (!authStore.accessData.token) {
-                            showMessageAndRedirect()
-                            isRefreshing = false
-                            return Promise.reject(body)
-                        }
-
-                        // 不检查 isAccess —— token 过期正是要 refresh 的场景
-                        // 如果 RT 也过期了，refresh 端点返回非 200，catch 里会跳登录
-
-                        if (authStore.fromPool && authStore.lastBrowserLoginUid && authStore.lastBrowserLoginUid !== useUserInfoStore().userInfo.uid) {
-                            onRefreshed('')
-                            showMessageAndRedirect()
-                            isRefreshing = false
-                            return Promise.reject(body)
-                        }
-
-                        (async () => {
-                            try {
-                                const deviceFp = await generateFingerprint();
-                                const res = await refreshService.post('/auth/refresh', null, {
-                                    params: { deviceFp },
-                                });
-                                const data = res.data as any;
-                                const newAccess = data.data.accessToken;
-                                const newExp = Date.now() + data.data.exp * 1000;
-                                authStore.setToken(newAccess, newExp);
-
-                                useUserInfoStore().fetchAndUpdateUserInfo().catch(console.error);
-                                const poolStore = useAccountPoolStore();
-                                if (poolStore.activeUid) {
-                                    poolStore.updateToken(poolStore.activeUid, newAccess, newExp);
-                                }
-
-                                onRefreshed(newAccess);
-                            } catch (err) {
-                                console.error('Token refresh failed', err);
-                                onRefreshed('')
-                                showMessageAndRedirect()
-                            } finally {
-                                isRefreshing = false;
-                            }
-                        })();
+                    // 共享 Promise：同一批 401 等同一个 refresh，不会重复刷新
+                    if (!refreshPromise) {
+                        refreshPromise = doRefresh();
                     }
+                    const captured = refreshPromise;
 
-                    return new Promise((resolve, reject) => {
-                        addRefreshSubscriber((newToken: string) => {
-                            if (!newToken) {
-                                reject(body)
-                                return
-                            }
-                            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-                            resolve(service(originalRequest));
-                        });
+                    return captured.then(success => {
+                        if (!success) {
+                            showMessageAndRedirect()
+                            return Promise.reject(body)
+                        }
+                        const token = authStore.accessData.token;
+                        if (!token) {
+                            showMessageAndRedirect()
+                            return Promise.reject(body)
+                        }
+                        originalRequest.headers['Authorization'] = `Bearer ${token}`;
+                        return service(originalRequest);
+                    }).finally(() => {
+                        if (refreshPromise === captured) {
+                            refreshPromise = null;
+                        }
                     });
                 }
             }

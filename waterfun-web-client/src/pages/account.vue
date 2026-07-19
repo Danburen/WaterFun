@@ -5,11 +5,6 @@
     <main class="account-main">
       <NuxtPage />
     </main>
-    <footer class="account-footer">
-      <div class="footer-content">
-        <p>&copy; {{ new Date().getFullYear() }} WaterFun. All rights reserved.</p>
-      </div>
-    </footer>
   </div>
 </template>
 

@@ -48,7 +48,7 @@ onMounted(async () => {
 <template>
   <div>
     <HeaderNavMenu />
-    <div style="max-width:1280px;margin:0 auto;padding:24px">
+    <div class="page-container">
       <el-row :gutter="24">
         <el-col :xs="24" :md="17">
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">

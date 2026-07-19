@@ -127,7 +127,7 @@ onMounted(async () => {
   <div>
     <HeaderNavMenu />
     <BannerCarousel />
-    <div style="max-width:1280px;margin:0 auto;padding:24px">
+    <div class="page-container">
       <el-row :gutter="24">
         <el-col :xs="24" :md="17">
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
@@ -388,17 +388,7 @@ onMounted(async () => {
         </el-col>
       </el-row>
     </div>
-    <el-divider style="margin:0" />
-    <footer style="padding:32px 24px;text-align:center">
-      <div style="display:flex;justify-content:center;gap:24px;margin-bottom:16px">
-        <NuxtLink to="/about" style="font-size:14px;color:#64748b;text-decoration:none">关于我们</NuxtLink>
-        <NuxtLink to="/EulaView" style="font-size:14px;color:#64748b;text-decoration:none">用户协议</NuxtLink>
-        <NuxtLink to="/legal/terms" style="font-size:14px;color:#64748b;text-decoration:none">服务条款</NuxtLink>
-        <NuxtLink to="/legal/privacy" style="font-size:14px;color:#64748b;text-decoration:none">隐私政策</NuxtLink>
-        <a href="#" style="font-size:14px;color:#64748b;text-decoration:none">联系我们</a>
-      </div>
-      <div style="font-size:13px;color:#94a3b8">© 2026 WaterFun. All rights reserved.</div>
-    </footer>
+    <AppFooter />
   </div>
 </template>
 <style scoped>

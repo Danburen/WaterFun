@@ -5,6 +5,8 @@ import router, { menuRoutes } from '@/router'
 
 const props = defineProps<{
   collapse: boolean;
+  drawerOpen?: boolean;
+  mobile?: boolean;
 }>()
 
 const route = useRoute()
@@ -112,7 +114,7 @@ const getIconClass = (icon?: string) => {
 </script>
 
 <template>
-  <aside :class="['sidebar', { collapsed: collapse }]">
+  <aside :class="['sidebar', { collapsed: collapse, 'sidebar-drawer': mobile, 'sidebar-open': mobile && drawerOpen }]">
     <div class="sidebar-header">
       <a href="#" class="sidebar-logo">
         <img src="../../assets/logo.svg" width="32" height="32" alt="WaterFun">
@@ -308,5 +310,17 @@ const getIconClass = (icon?: string) => {
 
 .nav-item span {
   transition: opacity 0.2s;
+}
+
+/* Mobile drawer mode */
+.sidebar-drawer {
+  position: fixed;
+  top: 0;
+  left: -240px;
+  z-index: 1001;
+  transition: left 0.3s ease;
+}
+.sidebar-drawer.sidebar-open {
+  left: 0;
 }
 </style>
