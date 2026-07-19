@@ -135,7 +135,7 @@ const loadOptions = async () => {
     const [me, cr, tr, hr] = await Promise.all([
       getCurrentUserInfo(),
       getCategoryOptions(),
-      getTagOptions(),
+      getTagOptions({ limit: 100 }),
       getHotTags(20),
     ]);
     const myInfo = me.data;

@@ -9,6 +9,7 @@ import { getUserOptions } from "~/api/user";
 import type { PageOptions } from "~/types/api";
 import CategoryCreateDialog from "~/views/Content/components/CategoryCreateDialog.vue";
 import { ElMessage } from "element-plus";
+import RemoteSelect from "~/components/RemoteSelect.vue";
 
 const router = useRouter();
 const loading = ref(false);
@@ -19,7 +20,6 @@ const createDialogVisible = ref(false);
 const dialogMode = ref<"create" | "edit">("create");
 const currentCategoryId = ref<number>(0);
 const categoryOptions = ref<OptionResItem<number>[]>([]);
-const userOptions = ref<OptionResItem<string>[]>([]);
 
 const searchForm = ref<{ name: string; slug: string; parentId: number | null; creatorId: string | null }>({ name: "", slug: "", parentId: null, creatorId: null });
 const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
@@ -35,7 +35,7 @@ const fetchData = async () => {
 
 const loadOptions = async () => {
   loadingOptions.value = true;
-  try { const [categoryRes, userRes] = await Promise.all([getCategoryOptions(), getUserOptions()]); categoryOptions.value = categoryRes.data || []; userOptions.value = userRes.data || []; } catch (e) { console.error(e); ElMessage.error('获取数据失败'); } finally { loadingOptions.value = false; }
+  try { const categoryRes = await getCategoryOptions(); categoryOptions.value = categoryRes.data || []; } catch (e) { console.error(e); ElMessage.error('获取数据失败'); } finally { loadingOptions.value = false; }
 };
 
 const handleSearch = () => { pageOpts.value.currentPage = 1; fetchData(); };
@@ -90,10 +90,13 @@ onMounted(() => { fetchData(); loadOptions(); });
         </div>
         <div class="search-field">
           <label>创建人</label>
-          <select v-model="searchForm.creatorId">
-            <option :value="null">全部</option>
-            <option v-for="item in userOptions" :key="item.id" :value="item.id" :disabled="item.disabled">{{ item.id }} ({{ item.name }})</option>
-          </select>
+          <RemoteSelect
+            :fetch-fn="(keyword, limit) => getUserOptions(keyword, limit).then(r => r.data ?? [])"
+            :model-value="searchForm.creatorId"
+            placeholder="全部"
+            clearable
+            @update:model-value="(v: any) => searchForm.creatorId = v ?? null"
+          />
         </div>
         <div class="search-actions">
           <button class="btn btn-primary" @click="handleSearch">查询</button>

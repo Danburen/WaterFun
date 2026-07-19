@@ -299,7 +299,12 @@ export const batchDeletePosts = (ids: string[]): PromiseResBody<void> => {
   return request.post('/posts/me/batch-delete', ids)
 }
 
-export const getPostLikedUsers = (id: string): PromiseResBody<UserBrief[]> => {
+export interface LikedUsersResp {
+  totalCount: number
+  previewUsers: UserBrief[]
+}
+
+export const getPostLikedUsers = (id: string): PromiseResBody<LikedUsersResp> => {
   return request.get(`/posts/${id}/liked-users`)
 }
 

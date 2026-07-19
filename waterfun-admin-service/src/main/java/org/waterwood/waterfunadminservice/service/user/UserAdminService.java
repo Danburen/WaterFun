@@ -107,11 +107,15 @@ public interface UserAdminService {
     void updateUserDatum(long uid, UserDatumUpdateAReq body);
 
     /**
-     * Get all user options for select, the option's value which id is user uid, name is username,
+     * Search user options for select dropdown.
+     * Returns top users matching keyword (by username or nickname), limited by {@code limit}.
+     * When keyword is empty, returns the most recently created users as default.
      *
+     * @param keyword search keyword (optional, empty returns recent users)
+     * @param limit   max results (default 100)
      * @return option list
      */
-    List<OptionVO<Long>> getAllUserOptions();
+    List<OptionVO<Long>> searchUserOptions(String keyword, int limit);
 
     /**
      * Create a new user default validated phone(won't check whether the phone number is visualise).

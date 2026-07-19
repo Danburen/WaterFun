@@ -7,6 +7,7 @@ import { getUserOptions } from "~/api/user";
 import { uploadImage, type AdminUploadBizType } from "~/api/upload";
 import { ElMessage } from "element-plus";
 import BaseDialog from "~/components/BaseDialog.vue";
+import RemoteSelect from "~/components/RemoteSelect.vue";
 
 const props = withDefaults(defineProps<{
   modelValue: boolean; mode?: "create" | "edit"; postId?: string;
@@ -67,7 +68,7 @@ const clearErrs = () => { titleErr.value = ''; contentErr.value = ''; authorIdEr
 
 const loadOptions = async () => {
   loadingOptions.value = true;
-  try { const [cr, tr, ur] = await Promise.all([getCategoryOptions(), getTagOptions(), getUserOptions()]); categoryOptions.value = cr.data || []; tagOptions.value = tr.data || []; userOptions.value = ur.data || []; }
+  try { const [cr, tr] = await Promise.all([getCategoryOptions(), getTagOptions({ limit: 100 })]); categoryOptions.value = cr.data || []; tagOptions.value = tr.data || []; }
   catch { ElMessage.error('获取数据失败'); }
   finally { loadingOptions.value = false; }
 };
@@ -236,12 +237,14 @@ const handleSave = async () => {
         </div>
       </div>
       <div class="form-field">
-        <label class="form-label">作者ID</label>
+        <label class="form-label">作者</label>
         <div class="form-content">
-            <select v-model="authorId" class="form-select">
-              <option :value="null">请选择</option>
-            <option v-for="item in userOptions" :key="item.id" :value="item.id" :disabled="item.disabled">{{ item.id }} ({{ item.name }}{{ item.code ? ` / ${item.code}` : '' }})</option>
-          </select>
+          <RemoteSelect
+            v-model="authorId"
+            placeholder="搜索用户..."
+            :fetcher="(kw: string) => getUserOptions({ keyword: kw, limit: 20 }).then(r => r.data || [])"
+            valueType="id"
+          />
           <div v-if="authorIdErr" class="form-error">{{ authorIdErr }}</div>
         </div>
       </div>

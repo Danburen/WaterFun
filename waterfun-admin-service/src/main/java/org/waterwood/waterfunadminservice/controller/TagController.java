@@ -72,9 +72,11 @@ public class TagController {
     }
 
     @GetMapping("/options")
-    public ApiResponse<List<OptionVO<Long>>> getOptions() {
+    public ApiResponse<List<OptionVO<Long>>> getOptions(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "100") int limit) {
         return ApiResponse.success(
-                tagService.getOptions()
+                tagService.getOptions(keyword, Math.min(limit, 200))
         );
     }
 

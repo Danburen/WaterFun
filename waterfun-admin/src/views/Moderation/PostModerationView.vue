@@ -68,7 +68,7 @@ const fetchData = async () => {
   loading.value = true;
   try {
     if (!tagOptions.value.length) {
-      const tr = await getTagOptions();
+      const tr = await getTagOptions({ limit: 100 });
       tagOptions.value = tr.data || [];
     }
     const query: any = {};

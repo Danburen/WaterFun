@@ -23,7 +23,7 @@ export const useDictStore = defineStore("dictStore", () => {
   async function refresh() {
     const [catRes, tagRes] = await Promise.all([
       getCategoryOptions(),
-      getTagOptions(),
+      getTagOptions("", 100),
     ]);
     categoryOptions.value = catRes.data || [];
     tagOptions.value = tagRes.data || [];

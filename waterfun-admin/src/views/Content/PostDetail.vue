@@ -22,25 +22,29 @@ const renderedPublishedHtml = ref('');
 const renderedEditedHtml = ref('');
 
 const categoryOptions = ref<OptionResItem<number>[]>([]);
-const userOptions = ref<OptionResItem<string>[]>([]);
-const tagOptions = ref<OptionResItem<number>[]>([]);
-
-const categoryNameMap = computed(() => { const m = new Map<number, string>(); categoryOptions.value.forEach(i => m.set(i.id, i.name)); return m; });
-const userNameMap = computed(() => { const m = new Map<string, string>(); userOptions.value.forEach(i => m.set(i.id, i.name)); return m; });
-const tagNameMap = computed(() => { const m = new Map<number, string>(); tagOptions.value.forEach(i => m.set(i.id, i.name)); return m; });
+const userNameMap = ref<Map<string, string>>(new Map());
+const tagNameMap = ref<Map<number, string>>(new Map());
 
 const visibilityLabelMap: Record<string, string> = { PUBLIC: "公开", PRIVATE: "私密", FANS_ONLY: "粉丝可见" };
 const statusBadgeCls: Record<string, string> = { DRAFT: "badge-gray", PENDING: "badge-yellow", PUBLISHED: "badge-green", REJECTED: "badge-red", ARCHIVED: "badge-gray" };
 const statusLabel: Record<string, string> = { DRAFT: "草稿", PENDING: "待审核", PUBLISHED: "已发布", REJECTED: "已拒绝", ARCHIVED: "已归档" };
 const typeLabel: Record<string, string> = { COMMON: "普通帖子", NOTICE: "公告" };
 
-const fetchOptions = async () => {
+const loadDicts = async () => {
   try {
-    const [cr, ur, tr] = await Promise.all([getCategoryOptions(), getUserOptions(), getTagOptions()]);
+    const [cr, tr, ur] = await Promise.all([
+      getCategoryOptions(),
+      getTagOptions("", 100),
+      getUserOptions("", 100),
+    ]);
     categoryOptions.value = cr.data || [];
-    userOptions.value = ur.data || [];
-    tagOptions.value = tr.data || [];
-  } catch { ElMessage.error('获取数据失败'); }
+    const tm = new Map<number, string>();
+    (tr.data || []).forEach((i: any) => tm.set(Number(i.id), i.name));
+    tagNameMap.value = tm;
+    const um = new Map<string, string>();
+    (ur.data || []).forEach((i: any) => um.set(String(i.id), i.name));
+    userNameMap.value = um;
+  } catch { /* ignore */ }
 };
 
 const renderContent = () => {
@@ -65,6 +69,7 @@ const fetchDetail = async () => {
     const res = await getPostById(postId.value);
     postDetail.value = res.data;
     renderContent();
+    loadDicts();
   }
   catch { ElMessage.error('获取文章详情失败'); }
   finally { loading.value = false; }
@@ -79,7 +84,7 @@ const hasEditedContent = computed(() => {
   return !!(d?.editedTitle || d?.editedContent || d?.editedSummary);
 });
 
-onMounted(async () => { await Promise.all([fetchOptions(), fetchDetail()]); });
+onMounted(async () => { await fetchDetail(); });
 </script>
 
 <template>

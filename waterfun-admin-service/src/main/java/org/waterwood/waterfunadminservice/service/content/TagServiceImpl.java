@@ -12,6 +12,7 @@ import org.waterwood.api.VO.OptionVO;
 import org.waterwood.utils.generator.IdentifierGenerator;
 import org.waterwood.waterfunadminservice.api.request.content.CreateTagRequest;
 import org.waterwood.utils.CollectionUtil;
+import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunadminservice.api.request.content.DeleteTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.UpdateTagReq;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.TagMapper;
@@ -78,15 +79,21 @@ public class TagServiceImpl implements TagService {
     }
     @Transactional
     @Override
-    public List<OptionVO<Long>> getOptions() {
-        return tagRepository.findAll().stream()
-                .filter(t -> ! t.getIsDeleted())
+    public List<OptionVO<Long>> getOptions(String keyword, int limit) {
+        List<Tag> tags;
+        if (StringUtil.isBlank(keyword)) {
+            tags = tagRepository.findAllByIsDeleted(false, PageRequest.of(0, limit)).getContent();
+        } else {
+            tags = tagRepository.searchByKeyword(keyword, PageRequest.of(0, limit));
+        }
+        return tags.stream()
                 .map(t -> OptionVO.<Long>builder()
                         .id(t.getId())
                         .code(t.getSlug())
                         .name(t.getName())
                         .usageCount(t.getUsageCount())
-                        .build()).toList();
+                        .build())
+                .toList();
     }
 
     @Override

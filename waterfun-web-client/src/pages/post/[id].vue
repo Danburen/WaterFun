@@ -3,7 +3,7 @@ import { usePostStore } from '~/stores/postStore'
 import { useCommentStore } from '~/stores/commentStore'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { likePost, collectPost, fetchPostList, reportPost, getPostLikedUsers } from '~/api/postApi'
+import { likePost, collectPost, fetchPostList, reportPost, getPostLikedUsers, type LikedUsersResp } from '~/api/postApi'
 import { likeComment, reportComment } from '~/api/commentApi'
 import type { ReportType } from '~/api/ticketApi'
 import UserBadge from '~/components/UserBadge.vue'
@@ -35,7 +35,7 @@ const collected = ref(false)
 const likeCount = ref(0)
 const collectCount = ref(0)
 const commentCount = ref(0)
-const likedUsers = ref<UserBrief[]>([])
+const likedUsers = ref<LikedUsersResp | null>(null)
 
 const commentText = ref('')
 const commentTextareaRef = ref<HTMLTextAreaElement | null>(null)
@@ -92,7 +92,7 @@ const fetchComments = (reset = false) => {
 const loadLikedUsers = async () => {
   try {
     const res = await getPostLikedUsers(postId.value)
-    likedUsers.value = (res.data as UserBrief[]) || []
+    likedUsers.value = (res.data as LikedUsersResp) || null
   } catch { /* ignore */ }
 }
 
@@ -438,10 +438,10 @@ watch(currentPost, (post) => {
               />
             </div>
           </div>
-          <div v-if="likedUsers.length > 0" class="liked-users-bar">
+          <div v-if="likedUsers?.previewUsers?.length" class="liked-users-bar">
             <div class="liked-avatars">
               <img
-                v-for="user in likedUsers.slice(0, 5)"
+                v-for="user in likedUsers.previewUsers"
                 :key="user.uid"
                 :src="user.avatar?.url || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"
                 :title="user.displayName"
@@ -449,7 +449,7 @@ watch(currentPost, (post) => {
               />
             </div>
             <span class="liked-text">
-              被 <strong>{{ likeCount }}</strong> 人赞过
+              被 <strong>{{ likedUsers.totalCount }}</strong> 人赞过
             </span>
           </div>
         </article>

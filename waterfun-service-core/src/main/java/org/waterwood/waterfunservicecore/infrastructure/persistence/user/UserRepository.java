@@ -1,5 +1,6 @@
 package org.waterwood.waterfunservicecore.infrastructure.persistence.user;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
@@ -79,4 +80,7 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
 
     @Query("SELECT u.createdAt FROM User u WHERE u.uid = :uids")
     List<Instant> getUserCreatedAtByUidIn(@Param("uids") List<Long> uids);
+
+    @Query("SELECT u FROM User u WHERE u.username LIKE %:keyword% OR u.nickname LIKE %:keyword% ORDER BY u.createdAt DESC")
+    List<User> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

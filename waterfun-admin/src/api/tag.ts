@@ -66,8 +66,8 @@ export const deleteTags = (tagIds: number[]): PromiseResBody<BatchResult> => {
   return request.delete<BatchResult>("/tags", { data });
 };
 
-export const getTagOptions = (): PromiseResBody<OptionResItem<number>[]> => {
-  return request.get<OptionResItem<number>[]>("/tags/options");
+export const getTagOptions = (keyword = "", limit = 100): PromiseResBody<OptionResItem<number>[]> => {
+  return request.get<OptionResItem<number>[]>("/tags/options", { params: { keyword, limit } });
 };
 
 export const searchTags = (keyword: string, limit: number = 10): PromiseResBody<OptionResItem<number>[]> => {

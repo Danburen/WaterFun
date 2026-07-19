@@ -16,27 +16,35 @@ const categoryDetail = ref<CategoryResp | null>(null);
 const editDialogVisible = ref(false);
 
 const categoryOptions = ref<OptionResItem<number>[]>([]);
-const userOptions = ref<OptionResItem<string>[]>([]);
+const userNameMap = ref<Map<string, string>>(new Map());
 
 const categoryNameMap = computed(() => { const m = new Map<number, string>(); categoryOptions.value.forEach(i => m.set(i.id, i.name)); return m; });
-const userNameMap = computed(() => { const m = new Map<string, string>(); userOptions.value.forEach(i => m.set(i.id, i.name)); return m; });
 
-const fetchOptions = async () => {
-  try { const [cr, ur] = await Promise.all([getCategoryOptions(), getUserOptions()]); categoryOptions.value = cr.data || []; userOptions.value = ur.data || []; }
-  catch { ElMessage.error('获取数据失败'); }
+const loadUserName = async (uid: string | number) => {
+  try {
+    const res = await getUserOptions("", 100);
+    const map = new Map<string, string>();
+    (res.data || []).forEach((i: any) => map.set(String(i.id), i.name));
+    userNameMap.value = map;
+  } catch { /* ignore */ }
 };
 
 const fetchDetail = async () => {
   if (Number.isNaN(categoryId.value)) { ElMessage.error('无效的分类ID'); router.back(); return; }
   loading.value = true;
-  try { const res = await getCategory(categoryId.value); categoryDetail.value = res.data; }
+  try {
+    const [catRes, optionsRes] = await Promise.all([getCategory(categoryId.value), getCategoryOptions()]);
+    categoryDetail.value = catRes.data;
+    categoryOptions.value = optionsRes.data || [];
+    if (catRes.data?.creatorId) loadUserName(catRes.data.creatorId);
+  }
   catch { ElMessage.error('获取分类详情失败'); }
   finally { loading.value = false; }
 };
 
 const handleEditSuccess = async () => { await fetchDetail() };
 
-onMounted(async () => { await Promise.all([fetchOptions(), fetchDetail()]); });
+onMounted(async () => { await fetchDetail(); });
 </script>
 
 <template>

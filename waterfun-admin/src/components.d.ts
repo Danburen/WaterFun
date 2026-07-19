@@ -20,6 +20,7 @@ declare module 'vue' {
     ImagePreviewDialog: typeof import('./components/ImagePreviewDialog.vue')['default']
     ListPage: typeof import('./components/ListPage.vue')['default']
     PlainTableContainer: typeof import('./components/PlainTableContainer.vue')['default']
+    RemoteSelect: typeof import('./components/RemoteSelect.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchContainer: typeof import('./components/SearchContainer.vue')['default']

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { formatDate } from "@waterfun/web-core/src/timer";
-import type { OptionResItem } from "@waterfun/web-core/src/types/api/response";
 import { useRoute, useRouter } from "vue-router";
 import { getTag, type TagResp } from "~/api/tag";
 import { getUserOptions } from "~/api/user";
@@ -14,26 +13,28 @@ const tagId = computed(() => Number(route.params.id));
 const loading = ref(false);
 const tagDetail = ref<TagResp | null>(null);
 const editDialogVisible = ref(false);
-const userOptions = ref<OptionResItem<string>[]>([]);
+const userNameMap = ref<Map<string, string>>(new Map());
 
-const userNameMap = computed(() => { const m = new Map<string, string>(); userOptions.value.forEach(i => m.set(i.id, i.name)); return m; });
-
-const fetchOptions = async () => {
-  try { const res = await getUserOptions(); userOptions.value = res.data || []; }
-  catch { ElMessage.error('获取数据失败'); }
+const loadUserName = async (uid: string | number) => {
+  try {
+    const res = await getUserOptions("", 100);
+    const map = new Map<string, string>();
+    (res.data || []).forEach((i: any) => map.set(String(i.id), i.name));
+    userNameMap.value = map;
+  } catch { /* ignore */ }
 };
 
 const fetchDetail = async () => {
   if (Number.isNaN(tagId.value)) { ElMessage.error('无效的标签ID'); router.back(); return; }
   loading.value = true;
-  try { const res = await getTag(tagId.value); tagDetail.value = res.data; }
+  try { const res = await getTag(tagId.value); tagDetail.value = res.data; if (res.data?.creatorId) loadUserName(res.data.creatorId); }
   catch { ElMessage.error('获取标签详情失败'); }
   finally { loading.value = false; }
 };
 
 const handleEditSuccess = async () => { await fetchDetail() };
 
-onMounted(async () => { await Promise.all([fetchOptions(), fetchDetail()]); });
+onMounted(async () => { await fetchDetail(); });
 </script>
 
 <template>

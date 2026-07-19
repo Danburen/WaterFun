@@ -18,7 +18,6 @@ import org.waterwood.waterfunservice.api.request.PublicPostListReq;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
 import org.waterwood.waterfunservice.api.response.ReportResponse;
 import org.waterwood.waterfunservice.api.response.post.*;
-import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.PostStatus;
 import org.waterwood.waterfunservicecore.entity.post.PostVisibility;
@@ -195,9 +194,9 @@ public class PostController {
         return ApiResponse.success();
     }
 
-    @Operation(summary = "Get users who liked a post")
+    @Operation(summary = "Get preview of users who liked a post (first 5 avatars + total count)")
     @GetMapping("/{id}/liked-users")
-    public ApiResponse<List<UserBrief>> getLikedUsers(@PathVariable Long id) {
+    public ApiResponse<LikedUsersResp> getLikedUsers(@PathVariable Long id) {
         return ApiResponse.success(postService.getLikedUsers(id));
     }
 

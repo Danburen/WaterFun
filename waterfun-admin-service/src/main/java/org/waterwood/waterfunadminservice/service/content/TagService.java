@@ -57,11 +57,15 @@ public interface TagService {
     BatchResult deleteTags(DeleteTagsRequest req);
 
     /**
-     * Get the tag options
+     * Get tag options for select dropdown.
+     * Returns tags matching keyword (by name or slug), limited by {@code limit}.
+     * When keyword is empty, returns the most recently created tags as default.
      *
-     * @return list ofPending optionVOs
+     * @param keyword search keyword (optional, empty returns recent tags)
+     * @param limit   max results (default 100)
+     * @return list of optionVOs
      */
-    List<OptionVO<Long>> getOptions();
+    List<OptionVO<Long>> getOptions(String keyword, int limit);
 
     /**
      * Search tags by keyword

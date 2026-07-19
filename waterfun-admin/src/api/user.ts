@@ -208,6 +208,6 @@ export const removeUserPermissions = (uid: Uid | number, permissionIds: number[]
   return request.delete<BatchResult>(`/users/${String(uid)}/permissions`, { data: { permissionIds } });
 };
 
-export const getUserOptions = (): PromiseResBody<OptionResItem<Uid>[]> => {
-  return request.get<OptionResItem<Uid>[]>("/users/options");
+export const getUserOptions = (keyword = "", limit = 100): PromiseResBody<OptionResItem<Uid>[]> => {
+  return request.get<OptionResItem<Uid>[]>("/users/options", { params: { keyword, limit } });
 };

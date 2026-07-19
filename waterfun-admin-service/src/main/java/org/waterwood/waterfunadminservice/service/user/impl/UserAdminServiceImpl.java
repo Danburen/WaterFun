@@ -3,6 +3,7 @@ package org.waterwood.waterfunadminservice.service.user.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -327,8 +328,13 @@ public class UserAdminServiceImpl implements UserAdminService {
     }
 
     @Override
-    public List<OptionVO<Long>> getAllUserOptions() {
-        return userRepository.findAll().stream()
+    public List<OptionVO<Long>> searchUserOptions(String keyword, int limit) {
+        if (StringUtil.isBlank(keyword)) {
+            return userRepository.findAll(PageRequest.of(0, limit)).stream()
+                    .map(User::toOptionVO)
+                    .toList();
+        }
+        return userRepository.searchByKeyword(keyword, PageRequest.of(0, limit)).stream()
                 .map(User::toOptionVO)
                 .toList();
     }

@@ -181,9 +181,11 @@ public class UserAdminController {
     }
 
     @GetMapping("/options")
-    public ApiResponse<List<OptionVO<Long>>> getUserOptions() {
+    public ApiResponse<List<OptionVO<Long>>> getUserOptions(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "100") int limit) {
         return ApiResponse.success(
-                userAdminService.getAllUserOptions()
+                userAdminService.searchUserOptions(keyword, Math.min(limit, 200))
         );
     }
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { OptionResItem } from "@waterfun/web-core/src/types/api/response";
 import { formatDate } from "@waterfun/web-core/src/timer";
 import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { getUserOptions } from "~/api/user";
 import ListPage from "~/components/ListPage.vue";
+import RemoteSelect from "~/components/RemoteSelect.vue";
 import { deleteTag, deleteTags, listTags, type TagResp } from "~/api/tag";
 import type { PageOptions } from "~/types/api";
 import TagCreateDialog from "~/views/Content/components/TagCreateDialog.vue";
@@ -12,14 +12,11 @@ import { ElMessage } from "element-plus";
 
 const router = useRouter();
 const loading = ref(false);
-const loadingOptions = ref(false);
 const tagList = ref<TagResp[]>([]);
 const selectedTagIds = ref<Set<number>>(new Set());
 const createDialogVisible = ref(false);
 const dialogMode = ref<"create" | "edit">("create");
 const currentTagId = ref<number>(0);
-const userOptions = ref<OptionResItem<string>[]>([]);
-
 const searchForm = ref<{ name: string; slug: string; creatorId: string | null }>({ name: "", slug: "", creatorId: null });
 const pageOpts = ref<PageOptions>({ currentPage: 1, pageSize: 10, total: 0 });
 
@@ -30,11 +27,6 @@ const fetchData = async () => {
     tagList.value = res.data.content || [];
     pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
   } catch (e) { console.error(e); ElMessage.error('获取数据失败'); } finally { loading.value = false; }
-};
-
-const loadOptions = async () => {
-  loadingOptions.value = true;
-  try { const res = await getUserOptions(); userOptions.value = res.data || []; } catch (e) { console.error(e); ElMessage.error('获取数据失败'); } finally { loadingOptions.value = false; }
 };
 
 const handleSearch = () => { pageOpts.value.currentPage = 1; fetchData(); };
@@ -71,7 +63,7 @@ const handleBatchDelete = async () => {
   } catch (e) { if (e !== "cancel") { console.error(e); ElMessage.error('标签删除失败'); } }
 };
 
-onMounted(() => { fetchData(); loadOptions(); });
+onMounted(() => { fetchData(); });
 </script>
 
 <template>
@@ -82,10 +74,13 @@ onMounted(() => { fetchData(); loadOptions(); });
         <div class="search-field"><label>标识符</label><input v-model="searchForm.slug" placeholder="唯一标识符" @keyup.enter="handleSearch" /></div>
         <div class="search-field">
           <label>创建人</label>
-          <select v-model="searchForm.creatorId">
-            <option :value="null">全部</option>
-            <option v-for="item in userOptions" :key="item.id" :value="item.id" :disabled="item.disabled">{{ item.id }} ({{ item.name }})</option>
-          </select>
+          <RemoteSelect
+            :fetch-fn="(keyword, limit) => getUserOptions(keyword, limit).then(r => r.data ?? [])"
+            :model-value="searchForm.creatorId"
+            placeholder="全部"
+            clearable
+            @update:model-value="(v: any) => searchForm.creatorId = v ?? null"
+          />
         </div>
         <div class="search-actions">
           <button class="btn btn-primary" @click="handleSearch">查询</button>
