@@ -59,7 +59,7 @@ const formatTime = (timeStr?: string): string => {
 const fetchBans = async () => {
   loading.value = true
   try {
-    const params: any = { page: currentPage.value - 1, size: pageSize.value }
+    const params: any = { page: currentPage.value, size: pageSize.value }
     if (searchUid.value) params.userUid = searchUid.value
     if (searchNickname.value.trim()) params.nickname = searchNickname.value.trim()
     const res = await listBans(params)

@@ -31,7 +31,7 @@ const getValidity = (row: BannerResp): { text: string; cls: string } => {
 const fetchData = async () => {
   loading.value = true;
   try {
-    const res = await listBanners({ page: (pageOpts.value.currentPage || 1) - 1, size: pageOpts.value.pageSize, title: searchForm.value.title || undefined, subtitle: searchForm.value.subtitle || undefined, position: searchForm.value.position || undefined, status: searchForm.value.status || undefined, startAt: searchForm.value.startAt || undefined, endAt: searchForm.value.endAt || undefined, isDeleted: searchForm.value.isDeleted === "" ? undefined : searchForm.value.isDeleted });
+    const res = await listBanners({ page: pageOpts.value.currentPage || 1, size: pageOpts.value.pageSize, title: searchForm.value.title || undefined, subtitle: searchForm.value.subtitle || undefined, position: searchForm.value.position || undefined, status: searchForm.value.status || undefined, startAt: searchForm.value.startAt || undefined, endAt: searchForm.value.endAt || undefined, isDeleted: searchForm.value.isDeleted === "" ? undefined : searchForm.value.isDeleted });
     bannerList.value = res.data.content || [];
     pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
   } catch (e) { console.error(e); ElMessage.error('获取数据失败'); } finally { loading.value = false; }

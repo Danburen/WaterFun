@@ -27,7 +27,7 @@ const fetchData = async () => {
   loading.value = true;
   try {
     const res = await getUserList({
-      page: (pageOpts.value.currentPage || 1) - 1,
+      page: pageOpts.value.currentPage || 1,
       size: pageOpts.value.pageSize,
       username: searchForm.value.username || undefined,
       nickname: searchForm.value.nickname || undefined,

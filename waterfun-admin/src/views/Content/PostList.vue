@@ -42,7 +42,7 @@ const fetchData = async () => {
   loading.value = true;
   try {
     const res = await listPosts({
-      page: (pageOpts.value.currentPage || 1) - 1, size: pageOpts.value.pageSize,
+      page: pageOpts.value.currentPage || 1, size: pageOpts.value.pageSize,
       title: searchForm.value.title || undefined, status: searchForm.value.status || undefined,
       categoryId: searchForm.value.categoryId ?? undefined, authorId: searchForm.value.authorId ?? undefined,
       slug: searchForm.value.slug || undefined,

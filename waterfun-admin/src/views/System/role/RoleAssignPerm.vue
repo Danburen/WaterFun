@@ -61,7 +61,7 @@ const fetchData = async () => {
   loading.value = true;
   try {
     const res = await listRolePerms(roleId.value, {
-      page: (pageOpts.value.currentPage || 1) - 1,
+      page: pageOpts.value.currentPage || 1,
       size: pageOpts.value.pageSize,
       name: searchForm.value.name || undefined,
       code: searchForm.value.code || undefined,

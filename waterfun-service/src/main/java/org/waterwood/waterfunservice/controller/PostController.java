@@ -58,9 +58,9 @@ public class PostController {
 
     @GetMapping("/hot")
     public ApiResponse<Page<PostCardResp>> listHotPosts(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.success(postService.listHotPosts(PageRequest.of(Math.max(page, 0), size)));
+        return ApiResponse.success(postService.listHotPosts(PageRequest.of(Math.max(page - 1, 0), size)));
     }
 
     @RateLimit(key = "listPublicPosts", permits = 60)
@@ -77,7 +77,7 @@ public class PostController {
             @RequestParam(required = false) PostVisibility visibility,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false)List<Integer> tagIds,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "newest") String sort) {
         Specification<Post> spec = PostSpec.ofSelf(title, status, visibility, categoryId, tagIds);
@@ -87,7 +87,7 @@ public class PostController {
             case "most-liked" -> Sort.by(Sort.Direction.DESC, "likeCount");
             default -> Sort.by(Sort.Direction.DESC, "publishedAt", "createdAt");
         };
-        return ApiResponse.success(postService.listAuthorCardPosts(spec, PageRequest.of(Math.max(page, 0), Math.min(size, 20), sortBy)));
+        return ApiResponse.success(postService.listAuthorCardPosts(spec, PageRequest.of(page - 1, Math.min(size, 20), sortBy)));
     }
 
     @GetMapping("/me/stats")

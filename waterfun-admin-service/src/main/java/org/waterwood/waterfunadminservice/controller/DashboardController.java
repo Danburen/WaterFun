@@ -50,9 +50,9 @@ public class DashboardController {
 
     @GetMapping("/online-users")
     public ApiResponse<Page<OnlineUserVO>> listOnlineUsers(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ApiResponse.success(adminOnlineService.listOnlineUsers(page, size, null, null, null, null));
+        return ApiResponse.success(adminOnlineService.listOnlineUsers(Math.max(page - 1, 0), size, null, null, null, null));
     }
 
     @GetMapping("/overview")

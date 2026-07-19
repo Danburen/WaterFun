@@ -38,9 +38,9 @@ public class ModerationController {
     @GetMapping("/list/posts")
     public ApiResponse<Page<AuditResponse<PostAuditPayload>>> listPosts(
            ModerationBaseQuery query,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size){
-        Pageable pageable = PageRequest.of(Math.max(0, page), size);
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
         return ApiResponse.success(
                 moderationService.listPendingPostTasks(query, pageable)
         );
@@ -49,9 +49,9 @@ public class ModerationController {
     @GetMapping("/list/images")
     public ApiResponse<Page<AuditResponse<ImageAuditPayload>>> listImages(
             ModerationBaseQuery query,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(Math.max(0, page), size);
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
         return ApiResponse.success(
                 moderationService.listPendingImageTasks(query, pageable)
         );
@@ -60,9 +60,9 @@ public class ModerationController {
     @GetMapping("/list/texts")
     public ApiResponse<Page<AuditResponse<ReplyPayload>>> listTexts(
             ModerationBaseQuery query,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(Math.max(0, page), size);
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), size);
         return ApiResponse.success(
                 moderationService.listPendingTextTasks(query, pageable)
         );

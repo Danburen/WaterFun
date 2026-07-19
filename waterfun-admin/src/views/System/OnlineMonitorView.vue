@@ -6,7 +6,7 @@ import ListPage from '~/components/ListPage.vue'
 
 const users = ref<OnlineUserVO[]>([])
 const totalElements = ref(0)
-const currentPage = ref(0)
+const currentPage = ref(1)
 const pageSize = ref(20)
 const loading = ref(false)
 const keyword = ref('')
@@ -42,7 +42,7 @@ const fetchUsers = async () => {
   finally { loading.value = false }
 }
 
-const search = () => { currentPage.value = 0; fetchUsers() }
+const search = () => { currentPage.value = 1; fetchUsers() }
 const handleForceOffline = async (uid: number) => {
   if (!confirm('确定强制该用户下线？')) return
   try { await forceOffline(uid); fetchUsers() }

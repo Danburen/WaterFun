@@ -20,8 +20,8 @@ public class AnnouncementController {
 
     @GetMapping
     public ApiResponse<Page<PostCardResp>> listAnnouncements(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.success(postService.listAnnouncements(PageRequest.of(page, size)));
+        return ApiResponse.success(postService.listAnnouncements(PageRequest.of(Math.max(page - 1, 0), size)));
     }
 }

@@ -22,13 +22,13 @@ public class OnlineUserController {
 
     @GetMapping
     public ApiResponse<Page<OnlineUserVO>> listOnlineUsers(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) UserType userType,
             @RequestParam(required = false) Short levelMin,
             @RequestParam(required = false) Short levelMax) {
-        return ApiResponse.success(adminOnlineService.listOnlineUsers(page, size, keyword, userType, levelMin, levelMax));
+        return ApiResponse.success(adminOnlineService.listOnlineUsers(Math.max(page - 1, 0), size, keyword, userType, levelMin, levelMax));
     }
 
     @GetMapping("/count")

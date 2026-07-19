@@ -28,7 +28,7 @@ const fetchRoleIds = () => {
 
 const fetchData = () => {
   loading.value = true;
-  listRoles(pageOpts.value.currentPage - 1, pageOpts.value.pageSize, searchForm.value.name, searchForm.value.code, searchForm.value.parentId)
+  listRoles(pageOpts.value.currentPage, pageOpts.value.pageSize, searchForm.value.name, searchForm.value.code, searchForm.value.parentId)
     .then(res => { roleList.value = res.data.content || []; pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0; })
     .catch(e => { console.log(e); ElMessage.error('获取数据失败'); })
     .finally(() => { loading.value = false; });

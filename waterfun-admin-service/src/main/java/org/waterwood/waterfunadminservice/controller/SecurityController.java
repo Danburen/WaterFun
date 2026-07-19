@@ -46,12 +46,12 @@ public class SecurityController {
             @RequestParam(required = false) Instant bannedAtEnd,
             @RequestParam(required = false) Instant expiresStart,
             @RequestParam(required = false) Instant expiresEnd,
-            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "20") int size
     ){
         Specification<IpBan> spec = IpBanSpec.of(ip, reason, bannedAtStart, bannedAtEnd, expiresStart, expiresEnd);
         Pageable pageable = PageRequest
-                .of(Math.max(page, 0), Math.min(size, 100))
+                .of(Math.max(page -1, 0), Math.min(size, 100))
                 .withSort(Sort.Direction.DESC, "bannedAt");
         return ApiResponse.success(
             ipBanService.listIpBanResponse(spec, pageable)
@@ -89,11 +89,11 @@ public class SecurityController {
             @RequestParam(required = false) AuditLogStatusType status,
             @RequestParam(required = false) Instant createdAtStart,
             @RequestParam(required = false) Instant createdAtEnd,
-            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest
-                .of(Math.max(page, 0), Math.min(size, 100))
+                .of(Math.max(page -1, 0), Math.min(size, 100))
                 .withSort(Sort.Direction.DESC, "createdAt");
         Specification<AuditLog> spec = AuditLogSpec.of(userId, username, action, ip, status, createdAtStart, createdAtEnd);
         return ApiResponse.success(auditLogService.listAuditLogs(spec, pageable));
@@ -129,12 +129,12 @@ public class SecurityController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) Instant createdAtStart,
             @RequestParam(required = false) Instant createdAtEnd,
-            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "20") int size
     ) {
         Specification<IpAccessLog> spec = IpAccessLogSpec.of(ip, userUid, requestPath, requestMethod, httpStatus, country, province, city, createdAtStart, createdAtEnd);
         Pageable pageable = PageRequest
-                .of(Math.max(page, 0), Math.min(size, 100))
+                .of(Math.max(page - 1, 0), Math.min(size, 100))
                 .withSort(Sort.Direction.DESC, "createdAt");
         return ApiResponse.success(ipAccessLogService.listIpAccessLogs(spec, pageable));
     }

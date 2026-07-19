@@ -22,7 +22,7 @@ const toggleAll = () => { if (allSelected.value) { tableData.value.filter(select
 const fetchData = async () => {
   loading.value = true;
   try {
-    const res = await getUserList({ page: (pageOpts.value.currentPage || 1) - 1, size: pageOpts.value.pageSize, username: searchUsername.value || undefined, nickname: searchNickname.value || undefined, accountStatus: searchAccountStatus.value || undefined });
+    const res = await getUserList({ page: pageOpts.value.currentPage || 1, size: pageOpts.value.pageSize, username: searchUsername.value || undefined, nickname: searchNickname.value || undefined, accountStatus: searchAccountStatus.value || undefined });
     tableData.value = res.data.content || []; pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
   } catch { ElMessage.error('获取用户列表失败'); }
   finally { loading.value = false; }

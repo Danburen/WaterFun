@@ -64,7 +64,7 @@ const fetchData = async () => {
   try {
     const res = await listUserRoles(
       uid.value,
-      (pageOpts.value.currentPage || 1) - 1,
+      pageOpts.value.currentPage || 1,
       pageOpts.value.pageSize,
       searchForm.value.roleId,
       searchForm.value.name || undefined,

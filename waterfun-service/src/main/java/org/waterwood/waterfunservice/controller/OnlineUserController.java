@@ -34,9 +34,9 @@ public class OnlineUserController {
 
     @GetMapping("/list")
     public ApiResponse<Page<UserBrief>> listOnlineUsers(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "12") int size) {
-        Page<Long> uidPage = onlineUserService.listOnlineUserIdsPage(page, size);
+        Page<Long> uidPage = onlineUserService.listOnlineUserIdsPage(Math.max(page - 1, 0), size);
         List<UserBrief> briefs = userBriefService.listUseBriefs(uidPage.getContent());
         return ApiResponse.success(new org.springframework.data.domain.PageImpl<>(
                 briefs, uidPage.getPageable(), uidPage.getTotalElements()));

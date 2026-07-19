@@ -24,7 +24,7 @@ const fetchPermOptions = async () => { const res = await getPermOptions(); permO
 const fetchData = async () => {
   loading.value = true;
   try {
-    const res = await listPermissions({ page: (pageOpts.value.currentPage || 1) - 1, size: pageOpts.value.pageSize, name: searchName.value || undefined, code: searchCode.value || undefined, type: searchType.value || undefined, resource: searchResource.value || undefined, parentId: searchParentId.value ?? undefined });
+            const res = await listPermissions({ page: pageOpts.value.currentPage || 1, size: pageOpts.value.pageSize, name: searchName.value || undefined, code: searchCode.value || undefined, type: searchType.value || undefined, resource: searchResource.value || undefined, parentId: searchParentId.value ?? undefined });
     tableData.value = res.data.content || []; pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
   } catch { ElMessage.error('获取权限信息失败'); }
   finally { loading.value = false; }

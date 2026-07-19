@@ -32,7 +32,7 @@ const fetchPermOptions = async () => {
 const fetchData = async () => {
   loading.value = true;
   try {
-    const res = await listPermissions({ page: (pageOpts.value.currentPage || 1) - 1, size: pageOpts.value.pageSize, name: searchForm.value.name || undefined, code: searchForm.value.code || undefined, type: searchForm.value.type || undefined, resource: searchForm.value.resource || undefined, parentId: searchForm.value.parentId ?? undefined });
+    const res = await listPermissions({ page: pageOpts.value.currentPage || 1, size: pageOpts.value.pageSize, name: searchForm.value.name || undefined, code: searchForm.value.code || undefined, type: searchForm.value.type || undefined, resource: searchForm.value.resource || undefined, parentId: searchForm.value.parentId ?? undefined });
     permissionList.value = res.data.content || [];
     pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
   } catch (e) { console.error(e); ElMessage.error('获取数据失败'); } finally { loading.value = false; }

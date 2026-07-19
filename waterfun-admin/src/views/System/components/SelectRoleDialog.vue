@@ -25,7 +25,7 @@ const fetchRoleOptions = async () => { try { const res = await getRoleAllIds(); 
 const fetchData = async () => {
   loading.value = true;
   try {
-    const res = await listRoles((pageOpts.value.currentPage || 1) - 1, pageOpts.value.pageSize, searchName.value || undefined, searchCode.value || undefined, searchParentId.value ?? undefined);
+    const res = await listRoles(pageOpts.value.currentPage || 1, pageOpts.value.pageSize, searchName.value || undefined, searchCode.value || undefined, searchParentId.value ?? undefined);
     tableData.value = res.data.content || []; pageOpts.value.total = res.data.totalElements ?? res.data.page?.totalElements ?? 0;
   } catch { ElMessage.error('获取角色信息失败'); }
   finally { loading.value = false; }
