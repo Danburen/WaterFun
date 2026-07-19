@@ -11,6 +11,13 @@
     "settings": "设置",
     "reminder": "订阅"
   },
+  "footer": {
+    "about": "关于我们",
+    "eula": "用户协议",
+    "terms": "服务条款",
+    "privacy": "隐私政策",
+    "contact": "联系我们"
+  },
   "user": {
     "profile": {
       "info": "{nickname} 的个人信息",
@@ -292,5 +299,9 @@
     "backHome": "返回首页",
     "userNotExist": "用户不存在",
     "anonymous": "匿名"
+  },
+  "contact": {
+    "title": "联系我们",
+    "desc": "有任何问题或建议？欢迎通过以下方式与我们取得联系。"
   }
 }

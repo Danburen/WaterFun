@@ -19,3 +19,7 @@ export const getPrivacy = (lang:LanguageTypes): PromiseResBody<FileResDataType> 
 export const getTerms = (lang:LanguageTypes): PromiseResBody<FileResDataType> => {
     return request.get(`/resource/legal/terms/${lang}/terms.txt`);
 }
+
+export const getContact = (lang:LanguageTypes): PromiseResBody<FileResDataType> => {
+    return request.get(`/resource/legal/contact/${lang}/contact.txt`);
+}

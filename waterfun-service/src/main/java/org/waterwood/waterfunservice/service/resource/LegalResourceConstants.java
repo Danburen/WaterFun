@@ -4,7 +4,7 @@ import java.util.Set;
 
 public class LegalResourceConstants {
     // 文件类型白名单
-    public static final Set<String> VALID_TYPES = Set.of("licence", "privacy", "about", "terms");
+    public static final Set<String> VALID_TYPES = Set.of("licence", "privacy", "about", "terms", "contact");
 
     // 语言白名单
     public static final Set<String> VALID_LANGS = Set.of("zh_CN", "en_US");

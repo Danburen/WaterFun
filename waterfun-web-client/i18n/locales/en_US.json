@@ -5,7 +5,19 @@
     "wiki": "Wiki",
     "resource": "Resource",
     "blog": "Blog",
-    "post": "Posts"
+    "post": "Posts",
+    "about": "About"
   },
-  "search": "Search"
+  "footer": {
+    "about": "About Us",
+    "eula": "User Agreement",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "contact": "Contact Us"
+  },
+  "search": "Search",
+  "contact": {
+    "title": "Contact Us",
+    "desc": "Have questions or suggestions? Feel free to reach out."
+  }
 }
