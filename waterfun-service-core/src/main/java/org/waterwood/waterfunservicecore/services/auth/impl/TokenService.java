@@ -92,6 +92,8 @@ public class TokenService implements AuthTokenService {
                 );
             } else { // revoke the old refresh token
                 redisHelper.del(oldRefRedisKey);
+                // clean up reverse index for old RT
+                redisHelper.del("rt:" + oldRefCache);
             }
         }
         String RT = StringUtil.noDashUUIDString(UUID.randomUUID());
@@ -100,6 +102,8 @@ public class TokenService implements AuthTokenService {
                 RT,
                 Duration.ofSeconds(refRotateExpire)
         );
+        // reverse index: refreshtoken:{RT} → userUid (used by refresh endpoint without access token)
+        redisHelper.set("rt:" + RT, String.valueOf(userUid), Duration.ofSeconds(refRotateExpire));
         return new TokenResult(RT, refRotateExpire);
     }
 
@@ -147,7 +151,20 @@ public class TokenService implements AuthTokenService {
         String stored = redisHelper.getValue(key);
         if (stored != null && stored.equals(refreshToken)) {
             redisHelper.del(key);
+            redisHelper.del("rt:" + stored);
         }
+    }
+
+    /**
+     * Resolve userUid from a refresh token value using the reverse index.
+     * Used by the refresh endpoint which has no access token in context.
+     */
+    public long resolveUserUidByRefreshToken(String refreshToken) {
+        String val = redisHelper.getValue("rt:" + refreshToken);
+        if (val == null) {
+            throw new BizException(BaseResponseCode.REAUTHENTICATE_REQUIRED);
+        }
+        return Long.parseLong(val);
     }
 
     @Override

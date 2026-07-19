@@ -107,6 +107,23 @@ const service = axios.create({
     ],
 })
 
+/** 专用于 token 刷新的 axios 实例（无 response 拦截器，避免循环） */
+const refreshService = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE,
+    timeout: 5000,
+    withCredentials: true,
+    transformResponse: [
+      (data) => {
+        if (typeof data !== 'string') return data
+        try {
+          return normalizeResponseTypes(JSONBigParser.parse(data))
+        } catch {
+          return data
+        }
+      },
+    ],
+})
+
 // request interceptors
 service.interceptors.request.use(
     async (config: import('axios').InternalAxiosRequestConfig) => {
@@ -197,12 +214,8 @@ service.interceptors.response.use(
                             return Promise.reject(body)
                         }
 
-                        if (!authStore.isAccess) {
-                            onRefreshed('')
-                            showMessageAndRedirect()
-                            isRefreshing = false
-                            return Promise.reject(body)
-                        }
+                        // 不检查 isAccess —— token 过期正是要 refresh 的场景
+                        // 如果 RT 也过期了，refresh 端点返回非 200，catch 里会跳登录
 
                         if (authStore.fromPool && authStore.lastBrowserLoginUid && authStore.lastBrowserLoginUid !== useUserInfoStore().userInfo.uid) {
                             onRefreshed('')
@@ -214,19 +227,12 @@ service.interceptors.response.use(
                         (async () => {
                             try {
                                 const deviceFp = await generateFingerprint();
-                                const res = await fetch(`${import.meta.env.VITE_API_BASE}/auth/refresh?deviceFp=${encodeURIComponent(deviceFp)}`, {
-                                    method: 'POST',
-                                    credentials: 'include',
-                                    headers: {
-                                        'Accept': 'application/json, text/plain, */*',
-                                    },
+                                const res = await refreshService.post('/auth/refresh', null, {
+                                    params: { deviceFp },
                                 });
-                                if (!res.ok) {
-                                    throw new Error("refresh failed");
-                                }
-                                const resData = await res.json();
-                                const newAccess = resData.data.accessToken;
-                                const newExp = resData.data.exp;
+                                const data = res.data as any;
+                                const newAccess = data.data.accessToken;
+                                const newExp = Date.now() + data.data.exp * 1000;
                                 authStore.setToken(newAccess, newExp);
 
                                 useUserInfoStore().fetchAndUpdateUserInfo().catch(console.error);

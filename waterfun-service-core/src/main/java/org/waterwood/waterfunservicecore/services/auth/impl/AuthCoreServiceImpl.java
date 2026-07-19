@@ -16,7 +16,6 @@ import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPay
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
-import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.auth.AuthCoreService;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSenderFactory;
 
@@ -59,15 +58,13 @@ public class AuthCoreServiceImpl implements AuthCoreService {
         StringUtil.isBlankThen(refreshToken, () -> {
             throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
         });// Missing refresh token
-        return UserCtxHolder.safeGetUserId().map(
-                userUid -> {
-                    RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
-                    TokenResult RT = userRepository.findById(userUid).map(_ ->
-                                    tokenService.genAndCacheRefToken(userUid, payload.deviceId()))
-                            .orElseThrow(AuthException::new);
-                    TokenResult AT = tokenService.genCacheNewAccTokenRevokeOlds(userUid, payload.deviceId());
-                    return TokenPair.of(AT, RT);
-                }
-        ).orElseThrow(() -> new AuthException(AuthCode.REAUTHORIZATION_REQUIRED));
+        // Resolve userUid from refresh token reverse index (not from access token)
+        long userUid = tokenService.resolveUserUidByRefreshToken(refreshToken);
+        RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
+        TokenResult RT = userRepository.findById(userUid).map(_ ->
+                        tokenService.genAndCacheRefToken(userUid, payload.deviceId()))
+                .orElseThrow(AuthException::new);
+        TokenResult AT = tokenService.genCacheNewAccTokenRevokeOlds(userUid, payload.deviceId());
+        return TokenPair.of(AT, RT);
     }
 }

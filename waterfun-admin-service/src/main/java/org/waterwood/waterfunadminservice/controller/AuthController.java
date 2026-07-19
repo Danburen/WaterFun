@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
+import org.waterwood.api.TokenPair;
 import org.waterwood.waterfunadminservice.service.auth.AuthService;
 import org.waterwood.waterfunadminservice.service.auth.UserService;
 import org.waterwood.waterfunservicecore.api.req.auth.LogoutRequestBody;
@@ -14,6 +15,7 @@ import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
+import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
 import org.waterwood.waterfunservicecore.services.auth.AuthCoreService;
 import org.waterwood.waterfunservicecore.services.auth.CaptchaService;
 import org.waterwood.waterfunservicecore.services.auth.LineCaptchaResult;
@@ -29,11 +31,13 @@ public class AuthController {
 
     private final CaptchaService captchaService;
     private final LoginService loginService;
+    private final AuthCoreService authCoreService;
     private final AuthService authService;
 
     public AuthController(CaptchaService captchaService, LoginService loginService, AuthCoreService authCoreService, UserCoreService userCoreService, AuthService authService, UserService userService, UserProfileCoreService userProfileCoreService) {
         this.captchaService = captchaService;
         this.loginService = loginService;
+        this.authCoreService = authCoreService;
         this.authService = authService;
     }
 
@@ -73,5 +77,19 @@ public class AuthController {
         } finally {
             CookieUtil.cleanTokenCookie(response);
         }
+    }
+
+    @Operation(summary = "刷新 Token")
+    @PostMapping("/refresh")
+    public ApiResponse<LoginClientData> refresh(String deviceFp, HttpServletRequest request, HttpServletResponse response) {
+        TokenPair tokenPair = authCoreService.refreshAccessToken(
+                CookieUtil.getCookieValue(request.getCookies(), "REFRESH_TOKEN"),
+                deviceFp
+        );
+        CookieUtil.setTokenCookie(response, tokenPair);
+        ResponseUtil.setNoCacheSecurityHeaders(response);
+        return ApiResponse.success(new LoginClientData(
+                tokenPair.accessToken(), tokenPair.accessExp(), false
+        ));
     }
 }
