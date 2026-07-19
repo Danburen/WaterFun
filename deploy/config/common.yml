@@ -13,7 +13,7 @@ jwt:
 spring:
   # -------- 数据库 (infra, 非三方) --------
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/waterfun?createDatabaseIfNotExist=true}
+    url: ${DB_URL:jdbc:mysql://waterfun-mysql:3306/waterfun?createDatabaseIfNotExist=true}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
