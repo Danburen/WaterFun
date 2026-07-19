@@ -2,12 +2,12 @@ package org.waterwood.waterfunadminservice.service.user.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.waterwood.waterfunadminservice.service.user.UserProfileService;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
 import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserProfileRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
-import org.waterwood.waterfunadminservice.service.user.UserProfileService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 @Service

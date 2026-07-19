@@ -12,6 +12,7 @@ import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.entity.content.Banner;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
+
 import java.util.List;
 
 public interface BannerService {

@@ -1,8 +1,8 @@
 package org.waterwood.waterfunadminservice.infrastructure.mapper;
 
 import org.mapstruct.*;
-import org.waterwood.waterfunservicecore.entity.user.UserCounter;
 import org.waterwood.waterfunadminservice.api.response.user.UserCounterARes;
+import org.waterwood.waterfunservicecore.entity.user.UserCounter;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserCounterMapper {

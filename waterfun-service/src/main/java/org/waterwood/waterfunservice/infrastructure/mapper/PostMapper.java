@@ -3,9 +3,12 @@ package org.waterwood.waterfunservice.infrastructure.mapper;
 import org.mapstruct.*;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.request.PutUserPostReq;
-import org.waterwood.waterfunservice.api.response.post.*;
-import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservice.api.request.content.PostSaveReq;
+import org.waterwood.waterfunservice.api.response.post.PostAuthorCardResp;
+import org.waterwood.waterfunservice.api.response.post.PostCardResp;
+import org.waterwood.waterfunservice.api.response.post.PostDetailResp;
+import org.waterwood.waterfunservice.api.response.post.PostDraftResp;
+import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 
 import java.util.Collection;

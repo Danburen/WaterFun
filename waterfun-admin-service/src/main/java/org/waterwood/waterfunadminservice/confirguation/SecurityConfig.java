@@ -1,7 +1,5 @@
 package org.waterwood.waterfunadminservice.confirguation;
 
-import java.util.Arrays;
-
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +12,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.waterwood.waterfunadminservice.infrastructure.filter.GatewayUserContextFilter;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity

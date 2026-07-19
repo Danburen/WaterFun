@@ -3,7 +3,6 @@ package org.waterwood.waterfunservice.service.report;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -28,24 +27,18 @@ import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
 import org.waterwood.waterfunservicecore.entity.notification.Inbox;
+import org.waterwood.waterfunservicecore.entity.post.CommentDO;
+import org.waterwood.waterfunservicecore.entity.post.CommentStatus;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.entity.security.PenaltyType;
 import org.waterwood.waterfunservicecore.entity.spec.TicketSpec;
-import org.waterwood.waterfunservicecore.entity.ticket.Ticket;
-import org.waterwood.waterfunservicecore.entity.ticket.TicketAuditStatus;
-import org.waterwood.waterfunservicecore.entity.ticket.TicketRejectType;
-import org.waterwood.waterfunservicecore.entity.ticket.TicketResource;
-import org.waterwood.waterfunservicecore.entity.ticket.TicketResourceId;
-import org.waterwood.waterfunservicecore.entity.ticket.TicketType;
-import org.waterwood.waterfunservicecore.entity.ticket.UserTicket;
-import org.waterwood.waterfunservicecore.entity.ticket.UserTicketId;
+import org.waterwood.waterfunservicecore.entity.ticket.*;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
 import org.waterwood.waterfunservicecore.exception.ReportAlreadyExistException;
 import org.waterwood.waterfunservicecore.exception.ReportNotFoundException;
+import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
-import org.waterwood.waterfunservicecore.entity.post.CommentDO;
-import org.waterwood.waterfunservicecore.entity.post.CommentStatus;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
@@ -54,22 +47,15 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.notification
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ticket.TicketRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ticket.TicketResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
-import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerator;
 import org.waterwood.waterfunservicecore.infrastructure.utils.IdGenerator;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service

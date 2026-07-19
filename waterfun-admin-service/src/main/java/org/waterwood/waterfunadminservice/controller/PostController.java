@@ -11,7 +11,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.VO.BatchResult;
-import org.waterwood.waterfunservicecore.entity.post.PostStatus;
 import org.waterwood.waterfunadminservice.api.request.DeletePostRequest;
 import org.waterwood.waterfunadminservice.api.request.content.AssignTagsRequest;
 import org.waterwood.waterfunadminservice.api.request.content.CreatePostRequest;
@@ -19,6 +18,7 @@ import org.waterwood.waterfunadminservice.api.request.content.PutPostReq;
 import org.waterwood.waterfunadminservice.api.response.content.PostResponse;
 import org.waterwood.waterfunadminservice.service.content.PostService;
 import org.waterwood.waterfunservicecore.entity.post.Post;
+import org.waterwood.waterfunservicecore.entity.post.PostStatus;
 import org.waterwood.waterfunservicecore.entity.spec.PostSpec;
 
 import java.util.List;

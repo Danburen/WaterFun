@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
 import org.waterwood.utils.CollectionUtil;
@@ -19,7 +20,6 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.CategoryRepo
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

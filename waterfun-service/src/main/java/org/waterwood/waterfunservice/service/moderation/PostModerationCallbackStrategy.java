@@ -1,9 +1,9 @@
 package org.waterwood.waterfunservice.service.moderation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.utils.CollectionUtil;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.service.post.TagService;

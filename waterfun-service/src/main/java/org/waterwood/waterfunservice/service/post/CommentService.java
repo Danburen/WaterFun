@@ -1,6 +1,5 @@
 package org.waterwood.waterfunservice.service.post;
 
-import jakarta.validation.Valid;
 import org.waterwood.waterfunservice.api.request.CreateCommentReq;
 import org.waterwood.waterfunservice.api.response.CommentResponse;
 import org.waterwood.waterfunservicecore.api.CursorPage;

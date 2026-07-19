@@ -10,6 +10,7 @@ import org.waterwood.waterfunservice.api.request.CreateReportReq;
 import org.waterwood.waterfunservice.api.response.CommentResponse;
 import org.waterwood.waterfunservice.api.response.ReportResponse;
 import org.waterwood.waterfunservice.service.post.CommentService;
+import org.waterwood.waterfunservice.service.report.ReportService;
 import org.waterwood.waterfunservicecore.api.CursorPage;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
@@ -18,7 +19,6 @@ import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.AuthContext;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.audit.ContentAuditService;
-import org.waterwood.waterfunservice.service.report.ReportService;
 
 @RequiredArgsConstructor
 @RestController

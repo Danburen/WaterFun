@@ -4,8 +4,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.waterwood.waterfunadminservice.api.request.AdminUploadPolicyReq;
-import org.waterwood.waterfunservicecore.api.BizType;
-import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
 import org.waterwood.waterfunservicecore.services.sys.upload.UploadBizStrategy;
 import org.waterwood.waterfunservicecore.services.sys.upload.UploadStrategyProducer;
 

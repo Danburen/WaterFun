@@ -5,9 +5,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.common.CloudFSRoot;
 import org.waterwood.waterfunservice.api.response.BannerResponse;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.content.Banner;
 import org.waterwood.waterfunservicecore.entity.content.VisibleStatus;
-import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.BannerRepository;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 

@@ -14,8 +14,10 @@ import org.waterwood.waterfunadminservice.api.request.audit.DeleteAuditLogReques
 import org.waterwood.waterfunadminservice.api.request.security.BanIpRequest;
 import org.waterwood.waterfunadminservice.api.request.security.UnbanIpRequest;
 import org.waterwood.waterfunadminservice.api.response.AuditLogResponse;
+import org.waterwood.waterfunadminservice.api.response.IpAccessLogResponse;
 import org.waterwood.waterfunadminservice.api.response.IpBanResponse;
 import org.waterwood.waterfunadminservice.service.AuditLogService;
+import org.waterwood.waterfunadminservice.service.IpAccessLogService;
 import org.waterwood.waterfunadminservice.service.IpBanService;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLog;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
@@ -25,8 +27,6 @@ import org.waterwood.waterfunservicecore.entity.security.IpBan;
 import org.waterwood.waterfunservicecore.entity.spec.AuditLogSpec;
 import org.waterwood.waterfunservicecore.entity.spec.IpAccessLogSpec;
 import org.waterwood.waterfunservicecore.entity.spec.IpBanSpec;
-import org.waterwood.waterfunadminservice.api.response.IpAccessLogResponse;
-import org.waterwood.waterfunadminservice.service.IpAccessLogService;
 
 import java.time.Instant;
 

@@ -2,9 +2,9 @@ package org.waterwood.waterfunservice.service.user;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.waterwood.waterfunservice.api.response.UserPublicProfileResp;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.api.resp.user.UserPublicCardResp;
-import org.waterwood.waterfunservice.api.response.UserPublicProfileResp;
 
 public interface UserService {
 

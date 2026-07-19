@@ -1,7 +1,6 @@
 package org.waterwood.waterfunadminservice.api.request.user;
 
 import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.waterwood.common.validation.PhoneNumber;
 

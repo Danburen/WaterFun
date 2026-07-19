@@ -8,7 +8,6 @@ import org.waterwood.waterfunadminservice.api.response.user.UserAdminBrief;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.ticket.TicketAuditStatus;
-import org.waterwood.waterfunservicecore.entity.ticket.TicketRejectType;
 import org.waterwood.waterfunservicecore.entity.ticket.TicketType;
 
 import java.time.Instant;

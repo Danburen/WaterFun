@@ -137,7 +137,7 @@ device:
 # -------- 认证 & Token (非三方) --------
 token:
   access:
-    expiration: 3600   # 1 hour (short-lived, refresh token mechanism handles renewal)
+    expiration: 60   # 1 hour (short-lived, refresh token mechanism handles renewal)
   refresh:
     rotate: 604800   # 7 days
     family: 2592000  # 30 days

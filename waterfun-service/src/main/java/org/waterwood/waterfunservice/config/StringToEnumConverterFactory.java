@@ -4,10 +4,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.stereotype.Component;
 
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.converter.ConverterFactory;
-import org.springframework.stereotype.Component;
-
 @Component
 public class StringToEnumConverterFactory implements ConverterFactory<String, Enum> {
 

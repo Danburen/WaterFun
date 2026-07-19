@@ -1,7 +1,6 @@
 package org.waterwood.waterfunservice.service.report;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -11,13 +10,9 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.waterwood.waterfunservicecore.entity.audit.*;
-import org.waterwood.waterfunservicecore.entity.security.PenaltyType;
-import org.waterwood.waterfunservicecore.entity.ticket.Ticket;
-import org.waterwood.waterfunservicecore.entity.ticket.TicketAuditStatus;
-import org.waterwood.waterfunservicecore.entity.ticket.TicketType;
-import org.waterwood.waterfunservicecore.entity.ticket.UserTicket;
-import org.waterwood.waterfunservicecore.entity.ticket.UserTicketId;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
+import org.waterwood.waterfunservicecore.entity.ticket.*;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.ReportAlreadyExistException;
 import org.waterwood.waterfunservicecore.exception.ReportNotFoundException;
@@ -35,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

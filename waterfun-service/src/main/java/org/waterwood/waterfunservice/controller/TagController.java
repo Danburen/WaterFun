@@ -10,10 +10,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.VO.OptionVO;
-import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.waterwood.waterfunservice.api.response.post.TagResponse;
 import org.waterwood.waterfunservice.infrastructure.mapper.TagMapper;
 import org.waterwood.waterfunservice.service.post.TagService;
+import org.waterwood.waterfunservicecore.entity.post.Tag;
 
 import java.util.List;
 

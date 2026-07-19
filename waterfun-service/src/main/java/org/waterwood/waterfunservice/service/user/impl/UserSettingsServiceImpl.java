@@ -7,7 +7,10 @@ import org.waterwood.waterfunservice.api.response.UserNotificationSettings;
 import org.waterwood.waterfunservice.api.response.UserPrivacySettings;
 import org.waterwood.waterfunservice.api.response.UserSettingsResp;
 import org.waterwood.waterfunservice.service.user.UserSettingsService;
-import org.waterwood.waterfunservicecore.entity.user.*;
+import org.waterwood.waterfunservicecore.entity.user.ContentPermission;
+import org.waterwood.waterfunservicecore.entity.user.ProfileVisibility;
+import org.waterwood.waterfunservicecore.entity.user.User;
+import org.waterwood.waterfunservicecore.entity.user.UserSetting;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
 

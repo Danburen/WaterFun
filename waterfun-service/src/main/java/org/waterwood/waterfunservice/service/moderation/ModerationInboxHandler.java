@@ -1,18 +1,17 @@
 package org.waterwood.waterfunservice.service.moderation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservice.api.response.InboxNotificationRes;
 import org.waterwood.waterfunservice.infrastructure.mapper.InboxSystemMapper;
 import org.waterwood.waterfunservice.service.SSEService;
 import org.waterwood.waterfunservicecore.api.message.ModerationConsumerMessage;
-import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditStatus;
+import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.notification.Inbox;
 import org.waterwood.waterfunservicecore.entity.notification.NoticeType;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.notification.InboxRepository;
@@ -21,7 +20,6 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserPre
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;

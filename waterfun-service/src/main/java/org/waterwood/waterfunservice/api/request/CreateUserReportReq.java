@@ -3,11 +3,11 @@ package org.waterwood.waterfunservice.api.request;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.waterwood.utils.StringUtil;
 import org.waterwood.waterfunservicecore.entity.audit.AuditType;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.security.PenaltyType;
 import org.waterwood.waterfunservicecore.entity.ticket.TicketType;
-import org.waterwood.utils.StringUtil;
 
 import java.util.List;
 

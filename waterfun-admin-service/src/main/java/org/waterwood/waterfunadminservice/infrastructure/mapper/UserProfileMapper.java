@@ -1,9 +1,9 @@
 package org.waterwood.waterfunadminservice.infrastructure.mapper;
 
+import org.mapstruct.*;
 import org.waterwood.waterfunadminservice.api.request.user.UserProfileUpdateAReq;
 import org.waterwood.waterfunadminservice.api.response.user.UserProfileRes;
 import org.waterwood.waterfunservicecore.entity.user.UserProfile;
-import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserProfileMapper {

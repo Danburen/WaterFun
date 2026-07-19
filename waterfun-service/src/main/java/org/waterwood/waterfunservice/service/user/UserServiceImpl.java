@@ -6,13 +6,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.waterwood.waterfunservice.api.response.UserPublicProfileResp;
 import org.waterwood.waterfunservice.service.NotificationService;
 import org.waterwood.waterfunservicecore.api.resp.user.UserBrief;
 import org.waterwood.waterfunservicecore.api.resp.user.UserPublicCardResp;
-import org.waterwood.waterfunservice.api.response.UserPublicProfileResp;
-import org.waterwood.waterfunservicecore.entity.user.*;
-import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
 import org.waterwood.waterfunservicecore.entity.audit.UserActionType;
+import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
+import org.waterwood.waterfunservicecore.entity.user.*;
 import org.waterwood.waterfunservicecore.exception.SelfFollowIsNotAllowException;
 import org.waterwood.waterfunservicecore.exception.notfound.UserAssociationDataNotFoundException;
 import org.waterwood.waterfunservicecore.exception.notfound.UserNotFoundException;
@@ -22,7 +22,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.UserLikeRepo
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.*;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
-import org.waterwood.waterfunservicecore.services.user.*;
+import org.waterwood.waterfunservicecore.services.user.UserBriefService;
 
 import java.util.List;
 

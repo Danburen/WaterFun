@@ -2,14 +2,14 @@ package org.waterwood.waterfunadminservice.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.waterwood.waterfunadminservice.api.response.monitor.SystemInfoVO;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.NetworkIF;
 import oshi.software.os.OperatingSystem;
-import org.springframework.stereotype.Service;
-import org.waterwood.waterfunadminservice.api.response.monitor.SystemInfoVO;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

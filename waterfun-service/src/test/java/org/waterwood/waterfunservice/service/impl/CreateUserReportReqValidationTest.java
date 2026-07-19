@@ -4,10 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.waterwood.waterfunservice.api.request.CreateUserReportReq;
 import org.waterwood.waterfunservicecore.entity.audit.AuditType;
-import org.waterwood.waterfunservicecore.entity.ticket.TicketType;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
+import org.waterwood.waterfunservicecore.entity.ticket.TicketType;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("CreateUserReportReq DTO 校验逻辑测试")
 public class CreateUserReportReqValidationTest {

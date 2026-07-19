@@ -27,7 +27,6 @@ import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunservicecore.entity.post.Comment;
 import org.waterwood.waterfunservicecore.entity.post.CommentDO;
 import org.waterwood.waterfunservicecore.entity.post.CommentStatus;
-import org.waterwood.waterfunservicecore.entity.post.Post;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.entity.security.PenaltyType;

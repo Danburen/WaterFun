@@ -8,17 +8,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import org.waterwood.api.ApiResponse;
 import org.waterwood.api.VO.BatchResult;
 import org.waterwood.api.VO.OptionVO;
 import org.waterwood.waterfunadminservice.api.request.role.*;
-import org.waterwood.api.ApiResponse;
 import org.waterwood.waterfunadminservice.api.response.perm.AssignedPermissionRes;
-import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
-import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunadminservice.api.response.role.RoleResp;
+import org.waterwood.waterfunadminservice.api.response.user.AssignedUserRes;
 import org.waterwood.waterfunadminservice.infrastructure.mapper.RoleMapper;
-import org.waterwood.waterfunservicecore.entity.spec.RoleSpec;
 import org.waterwood.waterfunadminservice.service.role.RoleService;
+import org.waterwood.waterfunservicecore.entity.spec.RoleSpec;
+import org.waterwood.waterfunservicecore.entity.user.Role;
 
 import java.util.List;
 

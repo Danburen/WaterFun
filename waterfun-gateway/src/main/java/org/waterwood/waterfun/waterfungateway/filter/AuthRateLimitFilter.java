@@ -1,11 +1,5 @@
 package org.waterwood.waterfun.waterfungateway.filter;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +15,12 @@ import org.waterwood.waterfun.waterfungateway.util.CounterWindow;
 import org.waterwood.waterfun.waterfungateway.util.RateLimitResponseBuilder;
 import org.waterwood.waterfun.waterfungateway.util.RateLimitUtils;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)

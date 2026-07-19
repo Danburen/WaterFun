@@ -5,46 +5,35 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.VO.BatchResult;
+import org.waterwood.common.CloudFSRoot;
+import org.waterwood.utils.CollectionUtil;
+import org.waterwood.waterfunservice.api.request.notifications.BatchMarkReadReq;
 import org.waterwood.waterfunservice.api.response.InboxNotificationRes;
-import org.waterwood.waterfunservice.infrastructure.dto.InboxPayload;
-import org.waterwood.waterfunservice.infrastructure.dto.ReactionInboxPayload;
-import org.waterwood.waterfunservice.infrastructure.dto.MultiUserIncludedInboxPayload;
-import org.waterwood.waterfunservice.infrastructure.dto.ReplyInboxPayload;
+import org.waterwood.waterfunservice.api.response.NotificationCoverageContent;
+import org.waterwood.waterfunservice.api.response.notifications.UnreadCountResp;
+import org.waterwood.waterfunservice.infrastructure.dto.*;
+import org.waterwood.waterfunservice.infrastructure.mapper.InboxSystemMapper;
+import org.waterwood.waterfunservicecore.api.CursorPage;
+import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.notification.BusinessType;
-import org.waterwood.waterfunservice.infrastructure.dto.FollowerInboxPayload;
 import org.waterwood.waterfunservicecore.entity.notification.Inbox;
 import org.waterwood.waterfunservicecore.entity.notification.NoticeType;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
-import org.waterwood.utils.CollectionUtil;
-import org.waterwood.waterfunservice.api.request.notifications.BatchMarkReadReq;
-import org.waterwood.waterfunservice.infrastructure.mapper.InboxSystemMapper;
-import org.waterwood.waterfunservicecore.api.CursorPage;
 import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
-
 import org.waterwood.waterfunservicecore.infrastructure.persistence.notification.InboxRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.waterwood.common.CloudFSRoot;
-import org.waterwood.waterfunservice.api.response.NotificationCoverageContent;
-import org.waterwood.waterfunservice.api.response.notifications.UnreadCountResp;
-import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
-import org.waterwood.waterfunservicecore.entity.audit.TargetType;
-import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
+import java.util.*;
 
 @Slf4j
 

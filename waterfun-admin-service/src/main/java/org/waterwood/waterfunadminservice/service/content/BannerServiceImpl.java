@@ -19,10 +19,10 @@ import org.waterwood.waterfunadminservice.infrastructure.mapper.BannerMapper;
 import org.waterwood.waterfunservicecore.api.req.CloudPutCallbackReq;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
+import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.content.Banner;
 import org.waterwood.waterfunservicecore.entity.content.BannerPosition;
 import org.waterwood.waterfunservicecore.entity.content.VisibleStatus;
-import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
@@ -32,10 +32,10 @@ import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceIn
 import org.waterwood.waterfunservicecore.infrastructure.persistence.BannerRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
+import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerator;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.infrastructure.validation.UploadValidator;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
-import org.waterwood.waterfunservicecore.infrastructure.utils.CosKeyPathGenerator;
 
 import java.time.Instant;
 import java.util.List;

@@ -3,12 +3,15 @@ package org.waterwood.waterfunservice.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservice.api.response.MiniFileResData;
-import org.waterwood.waterfunservice.service.resource.ResourceService;
 import org.waterwood.waterfunservice.service.resource.LegalResourceConstants;
+import org.waterwood.waterfunservice.service.resource.ResourceService;
 import org.waterwood.waterfunservicecore.services.sys.storage.CloudFileService;
 
 import java.io.IOException;
