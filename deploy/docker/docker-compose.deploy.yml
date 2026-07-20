@@ -154,13 +154,13 @@ services:
       ALIYUN_SMS_SIGN_NAME: ${ALIYUN_SMS_SIGN_NAME}
       ALIYUN_SMS_VERIFY_CODE_TEMPLATE: ${ALIYUN_SMS_VERIFY_CODE_TEMPLATE}
       WATERFUN_KEK: ${WATERFUN_KEK}
-      JAVA_TOOL_OPTIONS: "-Xmx256m -Xms256m -XX:+UseSerialGC -Dserver.tomcat.max-threads=100"
+      JAVA_TOOL_OPTIONS: "-Xmx384m -Xms384m -XX:+UseSerialGC -Dserver.tomcat.max-threads=100"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ../keys:/app/deploy/keys:ro
       - ../resource:/app/deploy/resource:ro
       - ../utils:/app/deploy/utils:ro
-    mem_limit: 384m
+    mem_limit: 512m
     restart: unless-stopped
     networks:
       - waterfun-net
@@ -201,12 +201,12 @@ services:
       ALIYUN_SMS_SIGN_NAME: ${ALIYUN_SMS_SIGN_NAME}
       ALIYUN_SMS_VERIFY_CODE_TEMPLATE: ${ALIYUN_SMS_VERIFY_CODE_TEMPLATE}
       WATERFUN_KEK: ${WATERFUN_KEK}
-      JAVA_TOOL_OPTIONS: "-Xmx96m -Xms96m -XX:+UseSerialGC -Dserver.tomcat.max-threads=30"
+      JAVA_TOOL_OPTIONS: "-Xmx160m -Xms160m -XX:+UseSerialGC -Dserver.tomcat.max-threads=30"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ../keys:/app/deploy/keys:ro
       - ../utils:/app/deploy/utils:ro
-    mem_limit: 160m
+    mem_limit: 256m
     restart: unless-stopped
     networks:
       - waterfun-net
