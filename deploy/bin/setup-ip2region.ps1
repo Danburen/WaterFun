@@ -16,7 +16,7 @@
 
 param(
     [string]$OutputDir = "$PSScriptRoot/../utils",
-    [string]$Url = "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region.xdb",
+    [string]$Url = "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v4.xdb",
     [string]$Filename = "ip2region_v4.xdb",
     [switch]$Force
 )

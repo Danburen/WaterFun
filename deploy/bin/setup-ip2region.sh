@@ -12,7 +12,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 OUTPUT_DIR="${OUTPUT_DIR:-"$SCRIPT_DIR/../utils"}"
-URL="${URL:-https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region.xdb}"
+URL="${URL:-https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v4.xdb}"
 FILENAME="${FILENAME:-ip2region_v4.xdb}"
 FORCE="${FORCE:-false}"
 

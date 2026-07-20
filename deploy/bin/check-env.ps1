@@ -182,7 +182,7 @@ if ($ip2regionPath -and (Test-Path $ip2regionPath)) {
     Write-Host "  ✅ ip2region_v4.xdb ($($size.ToString('N0')) bytes)" -ForegroundColor Green
 } else {
     Write-Host "  ❌ ip2region_v4.xdb not found" -ForegroundColor Yellow
-    Write-Host "     → Run: .\deploy\bin\setup-ip2region.ps1" -ForegroundColor Cyan
+    Write-Host "     → Run: .\deploy\bin\setup-ip2region.ps1 for windows or setup-ip2region.sh for linux" -ForegroundColor Cyan
     Write-Host "     Or manually download to deploy/utils/ip2region_v4.xdb" -ForegroundColor Cyan
 }
 

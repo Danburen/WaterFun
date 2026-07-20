@@ -33,8 +33,8 @@ on:
 
   # ─── main 分支 push → 部署 latest ───
   push:
-    branches:
-      - main
+#    branches:
+#      - main
     tags:
       - 'v*'
     paths-ignore:
