@@ -359,14 +359,14 @@ public class UserAdminServiceImpl implements UserAdminService {
         ud.setEncryptionKeyId(key.getKeyId());
 
         if(StringUtil.isNotBlank(phone)){
-            userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(phone, hmacKey.getEncryptedKey())).ifPresent(
+            userDatumRepo.findByPhoneHash(HashUtil.toSha256HmacString(phone, hmacKey.getEncryptedKey())).ifPresent(
                     _->{
                         throw new UserAdminException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
                     }
             );
             String encryptedPhone = EncryptionHelper.encryptField(phone, key);
             ud.setPhoneEncrypted(encryptedPhone);
-            ud.setPhoneHash(HashUtil.Sha256HmacString(req.getPhone(), hmacKey.getEncryptedKey()));
+            ud.setPhoneHash(HashUtil.toSha256HmacString(req.getPhone(), hmacKey.getEncryptedKey()));
         }
 
         ud.setPhoneVerified(true);

@@ -17,6 +17,7 @@ import org.waterwood.api.AuthCode;
 import org.waterwood.api.TokenPair;
 import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservice.service.log.AuditLogService;
+import org.waterwood.waterfunservicecore.api.auth.LoginResult;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.req.auth.RegisterRequest;
@@ -31,7 +32,6 @@ import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
 import org.waterwood.waterfunservicecore.services.auth.LineCaptchaResult;
-import org.waterwood.waterfunservicecore.services.auth.LoginService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.auth.impl.AuthCoreServiceImpl;
 import org.waterwood.waterfunservicecore.services.auth.impl.CaptchaServiceImpl;
@@ -118,11 +118,11 @@ public class AuthController {
     public ApiResponse<LoginClientData> loginByPassword(@Valid @RequestBody PwdLoginReq body, HttpServletRequest request, HttpServletResponse response) {
         try {
             Cookie[] cookies = request.getCookies();
-            User user = loginService.login(body, CookieUtil.getCookieValue(cookies, "CAPTCHA_KEY"));
-            auditLogService.record(user.getUid(), user.getUsername(), AuditLogActionType.LOGIN,
+            LoginResult result = loginService.login(body, CookieUtil.getCookieValue(cookies, "CAPTCHA_KEY"));
+            auditLogService.record(result.user().getUid(), result.user().getUsername(), AuditLogActionType.LOGIN,
                     request, body.getDeviceInfo());
             return ApiResponse.success(
-                    authService.BuildLoginResponse(response, user, body.getDeviceFp(), false)
+                    authService.BuildLoginResponse(response, result.user(), body.getDeviceFp(), false)
             );
         } catch (Exception e) {
             auditLogService.record(null, body.getUsername(), AuditLogActionType.LOGIN,
@@ -132,13 +132,13 @@ public class AuthController {
     }
 
 
-    @Operation(summary = "手机登陆")
+    @Operation(summary = "手机/邮箱登陆")
     @PostMapping("/login-by-code")
     @RateLimit(key = "auth.login.code", permits = 5, window = 300)
     public ApiResponse<LoginClientData> loginByCode(@Valid @RequestBody VerifyCodeDto dto, HttpServletRequest request, HttpServletResponse response) {
         try {
             String codeKey = dto.getChannel() == VerifyChannel.SMS ? "SMS_CODE_KEY" : "EMAIL_CODE_KEY";
-            LoginService.LoginResult result = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
+            LoginResult result = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
             auditLogService.record(result.user().getUid(), result.user().getUsername(), AuditLogActionType.LOGIN,
                     request, dto.getDeviceInfo());
             return ApiResponse.success(

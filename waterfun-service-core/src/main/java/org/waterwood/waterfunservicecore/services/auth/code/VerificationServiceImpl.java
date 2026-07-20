@@ -136,7 +136,7 @@ public class VerificationServiceImpl implements VerificationService {
         String failKey = "vfail:" + channel.name() + ":" + target + ":" + scene.name();
         String val = redisHelper.getValue(failKey);
         if (val != null && Integer.parseInt(val) >= VERIFY_MAX_ATTEMPTS) {
-            throw new BizException(BaseResponseCode.RATE_LIMIT_EXCEEDED);
+            throw new RateLimitException();
         }
 
         CodeVerifier verifier = codeVerifierFactory.of(channel);

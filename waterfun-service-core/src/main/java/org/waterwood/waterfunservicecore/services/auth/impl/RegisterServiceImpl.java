@@ -73,14 +73,14 @@ public class RegisterServiceImpl implements RegisterService {
         }
         verificationService.verifyCode(smsCodeKey, verify);
 
-        userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(phone, hmacKey.getEncryptedKey())).ifPresent(
+        userDatumRepo.findByPhoneHash(HashUtil.toSha256HmacString(phone, hmacKey.getEncryptedKey())).ifPresent(
                 _->{
                     throw new BizException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
                 }
         );
         // Verify email
         if (StringUtil.isNotBlank(email)) {
-            userDatumRepo.findByEmailHash(HashUtil.Sha256HmacString(email, hmacKey.getEncryptedKey())).ifPresent(
+            userDatumRepo.findByEmailHash(HashUtil.toSha256HmacString(email, hmacKey.getEncryptedKey())).ifPresent(
                     _ -> {
                         throw new BizException(BaseResponseCode.EMAIL_ALREADY_USED);
                     }
@@ -103,12 +103,12 @@ public class RegisterServiceImpl implements RegisterService {
         ud.setUid(user.getUid());
         ud.setEncryptionKeyId(aesKet.getKeyId());
         ud.setPhoneEncrypted(encryptedPhone);
-        ud.setPhoneHash(HashUtil.Sha256HmacString(phone, hmacKey.getEncryptedKey()));
+        ud.setPhoneHash(HashUtil.toSha256HmacString(phone, hmacKey.getEncryptedKey()));
 
         if(StringUtil.isNotBlank(email)) {
             String encryptedEmail = EncryptionHelper.encryptField(email, aesKet);
             ud.setEmailEncrypted(encryptedEmail);
-            ud.setEmailHash(HashUtil.Sha256HmacString(email, hmacKey.getEncryptedKey()));
+            ud.setEmailHash(HashUtil.toSha256HmacString(email, hmacKey.getEncryptedKey()));
             ud.setEmailExpireAt(Instant.now().plus(Duration.ofHours(emailUnverifiedExpireHours)));
         }
 
@@ -149,11 +149,11 @@ public class RegisterServiceImpl implements RegisterService {
         verificationService.verifyCode(target, scene, channel, codeKey, code);
 
         if (channel == VerifyChannel.SMS) {
-            userDatumRepo.findByPhoneHash(HashUtil.Sha256HmacString(target, hmacKey.getEncryptedKey())).ifPresent(
+            userDatumRepo.findByPhoneHash(HashUtil.toSha256HmacString(target, hmacKey.getEncryptedKey())).ifPresent(
                     _ -> { throw new BizException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED); }
             );
         } else if (channel == VerifyChannel.EMAIL) {
-            userDatumRepo.findByEmailHash(HashUtil.Sha256HmacString(target, hmacKey.getEncryptedKey())).ifPresent(
+            userDatumRepo.findByEmailHash(HashUtil.toSha256HmacString(target, hmacKey.getEncryptedKey())).ifPresent(
                     _ -> { throw new BizException(BaseResponseCode.EMAIL_ALREADY_USED); }
             );
         }
@@ -161,7 +161,7 @@ public class RegisterServiceImpl implements RegisterService {
         String username;
         int suffix = 0;
         do {
-            String shortHash = HashUtil.Sha256HmacString(target, hmacKey.getEncryptedKey()).substring(0, 8);
+            String shortHash = HashUtil.toSha256HmacString(target, hmacKey.getEncryptedKey()).substring(0, 8);
             String suffixStr = suffix > 0 ? String.valueOf(suffix) : "";
             username = "u_" + shortHash + suffixStr;
             suffix++;
@@ -182,11 +182,11 @@ public class RegisterServiceImpl implements RegisterService {
 
         if (channel == VerifyChannel.SMS) {
             ud.setPhoneEncrypted(encryptedTarget);
-            ud.setPhoneHash(HashUtil.Sha256HmacString(target, hmacKey.getEncryptedKey()));
+            ud.setPhoneHash(HashUtil.toSha256HmacString(target, hmacKey.getEncryptedKey()));
             ud.setPhoneVerified(true);
         } else {
             ud.setEmailEncrypted(encryptedTarget);
-            ud.setEmailHash(HashUtil.Sha256HmacString(target, hmacKey.getEncryptedKey()));
+            ud.setEmailHash(HashUtil.toSha256HmacString(target, hmacKey.getEncryptedKey()));
             ud.setEmailVerified(false);
             ud.setEmailExpireAt(Instant.now().plus(Duration.ofHours(emailUnverifiedExpireHours)));
         }

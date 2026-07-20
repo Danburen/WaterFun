@@ -147,7 +147,9 @@ public enum BaseResponseCode implements ResponseCode {
     PRIVACY_FOLLOW_NOT_ALLOWED("privacy.follow_not_allowed"),
 
     // Content
-    CONTENT_INAPPROPRIATE("content.inappropriate"),;
+    CONTENT_INAPPROPRIATE("content.inappropriate"),
+    DAILY_LIMIT_EXCEEDED("system.daily_limit_exceeded"),
+    AttemptLimitExceededException("system.attempt_limit_exceeded_minutes"),;
     private final String code;
     // private final String defaultMessage;
 

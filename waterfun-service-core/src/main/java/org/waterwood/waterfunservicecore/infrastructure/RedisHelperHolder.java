@@ -1,5 +1,6 @@
 package org.waterwood.waterfunservicecore.infrastructure;
 
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 
@@ -43,7 +44,8 @@ public interface RedisHelperHolder {
 
     <T> T getValue(String key, Class<T> clazz);
 
-    String getValue(String key);
+
+    @Nullable String  getValue(String key);
 
     <T> boolean validateAndRemove(String key, T value);
 

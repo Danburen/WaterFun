@@ -1,6 +1,7 @@
 package org.waterwood.waterfunservicecore.infrastructure;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.ScanOptions;
@@ -120,14 +121,17 @@ public class RedisHelper implements RedisHelperHolder {
         return redisTemplate.opsForSet().members(key);
     }
 
+    @Override
     public <T> T getValue(String key, Class<T> clazz) {
         return JsonUtil.fromJson(redisTemplate.opsForValue().get(key), clazz);
     }
 
-    public String getValue(String key) {
+    @Override
+    public @Nullable String getValue(String key) {
         return redisTemplate.opsForValue().get(key);
     }
 
+    @Override
     public <T> boolean validateAndRemove(String pKey, T value) {
         String stored = getValue(pKey);
 //        log.info("key: {}, stored: {}, value: {}, equal:{}",

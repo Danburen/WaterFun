@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.common.exceptions.AuthException;
+import org.waterwood.waterfunservicecore.api.auth.LoginResult;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 import org.waterwood.waterfunservicecore.entity.user.User;
@@ -27,14 +28,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginClientData loginByPwd(PwdLoginReq body, HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        User user = loginService.login(body, CookieUtil.getCookieValue(cookies, "ADMIN_CAPTCHA_KEY"));
-        List<String> roles = userRoleRepo.findByUserUid(user.getUid()).stream()
-                .map(r-> r.getRole().getCode()).toList();
-//        return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp()).getData();
-        if(roles.contains("ADMIN")) {
-            return authCoreService.BuildLoginResponse(response, user,body.getDeviceFp(), false);
-        }
-        throw new AuthException();
+        return authCoreService.BuildLoginResponse(
+                response,
+                loginService.adminLogin(body, CookieUtil.getCookieValue(
+                                request.getCookies(),
+                                "ADMIN_CAPTCHA_KEY")
+                        ).user(),
+                body.getDeviceFp(),
+                false
+        );
     }
 }

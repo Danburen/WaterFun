@@ -33,7 +33,7 @@ public class UserDatumCoreServiceImpl implements UserDatumCoreService {
     public UserDatum saveNewEmail(long userUid, String email, boolean verified) {
         UserDatum ud = getUserDatum(userUid);
         EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
-        String newHashed = HashUtil.Sha256HmacString(email, hmacKey.getEncryptedKey());
+        String newHashed = HashUtil.toSha256HmacString(email, hmacKey.getEncryptedKey());
         // check new email whether equal to old email
         if(newHashed.equals(ud.getEmailHash())){
             throw new BizException(BaseResponseCode.TWO_VALUE_MUST_DIFFERENT,"email");
@@ -55,7 +55,7 @@ public class UserDatumCoreServiceImpl implements UserDatumCoreService {
     public UserDatum saveNewPhone(long userUid, String phone, boolean verified) {
         UserDatum ud = getUserDatum(userUid);
         EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
-        String newHashed = HashUtil.Sha256HmacString(phone, hmacKey.getEncryptedKey());
+        String newHashed = HashUtil.toSha256HmacString(phone, hmacKey.getEncryptedKey());
         // check new phone whether equal to old phone
         if(newHashed.equals(ud.getPhoneHash())){
             throw new BizException(BaseResponseCode.TWO_VALUE_MUST_DIFFERENT,"phone");
