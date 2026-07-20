@@ -90,6 +90,7 @@ services:
 
   # ====================== 后端服务 ======================
   gateway:
+    user: "1000:1001"
     image: ${REGISTRY:-ghcr.io}/${GITHUB_REPOSITORY:-your-org/waterfun}/gateway:${IMAGE_TAG:-latest}
     container_name: waterfun-gateway
     environment:
@@ -118,6 +119,7 @@ services:
       - waterfun-net
 
   user-service:
+    user: "1000:1001"
     image: ${REGISTRY:-ghcr.io}/${GITHUB_REPOSITORY:-your-org/waterfun}/user-service:${IMAGE_TAG:-latest}
     container_name: waterfun-user-service
     environment:
@@ -164,6 +166,7 @@ services:
       - waterfun-net
 
   admin-service:
+    user: "1000:1001"
     image: ${REGISTRY:-ghcr.io}/${GITHUB_REPOSITORY:-your-org/waterfun}/admin-service:${IMAGE_TAG:-latest}
     container_name: waterfun-admin-service
     environment:
