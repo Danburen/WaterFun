@@ -15,6 +15,7 @@ public final class DataAdapter {
      * @param defaultVal default values if can't adapter
      * @return adapted data
      */
+    @Deprecated
     public static <T> T toValue(Object value, T defaultVal){
         if(value == null){
             return defaultVal;

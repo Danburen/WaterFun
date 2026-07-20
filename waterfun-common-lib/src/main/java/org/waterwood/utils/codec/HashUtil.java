@@ -11,7 +11,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 public final class HashUtil {
-    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final Snowflake SNOW = Snowflake.of(0, 0);
     private static final ThreadLocal<MessageDigest> MD5_DIGEST = ThreadLocal.withInitial(() -> {
         try {
@@ -37,7 +37,7 @@ public final class HashUtil {
         }
     });
 
-    public static String Sha256HmacString(String data, String key) {
+    public static String toSha256HmacString(String data, String key) {
         try {
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "HmacSHA256");
             SHA256_HMAC.get().init(secretKey);
@@ -60,7 +60,7 @@ public final class HashUtil {
 
     public static String getRandomSalt(int length) {
         byte[] saltBytes = new byte[length];
-        secureRandom.nextBytes(saltBytes);
+        SECURE_RANDOM.nextBytes(saltBytes);
         return Base64.getEncoder().encodeToString(saltBytes);
     }
 
