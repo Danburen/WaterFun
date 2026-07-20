@@ -2,6 +2,7 @@ package org.waterwood.waterfunservicecore.infrastructure.utils.context;
 
 
 import org.jetbrains.annotations.Nullable;
+import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserSetting;
 
 import java.util.Locale;
@@ -24,9 +25,13 @@ public class UserCtxHolder {
         return Optional.ofNullable(get());
     }
 
-    @Nullable
+    /**
+     * This method only allow used in authenticated scene
+     * we recommend using {@link UserCtxHolder#safeGetUserId()}
+     * @return {@link User#getUid()}
+     */
     public static Long getUserUid(){
-        return get() == null ? null : get().getUserUid();
+        return get().getUserUid();
     }
     /**
      * Set value to ThreadLocal

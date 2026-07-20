@@ -12,7 +12,6 @@ export const useAuthStore = defineStore('accessStore', ()=>{
         expire: 0,
     })
 
-    const fromPool = ref(false)
     const lastBrowserLoginUid = ref('')
 
     const setToken = (token:string,expire:number) => {
@@ -38,7 +37,6 @@ export const useAuthStore = defineStore('accessStore', ()=>{
         removeToken,
         accessData,
         isAccess,
-        fromPool,
         lastBrowserLoginUid,
     }
 },{
