@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.waterfunservicecore.exception.BizException;
-import org.waterwood.waterfunservicecore.exception.RateLimitException;
+import org.waterwood.waterfunservicecore.exception.InvalidVerifySceneException;
+import org.waterwood.waterfunservicecore.exception.threshold.RateLimitException;
 import org.waterwood.waterfunservicecore.exception.RegisterChannelUnsupportedException;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
@@ -18,15 +19,17 @@ import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
-import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
 import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
-import org.waterwood.waterfunservicecore.services.sms.SmsCodeService;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+import org.waterwood.utils.codec.HashUtil;
 
 @Slf4j
 @Service
@@ -34,10 +37,8 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class VerificationServiceImpl implements VerificationService {
     private final CodeSenderFactory codeSenderFactory;
-    private final SmsCodeService smsCodeService;
     private final CodeVerifierFactory codeVerifierFactory;
     private final EncryptedKeyService encryptedKeyService;
-    private final UserRepository userRepository;
     private final UserDatumRepo userDatumRepo;
     private final RedisHelperHolder redisHelper;
 
@@ -62,10 +63,7 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     @Override
-    public CodeResult sendAuthenticationCode(String target, VerifyChannel channel, VerifyScene scene) {
-        if (channel == VerifyChannel.EMAIL && scene == VerifyScene.REGISTER) {
-            throw new RegisterChannelUnsupportedException();
-        }
+    public CodeResult sendCodeForAuthenticated(String target, VerifyChannel channel, VerifyScene scene) {
         checkTargetNotRateLimited(target, channel);
         CodeSender sender = codeSenderFactory.of(channel);
         CodeResult result = sender.sendCode(target, scene);
@@ -74,12 +72,27 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     @Override
-    public CodeResult sendCode(SendCodeDto dto) {
+    public CodeResult sendCodeForAnonymous(SendCodeDto dto) {
+        // White list for anonymous, only allow login, register, forgot-password
+        if(! List.of(VerifyScene.LOGIN, VerifyScene.REGISTER, VerifyScene.FORGOT_PASSWORD).contains(dto.getScene())) {
+            throw new InvalidVerifySceneException();
+        }
         if (dto.getChannel() == VerifyChannel.EMAIL && dto.getScene() == VerifyScene.REGISTER) {
             throw new RegisterChannelUnsupportedException();
         }
         String target = dto.getTarget();
         VerifyChannel channel = dto.getChannel();
+        // For LOGIN and FORGOT_PASSWORD: only send code if target is registered.
+        // Return 200 either way to not reveal registration status.
+        if (dto.getScene() != VerifyScene.REGISTER && !isTargetRegistered(target, channel)) {
+            return CodeResult.builder()
+                    .sendSuccess(true)
+                    .target(target)
+                    .channel(channel)
+                    .key(UUID.randomUUID().toString())
+                    .build();
+        }
+
         checkTargetNotRateLimited(target, channel);
         CodeSender sender = codeSenderFactory.of(channel);
         CodeResult result = sender.sendCode(target, dto.getScene());
@@ -87,12 +100,23 @@ public class VerificationServiceImpl implements VerificationService {
         return result;
     }
 
+    /**
+     * Check whether the given target (phone/email) is registered in the system.
+     * Used by {@link #sendCodeForAnonymous} to decide whether to actually send a code.
+     */
+    private boolean isTargetRegistered(String target, VerifyChannel channel) {
+        EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
+        String hash = HashUtil.toSha256HmacString(target, hmacKey.getEncryptedKey());
+        return switch (channel) {
+            case SMS -> userDatumRepo.findByPhoneHash(hash).isPresent();
+            case EMAIL -> userDatumRepo.findByEmailHash(hash).isPresent();
+        };
+    }
+
     /** Per-target hourly limit: max 10 sends per rolling hour (cost-sensitive channels). */
     private static final int TARGET_HOURLY_LIMIT = 10;
-
     /** Max failed verification attempts before temporary lockout. */
     private static final int VERIFY_MAX_ATTEMPTS = 5;
-
     /** Lockout duration (minutes) after exceeding max failed attempts. */
     private static final long VERIFY_LOCK_MINUTES = 15;
 
@@ -141,12 +165,9 @@ public class VerificationServiceImpl implements VerificationService {
 
         CodeVerifier verifier = codeVerifierFactory.of(channel);
         if(! verifier.verifyCode(target, scene, key, code)){
-            // Atomic increment — TTL is set only on first creation (count == 1),
-            // so the lockout window starts from the first failed attempt.
             redisHelper.increment(failKey, Duration.ofMinutes(VERIFY_LOCK_MINUTES));
             throw new BizException(BaseResponseCode.VERIFY_CODE_INVALID);
         }
-
         // Success — clear fail counter
         redisHelper.del(failKey);
     }
@@ -163,7 +184,7 @@ public class VerificationServiceImpl implements VerificationService {
     @Override
     public void verifyAuthorizedCode(String verifyCodeKey, SecurityVerifyCodeDto verifyBody, String target, VerifyScene scene){
         if(scene != verifyBody.getScene()){
-            throw new BizException(BaseResponseCode.INVALID_VERIFY_SCENE);
+            throw new InvalidVerifySceneException();
         }
         this.verifyCode(
                 target,

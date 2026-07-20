@@ -10,12 +10,14 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.waterwood.utils.StringUtil;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserSettingRepository;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.AuthContext;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,29 +25,51 @@ import java.util.stream.Collectors;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GatewayUserContextFilter extends OncePerRequestFilter {
 
+    private final UserSettingRepository userSettingRepository;
+
+    public GatewayUserContextFilter(UserSettingRepository userSettingRepository) {
+        this.userSettingRepository = userSettingRepository;
+    }
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String lang = request.getHeader("X-User-Lang");
+        Locale locale = Locale.forLanguageTag(lang != null ? lang : "en");
+
         String userUid = request.getHeader("X-User-Uid");
         if(StringUtil.isBlank(userUid)) {
-            filterChain.doFilter(request, response);
+            AuthContext authCtx = new AuthContext();
+            authCtx.setLocale(locale);
+            authCtx.setClientIp((String) request.getAttribute("clientIp"));
+            UserCtxHolder.set(authCtx);
+            try {
+                filterChain.doFilter(request, response);
+            } finally {
+                UserCtxHolder.remove();
+            }
             return;
         }
 
-        AuthContext authContext = new AuthContext();
-        authContext.setUserUid(Long.valueOf(userUid));
+        AuthContext authCtx = new AuthContext();
 
         String jti = request.getHeader("X-Token-Jti");
         if(StringUtil.isBlank(jti)){
             jti = request.getHeader("X-User-Jti");
         }
 
-        authContext.setJti(jti);
-        authContext.setDid(request.getHeader("X-User-Did"));
-        UserCtxHolder.set(authContext);
+        authCtx.setUserUid(Long.valueOf(userUid));
+        authCtx.setJti(jti);
+        authCtx.setLocale(locale);
+        authCtx.setDid(request.getHeader("X-User-Did"));
+        authCtx.setClientIp((String) request.getAttribute("clientIp"));
+        userSettingRepository.findById(authCtx.getUserUid())
+                .ifPresent(authCtx::setUserSetting);
+
+        UserCtxHolder.set(authCtx);
         try {
             filterChain.doFilter(request, response);
         } finally {
-            UserCtxHolder.remove();  // must clean to prevent MEMORY_LEAK
+            UserCtxHolder.remove();
         }
     }
 

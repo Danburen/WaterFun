@@ -16,9 +16,9 @@ import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
 import org.waterwood.common.exceptions.AuthException;
-import org.waterwood.waterfunservicecore.exception.AttemptLimitExceededException;
 import org.waterwood.waterfunservicecore.exception.BizException;
-import org.waterwood.waterfunservicecore.exception.DailyLimitExceededException;
+import org.waterwood.waterfunservicecore.exception.threshold.AttemptLimitExceededException;
+import org.waterwood.waterfunservicecore.exception.threshold.DailyLimitExceededException;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
@@ -40,10 +40,12 @@ import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
 import org.waterwood.waterfunservicecore.services.online.OnlineUserService;
 import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
+import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.waterwood.waterfunservicecore.api.req.auth.ForgetPasswordDto;
 
 @Slf4j
 @Service
@@ -65,6 +67,7 @@ public class LoginServiceImpl implements LoginService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final UserRoleRepo userRoleRepo;
     private final RedisHelperHolder redisHelper;
+    private final UserCoreService userCoreService;
 
     private static final int ADMIN_LOGIN_MAX_ATTEMPTS = 5;
     private static final long ADMIN_LOGIN_LOCK_MINUTES = 120;
@@ -133,6 +136,34 @@ public class LoginServiceImpl implements LoginService {
     public LoginResult login(PwdLoginReq body, String verifyUuidKey){
         return tryLogin(body.getUsername(), false,
                 () -> verifyCredentials(body, verifyUuidKey));
+    }
+
+    @Override
+    @Transactional
+    public void forgetPassword(String verifyCodeKey, ForgetPasswordDto dto) {
+        // Verify the SMS/email code (already protected by 5-fail lockout in VerificationServiceImpl)
+        verificationService.verifyCode(
+                dto.getTarget(), VerifyScene.FORGOT_PASSWORD, dto.getChannel(),
+                verifyCodeKey, dto.getCode()
+        );
+
+        // Find user by phone/email
+        EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
+        String channelHash = HashUtil.toSha256HmacString(dto.getTarget(), hmacKey.getEncryptedKey());
+        UserDatum ud = switch (dto.getChannel()) {
+            case SMS -> userDatumRepo.findByPhoneHash(channelHash)
+                    .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
+            case EMAIL -> userDatumRepo.findByEmailHash(channelHash)
+                    .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
+        };
+
+        // New-password confirmation check
+        if (!dto.getNewPwd().equals(dto.getConfirmPwd())) {
+            throw new BizException(BaseResponseCode.PASSWORD_TWO_PASSWORD_NOT_EQUAL);
+        }
+
+        // Update password (handles encoding, same-password rejection, audit log)
+        userCoreService.changePwd(ud.getUid(), dto.getNewPwd());
     }
 
     /**

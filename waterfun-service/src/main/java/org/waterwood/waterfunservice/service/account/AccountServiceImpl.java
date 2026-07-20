@@ -111,7 +111,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public CodeResult changeEmail(String verifyCodeKey, EmailChangeDto dto) {
-        long userUid = UserCtxHolder.getUserUid();
         // Verify identity via SMS (phone is primary auth)
         verificationService.verifyAuthorizedCodeWithChannel(
                 verifyCodeKey,
@@ -121,14 +120,13 @@ public class AccountServiceImpl implements AccountService {
                 VerifyChannel.SMS
         );
         // TODO: ADD MOVE VERIFICATION FOR EMAIL CHANGE AND AUDIT LOG
-        return verificationService.sendAuthenticationCode(
+        return verificationService.sendCodeForAuthenticated(
                 dto.getEmail() , VerifyChannel.EMAIL, VerifyScene.ACTIVATE);
     }
 
     @Override
     @Transactional
     public CodeResult bindEmail(String verifyCodeKey, EmailBindActivateDto dto) {
-        long userUid = UserCtxHolder.getUserUid();
         verificationService.verifyAuthorizedCode(
                 verifyCodeKey,
                 dto.getVerify(),
@@ -136,7 +134,7 @@ public class AccountServiceImpl implements AccountService {
                 VerifyScene.BIND_EMAIL
         );
         // TODO: ADD MOVE VERIFICATION FOR EMAIL BIND AND AUDIT LOG
-        return verificationService.sendAuthenticationCode(
+        return verificationService.sendCodeForAuthenticated(
                 dto.getEmail(), VerifyChannel.EMAIL, VerifyScene.ACTIVATE);
     }
 
@@ -162,7 +160,7 @@ public class AccountServiceImpl implements AccountService {
                 VerifyScene.CHANGE_PHONE,
                 VerifyChannel.SMS
         );
-        return verificationService.sendAuthenticationCode(
+        return verificationService.sendCodeForAuthenticated(
                 dto.getPhone(), VerifyChannel.SMS, VerifyScene.ACTIVATE);
     }
 

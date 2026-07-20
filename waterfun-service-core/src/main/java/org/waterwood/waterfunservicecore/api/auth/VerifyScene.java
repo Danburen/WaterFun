@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum VerifyScene {
     LOGIN,
     REGISTER,
+    FORGOT_PASSWORD,
     SET_PASSWORD,
     RESET_PASSWORD,
     CHANGE_EMAIL,

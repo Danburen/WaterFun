@@ -19,7 +19,7 @@ import org.waterwood.waterfunservice.service.user.UserService;
 import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.BizException;
-import org.waterwood.waterfunservicecore.exception.TagLimitExceededException;
+import org.waterwood.waterfunservicecore.exception.threshold.TagLimitExceededException;
 import org.waterwood.waterfunservicecore.exception.conflict.TagConflictException;
 import org.waterwood.waterfunservicecore.exception.notfound.TagNotFoundException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.TagRepository;

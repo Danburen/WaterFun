@@ -13,7 +13,7 @@ import org.waterwood.waterfunservicecore.entity.resource.AuditResourceId;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.exception.ReportAlreadyExistException;
-import org.waterwood.waterfunservicecore.exception.ReportNotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.ReportNotFoundException;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.audit.AuditTaskRepository;

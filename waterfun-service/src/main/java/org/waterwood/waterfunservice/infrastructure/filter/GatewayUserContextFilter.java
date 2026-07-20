@@ -59,8 +59,6 @@ public class GatewayUserContextFilter extends OncePerRequestFilter {
         authCtx.setLocale(locale);
         authCtx.setDid(request.getHeader("X-User-Did"));
         authCtx.setClientIp((String) request.getAttribute("clientIp"));
-
-        // Load user settings once per request
         userSettingRepository.findById(authCtx.getUserUid())
                 .ifPresent(authCtx::setUserSetting);
 

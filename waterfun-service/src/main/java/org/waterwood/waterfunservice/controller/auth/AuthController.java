@@ -19,6 +19,7 @@ import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservice.service.log.AuditLogService;
 import org.waterwood.waterfunservicecore.api.auth.LoginResult;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
+import org.waterwood.waterfunservicecore.api.req.auth.ForgetPasswordDto;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.req.auth.RegisterRequest;
 import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
@@ -29,6 +30,7 @@ import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
+import org.waterwood.waterfunservicecore.infrastructure.utils.CookieKeyGetter;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
 import org.waterwood.waterfunservicecore.services.auth.LineCaptchaResult;
@@ -106,7 +108,7 @@ public class AuthController {
         if (!captchaService.verifyCode(captchaKey, dto.getCaptcha())) {
             throw new AuthException(AuthCode.CAPTCHA_INVALID);
         }
-        CodeResult result = verificationService.sendCode(dto);
+        CodeResult result = verificationService.sendCodeForAnonymous(dto);
         String cookieKey = dto.getChannel().name() + "_CODE_KEY";
         ResponseUtil.setCookieAndNoCache(response, cookieKey, result.getKey(), 120);
         return ApiResponse.success();
@@ -146,6 +148,26 @@ public class AuthController {
             );
         } catch (Exception e) {
             auditLogService.record(null, dto.getTarget(), AuditLogActionType.LOGIN,
+                    AuditLogStatusType.FAIL, e.getMessage(), request, dto.getDeviceInfo());
+            throw e;
+        }
+    }
+
+    @Operation(summary = "忘记密码 - 重置密码")
+    @PostMapping("/forgot-password/reset")
+    @RateLimit(key = "auth.forgot-password", permits = 3, window = 300)
+    public ApiResponse<Void> forgotPasswordReset(@Valid @RequestBody ForgetPasswordDto dto,
+                                                  HttpServletRequest request) {
+        try {
+            loginService.forgetPassword(
+                    CookieKeyGetter.getChannelVerifyCodeKey(dto.getChannel(), request.getCookies()),
+                    dto
+            );
+            auditLogService.record(null, dto.getTarget(), AuditLogActionType.CHANGE_PASSWORD,
+                    request, dto.getDeviceInfo());
+            return ApiResponse.success();
+        } catch (Exception e) {
+            auditLogService.record(null, dto.getTarget(), AuditLogActionType.CHANGE_PASSWORD,
                     AuditLogStatusType.FAIL, e.getMessage(), request, dto.getDeviceInfo());
             throw e;
         }

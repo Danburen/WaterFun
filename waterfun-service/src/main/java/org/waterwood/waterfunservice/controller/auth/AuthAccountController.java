@@ -42,11 +42,12 @@ public class AuthAccountController {
         );
     }
 
-    @Operation(summary = "账户页发送验证码")
+    @Operation(summary = "账户页发送验证码（自动获取当前用户目标）")
     @PostMapping("/send-verify-code")
     @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> sendVerifyCode(@Valid @RequestBody SendCodeDto dto, HttpServletResponse response) {
-        CodeResult result = verificationService.sendCode(dto);
+        CodeResult result = verificationService.sendAutoTargetAuthenticationCode(
+                dto.getChannel(), dto.getScene());
         String cookieKey = dto.getChannel().name() + "_CODE_KEY";
         ResponseUtil.setCookieAndNoCache(response, cookieKey, result.getKey(), 120);
         return ApiResponse.success();
@@ -56,7 +57,7 @@ public class AuthAccountController {
     @PostMapping("/password/reset")
     @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> resetPassword(@Valid @RequestBody ResetPasswordDto dto, HttpServletRequest request) {
-        long userUid = UserCtxHolder.getUserUid();
+        Long userUid = UserCtxHolder.getUserUid();
         try {
             accountService.changePwd(
                     CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), request.getCookies()),
@@ -75,7 +76,7 @@ public class AuthAccountController {
     @PostMapping("/password/set")
     @RateLimit(key = "account.default", permits = 5, window = 300)
     public ApiResponse<Void> setPassword(@Valid @RequestBody SetPasswordDto dto, HttpServletRequest request) {
-        long userUid = UserCtxHolder.getUserUid();
+        Long userUid = UserCtxHolder.getUserUid();
         try {
             accountService.setPassword(
                     CookieKeyGetter.getChannelVerifyCodeKey(dto.getVerify().getChannel(), request.getCookies()),

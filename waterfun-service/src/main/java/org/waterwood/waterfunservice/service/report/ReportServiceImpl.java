@@ -36,7 +36,7 @@ import org.waterwood.waterfunservicecore.entity.spec.TicketSpec;
 import org.waterwood.waterfunservicecore.entity.ticket.*;
 import org.waterwood.waterfunservicecore.exception.ForbiddenException;
 import org.waterwood.waterfunservicecore.exception.ReportAlreadyExistException;
-import org.waterwood.waterfunservicecore.exception.ReportNotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.ReportNotFoundException;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.exception.reference.ResourceReferenceInvalidException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CommentRepository;

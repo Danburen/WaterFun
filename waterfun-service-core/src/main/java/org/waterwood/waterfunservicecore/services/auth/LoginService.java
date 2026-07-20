@@ -1,6 +1,7 @@
 package org.waterwood.waterfunservicecore.services.auth;
 
 import org.waterwood.waterfunservicecore.api.auth.LoginResult;
+import org.waterwood.waterfunservicecore.api.req.auth.ForgetPasswordDto;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 
@@ -30,4 +31,12 @@ public interface LoginService {
      * @return  login result containing user and whether it was auto-registered
      */
     LoginResult login(VerifyCodeDto dto, String codeKey);
+
+    /**
+     * Forgot password: verify code then update password.
+     * No authentication required — public endpoint.
+     * @param verifyCodeKey cached verify code key
+     * @param dto           forget password dto
+     */
+    void forgetPassword(String verifyCodeKey, ForgetPasswordDto dto);
 }

@@ -15,7 +15,7 @@ import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.entity.ticket.*;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.exception.ReportAlreadyExistException;
-import org.waterwood.waterfunservicecore.exception.ReportNotFoundException;
+import org.waterwood.waterfunservicecore.exception.notfound.ReportNotFoundException;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.UserReportRepository;

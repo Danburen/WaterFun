@@ -32,9 +32,14 @@ public interface VerificationService {
      * @param target target
      * @return code result
      */
-    CodeResult sendAuthenticationCode(String target, VerifyChannel channel, VerifyScene scene);
+    CodeResult sendCodeForAuthenticated(String target, VerifyChannel channel, VerifyScene scene);
 
-    CodeResult sendCode(SendCodeDto dto);
+    /**
+     * Send code to anonymous, usually used for register or login
+     * @param dto {@link SendCodeDto}
+     * @return {@link CodeResult}
+     */
+    CodeResult sendCodeForAnonymous(SendCodeDto dto);
 
     /**
      * Verify code

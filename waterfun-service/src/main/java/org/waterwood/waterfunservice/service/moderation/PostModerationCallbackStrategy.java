@@ -18,7 +18,7 @@ import org.waterwood.waterfunservicecore.entity.post.Tag;
 import org.waterwood.waterfunservicecore.entity.resource.Resource;
 import org.waterwood.waterfunservicecore.entity.resource.ResourceStatus;
 import org.waterwood.waterfunservicecore.entity.user.User;
-import org.waterwood.waterfunservicecore.exception.TagLimitExceededException;
+import org.waterwood.waterfunservicecore.exception.threshold.TagLimitExceededException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.CategoryRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.PostRepository;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.ResourceRepository;

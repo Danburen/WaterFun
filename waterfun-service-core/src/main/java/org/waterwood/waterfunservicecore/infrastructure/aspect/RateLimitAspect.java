@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.waterwood.waterfunservicecore.exception.RateLimitException;
+import org.waterwood.waterfunservicecore.exception.threshold.RateLimitException;
 
 import java.util.Objects;
 import java.util.Queue;
