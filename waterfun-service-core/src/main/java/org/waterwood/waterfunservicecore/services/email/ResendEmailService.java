@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.waterwood.utils.MaskUtil;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
@@ -28,7 +29,7 @@ public class ResendEmailService extends EmailServiceBase {
     @Override
     public CodeResult sendHtmlEmail(String to, String from, String subject, String html) {
         if (mockMode) {
-            log.info("[MOCK] Skipping real email to {}, subject: {}", to, subject);
+            log.info("[MOCK] Skipping real email to {}, subject: {}", MaskUtil.maskEmail(to), subject);
             return CodeResult.builder()
                     .sendSuccess(true)
                     .target(to)

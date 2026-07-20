@@ -6,6 +6,7 @@ import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.waterwood.utils.MaskUtil;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
@@ -35,7 +36,7 @@ public class AliyunSmsService implements SmsService {
     @Override
     public CodeResult sendSms(String phoneNumber, String templateCode, Map<String, Object> params) {
         if (mockMode) {
-            log.info("[MOCK] Skipping real SMS to {}, template: {}, params: {}", phoneNumber, templateCode, params);
+            log.info("[MOCK] Skipping real SMS to {}, template: {}, params: {}", MaskUtil.maskPhone(phoneNumber), templateCode, params);
             return CodeResult.builder()
                     .sendSuccess(true)
                     .target(phoneNumber)

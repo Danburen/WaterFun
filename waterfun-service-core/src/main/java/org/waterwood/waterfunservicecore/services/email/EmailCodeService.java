@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.waterwood.utils.MaskUtil;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.common.cache.RedisKeyBuilder;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
@@ -60,8 +61,7 @@ public class EmailCodeService implements CodeVerifier, CodeSender {
                 fragment.getTemplateKey() ,
                 data);
         sendResult.setKey(uuid);
-//        CodeResult sendResult = new CodeResult(true, target, VerifyChannel.SMS , uuid);
-//        log.info("send result key{}, code:{}",  sendResult.getKey(), code);
+        log.info("Send email code to {}, send result key{}, code:{}", MaskUtil.maskEmail(target), sendResult.getKey(), code);
 
         if (sendResult.isSendSuccess()){
             redisHelper.set(

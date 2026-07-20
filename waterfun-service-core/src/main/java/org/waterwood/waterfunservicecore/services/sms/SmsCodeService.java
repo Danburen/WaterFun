@@ -41,7 +41,7 @@ public class SmsCodeService implements CodeVerifier, CodeSender {
         CodeResult result =
                 smsService.sendSms(target, smsCodeTemplate, Map.of("code", code, "time", expireDuration));
         result.setKey(uuid);
-        log.info("Sms send to phone{} user {} send result key{}, code:{}",
+        log.info("Sms send to phone {} user {} send result key{}, code:{}",
                 MaskUtil.maskPhone(target),
                 UserCtxHolder.safeGetUserId().map(String::valueOf).orElse("anonymous"),
                 result.getKey(),
