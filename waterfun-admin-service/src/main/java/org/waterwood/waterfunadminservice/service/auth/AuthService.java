@@ -2,6 +2,7 @@ package org.waterwood.waterfunadminservice.service.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.waterwood.waterfunadminservice.api.request.AdminChangePasswordReq;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
 
@@ -17,4 +18,11 @@ public interface AuthService {
      * @return Login client data which contains user info and tokens
      */
     LoginClientData loginByPwd(PwdLoginReq body, HttpServletRequest request, HttpServletResponse response);
+
+    /**
+     * Change admin password (requires old password verification).
+     * @param uid current admin uid
+     * @param dto change password request
+     */
+    void adminChangePassword(long uid, AdminChangePasswordReq dto);
 }

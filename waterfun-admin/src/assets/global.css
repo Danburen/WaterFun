@@ -535,6 +535,35 @@ body {
 .dialog-fade-enter-from .dialog-panel { transform: scale(0.95) translateY(-10px); }
 .dialog-fade-leave-to .dialog-panel { transform: scale(0.95) translateY(10px); }
 
+/* ========== Auth (Login) Responsive ========== */
+@media (max-width: 768px) {
+  .login-card {
+    flex-direction: column;
+    width: 92vw;
+    min-height: auto;
+  }
+  .login-brand {
+    display: none;
+  }
+  .login-form-wrapper {
+    padding: 28px 24px !important;
+  }
+  .login-form-inner {
+    max-width: none !important;
+  }
+  .login-form-inner .form-title {
+    font-size: 20px;
+  }
+  .login-form-inner .form-subtitle {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .login-btn {
+    padding: 14px 0;
+    font-size: 14px;
+  }
+}
+
 /* ========== Responsive Utilities ========== */
 @media (max-width: 768px) {
   .content-area {

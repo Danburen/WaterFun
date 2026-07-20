@@ -64,6 +64,9 @@ public class RateLimitAspect {
     private String getCurrentIp() {
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         if (attrs instanceof ServletRequestAttributes servletAttrs) {
+            // X-Real-Client-Ip is injected by Gateway's AuthGlobalFilter
+            String realIp = servletAttrs.getRequest().getHeader("X-Real-Client-Ip");
+            if (realIp != null && !realIp.isBlank()) return realIp;
             return servletAttrs.getRequest().getRemoteAddr();
         }
         return "unknown";

@@ -38,7 +38,7 @@ public class AuthRateLimitFilter implements GlobalFilter, Ordered {
             @Value("${waterfun.rate-limit.auth.enabled:true}") boolean enabled,
             @Value("${waterfun.rate-limit.auth.requests:20}") int requestLimit,
             @Value("${waterfun.rate-limit.auth.window-seconds:60}") long windowSeconds,
-            @Value("${waterfun.rate-limit.auth.paths:/api/auth/login,/api/auth/register,/api/auth/refresh}") String pathsCsv) {
+            @Value("${waterfun.rate-limit.auth.paths:/api/auth/login-by-password,/api/auth/login-by-code,/api/auth/register,/api/auth/refresh,/api/auth/forgot-password/reset,/api/admin/auth/login-by-password,/api/admin/auth/refresh}") String pathsCsv) {
         this.enabled = enabled;
         this.requestLimit = requestLimit;
         this.windowSeconds = windowSeconds;

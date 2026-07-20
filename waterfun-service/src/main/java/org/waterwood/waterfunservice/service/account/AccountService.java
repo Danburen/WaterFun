@@ -61,7 +61,7 @@ public interface AccountService {
      * Activate phone number
      *
      * @param verifyCodeKey cached verify code key
-     * @param dto           change phone number dto
+     * @param dto           change phone number dto (contains deviceFp in verify)
      */
     void activatePhone(String verifyCodeKey, PhoneChangeActivateDto dto);
 
@@ -69,7 +69,7 @@ public interface AccountService {
      * Verify user's account for Unbinding email
      *
      * @param channelVerifyCodeKey verify body
-     * @param dto                  unbind email dto
+     * @param dto                  unbind email dto (contains deviceFp in verify)
      */
     void unbindEmail(String channelVerifyCodeKey, EmailBindActivateDto dto);
 

@@ -1,9 +1,7 @@
 export interface DeviceInfo {
     deviceFp: string
-    deviceType?: string
     os?: string
     browser?: string
-    screenResolution?: string
 }
 
 interface BaseLoginRequest {

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.waterwood.waterfunservicecore.api.req.auth.DeviceInfoReq;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLog;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
@@ -24,13 +25,27 @@ public class AuditLogCoreServiceImpl implements AuditLogCoreService {
     private final IpLocationService ipLocationService;
 
     @Override
-    public void record(Long userId, String username, AuditLogActionType action) {
-        record(userId, username, action, AuditLogStatusType.SUCCESS, null);
+    public void recordSuccess(Long userId, String username, AuditLogActionType action) {
+        record0(userId, username, action, AuditLogStatusType.SUCCESS, null, null);
     }
 
     @Override
-    public void record(Long userId, String username, AuditLogActionType action,
-                       AuditLogStatusType status, String failReason) {
+    public void recordFailure(Long userId, String username, AuditLogActionType action, String failReason) {
+        record0(userId, username, action, AuditLogStatusType.FAIL, failReason, null);
+    }
+
+    @Override
+    public void recordSuccess(Long userId, String username, AuditLogActionType action, DeviceInfoReq deviceInfo) {
+        record0(userId, username, action, AuditLogStatusType.SUCCESS, null, deviceInfo);
+    }
+
+    @Override
+    public void recordFailure(Long userId, String username, AuditLogActionType action, String failReason, DeviceInfoReq deviceInfo) {
+        record0(userId, username, action, AuditLogStatusType.FAIL, failReason, deviceInfo);
+    }
+
+    private void record0(Long userId, String username, AuditLogActionType action,
+                         AuditLogStatusType status, String failReason, DeviceInfoReq deviceInfo) {
         try {
             AuditLog log = new AuditLog();
             log.setUserId(userId);
@@ -47,6 +62,10 @@ public class AuditLogCoreServiceImpl implements AuditLogCoreService {
             log.setCountry(location.getOrDefault("country", ""));
             log.setProvince(location.getOrDefault("province", ""));
             log.setCity(location.getOrDefault("city", ""));
+
+            if (deviceInfo != null) {
+                log.setDeviceInfo(deviceInfo.toMap());
+            }
 
             auditLogRepository.save(log);
         } catch (Exception e) {

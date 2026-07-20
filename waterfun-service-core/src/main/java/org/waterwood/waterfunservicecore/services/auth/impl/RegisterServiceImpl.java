@@ -22,6 +22,7 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDat
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.AuthContext;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.api.req.auth.DeviceInfoReq;
 import org.waterwood.waterfunservicecore.api.req.auth.RegisterRequest;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.utils.codec.HashUtil;
@@ -59,82 +60,90 @@ public class RegisterServiceImpl implements RegisterService {
     @Transactional
     @Override
     public User register(RegisterRequest body, String smsCodeKey) {
-        String email = body.getEmail();
-        String phone = body.getPhone();
-        EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
+        DeviceInfoReq deviceInfo = body.getVerify() != null ? body.getVerify().getDeviceInfo() : null;
+        try {
+            String email = body.getEmail();
+            String phone = body.getPhone();
+            EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
 
-        userRepo.findByUsername(body.getUsername()).ifPresent(_ -> {
-            throw new UserNameAlreadyExistException();
-        });
-        // Verify phone
-        VerifyCodeDto verify = body.getVerify();
-        if(! verify.getTarget().equals(phone)){
-            throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
-        }
-        verificationService.verifyCode(smsCodeKey, verify);
+            userRepo.findByUsername(body.getUsername()).ifPresent(_ -> {
+                throw new UserNameAlreadyExistException();
+            });
+            // Verify phone
+            VerifyCodeDto verify = body.getVerify();
+            if(! verify.getTarget().equals(phone)){
+                throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
+            }
+            verificationService.verifyCode(smsCodeKey, verify);
 
-        userDatumRepo.findByPhoneHash(HashUtil.toSha256HmacString(phone, hmacKey.getEncryptedKey())).ifPresent(
-                _->{
-                    throw new BizException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
-                }
-        );
-        // Verify email
-        if (StringUtil.isNotBlank(email)) {
-            userDatumRepo.findByEmailHash(HashUtil.toSha256HmacString(email, hmacKey.getEncryptedKey())).ifPresent(
-                    _ -> {
-                        throw new BizException(BaseResponseCode.EMAIL_ALREADY_USED);
+            userDatumRepo.findByPhoneHash(HashUtil.toSha256HmacString(phone, hmacKey.getEncryptedKey())).ifPresent(
+                    _->{
+                        throw new BizException(BaseResponseCode.PHONE_NUMBER_ALREADY_USED);
                     }
             );
+            // Verify email
+            if (StringUtil.isNotBlank(email)) {
+                userDatumRepo.findByEmailHash(HashUtil.toSha256HmacString(email, hmacKey.getEncryptedKey())).ifPresent(
+                        _ -> {
+                            throw new BizException(BaseResponseCode.EMAIL_ALREADY_USED);
+                        }
+                );
+            }
+            // Encrypt email, phone, password
+            EncryptionDataKey aesKet = encryptedKeyService.getAesKey();
+            String encryptedPhone = EncryptionHelper.encryptField(phone, aesKet);
+            String password = body.getPassword();
+
+            // STEP 5: Set user
+            User user = new User();
+            user.setUsername(body.getUsername());
+            if(StringUtil.isNotBlank( password)) user.setPasswordHash(encoder.encode(password));
+            user.setUid(uidGenerator.generateUid());
+            user.setAccountStatus(AccountStatus.ACTIVE);
+            // STEP 6: Set user data
+            UserDatum ud = new UserDatum();
+            ud.setUser(user);
+            ud.setUid(user.getUid());
+            ud.setEncryptionKeyId(aesKet.getKeyId());
+            ud.setPhoneEncrypted(encryptedPhone);
+            ud.setPhoneHash(HashUtil.toSha256HmacString(phone, hmacKey.getEncryptedKey()));
+
+            if(StringUtil.isNotBlank(email)) {
+                String encryptedEmail = EncryptionHelper.encryptField(email, aesKet);
+                ud.setEmailEncrypted(encryptedEmail);
+                ud.setEmailHash(HashUtil.toSha256HmacString(email, hmacKey.getEncryptedKey()));
+                ud.setEmailExpireAt(Instant.now().plus(Duration.ofHours(emailUnverifiedExpireHours)));
+            }
+
+            ud.setPhoneVerified(true);
+            ud.setEmailVerified(false);
+
+            UserProfile up = new UserProfile();
+            up.setUser(user);
+            UserCounter uc = new UserCounter();
+            uc.setUser(user);
+            UserPreference upp = new UserPreference();
+            upp.setUser(user);
+            upp.setLocale(UserCtxHolder.safeGet().map(AuthContext::getLocale).orElse(Locale.CHINA).toLanguageTag());
+
+            UserSetting us = new UserSetting();
+            us.setUser(user);
+
+            user.setUserCounter(uc);
+            user.setUserProfile(up);
+            user.setUserDatum(ud);
+            user.setUserPreference(upp);
+            user.setUserSetting(us);
+            userRepo.save(user);
+            siteStatisticRecorder.recordNewUser();
+            auditLogCoreService.recordSuccess(user.getUid(), user.getUsername(),
+                    AuditLogActionType.REGISTER, deviceInfo);
+            return user;
+        } catch (Exception e) {
+            auditLogCoreService.recordFailure(null, body.getUsername(), AuditLogActionType.REGISTER,
+                    e.getMessage(), deviceInfo);
+            throw e;
         }
-        // Encrypt email, phone, password
-        EncryptionDataKey aesKet = encryptedKeyService.getAesKey();
-        String encryptedPhone = EncryptionHelper.encryptField(phone, aesKet);
-        String password = body.getPassword();
-
-        // STEP 5: Set user
-        User user = new User();
-        user.setUsername(body.getUsername());
-        if(StringUtil.isNotBlank( password)) user.setPasswordHash(encoder.encode(password));
-        user.setUid(uidGenerator.generateUid());
-        user.setAccountStatus(AccountStatus.ACTIVE);
-        // STEP 6: Set user data
-        UserDatum ud = new UserDatum();
-        ud.setUser(user);
-        ud.setUid(user.getUid());
-        ud.setEncryptionKeyId(aesKet.getKeyId());
-        ud.setPhoneEncrypted(encryptedPhone);
-        ud.setPhoneHash(HashUtil.toSha256HmacString(phone, hmacKey.getEncryptedKey()));
-
-        if(StringUtil.isNotBlank(email)) {
-            String encryptedEmail = EncryptionHelper.encryptField(email, aesKet);
-            ud.setEmailEncrypted(encryptedEmail);
-            ud.setEmailHash(HashUtil.toSha256HmacString(email, hmacKey.getEncryptedKey()));
-            ud.setEmailExpireAt(Instant.now().plus(Duration.ofHours(emailUnverifiedExpireHours)));
-        }
-
-        ud.setPhoneVerified(true);
-        ud.setEmailVerified(false);
-
-        UserProfile up = new UserProfile();
-        up.setUser(user);
-        UserCounter uc = new UserCounter();
-        uc.setUser(user);
-        UserPreference upp = new UserPreference();
-        upp.setUser(user);
-        upp.setLocale(UserCtxHolder.safeGet().map(AuthContext::getLocale).orElse(Locale.CHINA).toLanguageTag());
-
-        UserSetting us = new UserSetting();
-        us.setUser(user);
-
-        user.setUserCounter(uc);
-        user.setUserProfile(up);
-        user.setUserDatum(ud);
-        user.setUserPreference(upp);
-        user.setUserSetting(us);
-        userRepo.save(user);
-        siteStatisticRecorder.recordNewUser();
-        auditLogCoreService.record(user.getUid(), user.getUsername(), AuditLogActionType.REGISTER);
-        return user;
     }
 
     @Transactional
@@ -208,7 +217,7 @@ public class RegisterServiceImpl implements RegisterService {
         user.setUserSetting(us);
         userRepo.save(user);
         siteStatisticRecorder.recordNewUser();
-        auditLogCoreService.record(user.getUid(), user.getUsername(), AuditLogActionType.REGISTER);
+        auditLogCoreService.recordSuccess(user.getUid(), user.getUsername(), AuditLogActionType.REGISTER);
         return user;
     }
 }

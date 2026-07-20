@@ -16,7 +16,6 @@ import org.waterwood.api.ApiResponse;
 import org.waterwood.api.AuthCode;
 import org.waterwood.api.TokenPair;
 import org.waterwood.common.exceptions.AuthException;
-import org.waterwood.waterfunservice.service.log.AuditLogService;
 import org.waterwood.waterfunservicecore.api.auth.LoginResult;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.req.auth.ForgetPasswordDto;
@@ -26,11 +25,8 @@ import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
-import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
-import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
-import org.waterwood.waterfunservicecore.infrastructure.utils.CookieKeyGetter;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
 import org.waterwood.waterfunservicecore.services.auth.LineCaptchaResult;
@@ -54,7 +50,6 @@ public class AuthController {
     private final RegisterServiceImpl registerService;
     private final AuthCoreServiceImpl authService;
     private final VerificationService verificationService;
-    private final AuditLogService auditLogService;
 
 
     @Operation(summary = "获取图形验证码")
@@ -116,82 +111,50 @@ public class AuthController {
 
     @Operation(summary = "密码登陆")
     @PostMapping("/login-by-password")
-    @RateLimit(key = "auth.login.password", permits = 5, window = 300)
+    @RateLimit(key = "ip", permits = 5, window = 300)
     public ApiResponse<LoginClientData> loginByPassword(@Valid @RequestBody PwdLoginReq body, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            Cookie[] cookies = request.getCookies();
-            LoginResult result = loginService.login(body, CookieUtil.getCookieValue(cookies, "CAPTCHA_KEY"));
-            auditLogService.record(result.user().getUid(), result.user().getUsername(), AuditLogActionType.LOGIN,
-                    request, body.getDeviceInfo());
-            return ApiResponse.success(
-                    authService.BuildLoginResponse(response, result.user(), body.getDeviceFp(), false)
-            );
-        } catch (Exception e) {
-            auditLogService.record(null, body.getUsername(), AuditLogActionType.LOGIN,
-                    AuditLogStatusType.FAIL, e.getMessage(), request, body.getDeviceInfo());
-            throw e;
-        }
+        Cookie[] cookies = request.getCookies();
+        LoginResult result = loginService.login(body, CookieUtil.getCookieValue(cookies, "CAPTCHA_KEY"));
+        return ApiResponse.success(
+                authService.BuildLoginResponse(response, result.user(), body.getDeviceFp(), false)
+        );
     }
 
 
     @Operation(summary = "手机/邮箱登陆")
     @PostMapping("/login-by-code")
-    @RateLimit(key = "auth.login.code", permits = 5, window = 300)
+    @RateLimit(key = "ip", permits = 5, window = 300)
     public ApiResponse<LoginClientData> loginByCode(@Valid @RequestBody VerifyCodeDto dto, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            String codeKey = dto.getChannel() == VerifyChannel.SMS ? "SMS_CODE_KEY" : "EMAIL_CODE_KEY";
-            LoginResult result = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
-            auditLogService.record(result.user().getUid(), result.user().getUsername(), AuditLogActionType.LOGIN,
-                    request, dto.getDeviceInfo());
-            return ApiResponse.success(
-                    authService.BuildLoginResponse(response, result.user(), dto.getDeviceFp(), result.isNewUser())
-            );
-        } catch (Exception e) {
-            auditLogService.record(null, dto.getTarget(), AuditLogActionType.LOGIN,
-                    AuditLogStatusType.FAIL, e.getMessage(), request, dto.getDeviceInfo());
-            throw e;
-        }
+        String codeKey = dto.getChannel() == VerifyChannel.SMS ? "SMS_CODE_KEY" : "EMAIL_CODE_KEY";
+        LoginResult result = loginService.login(dto, CookieUtil.getCookieValue(request, codeKey));
+        return ApiResponse.success(
+                authService.BuildLoginResponse(response, result.user(), dto.getDeviceFp(), result.isNewUser())
+        );
     }
 
     @Operation(summary = "忘记密码 - 重置密码")
     @PostMapping("/forgot-password/reset")
-    @RateLimit(key = "auth.forgot-password", permits = 3, window = 300)
+    @RateLimit(key = "ip", permits = 3, window = 300)
     public ApiResponse<Void> forgotPasswordReset(@Valid @RequestBody ForgetPasswordDto dto,
                                                   HttpServletRequest request) {
-        try {
-            loginService.forgetPassword(
-                    CookieKeyGetter.getChannelVerifyCodeKey(dto.getChannel(), request.getCookies()),
-                    dto
-            );
-            auditLogService.record(null, dto.getTarget(), AuditLogActionType.CHANGE_PASSWORD,
-                    request, dto.getDeviceInfo());
-            return ApiResponse.success();
-        } catch (Exception e) {
-            auditLogService.record(null, dto.getTarget(), AuditLogActionType.CHANGE_PASSWORD,
-                    AuditLogStatusType.FAIL, e.getMessage(), request, dto.getDeviceInfo());
-            throw e;
-        }
+        loginService.forgetPassword(
+                CookieUtil.getCookieValue(request.getCookies(), dto.getChannel().name().toUpperCase() + "_CODE_KEY"),
+                dto
+        );
+        return ApiResponse.success();
     }
 
     @Operation(summary = "注册")
     @PostMapping("/register")
-    @RateLimit(key = "auth.register", permits = 3, window = 300)
+    @RateLimit(key = "ip", permits = 3, window = 300)
     public ApiResponse<LoginClientData> register(@Valid @RequestBody RegisterRequest dto, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            User user = registerService.register(
-                    dto,
-                    CookieUtil.getCookieValue(request.getCookies(), "SMS_CODE_KEY")
-            );
-            auditLogService.record(user.getUid(), user.getUsername(), AuditLogActionType.REGISTER,
-                    request, dto.getVerify().getDeviceInfo());
-            return ApiResponse.success(
-                    authService.BuildLoginResponse(response, user, dto.getVerify().getDeviceFp(), true)
-            );
-        } catch (Exception e) {
-            auditLogService.record(null, dto.getUsername(), AuditLogActionType.REGISTER,
-                    AuditLogStatusType.FAIL, e.getMessage(), request, dto.getVerify().getDeviceInfo());
-            throw e;
-        }
+        User user = registerService.register(
+                dto,
+                CookieUtil.getCookieValue(request.getCookies(), "SMS_CODE_KEY")
+        );
+        return ApiResponse.success(
+                authService.BuildLoginResponse(response, user, dto.getVerify().getDeviceFp(), true)
+        );
     }
 
     @PostMapping("/refresh")

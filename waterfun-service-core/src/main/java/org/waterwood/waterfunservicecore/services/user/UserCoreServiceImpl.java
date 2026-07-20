@@ -89,7 +89,7 @@ public class UserCoreServiceImpl implements UserCoreService {
         }
         u.setPasswordHash(encoder.encode(newPwd));
         User saved = userRepository.save(u);
-        auditLogCoreService.record(userUid, saved.getUsername(), AuditLogActionType.CHANGE_PASSWORD);
+        auditLogCoreService.recordSuccess(userUid, saved.getUsername(), AuditLogActionType.CHANGE_PASSWORD);
         return saved;
     }
 

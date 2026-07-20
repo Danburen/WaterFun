@@ -284,10 +284,32 @@ onMounted(async () => {
   width: 100%;
 }
 
-.submit-btn {
-  width: 100%;
-  height: 30px;
-  font-size: 16px;
-  margin-top: 20px;
+/* Base .submit-btn now in global.css (.password-page .submit-btn) */
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .password-page {
+    padding: 12px;
+    align-items: flex-start;
+  }
+  .password-form-container {
+    margin: 12px;
+    padding: 16px;
+  }
+  .form-title {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+  .form-description {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .password-form :deep(.el-form-item) {
+    margin-bottom: 14px;
+  }
+  .password-form :deep(.el-form-item__label) {
+    font-size: 13px;
+    padding-bottom: 2px;
+  }
 }
 </style>

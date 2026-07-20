@@ -1,11 +1,19 @@
 package org.waterwood.waterfunservicecore.services.audit;
 
+import org.waterwood.waterfunservicecore.api.req.auth.DeviceInfoReq;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
-import org.waterwood.waterfunservicecore.entity.audit.AuditLogStatusType;
 
 public interface AuditLogCoreService {
 
-    void record(Long userId, String username, AuditLogActionType action);
+    /** Basic success audit (no device info). */
+    void recordSuccess(Long userId, String username, AuditLogActionType action);
 
-    void record(Long userId, String username, AuditLogActionType action, AuditLogStatusType status, String failReason);
+    /** Failure audit with reason (no device info). */
+    void recordFailure(Long userId, String username, AuditLogActionType action, String failReason);
+
+    /** Success audit with full device info. */
+    void recordSuccess(Long userId, String username, AuditLogActionType action, DeviceInfoReq deviceInfo);
+
+    /** Failure audit with reason and full device info. */
+    void recordFailure(Long userId, String username, AuditLogActionType action, String failReason, DeviceInfoReq deviceInfo);
 }

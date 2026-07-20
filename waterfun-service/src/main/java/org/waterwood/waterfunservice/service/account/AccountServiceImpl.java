@@ -22,7 +22,10 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDat
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRepository;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
 import org.waterwood.waterfunservicecore.infrastructure.security.EncryptionHelper;
+import org.waterwood.waterfunservicecore.api.req.auth.DeviceInfoReq;
+import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
+import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.email.ResendEmailService;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
@@ -45,6 +48,7 @@ public class AccountServiceImpl implements AccountService {
     private final EncryptedKeyService encryptedKeyService;
     private final UserCoreService userCoreService;
     private final UserDatumCoreService userDatumCoreService;
+    private final AuditLogCoreService auditLogCoreService;
     private final ResendEmailService emailService;
     private final MessageSource messageSource;
 
@@ -56,56 +60,81 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void changePwd(String verifyCodeKey, ResetPasswordDto dto) {
         long userUid = UserCtxHolder.getUserUid();
-        verificationService.verifyAuthorizedCode(
-                verifyCodeKey,
-                dto.getVerify(),
-                getTargetOfChannel(dto.getVerify().getChannel()),
-                VerifyScene.RESET_PASSWORD
-        );
-        User user = userCoreService.getUser(userUid);
-        if(! dto.getConfirmPwd().equals(dto.getNewPwd())){
-            throw new BizException(BaseResponseCode.PASSWORD_TWO_PASSWORD_NOT_EQUAL);
+        DeviceInfoReq deviceInfo = dto.getVerify() != null ? dto.getVerify().getDeviceInfo() : null;
+        try {
+            verificationService.verifyAuthorizedCode(
+                    verifyCodeKey,
+                    dto.getVerify(),
+                    getTargetOfChannel(dto.getVerify().getChannel()),
+                    VerifyScene.RESET_PASSWORD
+            );
+            User user = userCoreService.getUser(userUid);
+            if(! dto.getConfirmPwd().equals(dto.getNewPwd())){
+                throw new BizException(BaseResponseCode.PASSWORD_TWO_PASSWORD_NOT_EQUAL);
+            }
+            // Skip old-password verification for users who registered without a password (e.g., quick login)
+            if(user.getPasswordHash() != null && !encoder.matches(dto.getOldPwd(), user.getPasswordHash())){
+                throw new BizException(BaseResponseCode.OLD_PASSWORD_INCORRECT);
+            }
+            userCoreService.changePwd(userUid, dto.getNewPwd());
+        } catch (Exception e) {
+            auditLogCoreService.recordFailure(userUid, null, AuditLogActionType.CHANGE_PASSWORD,
+                    e.getMessage(), deviceInfo);
+            throw e;
         }
-        // Skip old-password verification for users who registered without a password (e.g., quick login)
-        if(user.getPasswordHash() != null && !encoder.matches(dto.getOldPwd(), user.getPasswordHash())){
-            throw new BizException(BaseResponseCode.OLD_PASSWORD_INCORRECT);
-        }
-        userCoreService.changePwd(userUid, dto.getNewPwd());
     }
 
     @Transactional
     @Override
     public void setPassword(String verifyCodeKey, SetPasswordDto dto) {
         long userUid = UserCtxHolder.getUserUid();
-        verificationService.verifyAuthorizedCode(
-                verifyCodeKey,
-                dto.getVerify(), getTargetOfChannel(dto.getVerify().getChannel()),
-                VerifyScene.SET_PASSWORD
-        );
-        User user = userRepository.findById(userUid).orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
-        if(! dto.getConfirmPwd().equals(dto.getNewPwd())){
-            throw new BizException(BaseResponseCode.PASSWORD_TWO_PASSWORD_NOT_EQUAL);
+        DeviceInfoReq deviceInfo = dto.getVerify() != null ? dto.getVerify().getDeviceInfo() : null;
+        try {
+            verificationService.verifyAuthorizedCode(
+                    verifyCodeKey,
+                    dto.getVerify(), getTargetOfChannel(dto.getVerify().getChannel()),
+                    VerifyScene.SET_PASSWORD
+            );
+            User user = userRepository.findById(userUid).orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
+            if(! dto.getConfirmPwd().equals(dto.getNewPwd())){
+                throw new BizException(BaseResponseCode.PASSWORD_TWO_PASSWORD_NOT_EQUAL);
+            }
+            if(user.getPasswordHash() != null) {
+                throw new BizException(BaseResponseCode.PASSWORD_ALREADY_SET);
+            }
+            user.setPasswordHash(encoder.encode(dto.getNewPwd()));
+            userRepository.save(user);
+            auditLogCoreService.recordSuccess(userUid, user.getUsername(),
+                    AuditLogActionType.CHANGE_PASSWORD, deviceInfo);
+        } catch (Exception e) {
+            auditLogCoreService.recordFailure(userUid, null, AuditLogActionType.CHANGE_PASSWORD,
+                    e.getMessage(), deviceInfo);
+            throw e;
         }
-        if(user.getPasswordHash() != null) {
-            throw new BizException(BaseResponseCode.PASSWORD_ALREADY_SET);
-        }
-        user.setPasswordHash(encoder.encode(dto.getNewPwd()));
-        userRepository.save(user);
     }
 
     @Override
     @Transactional
     public void activateEmail(String verifyCodeKey, EmailBindActivateDto dto) {
         long userUid = UserCtxHolder.getUserUid();
-        verificationService.verifyAuthorizedCodeWithChannel(
-                verifyCodeKey,
-                dto.getVerify(),
-                dto.getEmail(),
-                VerifyScene.ACTIVATE,
-                VerifyChannel.EMAIL
-        );
-        UserDatum ud = userDatumCoreService.saveNewEmail(userUid, dto.getEmail(), true);
-        userDatumRepo.save(ud);
+        DeviceInfoReq deviceInfo = dto.getVerify() != null ? dto.getVerify().getDeviceInfo() : null;
+        try {
+            verificationService.verifyAuthorizedCodeWithChannel(
+                    verifyCodeKey,
+                    dto.getVerify(),
+                    dto.getEmail(),
+                    VerifyScene.ACTIVATE,
+                    VerifyChannel.EMAIL
+            );
+            UserDatum ud = userDatumCoreService.saveNewEmail(userUid, dto.getEmail(), true);
+            userDatumRepo.save(ud);
+            auditLogCoreService.recordSuccess(userUid, null,
+                    AuditLogActionType.BIND_EMAIL, deviceInfo);
+        } catch (Exception e) {
+            auditLogCoreService.recordFailure(userUid, null, AuditLogActionType.BIND_EMAIL,
+                    e.getMessage(), deviceInfo);
+            throw e;
+        }
     }
 
     @Override
@@ -174,42 +203,58 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void activatePhone(String verifyCodeKey, PhoneChangeActivateDto dto) {
         long userUid = UserCtxHolder.getUserUid();
-        verificationService.verifyAuthorizedCodeWithChannel(
-                verifyCodeKey,
-                dto.getVerify(),
-                dto.getPhone(),
-                VerifyScene.ACTIVATE,
-                VerifyChannel.SMS
-        );
-        //TODO: ADD MOVE VERIFICATION FOR PHONE CHANGE AND AUDIT LOG
-        userDatumCoreService.saveNewPhone(userUid, dto.getPhone(), true);
+        DeviceInfoReq deviceInfo = dto.getVerify() != null ? dto.getVerify().getDeviceInfo() : null;
+        try {
+            verificationService.verifyAuthorizedCodeWithChannel(
+                    verifyCodeKey,
+                    dto.getVerify(),
+                    dto.getPhone(),
+                    VerifyScene.ACTIVATE,
+                    VerifyChannel.SMS
+            );
+            userDatumCoreService.saveNewPhone(userUid, dto.getPhone(), true);
+            auditLogCoreService.recordSuccess(userUid, null,
+                    AuditLogActionType.CHANGE_PHONE, deviceInfo);
+        } catch (Exception e) {
+            auditLogCoreService.recordFailure(userUid, null, AuditLogActionType.CHANGE_PHONE,
+                    e.getMessage(), deviceInfo);
+            throw e;
+        }
     }
 
     @Override
     public void unbindEmail(String channelVerifyCodeKey, EmailBindActivateDto dto) {
         long userUid = UserCtxHolder.getUserUid();
-        verificationService.verifyAuthorizedCodeWithChannel(
-                channelVerifyCodeKey,
-                dto.getVerify(),
-                getTargetOfChannel(dto.getVerify().getChannel()),
-                VerifyScene.UNBIND,
-                VerifyChannel.EMAIL
-        );
-        String emailRaw = userDatumCoreService.getRawEmail(userUid);
-        if(emailRaw == null){
-            throw new BizException(BaseResponseCode.EMAIL_NOT_FOUND);
-        }
+        DeviceInfoReq deviceInfo = dto.getVerify() != null ? dto.getVerify().getDeviceInfo() : null;
+        try {
+            verificationService.verifyAuthorizedCodeWithChannel(
+                    channelVerifyCodeKey,
+                    dto.getVerify(),
+                    getTargetOfChannel(dto.getVerify().getChannel()),
+                    VerifyScene.UNBIND,
+                    VerifyChannel.EMAIL
+            );
+            String emailRaw = userDatumCoreService.getRawEmail(userUid);
+            if(emailRaw == null){
+                throw new BizException(BaseResponseCode.EMAIL_NOT_FOUND);
+            }
 
-        if (!emailRaw.equals(dto.getEmail())){
-            throw new BizException(BaseResponseCode.EMAIL_INVALID);
-        }
+            if (!emailRaw.equals(dto.getEmail())){
+                throw new BizException(BaseResponseCode.EMAIL_INVALID);
+            }
 
-        // TODO ADD AUDIO LOG AND FALLBACK
-        UserDatum ud = userDatumCoreService.getUserDatum(userUid);
-        ud.setEmailExpireAt(null);
-        ud.setEmailEncrypted(null);
-        ud.setEmailVerified(false);
-        userDatumRepo.save(ud);
+            UserDatum ud = userDatumCoreService.getUserDatum(userUid);
+            ud.setEmailExpireAt(null);
+            ud.setEmailEncrypted(null);
+            ud.setEmailVerified(false);
+            userDatumRepo.save(ud);
+            auditLogCoreService.recordSuccess(userUid, null,
+                    AuditLogActionType.UNBIND_EMAIL, deviceInfo);
+        } catch (Exception e) {
+            auditLogCoreService.recordFailure(userUid, null, AuditLogActionType.UNBIND_EMAIL,
+                    e.getMessage(), deviceInfo);
+            throw e;
+        }
     }
 
     private @NotNull String getTargetOfChannel(VerifyChannel channel) {

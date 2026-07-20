@@ -8,7 +8,7 @@ import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 public interface LoginService {
     /**
      * Normal pwd login, must not be an administrator
-     * @param body {@link PwdLoginReq}
+     * @param body {@link PwdLoginReq} (contains deviceFp)
      * @param verifyUuidKey captcha verify login key
      * @return {@link LoginResult}
      */
@@ -16,7 +16,7 @@ public interface LoginService {
 
     /**
      * Admin pwd login the user must have thr role of "ADMIN"
-     * @param body pwd login body
+     * @param body pwd login body (contains deviceFp)
      * @param verifyUuidKey verify uuid key
      * @return {@link LoginResult}
      */
@@ -26,7 +26,7 @@ public interface LoginService {
 
     /***
      * Login by code, user must not be admin
-     * @param dto verify code dto
+     * @param dto verify code dto (contains deviceFp)
      * @param codeKey code key
      * @return  login result containing user and whether it was auto-registered
      */
@@ -36,7 +36,7 @@ public interface LoginService {
      * Forgot password: verify code then update password.
      * No authentication required — public endpoint.
      * @param verifyCodeKey cached verify code key
-     * @param dto           forget password dto
+     * @param dto           forget password dto (contains deviceFp)
      */
     void forgetPassword(String verifyCodeKey, ForgetPasswordDto dto);
 }

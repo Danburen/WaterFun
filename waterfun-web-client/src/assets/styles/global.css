@@ -676,6 +676,116 @@ select.wf-form-control {
   box-shadow: none;
 }
 
+/* ========== Auth Shared ========== */
+/* el-form-item spacing inside auth forms (global so :deep not needed) */
+.auth-form .el-form-item,
+.register-form .el-form-item {
+  margin-bottom: 18px;
+}
+.auth-form .el-input__wrapper,
+.register-form .el-input__wrapper {
+  border-radius: 8px;
+}
+
+/* Shared full-width submit button */
+.login-btn {
+  width: 100%;
+  padding: 22px 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.password-page .submit-btn {
+  width: 100%;
+  height: 30px;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+/* ========== Auth (Login/Register) Responsive ========== */
+@media (max-width: 768px) {
+  .auth-form .el-form-item,
+  .register-form .el-form-item {
+    margin-bottom: 14px;
+  }
+  .auth-form .el-form-item__label,
+  .register-form .el-form-item__label {
+    font-size: 13px;
+    padding-bottom: 2px;
+  }
+  .login-btn {
+    padding: 16px 0;
+    font-size: 14px;
+  }
+  .password-page .submit-btn {
+    padding: 14px 0;
+    font-size: 14px;
+    height: auto;
+    margin-top: 14px;
+  }
+  .auth-form .captcha-container {
+    flex-wrap: nowrap;
+  }
+  .auth-form .captcha-image-wrap .captcha-image {
+    width: 80px;
+    height: 32px;
+  }
+  .auth-form .form-footer {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .auth-form .form-footer .to-register,
+  .auth-form .form-footer .to-login {
+    margin-left: 0;
+    text-align: center;
+  }
+  .auth-form .legal-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .register-form .form-footer {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .register-form .form-footer .to-login {
+    margin-left: 0;
+    text-align: center;
+  }
+  .register-form .agreement-area {
+    align-items: center;
+  }
+  .register-form .legal-links {
+    margin-left: 0;
+    justify-content: center;
+  }
+  .password-form-container {
+    margin: 12px !important;
+    padding: 16px !important;
+    max-width: none !important;
+  }
+  .password-page .form-title {
+    font-size: 17px;
+  }
+  .password-page .form-description {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .password-page .submit-btn {
+    padding: 14px 0;
+    font-size: 14px;
+    height: auto;
+  }
+}
+
 /* ========== Scrollbar ========== */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
