@@ -200,4 +200,36 @@ defineProps<{
   color: var(--wf-text-muted, #94a3b8);
   margin: 0 0 24px;
 }
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .login-page {
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  .login-card {
+    flex-direction: column;
+    width: 92vw;
+    min-height: auto;
+    border-radius: 12px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .login-brand {
+    display: none;
+  }
+  .login-form-wrapper {
+    padding: 28px 24px;
+  }
+  .login-form-inner {
+    max-width: none;
+  }
+  .form-title {
+    font-size: 20px;
+  }
+  .form-subtitle {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+}
 </style>

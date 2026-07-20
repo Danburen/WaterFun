@@ -193,14 +193,6 @@ watch(() => route.query.userAgreementConfirm, (val) => {
   width: 100%;
 }
 
-.register-form :deep(.el-form-item) {
-  margin-bottom: 18px;
-}
-
-.register-form :deep(.el-input__wrapper) {
-  border-radius: 8px;
-}
-
 .supplementary-header {
   margin-bottom: 0 !important;
 }
@@ -225,21 +217,6 @@ watch(() => route.query.userAgreementConfirm, (val) => {
 
 .supplementary-body {
   padding-top: 4px;
-}
-
-.login-btn {
-  width: 100%;
-  padding: 22px 0;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  border: none;
-  border-radius: 8px;
-  margin-top: 4px;
-}
-
-.login-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
 }
 
 .form-footer {
@@ -283,5 +260,12 @@ watch(() => route.query.userAgreementConfirm, (val) => {
 .separator {
   color: #cbd5e1;
   font-size: 12px;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .supplementary-toggle {
+    font-size: 13px;
+  }
 }
 </style>

@@ -258,7 +258,7 @@ function getLoginType(){
           </el-button>
         </el-form-item>
         <div class="form-footer">
-          <el-button size="small" link>{{ $t('auth.forgetPassword') }}</el-button>
+          <el-button size="small" link @click.prevent="router.push('/forgot-password')">{{ $t('auth.forgetPassword') }}</el-button>
           <el-button size="small" link class="to-register" @click.prevent="router.push('/register')">
             {{ $t('auth.toRegister') }}
           </el-button>
@@ -357,14 +357,6 @@ function getLoginType(){
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.auth-form :deep(.el-form-item) {
-  margin-bottom: 18px;
-}
-
-.auth-form :deep(.el-input__wrapper) {
-  border-radius: 8px;
-}
-
 .captcha-container {
   display: flex;
   align-items: center;
@@ -384,21 +376,6 @@ function getLoginType(){
   border-radius: 6px;
 }
 
-.login-btn {
-  width: 100%;
-  padding: 22px 0;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  border: none;
-  border-radius: 8px;
-  margin-top: 4px;
-}
-
-.login-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
 .form-footer {
   display: flex;
   align-items: center;
@@ -414,5 +391,23 @@ function getLoginType(){
   margin-top: 20px;
   padding-top: 16px;
   border-top: 1px solid #f1f5f9;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .tab-switcher {
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  .captcha-container {
+    gap: 8px;
+  }
+  .captcha-image-wrap .captcha-image {
+    width: 80px;
+    height: 32px;
+  }
 }
 </style>

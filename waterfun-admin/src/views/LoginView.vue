@@ -296,4 +296,31 @@ const submitLoginForm = () => {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ========== Responsive Overrides ========== */
+@media (max-width: 768px) {
+  .login-page {
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  .login-page::before {
+    display: none;
+  }
+  .login-card {
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .login-form-inner .form-input {
+    font-size: 15px;
+    padding: 10px 14px;
+  }
+  .login-form-inner .form-group {
+    margin-bottom: 14px;
+  }
+  .login-form-inner .form-label-style {
+    font-size: 13px;
+  }
+}
 </style>

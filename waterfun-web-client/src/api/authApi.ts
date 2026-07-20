@@ -33,7 +33,7 @@ interface CodeLoginRequest extends VerifyCodeDto {
 export type LoginRequest = PasswordLoginRequest | CodeLoginRequest
 export type RegisterRequest = BasicRegisterRequest | FullRegisterRequest
 
-export type VerifyScene = 'login' | 'register' | SecurityVerifyScene
+export type VerifyScene = 'login' | 'register' | 'forgot_password' | SecurityVerifyScene
 
 export type SecurityVerifyScene = 'reset_password' | 'set_password' |
     'change_email' | 'change_phone' | 'verify' | 'activate' | 'bind_email' | 'unbind'
@@ -117,6 +117,21 @@ export const logout = async (deviceFp: string): PromiseResBody<void> => {
     return request.post('/user/security/logout', { deviceFp })
 }
 
+
+export interface ForgotPasswordRequest {
+    channel: 'sms' | 'email'
+    target: string
+    code: string
+    newPwd: string
+    confirmPwd: string
+    deviceFp?: string
+    deviceInfo?: DeviceInfo
+}
+
+export const forgotPasswordReset = async (data: ForgotPasswordRequest): PromiseResBody<void> => {
+    const body = await enrichWithDeviceInfo(data as any)
+    return request.post('/auth/forgot-password/reset', body)
+}
 
 export const refreshAccessToken = (deviceFp: string): PromiseResBody<AccessTokenResponse> => {
     return request.post('/auth/refresh', null, { params: { deviceFp } });
