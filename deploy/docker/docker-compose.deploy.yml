@@ -123,10 +123,6 @@ services:
     image: ${REGISTRY:-ghcr.io}/${GITHUB_REPOSITORY:-your-org/waterfun}/user-service:${IMAGE_TAG:-latest}
     container_name: waterfun-user-service
     environment:
-      VIRTUAL_HOST: ${API_DOMAIN:-api.waterfun.top}
-      VIRTUAL_PORT: 8081
-      LETSENCRYPT_HOST: ${API_DOMAIN:-api.waterfun.top}
-      LETSENCRYPT_EMAIL: ${SSL_EMAIL:-admin@waterfun.top}
       SPRING_PROFILES_ACTIVE: prod
       WATERFUN_SERVICE_PORT: 8081
       JWT_PRIVATE_KEY: file:/app/deploy/keys/private.key
@@ -170,10 +166,6 @@ services:
     image: ${REGISTRY:-ghcr.io}/${GITHUB_REPOSITORY:-your-org/waterfun}/admin-service:${IMAGE_TAG:-latest}
     container_name: waterfun-admin-service
     environment:
-      VIRTUAL_HOST: ${API_DOMAIN:-api.waterfun.top}
-      VIRTUAL_PORT: 8082
-      LETSENCRYPT_HOST: ${API_DOMAIN:-api.waterfun.top}
-      LETSENCRYPT_EMAIL: ${SSL_EMAIL:-admin@waterfun.top}
       SPRING_PROFILES_ACTIVE: prod
       WATERFUN_ADMIN_SERVICE_PORT: 8082
       JWT_PRIVATE_KEY: file:/app/deploy/keys/private.key
