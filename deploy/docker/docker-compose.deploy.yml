@@ -108,11 +108,11 @@ services:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      JAVA_TOOL_OPTIONS: "-Xmx48m -Xms48m -XX:+UseSerialGC"
+      JAVA_TOOL_OPTIONS: "-Xmx256m -Xms256m -XX:+UseSerialGC"
     volumes:
       - ../config/common.yml:/app/deploy/config/common.yml:ro
       - ../keys:/app/deploy/keys:ro
-    mem_limit: 96m
+    mem_limit: 384m
     restart: unless-stopped
     networks:
       - waterfun-net
