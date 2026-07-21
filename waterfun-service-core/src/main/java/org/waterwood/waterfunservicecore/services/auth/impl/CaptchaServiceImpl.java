@@ -8,7 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.services.auth.CaptchaService;
 import org.waterwood.waterfunservicecore.services.auth.LineCaptchaResult;
-import org.waterwood.waterfunservicecore.services.auth.VerifyKeyBuilder;
+import org.waterwood.common.cache.RedisKeyBuilder;
+import static org.waterwood.common.RedisKeyPrefix.VERIFY;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -18,12 +19,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CaptchaServiceImpl implements CaptchaService {
     private final RedisHelperHolder redisHelper;
+
+    // -- Redis key builders --
+
+    private static String captchaKey(String uuid) {
+        return RedisKeyBuilder.build(VERIFY, "captcha", uuid);
+    }
+
     @Override
     public LineCaptchaResult generateCaptcha(){
         LineCaptcha lineCaptcha = generateLineCaptcha();
         String uuid = UUID.randomUUID().toString();
         String code = lineCaptcha.getCode();
-        redisHelper.set(VerifyKeyBuilder.captcha(uuid),code, Duration.ofMinutes(2));
+        redisHelper.set(captchaKey(uuid), code, Duration.ofMinutes(2));
         return new LineCaptchaResult(uuid,lineCaptcha);
     }
 
@@ -34,6 +42,6 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     @Override
     public boolean verifyCode(String uuid, String code){
-        return redisHelper.validateAndRemove(VerifyKeyBuilder.captcha(uuid),code);
+        return redisHelper.validateAndRemove(captchaKey(uuid), code);
     }
 }

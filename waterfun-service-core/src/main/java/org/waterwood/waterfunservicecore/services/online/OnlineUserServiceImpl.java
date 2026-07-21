@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.waterwood.common.RedisKeyPrefix;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 
 import java.time.Duration;
@@ -22,8 +23,8 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     @Value("${online-user.ttl:300}")
     private long onlineTtl;
 
-    private static final String ONLINE_USERS_KEY = "online:users";
-    private static final String ONLINE_USER_PREFIX = "online:user:";
+    private static final String ONLINE_USERS_KEY = RedisKeyPrefix.ONLINE + ":users";
+    private static final String ONLINE_USER_PREFIX = RedisKeyPrefix.ONLINE + "::user:";
     private static final String FIELD_SESSION_ID = "sessionId";
     private static final String FIELD_LAST_ACTIVE = "lastActive";
     private static final String FIELD_IP = "ip";

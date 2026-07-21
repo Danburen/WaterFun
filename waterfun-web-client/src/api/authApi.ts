@@ -47,23 +47,8 @@ export type SendCodeType = {
     captcha?: string
 }
 
-export type SecuritySendCodeType = {
-    channel: 'sms' | 'email'
-    scene: VerifyScene
-    deviceFp?: string
-    deviceInfo?: DeviceInfo
-}
-
 export interface VerifyCodeDto {
     target: string
-    code: string
-    channel: 'sms' | 'email'
-    scene: VerifyScene
-    deviceFp?: string
-    deviceInfo?: DeviceInfo
-}
-
-export interface SecurityVerifyCodeDto {
     code: string
     channel: 'sms' | 'email'
     scene: VerifyScene
@@ -108,29 +93,39 @@ export const sendCode = async (sendCodeData: SendCodeType): PromiseResBody<void>
     return request.post('/auth/send-code', body)
 }
 
-export const sendAuthenticationCode = async (sendCodeData: SecuritySendCodeType): PromiseResBody<void> => {
-    const body = await enrichWithDeviceInfo(sendCodeData as any)
-    return request.post('/user/security/send-verify-code', body)
-}
-
 export const logout = async (deviceFp: string): PromiseResBody<void> => {
     return request.post('/user/security/logout', { deviceFp })
 }
 
 
 export interface ForgotPasswordRequest {
-    channel: 'sms' | 'email'
     target: string
     code: string
     newPwd: string
     confirmPwd: string
-    deviceFp?: string
     deviceInfo?: DeviceInfo
 }
 
-export const forgotPasswordReset = async (data: ForgotPasswordRequest): PromiseResBody<void> => {
-    const body = await enrichWithDeviceInfo(data as any)
-    return request.post('/auth/forgot-password/reset', body)
+export interface ReAuthKeyVo {
+    reAuthKey: string;
+}
+
+export interface ReAuthTokenVo {
+    reAuthToken: string;
+}
+
+// -- 忘记密码 re-auth 流程 --
+
+export const forgotPasswordReAuth = (identifier: string, captcha: string): PromiseResBody<ReAuthKeyVo> => {
+    return request.post('/auth/forgot-password/re-auth', { identifier, captcha });
+}
+
+export const forgotPasswordVerifyReAuth = (reAuthKey: string, code: string): PromiseResBody<ReAuthTokenVo> => {
+    return request.post('/auth/forgot-password/re-auth/verify', { reAuthKey, code });
+}
+
+export const forgotPasswordReset = async (reAuthToken: string, newPwd: string, confirmPwd: string): PromiseResBody<void> => {
+    return request.post('/auth/forgot-password/reset', { reAuthToken, newPwd, confirmPwd })
 }
 
 export const refreshAccessToken = (deviceFp: string): PromiseResBody<AccessTokenResponse> => {

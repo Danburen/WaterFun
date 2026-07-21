@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.waterwood.waterfunservice.service.account.AccountService;
+import org.waterwood.waterfunservicecore.services.account.AccountCoreService;
 import org.waterwood.waterfunservicecore.services.audit.UserActivityLogService;
-import org.waterwood.waterfunservicecore.services.auth.AuthTokenService;
+import org.waterwood.waterfunservicecore.services.auth.AccessTokenService;
 import org.waterwood.waterfunservicecore.services.auth.DeviceService;
 import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
 import org.waterwood.waterfunservicecore.services.stats.UserLastActiveService;
@@ -14,8 +14,8 @@ import org.waterwood.waterfunservicecore.services.stats.UserLastActiveService;
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
-    private final AccountService accountService;
-    private final AuthTokenService authTokenService;
+    private final AccountCoreService accountCoreService;
+    private final AccessTokenService accessTokenService;
     private final DeviceService deviceService;
     private final SSEService sseService;
     private final IpBanService ipBanService;
@@ -26,13 +26,13 @@ public class ScheduleService {
     @Async
     @Scheduled(cron = "0 0 3 * * *")
     public void cleanUnverifiedEmail() {
-        accountService.cleanUnverifiedEmail();
+        accountCoreService.cleanUnverifiedEmail();
     }
 
     @Async
     @Scheduled(cron = "0 0 3 * * *")
     public void cleanZombieRefFamily() {
-        authTokenService.cleanZombieRefFamily();
+        accessTokenService.cleanZombieRefFamily();
     }
 
     @Async

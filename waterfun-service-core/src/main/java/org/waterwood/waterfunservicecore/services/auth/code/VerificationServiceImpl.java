@@ -13,7 +13,7 @@ import org.waterwood.waterfunservicecore.exception.RegisterChannelUnsupportedExc
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.req.auth.SecurityVerifyCodeDto;
-import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
+import org.waterwood.waterfunservicecore.api.req.auth.SendCodeReq;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
@@ -29,6 +29,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static org.waterwood.common.RedisKeyPrefix.THRESHOLD;
+
+import org.waterwood.common.cache.RedisKeyBuilder;
 import org.waterwood.utils.codec.HashUtil;
 
 @Slf4j
@@ -72,7 +75,7 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     @Override
-    public CodeResult sendCodeForAnonymous(SendCodeDto dto) {
+    public CodeResult sendCodeForAnonymous(SendCodeReq dto) {
         // White list for anonymous, only allow login, register, forgot-password
         if(! List.of(VerifyScene.LOGIN, VerifyScene.REGISTER, VerifyScene.FORGOT_PASSWORD).contains(dto.getScene())) {
             throw new InvalidVerifySceneException();
@@ -112,7 +115,7 @@ public class VerificationServiceImpl implements VerificationService {
             case EMAIL -> userDatumRepo.findByEmailHash(hash).isPresent();
         };
     }
-
+    
     /** Per-target hourly limit: max 10 sends per rolling hour (cost-sensitive channels). */
     private static final int TARGET_HOURLY_LIMIT = 10;
     /** Max failed verification attempts before temporary lockout. */
@@ -120,22 +123,38 @@ public class VerificationServiceImpl implements VerificationService {
     /** Lockout duration (minutes) after exceeding max failed attempts. */
     private static final long VERIFY_LOCK_MINUTES = 15;
 
+    // -- Redis key builders --
+
+    /** 1-minute send-rate window key: {@code threshold:target:{channel}:{target}:1m} */
+    private static String targetMinKey(String channel, String target) {
+        return RedisKeyBuilder.build(THRESHOLD, "target", channel, target, "1m");
+    }
+
+    /** 1-hour send-rate window key: {@code threshold:target:{channel}:{target}:1h} */
+    private static String targetHourKey(String channel, String target) {
+        return RedisKeyBuilder.build(THRESHOLD, "target", channel, target, "1h");
+    }
+
+    /** Failed-verification counter key: {@code threshold:vfail:{channel}:{target}:{scene}} */
+    private static String verifyFailKey(String channel, String target, String scene) {
+        return RedisKeyBuilder.build(THRESHOLD, "vfail", channel, target, scene);
+    }
+
     /**
      * Check if this target+channel combination is rate-limited (Redis hasKey).
      * Dual-window: 1/min (all channels) + 10/hour (cost-sensitive).
      * Must be paired with {@link #recordTargetRateLimit} after the actual send succeeds.
      */
     private void checkTargetNotRateLimited(String target, VerifyChannel channel) {
+        String ch = channel.name();
         // 1-minute window
-        String minKey = "rate:target:" + channel.name() + ":" + target;
-        if (Boolean.TRUE.equals(redisHelper.hasKey(minKey))) {
+        if (Boolean.TRUE.equals(redisHelper.hasKey(targetMinKey(ch, target)))) {
             throw new RateLimitException();
         }
 
         // 1-hour window
-        String hourKey = "rate:target:" + channel.name() + ":hour:" + target;
-        String val = redisHelper.getValue(hourKey);
-        if (val != null && Integer.parseInt(val) >= TARGET_HOURLY_LIMIT) {
+        String hourVal = redisHelper.getValue(targetHourKey(ch, target));
+        if (hourVal != null && Integer.parseInt(hourVal) >= TARGET_HOURLY_LIMIT) {
             throw new RateLimitException();
         }
     }
@@ -145,19 +164,19 @@ public class VerificationServiceImpl implements VerificationService {
      * does not falsely block the user for the window duration.
      */
     private void recordTargetRateLimit(String target, VerifyChannel channel) {
+        String ch = channel.name();
         // 1-minute window
-        String minKey = "rate:target:" + channel.name() + ":" + target;
-        redisHelper.set(minKey, "1", Duration.ofMinutes(1));
+        redisHelper.set(targetMinKey(ch, target), "1", Duration.ofMinutes(1));
 
         // 1-hour window (atomic INCR)
-        String hourKey = "rate:target:" + channel.name() + ":hour:" + target;
-        redisHelper.increment(hourKey, Duration.ofHours(1));
+        redisHelper.increment(targetHourKey(ch, target), Duration.ofHours(1));
     }
 
     @Override
     public void verifyCode(String target, VerifyScene scene, VerifyChannel channel, String key, String code) {
         // Check brute-force lockout: too many failed attempts?
-        String failKey = "vfail:" + channel.name() + ":" + target + ":" + scene.name();
+        String ch = channel.name();
+        String failKey = verifyFailKey(ch, target, scene.name());
         String val = redisHelper.getValue(failKey);
         if (val != null && Integer.parseInt(val) >= VERIFY_MAX_ATTEMPTS) {
             throw new RateLimitException();

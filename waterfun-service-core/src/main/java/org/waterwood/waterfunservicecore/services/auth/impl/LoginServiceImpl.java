@@ -18,7 +18,8 @@ import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
-import org.waterwood.waterfunservicecore.entity.security.BanReasonType;
+import org.waterwood.waterfunservicecore.exception.notfound.NotFoundException;
+import org.waterwood.waterfunservicecore.services.user.UserDatumCoreService;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.waterfunservicecore.entity.user.UserDatum;
 import org.waterwood.waterfunservicecore.entity.user.UserPermission;
@@ -37,11 +38,14 @@ import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPay
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
 import org.waterwood.waterfunservicecore.services.auth.LoginService;
+import org.waterwood.waterfunservicecore.services.auth.SingleUseTokenService;
 import org.waterwood.waterfunservicecore.services.auth.RegisterService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
 import org.waterwood.waterfunservicecore.services.online.OnlineUserService;
 import org.waterwood.waterfunservicecore.services.stats.SiteStatisticRecorder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
+import org.waterwood.common.cache.RedisKeyBuilder;
+import static org.waterwood.common.RedisKeyPrefix.THRESHOLD;
 import org.waterwood.utils.codec.HashUtil;
 
 import java.time.Duration;
@@ -53,7 +57,7 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
     private final UserRepository userRepo;
-    private final TokenService tokenService;
+    private final AccessTokenServiceImpl authTokenServiceImpl;
     private final UserDatumRepo userDatumRepo;
     private final EncryptedKeyService encryptedKeyService;
     private final CaptchaServiceImpl captchaService;
@@ -68,6 +72,8 @@ public class LoginServiceImpl implements LoginService {
     private final UserRoleRepo userRoleRepo;
     private final RedisHelperHolder redisHelper;
     private final UserCoreService userCoreService;
+    private final UserDatumCoreService userDatumCoreService;
+    private final SingleUseTokenService singleUseTokenService;
 
     private static final int ADMIN_LOGIN_MAX_ATTEMPTS = 5;
     private static final long ADMIN_LOGIN_LOCK_MINUTES = 120;
@@ -75,16 +81,26 @@ public class LoginServiceImpl implements LoginService {
     private static final long NORMAL_LOGIN_LOCK_MINUTES = 15;
     private static final long DAILY_NORMAL_LOGIN_MAX_ATTEMPTS = 30;
     private static final long DAILY_ADMIN_LOGIN_MAX_ATTEMPTS = 15;
-    private static final String LOGIN_FAIL_PREFIX = "limit:temp:fail:login:";
-    private static final String LOGIN_FAIL_DAILY_PREFIX = "limit:daily:fail:login:";
+
+    // -- Redis key builders --
+
+    /** Short-term lockout window key: {@code threshold:fail:login:temp:{username}} */
+    private static String loginTempFailKey(String username) {
+        return RedisKeyBuilder.build(THRESHOLD, "fail", "login", "temp", username);
+    }
+
+    /** Daily limit window key: {@code threshold:fail:login:daily:{username}} */
+    private static String loginDailyFailKey(String username) {
+        return RedisKeyBuilder.build(THRESHOLD, "fail", "login", "daily", username);
+    }
 
     @Override
     public void logout(String refreshToken, String dfp) {
         if(StringUtil.isBlank(refreshToken)) throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
         long userUid = UserCtxHolder.getUserUid();
-        RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
-        tokenService.removeAccessToken(payload.userUid(), payload.deviceId());
-        tokenService.removeRefreshToken(userUid, dfp, refreshToken);
+        RefreshTokenPayload payload = authTokenServiceImpl.validateRefreshToken(userUid, refreshToken, dfp);
+        authTokenServiceImpl.removeAccessToken(payload.userUid(), payload.deviceId());
+        authTokenServiceImpl.removeRefreshToken(userUid, dfp, refreshToken);
     }
 
     @Override
@@ -163,27 +179,32 @@ public class LoginServiceImpl implements LoginService {
     public void forgetPassword(String verifyCodeKey, ForgetPasswordDto dto) {
         DeviceInfoReq deviceInfo = dto.getDeviceInfo();
         try {
+            // Resolve identifier → find the user
+            Long userUid = userCoreService.resolveUid(dto.getTarget());
+
+            // Get the bound phone number for SMS verification
+            String phone = userDatumCoreService.getRawPhone(userUid);
+            if (phone == null) {
+                throw new BizException(BaseResponseCode.USER_NOT_FOUND);
+            }
+
+            // Verify the SMS code against the bound phone (channel forced to SMS)
             verificationService.verifyCode(
-                    dto.getTarget(), VerifyScene.FORGOT_PASSWORD, dto.getChannel(),
+                    phone, VerifyScene.FORGOT_PASSWORD, VerifyChannel.SMS,
                     verifyCodeKey, dto.getCode()
             );
-
-            EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
-            String channelHash = HashUtil.toSha256HmacString(dto.getTarget(), hmacKey.getEncryptedKey());
-            UserDatum ud = switch (dto.getChannel()) {
-                case SMS -> userDatumRepo.findByPhoneHash(channelHash)
-                        .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
-                case EMAIL -> userDatumRepo.findByEmailHash(channelHash)
-                        .orElseThrow(() -> new BizException(BaseResponseCode.USER_NOT_FOUND));
-            };
 
             if (!dto.getNewPwd().equals(dto.getConfirmPwd())) {
                 throw new BizException(BaseResponseCode.PASSWORD_TWO_PASSWORD_NOT_EQUAL);
             }
 
-            userCoreService.changePwd(ud.getUid(), dto.getNewPwd());
-            auditLogCoreService.recordSuccess(ud.getUid(), null,
+            userCoreService.changePwd(userUid, dto.getNewPwd());
+            auditLogCoreService.recordSuccess(userUid, null,
                     AuditLogActionType.FORGOT_PASSWORD, deviceInfo);
+        } catch (NotFoundException e) {
+            auditLogCoreService.recordFailure(null, dto.getTarget(), AuditLogActionType.FORGOT_PASSWORD,
+                    "User not found", deviceInfo);
+            throw new BizException(BaseResponseCode.USER_NOT_FOUND);
         } catch (Exception e) {
             auditLogCoreService.recordFailure(null, dto.getTarget(), AuditLogActionType.FORGOT_PASSWORD,
                     e.getMessage(), deviceInfo);
@@ -193,8 +214,8 @@ public class LoginServiceImpl implements LoginService {
 
     private LoginResult tryLogin(String username, boolean isAdmin,
                                   Supplier<User> credentialChecker, DeviceInfoReq deviceInfo) {
-        String shortFailKey = LOGIN_FAIL_PREFIX + username;
-        String dailyFailKey = LOGIN_FAIL_DAILY_PREFIX + username;
+        String shortFailKey = loginTempFailKey(username);
+        String dailyFailKey = loginDailyFailKey(username);
         checkShortTermLockout(shortFailKey, isAdmin);
         checkDailyLimit(dailyFailKey, isAdmin);
 
@@ -251,15 +272,19 @@ public class LoginServiceImpl implements LoginService {
     }
 
     private User verifyCredentials(PwdLoginReq body, String verifyUuidKey) {
-        return userRepo.findByUsername(body.getUsername())
-                .map(uu -> {
-                    if (!captchaService.verifyCode(verifyUuidKey, body.getCaptcha()))
-                        throw new AuthException(AuthCode.CAPTCHA_INVALID);
-                    if (!encoder.matches(body.getPassword(), uu.getPasswordHash()))
-                        throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
-                    return uu;
-                })
-                .orElseThrow(() -> new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT));
+        // Resolve identifier (phone/email/username) → userUid → User
+        Long userUid;
+        try {
+            userUid = userCoreService.resolveUid(body.getUsername());
+        } catch (NotFoundException e) {
+            throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
+        }
+        User uu = userCoreService.getUser(userUid);
+        if (!captchaService.verifyCode(verifyUuidKey, body.getCaptcha()))
+            throw new AuthException(AuthCode.CAPTCHA_INVALID);
+        if (!encoder.matches(body.getPassword(), uu.getPasswordHash()))
+            throw new AuthException(AuthCode.USERNAME_OR_PASSWORD_INCORRECT);
+        return uu;
     }
 
     private void checkLoginBan(Long userUid) {

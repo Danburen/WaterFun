@@ -22,8 +22,12 @@ import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRep
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.exception.InappropriateContentException;
 import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserRoleRepo;
+import org.waterwood.waterfunservicecore.entity.EncryptionDataKey;
 import org.waterwood.waterfunservicecore.entity.audit.AuditLogActionType;
 import org.waterwood.waterfunservicecore.entity.spec.UserPermSpec;
+import org.waterwood.waterfunservicecore.infrastructure.persistence.user.UserDatumRepo;
+import org.waterwood.waterfunservicecore.infrastructure.security.EncryptedKeyService;
+import org.waterwood.utils.codec.HashUtil;
 import org.waterwood.waterfunservicecore.entity.spec.UserSpec;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
 import org.waterwood.waterfunservicecore.services.audit.AuditLogCoreService;
@@ -44,6 +48,8 @@ public class UserCoreServiceImpl implements UserCoreService {
     private final UserRepository userRepository;
     private final UserRoleRepo userRoleRepo;
     private final UserPermRepo userPermRepo;
+    private final UserDatumRepo userDatumRepo;
+    private final EncryptedKeyService encryptedKeyService;
     private final RoleRepo roleRepo;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -83,8 +89,8 @@ public class UserCoreServiceImpl implements UserCoreService {
     @Transactional
     public User changePwd(long userUid, String newPwd) {
         User u = getUser(userUid);
-        if(u.getPasswordHash() == null) return u;
-        if(encoder.matches(newPwd, u.getPasswordHash())){
+        // Allow setting password for users who registered without one (e.g., via SMS code)
+        if(u.getPasswordHash() != null && encoder.matches(newPwd, u.getPasswordHash())){
             throw new BizException(BaseResponseCode.PASSWORD_TWO_PASSWORD_MUST_DIFFERENT);
         }
         u.setPasswordHash(encoder.encode(newPwd));
@@ -152,6 +158,26 @@ public class UserCoreServiceImpl implements UserCoreService {
                 .anyMatch(role -> role.getCode().equalsIgnoreCase(
                         userRoleCoreService.getAdminRoleCode()
                 ));
+    }
+
+    @Override
+    public Long resolveUid(String identifier) {
+        // 1. Try phone (HMAC hash)
+        EncryptionDataKey hmacKey = encryptedKeyService.getUserDatumHmacKey();
+        String phoneHash = HashUtil.toSha256HmacString(identifier, hmacKey.getEncryptedKey());
+        UserDatum ud = userDatumRepo.findByPhoneHash(phoneHash).orElse(null);
+        if (ud != null) return ud.getUid();
+
+        // 2. Try email (HMAC hash)
+        String emailHash = HashUtil.toSha256HmacString(identifier, hmacKey.getEncryptedKey());
+        ud = userDatumRepo.findByEmailHash(emailHash).orElse(null);
+        if (ud != null) return ud.getUid();
+
+        // 3. Try username
+        User u = userRepository.findByUsername(identifier).orElse(null);
+        if (u != null) return u.getUid();
+
+        throw new NotFoundException("User not found for identifier: " + identifier);
     }
 
     private List<Permission> getRolePermissions(int roleId){

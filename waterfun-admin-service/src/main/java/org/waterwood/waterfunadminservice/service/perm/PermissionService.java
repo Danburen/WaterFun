@@ -81,7 +81,7 @@ public interface PermissionService {
      * Batch replace a permission's users, the old user-permission relations will be removed
      * @param id the permission id
      * @param userUids user uids
-     * @param expiresAt the permission expiration. will never expire if set null
+     * @param expiresAt the permission expiration. will never expiresIn if set null
      * @return batch processing result
      */
     BatchResult replacePermUsers(int id, List<Long> userUids, Instant expiresAt);

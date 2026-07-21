@@ -8,6 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.waterwood.common.RedisKeyPrefix;
+import org.waterwood.common.cache.RedisKeyBuilder;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.entity.user.User;
 import org.waterwood.utils.codec.HashUtil;
@@ -75,7 +77,7 @@ public class DeviceServiceImpl implements DeviceService {
         while(!users.getContent().isEmpty()){
             users.forEach(user->{
                 Map<String, Long> devices = getUserDeviceLastActiveTime(user.getUid());
-                // Get all the devices that are older than the max expire time
+                // Get all the devices that are older than the max expiresIn time
                 devices.entrySet().removeIf(
                         entry-> (System.currentTimeMillis() - entry.getValue()) < deviceExpireMaxTimeMillis);
                 redisHelper.hashDel(getDevicesKey(user.getUid()), devices.keySet().toArray(new String[0]));
@@ -139,9 +141,19 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     private String getDeviceLastActiveKey(Long userUid, String did){
-        return "user:" + userUid + ":device:" + did + ":last_active";
+        return RedisKeyBuilder.build(
+                RedisKeyPrefix.USER,
+                userUid.toString(),
+                "device",
+                did,
+                "last-active"
+        );
     }
     private String getDevicesKey(Long userUid){
-        return UserKeyBuilder.userDevices(userUid);
+        return RedisKeyBuilder.build(
+                RedisKeyPrefix.USER,
+                userUid.toString(),
+                "devices"
+        );
     }
 }

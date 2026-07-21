@@ -3,13 +3,17 @@ import { ref, onUnmounted, onBeforeMount, watch } from 'vue';
 import {ElMessage} from "element-plus";
 import {useI18n} from 'vue-i18n';
 import { Refresh } from '@element-plus/icons-vue';
-import { sendCode, getCaptcha } from "~/api/authApi";
+import { sendCode, forgotPasswordReAuth, getCaptcha } from "~/api/authApi";
 import type { SendCodeType, VerifyScene } from "~/api/authApi";
 import { throttle } from "@waterfun/web-core/src/triggerControl";
 import { generateFingerprint } from "@waterfun/web-core/src/fingerprint";
 import { convertArrayBufferToBase64 } from '@waterfun/web-core/src/dataMapper';
 
 const i18n = useI18n();
+
+const emit = defineEmits<{
+  sent: [data: { reAuthKey?: string }]
+}>();
 
 const props = defineProps<{
   username: string
@@ -51,14 +55,20 @@ const confirmCaptcha = async () => {
   if (!captchaInput.value.trim()) return;
   sending.value = true;
   try {
-    const requestData: SendCodeType = {
-      target: props.username,
-      channel: props.getType,
-      scene: props.scene,
-      deviceFp: await generateFingerprint(),
-      captcha: captchaInput.value,
+    if (props.scene === 'forgot_password') {
+      // Forgot-password: use resolveUid flow (supports phone/email/username)
+      const res = await forgotPasswordReAuth(props.username, captchaInput.value);
+      emit('sent', { reAuthKey: res.data?.reAuthKey });
+    } else {
+      const requestData: SendCodeType = {
+        target: props.username,
+        channel: props.getType,
+        scene: props.scene,
+        deviceFp: await generateFingerprint(),
+        captcha: captchaInput.value,
+      }
+      await sendCode(requestData);
     }
-    await sendCode(requestData);
     ElMessage.success(i18n.t('message.success.verificationCodeSent'));
     showCaptcha.value = false;
     captchaInput.value = '';

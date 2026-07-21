@@ -13,6 +13,6 @@ import org.waterwood.common.TokenResult;
  */
 public record TokenPair(String accessToken, long accessExp, String refreshToken,long refreshExp) {
     public static TokenPair of(TokenResult at, TokenResult rt) {
-        return new TokenPair(at.tokenValue(), at.expire(), rt.tokenValue(), rt.expire());
+        return new TokenPair(at.value(), at.expiresIn(), rt.value(), rt.expiresIn());
     }
 }

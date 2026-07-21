@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * A service for managing AUTH tokens.
  */
-public interface AuthTokenService {
+public interface AccessTokenService {
     /**
      * Generate and store access token(jti) to cache service.
      * @param userUid the user ID
@@ -38,12 +38,6 @@ public interface AuthTokenService {
     void removeRefreshToken(long userUid, String dfp, String refreshToken);
 
     void removeAccessToken(Long userUid, String deviceId);
-
-    String buildRefCacheKey(long userUid, String deviceId, String family);
-
-    String buildRtFamiliesCacheKey(long userUid);
-
-    String buildAccessUserDeviceKey(long userUid, String deviceId);
 
     Set<String> getFamilyIds(long userUid);
 

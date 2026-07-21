@@ -1,18 +1,22 @@
 package org.waterwood.waterfunservicecore.api.req.auth;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 
 @Data
-public class SecuritySendCodeDto {
+@NoArgsConstructor
+public class SendCodeReq {
+    @NotBlank(message = "{valid.need_target}")
+    private String target;
     @NotNull
     private VerifyChannel channel;
-    @NotEmpty
     private String deviceFp;
     private DeviceInfoReq deviceInfo;
     @NotNull
     private VerifyScene scene;
+    private String captcha;
 }

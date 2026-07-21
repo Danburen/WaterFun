@@ -3,7 +3,7 @@ package org.waterwood.waterfunservicecore.services.auth.code;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.req.auth.SecurityVerifyCodeDto;
-import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
+import org.waterwood.waterfunservicecore.api.req.auth.SendCodeReq;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.exception.BizException;
@@ -36,10 +36,10 @@ public interface VerificationService {
 
     /**
      * Send code to anonymous, usually used for register or login
-     * @param dto {@link SendCodeDto}
+     * @param dto {@link SendCodeReq}
      * @return {@link CodeResult}
      */
-    CodeResult sendCodeForAnonymous(SendCodeDto dto);
+    CodeResult sendCodeForAnonymous(SendCodeReq dto);
 
     /**
      * Verify code

@@ -96,7 +96,7 @@ public interface RoleService {
      *
      * @param id       role ID
      * @param userIds  the request body
-     * @param expireAt role expire time ,if set null, will never expire
+     * @param expireAt role expiresIn time ,if set null, will never expiresIn
      * @return Batch Result
      */
     BatchResult assignUsers(int id, List<Long> userIds, Instant expireAt);
@@ -135,7 +135,7 @@ public interface RoleService {
      * Batch replacing users ofPending a role, the users will be replaced by the given user list, and the old users will be removed
      * @param id the role id
      * @param userUids user uids
-     * @param expiresAt role expire time ,if set null, will never expire
+     * @param expiresAt role expiresIn time ,if set null, will never expiresIn
      * @return batch processing result
      */
     BatchResult replaceUserRoles(int id, List<Long> userUids, Instant expiresAt);

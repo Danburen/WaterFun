@@ -32,11 +32,11 @@ public class RsaJwtDecoder implements ReactiveJwtDecoder {
     }
 
     /**
-     * Parses the JWT tokenValue and returns the claims.
-     * This will validateAndRemove the tokenValue signature and expiration first.
-     * @param JwToken the JWT tokenValue to parse
+     * Parses the JWT value and returns the claims.
+     * This will validateAndRemove the value signature and expiration first.
+     * @param JwToken the JWT value to parse
      * @return Claims Instance
-     * @throws JwtException if the tokenValue is invalid or expired
+     * @throws JwtException if the value is invalid or expired
      */
     public Claims parseToken(String JwToken) throws JwtException {
         return Jwts.parser()

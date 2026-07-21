@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
 import org.waterwood.common.CloudFSRoot;
-import org.waterwood.common.KeyConstants;
+import org.waterwood.common.RedisKeyPrefix;
 import org.waterwood.common.io.FileExtension;
 import org.waterwood.common.io.FileProbeResult;
 import org.waterwood.common.io.ResourceType;
@@ -33,7 +33,6 @@ import org.waterwood.waterfunservicecore.api.resp.PresignedResp;
 import org.waterwood.waterfunservicecore.api.resp.CloudResPresignedUrlResp;
 import org.waterwood.waterfunservicecore.entity.audit.TargetType;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
-import org.waterwood.waterfunservicecore.services.sys.CloudKeyBuilder;
 import org.waterwood.waterfunservicecore.services.sys.storage.*;
 import org.waterwood.waterfunservicecore.infrastructure.utils.BizUploadPayload;
 
@@ -63,8 +62,8 @@ public class TencentCosService implements CloudFileService {
     @Value("${cloud.tencent.cos.upload-token-expires-seconds:300}")
     private long uploadTokenExpires;
     private final RedisHelperHolder redisHelper;
-    @Value("${cloud.biz-prefix}")
-    private String bizPrefix;
+    @Value("${cloud.biz-prefix:waterfun}")
+    private String rootKeyPrefix;
 
     @Autowired
     public TencentCosService(
@@ -185,8 +184,9 @@ public class TencentCosService implements CloudFileService {
 
     @Override
     public String getCachedRedisKey(Serializable bizId, TargetType resType, CloudResOperationType operationType) {
-        return RedisKeyBuilder.buildKey(
-                CloudKeyBuilder.fs(),
+        return RedisKeyBuilder.build(
+                RedisKeyPrefix.CLOUD,
+                "fs",
                 operationType.getKey(),
                 resType.toLowerCase(),
                 bizId.toString()
@@ -429,10 +429,10 @@ public class TencentCosService implements CloudFileService {
     }
 
     private String buildUploadRedisKey(String token){
-        return RedisKeyBuilder.buildKey(KeyConstants.UPLOADS, KeyConstants.TOKEN, token);
+        return RedisKeyBuilder.build(RedisKeyPrefix.UPLOADS, "token", token);
     }
 
     private String buildCosKey(CloudFSRoot root, String... keys){
-        return PathUtil.buildPath(bizPrefix, root.getKey(), keys);
+        return PathUtil.buildPath(rootKeyPrefix, root.getKey(), keys);
     }
 }

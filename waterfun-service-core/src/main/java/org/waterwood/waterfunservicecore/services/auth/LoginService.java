@@ -33,10 +33,11 @@ public interface LoginService {
     LoginResult login(VerifyCodeDto dto, String codeKey);
 
     /**
-     * Forgot password: verify code then update password.
+     * Forgot password: resolve identifier → verify SMS code → update password.
      * No authentication required — public endpoint.
-     * @param verifyCodeKey cached verify code key
-     * @param dto           forget password dto (contains deviceFp)
+     * @param verifyCodeKey cached SMS verify code key
+     * @param dto           forget password dto (contains target identifier, codes, deviceInfo)
      */
     void forgetPassword(String verifyCodeKey, ForgetPasswordDto dto);
+
 }

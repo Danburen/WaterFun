@@ -1,21 +1,23 @@
 package org.waterwood.waterfunservicecore.services.auth.impl;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 import org.waterwood.api.BaseResponseCode;
+import org.waterwood.common.RedisKeyPrefix;
+import org.waterwood.common.cache.RedisKeyBuilder;
 import org.waterwood.utils.StringUtil;
+import org.waterwood.waterfunservicecore.exception.TokenInvalidOrExpireException;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.common.TokenResult;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelper;
 import org.waterwood.waterfunservicecore.infrastructure.security.RefreshTokenPayload;
 import org.waterwood.waterfunservicecore.infrastructure.security.RsaJwtUtil;
-import org.waterwood.waterfunservicecore.services.auth.AuthTokenService;
+import org.waterwood.waterfunservicecore.services.auth.AccessTokenService;
 import org.waterwood.waterfunservicecore.services.auth.DeviceService;
 import org.waterwood.common.constratin.UserKeyBuilder;
 
@@ -24,7 +26,7 @@ import java.util.*;
 
 @Service
 @Slf4j
-public class TokenService implements AuthTokenService {
+public class AccessTokenServiceImpl implements AccessTokenService {
     private final RsaJwtUtil rsaJwtUtil;
     private final RedisHelperHolder redisHelper;
     private final DeviceService deviceService;
@@ -36,7 +38,7 @@ public class TokenService implements AuthTokenService {
     private Long refFamilyExpire;
     @Value("${token.access.expiration:3600}") // Default to 1 hour in seconds
     private Long accessTokenExpire;
-    public TokenService(RedisHelper redisHelper, RsaJwtUtil rsaJwtUtil, DeviceServiceImpl deviceService) {
+    public AccessTokenServiceImpl(RedisHelper redisHelper, RsaJwtUtil rsaJwtUtil, DeviceServiceImpl deviceService) {
         this.redisHelper = redisHelper;
         this.rsaJwtUtil = rsaJwtUtil;
         this.deviceService = deviceService;
@@ -108,12 +110,12 @@ public class TokenService implements AuthTokenService {
     }
 
     /**
-     * Validates the refresh tokenValue and returns the userUid if valid.
+     * Validates the refresh value and returns the userUid if valid.
      * <p><b>Refresh Token will be removed </b>after validateAndRemove</p>
      *
      * @param userUid the user UID
-     * @param refreshToken the refresh tokenValue to validateAndRemove
-     * @return Long ofPending <b>UserID</b> if the tokenValue is valid
+     * @param refreshToken the refresh value to validateAndRemove
+     * @return Long ofPending <b>UserID</b> if the value is valid
      */
     @Override
     public RefreshTokenPayload validateRefreshToken(long userUid, String refreshToken, String dfp) {
@@ -139,7 +141,8 @@ public class TokenService implements AuthTokenService {
         String jtiKey = buildAccessUserDeviceKey(Long.parseLong(userUid), did);
         String savedJti = redisHelper.getValue(jtiKey);
         if(savedJti == null || !savedJti.equals(jti)){
-            throw new JwtException("Invalid token ID");
+            // missing jti id
+            throw new TokenInvalidOrExpireException();
         }
     }
 
@@ -151,7 +154,7 @@ public class TokenService implements AuthTokenService {
         String stored = redisHelper.getValue(key);
         if (stored != null && stored.equals(refreshToken)) {
             redisHelper.del(key);
-            redisHelper.del("rt:" + stored);
+            redisHelper.del(rtTokenKey(refreshToken));
         }
     }
 
@@ -160,7 +163,7 @@ public class TokenService implements AuthTokenService {
      * Used by the refresh endpoint which has no access token in context.
      */
     public long resolveUserUidByRefreshToken(String refreshToken) {
-        String val = redisHelper.getValue("rt:" + refreshToken);
+        String val = redisHelper.getValue(rtTokenKey(refreshToken));
         if (val == null) {
             throw new BizException(BaseResponseCode.REAUTHENTICATE_REQUIRED);
         }
@@ -170,24 +173,6 @@ public class TokenService implements AuthTokenService {
     @Override
     public void removeAccessToken(Long userUid, String deviceId) {
         redisHelper.del(buildAccessUserDeviceKey(userUid, deviceId));
-    }
-    @Override
-    public String buildRefCacheKey(long userUid, String deviceId, String family) {
-        return "user:"+ userUid + ":device:" + deviceId + ":rt_family:" + family + ":ref";
-    }
-
-    public String buildRtFamilyCacheKey(long userUid, String deviceId) {
-        return "user:"+ userUid + ":device:" + deviceId + ":rt_family";
-    }
-
-    @Override
-    public String buildRtFamiliesCacheKey(long userUid) {
-        return "user:"+ userUid + ":rt_families";
-    }
-
-    @Override
-    public String buildAccessUserDeviceKey(long userUid, String deviceId){
-        return UserKeyBuilder.userAccessDevice(userUid, deviceId);
     }
 
     @Override
@@ -199,7 +184,7 @@ public class TokenService implements AuthTokenService {
     public void cleanZombieRefFamily() {
         // TODO: add asynchronous remove to help release server pressure.
         ScanOptions options = ScanOptions.scanOptions()
-                .match("user:*:rt_families")
+                .match("user:*:rt-families")
                 .count(100)  // 100 per batch
                 .build();
         Cursor<String> cursor = redisHelper.scan(options);
@@ -209,19 +194,19 @@ public class TokenService implements AuthTokenService {
         while(cursor.hasNext()){
             batch.add(cursor.next());
             if(batch.size() >= 100){
-                removed += processBatchRTFamiliesClean(batch);
+                removed += processBatchRtFamiliesClean(batch);
                 batch.clear();
                 batchCount++;
             }
         }
         if (!batch.isEmpty()) {
-            removed += processBatchRTFamiliesClean(batch);
+            removed += processBatchRtFamiliesClean(batch);
         }
         cursor.close();
         log.info("Zombie Refresh Families successfully cleaned up, total {} in {} batches", removed, batchCount);
     }
 
-    private long processBatchRTFamiliesClean(List<String> batch) {
+    private long processBatchRtFamiliesClean(List<String> batch) {
         long removed = 0;
         for(String key: batch){
             Set<String> familiesSet = redisHelper.setMembers(key);
@@ -244,5 +229,32 @@ public class TokenService implements AuthTokenService {
             redisHelper.setRemove(key, toRemove);
         }
         return removed;
+    }
+
+    private static String buildRefCacheKey(long userUid, String deviceId, String family) {
+        return RedisKeyBuilder.build(RedisKeyPrefix.USER, userUid,
+                "device",  deviceId,
+                "rt-family", family,
+                "ref"
+        );
+    }
+
+    private static  String buildRtFamilyCacheKey(long userUid, String deviceId) {
+        return RedisKeyBuilder.build(RedisKeyPrefix.USER, userUid,
+                "device", deviceId,
+                "rt-family"
+        );
+    }
+
+    private static String rtTokenKey(String rt){
+        return RedisKeyPrefix.REFRESH_TOKEN + ":" + rt;
+    }
+
+    private static String buildRtFamiliesCacheKey(long userUid) {
+        return RedisKeyPrefix.USER + ":" + userUid + ":rt-families";
+    }
+
+    private static String buildAccessUserDeviceKey(long userUid, String deviceId){
+        return UserKeyBuilder.userAccessDevice(userUid, deviceId);
     }
 }

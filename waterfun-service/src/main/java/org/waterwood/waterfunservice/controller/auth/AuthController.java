@@ -15,13 +15,19 @@ import org.springframework.web.bind.annotation.*;
 import org.waterwood.api.ApiResponse;
 import org.waterwood.api.AuthCode;
 import org.waterwood.api.TokenPair;
+import org.waterwood.common.TokenResult;
+import org.waterwood.waterfunservice.api.request.ForgotPasswordReAuthReq;
+import org.waterwood.waterfunservice.api.request.ForgotPasswordResetReq;
+import org.waterwood.waterfunservice.api.request.ForgotPasswordVerifyReq;
+import org.waterwood.waterfunservice.api.response.ReAuthKeyVo;
+import org.waterwood.waterfunservice.api.response.ReAuthTokenVo;
 import org.waterwood.common.exceptions.AuthException;
 import org.waterwood.waterfunservicecore.api.auth.LoginResult;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
-import org.waterwood.waterfunservicecore.api.req.auth.ForgetPasswordDto;
+import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.req.auth.PwdLoginReq;
 import org.waterwood.waterfunservicecore.api.req.auth.RegisterRequest;
-import org.waterwood.waterfunservicecore.api.req.auth.SendCodeDto;
+import org.waterwood.waterfunservicecore.api.req.auth.SendCodeReq;
 import org.waterwood.waterfunservicecore.api.req.auth.VerifyCodeDto;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.api.resp.auth.LoginClientData;
@@ -30,11 +36,10 @@ import org.waterwood.waterfunservicecore.infrastructure.aspect.RateLimit;
 import org.waterwood.waterfunservicecore.infrastructure.utils.CookieUtil;
 import org.waterwood.waterfunservicecore.infrastructure.utils.ResponseUtil;
 import org.waterwood.waterfunservicecore.services.auth.LineCaptchaResult;
+import org.waterwood.waterfunservicecore.services.auth.SingleUseTokenService;
+import org.waterwood.waterfunservicecore.services.account.AccountCoreService;
 import org.waterwood.waterfunservicecore.services.auth.code.VerificationService;
-import org.waterwood.waterfunservicecore.services.auth.impl.AuthCoreServiceImpl;
-import org.waterwood.waterfunservicecore.services.auth.impl.CaptchaServiceImpl;
-import org.waterwood.waterfunservicecore.services.auth.impl.LoginServiceImpl;
-import org.waterwood.waterfunservicecore.services.auth.impl.RegisterServiceImpl;
+import org.waterwood.waterfunservicecore.services.auth.impl.*;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -50,6 +55,8 @@ public class AuthController {
     private final RegisterServiceImpl registerService;
     private final AuthCoreServiceImpl authService;
     private final VerificationService verificationService;
+    private final SingleUseTokenService singleUseTokenService;
+    private final AccountCoreService accountCoreService;
 
 
     @Operation(summary = "获取图形验证码")
@@ -71,6 +78,7 @@ public class AuthController {
         result.captcha().write(response.getOutputStream());
     }
 
+    @Deprecated
     @GetMapping("/csrf-token")
     public ApiResponse<Void> getCsrfToken(HttpServletRequest request,HttpServletResponse response) {
         CsrfToken token = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
@@ -96,7 +104,7 @@ public class AuthController {
      */
     @Operation(summary = "发送验证码（需图形验证码）")
     @PostMapping("/send-code")
-    public ApiResponse<Void> sendCode(@Valid @RequestBody SendCodeDto dto,
+    public ApiResponse<Void> sendCode(@Valid @RequestBody SendCodeReq dto,
                                        HttpServletRequest request,
                                        HttpServletResponse response) {
         String captchaKey = CookieUtil.getCookieValue(request.getCookies(), "CAPTCHA_KEY");
@@ -132,15 +140,43 @@ public class AuthController {
         );
     }
 
-    @Operation(summary = "忘记密码 - 重置密码")
+    @Operation(summary = "忘记密码 - 发送验证码到绑定手机（通过任意标识符）")
+    @PostMapping("/forgot-password/re-auth")
+    @RateLimit(key = "ip", permits = 3, window = 60)
+    public ApiResponse<ReAuthKeyVo> forgotPasswordReAuth(
+            @Valid @RequestBody ForgotPasswordReAuthReq body,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        String captchaKey = CookieUtil.getCookieValue(request.getCookies(), "CAPTCHA_KEY");
+        if (!captchaService.verifyCode(captchaKey, body.getCaptcha())) {
+            throw new AuthException(AuthCode.CAPTCHA_INVALID);
+        }
+        String reAuthKey = accountCoreService.initiateForgotPasswordReAuth(body.getIdentifier());
+        if (reAuthKey != null) {
+            ResponseUtil.setCookieAndNoCache(response, "SMS_CODE_KEY", reAuthKey, 300);
+            return ApiResponse.success(new ReAuthKeyVo(reAuthKey));
+        }
+        return ApiResponse.success(new ReAuthKeyVo(null));
+    }
+
+    @Operation(summary = "忘记密码 - 验证码确认，获取 reAuthToken")
+    @PostMapping("/forgot-password/re-auth/verify")
+    @RateLimit(key = "ip", permits = 5, window = 300)
+    public ApiResponse<ReAuthTokenVo> forgotPasswordVerifyReAuth(
+            @Valid @RequestBody ForgotPasswordVerifyReq body) {
+        TokenResult token = accountCoreService.verifyForgotPasswordReAuth(
+                body.getReAuthKey(), body.getCode());
+        return ApiResponse.success(new ReAuthTokenVo(token));
+    }
+
+    @Operation(summary = "忘记密码 - 使用 reAuthToken 重置密码")
     @PostMapping("/forgot-password/reset")
     @RateLimit(key = "ip", permits = 3, window = 300)
-    public ApiResponse<Void> forgotPasswordReset(@Valid @RequestBody ForgetPasswordDto dto,
-                                                  HttpServletRequest request) {
-        loginService.forgetPassword(
-                CookieUtil.getCookieValue(request.getCookies(), dto.getChannel().name().toUpperCase() + "_CODE_KEY"),
-                dto
-        );
+    public ApiResponse<Void> forgotPasswordReset(
+            @Valid @RequestBody ForgotPasswordResetReq body) {
+        Long uid = singleUseTokenService.consumeVerifyToken(
+                body.getReAuthToken(), VerifyScene.FORGOT_PASSWORD.name());
+        accountCoreService.resetPasswordByToken(uid, body.getNewPwd(), body.getConfirmPwd());
         return ApiResponse.success();
     }
 
@@ -169,4 +205,5 @@ public class AuthController {
                 tokenPair.accessToken(), tokenPair.accessExp(), false
         ));
     }
+
 }

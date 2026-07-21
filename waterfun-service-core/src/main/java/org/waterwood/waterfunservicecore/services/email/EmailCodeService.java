@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import org.waterwood.utils.MaskUtil;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.common.cache.RedisKeyBuilder;
+import static org.waterwood.common.RedisKeyPrefix.VERIFY;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
-import org.waterwood.waterfunservicecore.services.auth.VerifyKeyBuilder;
-import org.waterwood.waterfunservicecore.services.auth.code.CodeVerifier;
 import org.waterwood.waterfunservicecore.exception.ServiceException;
+import org.waterwood.waterfunservicecore.services.auth.code.CodeVerifier;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSender;
 import org.waterwood.waterfunservicecore.services.email.template.EmailTemplateFragment;
 import org.waterwood.waterfunservicecore.services.email.template.EmailTemplateLayout;
@@ -31,14 +31,19 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 @RequiredArgsConstructor
 public class EmailCodeService implements CodeVerifier, CodeSender {
-    private static final String REDIS_KEY_PREFIX = "verify:email-code";
     private final RedisHelperHolder redisHelper;
     private final MessageSource messageSource;
-    @Value("${expire.email.verify}")
+    @Value("${expiresIn.email.verify}")
     private Long expireDuration;
     @Value("${mail.support.email}")
     private String supportEmail;
     private final ResendEmailService emailService;
+
+    // -- Redis key builders --
+
+    private static String emailCodeKey(String target, String scene, String identifier) {
+        return RedisKeyBuilder.build(VERIFY, "email", target, scene, identifier);
+    }
 
     @Override
     public CodeResult sendCode(String target, VerifyScene scene) {
@@ -65,7 +70,7 @@ public class EmailCodeService implements CodeVerifier, CodeSender {
 
         if (sendResult.isSendSuccess()){
             redisHelper.set(
-                    RedisKeyBuilder.buildKey(VerifyKeyBuilder.email(target), scene.getValue(), uuid),
+                    emailCodeKey(target, scene.getValue(), uuid),
                     code,
                     Duration.ofMinutes(expireDuration));
         }else{
@@ -82,7 +87,7 @@ public class EmailCodeService implements CodeVerifier, CodeSender {
     @Override
     public boolean verifyCode(String target, VerifyScene scene, String key, String code) {
         return redisHelper.validateAndRemove(
-                RedisKeyBuilder.buildKey(VerifyKeyBuilder.email(target), scene.getValue(), key),
+                emailCodeKey(target, scene.getValue(), key),
                 code
         );
     }

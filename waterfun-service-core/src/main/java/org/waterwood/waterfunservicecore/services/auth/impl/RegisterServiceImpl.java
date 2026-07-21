@@ -54,7 +54,7 @@ public class RegisterServiceImpl implements RegisterService {
     private final SiteStatisticRecorder siteStatisticRecorder;
     private final AuditLogCoreService auditLogCoreService;
 
-    @Value("${expire.email.unverified-expire-hours:24}")
+    @Value("${expiresIn.email.unverified-expiresIn-hours:24}")
     private Long emailUnverifiedExpireHours;
 
     @Transactional

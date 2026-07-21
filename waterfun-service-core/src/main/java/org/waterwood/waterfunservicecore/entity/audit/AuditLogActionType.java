@@ -11,7 +11,8 @@ public enum AuditLogActionType {
     BIND_EMAIL(4),
     UNBIND_EMAIL(5),
     CHANGE_PHONE(6),
-    FORGOT_PASSWORD(7);
+    FORGOT_PASSWORD(7),
+    CHANGE_EMAIL(8);
 
     private final byte value;
     AuditLogActionType(final int value) {

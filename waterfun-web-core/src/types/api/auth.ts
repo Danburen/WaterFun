@@ -46,23 +46,8 @@ export type SendCodeType = {
     deviceInfo?: DeviceInfo
 }
 
-export type SecuritySendCodeType = {
-    channel: 'sms' | 'email'
-    scene: VerifyScene
-    deviceFp?: string
-    deviceInfo?: DeviceInfo
-}
-
 export interface VerifyCodeDto {
     target: string
-    code: string
-    channel: 'sms' | 'email'
-    scene: VerifyScene
-    deviceFp?: string
-    deviceInfo?: DeviceInfo
-}
-
-export interface SecurityVerifyCodeDto {
     code: string
     channel: 'sms' | 'email'
     scene: VerifyScene

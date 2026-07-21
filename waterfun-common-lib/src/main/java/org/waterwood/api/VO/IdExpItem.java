@@ -11,7 +11,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 /**
- * A class which contains ids and expireAt, used for batch delete or batch expire
+ * A class which contains ids and expireAt, used for batch delete or batch expiresIn
  */
 public class IdExpItem<T> implements Serializable {
     private T id;

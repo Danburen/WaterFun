@@ -24,7 +24,7 @@ import org.waterwood.waterfunservicecore.services.auth.code.CodeSenderFactory;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthCoreServiceImpl implements AuthCoreService {
-    private final TokenService tokenService;
+    private final AccessTokenServiceImpl authTokenServiceImpl;
     private final DeviceServiceImpl deviceService;
     private final UserRepository userRepository;
     private final CodeSenderFactory codeSenderFactory;
@@ -40,18 +40,18 @@ public class AuthCoreServiceImpl implements AuthCoreService {
     @Override
     public TokenPair createNewTokens(long userUid, String deviceFingerprint) {
         String deviceId = deviceService.generateAndStoreDeviceId(userUid, deviceFingerprint);
-        TokenResult accessToken = tokenService.genCacheNewAccTokenRevokeOlds(userUid, deviceId);
-        TokenResult refreshToken = tokenService.genAndCacheRefToken(userUid, deviceId);
+        TokenResult accessToken = authTokenServiceImpl.genCacheNewAccTokenRevokeOlds(userUid, deviceId);
+        TokenResult refreshToken = authTokenServiceImpl.genAndCacheRefToken(userUid, deviceId);
         return new TokenPair(
-                accessToken.tokenValue(), accessToken.expire(),
-                refreshToken.tokenValue(), refreshToken.expire());
+                accessToken.value(), accessToken.expiresIn(),
+                refreshToken.value(), refreshToken.expiresIn());
     }
 
     /**
      * Return the refresh token
      *
-     * @param refreshToken refresh tokenValue
-     * @return Token result that contains tokenValue and expirations.
+     * @param refreshToken refresh value
+     * @return Token result that contains value and expirations.
      */
     @Override
     public TokenPair refreshAccessToken(String refreshToken, String dfp) {
@@ -59,12 +59,12 @@ public class AuthCoreServiceImpl implements AuthCoreService {
             throw new AuthException(AuthCode.REAUTHORIZATION_REQUIRED);
         });// Missing refresh token
         // Resolve userUid from refresh token reverse index (not from access token)
-        long userUid = tokenService.resolveUserUidByRefreshToken(refreshToken);
-        RefreshTokenPayload payload = tokenService.validateRefreshToken(userUid, refreshToken, dfp);
+        long userUid = authTokenServiceImpl.resolveUserUidByRefreshToken(refreshToken);
+        RefreshTokenPayload payload = authTokenServiceImpl.validateRefreshToken(userUid, refreshToken, dfp);
         TokenResult RT = userRepository.findById(userUid).map(_ ->
-                        tokenService.genAndCacheRefToken(userUid, payload.deviceId()))
+                        authTokenServiceImpl.genAndCacheRefToken(userUid, payload.deviceId()))
                 .orElseThrow(AuthException::new);
-        TokenResult AT = tokenService.genCacheNewAccTokenRevokeOlds(userUid, payload.deviceId());
+        TokenResult AT = authTokenServiceImpl.genCacheNewAccTokenRevokeOlds(userUid, payload.deviceId());
         return TokenPair.of(AT, RT);
     }
 }

@@ -86,4 +86,13 @@ public interface UserCoreService {
      */
     void updateNickname(long userUid, String nickname);
 
+    /**
+     * Resolve a login identifier (phone/email/username) to user UID.
+     * Search order: phone hash → email hash → username.
+     *
+     * @param identifier phone number, email address, or username
+     * @return user UID
+     * @throws NotFoundException if no user matches the identifier
+     */
+    Long resolveUid(String identifier);
 }

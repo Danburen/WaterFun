@@ -1,6 +1,6 @@
 import request from "../utils/axiosRequest"
 import type { PromiseResBody } from "@waterfun/web-core/src/types/api/response";
-import type { SecurityVerifyCodeDto, SendCodeType } from "~/api/authApi";
+import type { VerifyScene } from "~/api/authApi";
 
 export interface AccountInfo {
     phoneMasked: string;
@@ -9,85 +9,70 @@ export interface AccountInfo {
     emailVerified: boolean;
 }
 
-export interface ResetPasswordRequest {
-    oldPwd: string;
-    newPwd: string;
-    confirmPwd: string;
-    verify: SecurityVerifyCodeDto;
-}
-
-export interface SetPasswordRequest {
-    newPwd: string;
-    confirmPwd: string;
-    verify: SecurityVerifyCodeDto;
-}
-
-export interface BindEmailRequest {
-    email: string;
-    verify: SecurityVerifyCodeDto;
-}
-
-export interface ActivateEmailRequest {
-    email: string;
-    verify: SecurityVerifyCodeDto;
-}
-
-export interface ChangeEmailRequest {
-    email: string;
-    verify: SecurityVerifyCodeDto;
-}
-
-export interface UnbindEmailRequest {
-    email: string;
-    verify: SecurityVerifyCodeDto;
-}
-
-export interface ActivatePhoneRequest {
-    phone: string;
-    verify: SecurityVerifyCodeDto;
-}
-
-export interface ChangePhoneRequest {
-    phone: string;
-    verify: SecurityVerifyCodeDto;
-}
-
 export const getAccountInfo = (): PromiseResBody<AccountInfo> => {
     return request.get('/auth/account');
 }
 
-export const resetPassword = (resetPasswordData: ResetPasswordRequest): PromiseResBody<void> => {
-    return request.post('/auth/account/password/reset', resetPasswordData);
+export interface ReAuthInfo {
+    maskedPhone: string;
 }
 
-export const setPassword = (setPasswordData: SetPasswordRequest): PromiseResBody<void> => {
-    return request.post('/auth/account/password/set', setPasswordData);
+export interface ReAuthTokenVo {
+    reAuthToken: string;
 }
 
-export const sendVerifyCode = (sendCodeData: SendCodeType): PromiseResBody<void> => {
-    return request.post('/auth/account/send-verify-code', sendCodeData);
+export interface ChangeTargetResp {
+    verifyKey: string;
 }
 
-export const bindEmail = (bindEmailData: BindEmailRequest): PromiseResBody<void> => {
-    return request.post('/auth/account/email/bind', bindEmailData);
+// -- re-auth 统一验证 API --
+
+export const getReAuthInfo = (): PromiseResBody<ReAuthInfo> => {
+    return request.get('/auth/account/re-auth/info');
 }
 
-export const activateEmail = (activateEmailData: ActivateEmailRequest): PromiseResBody<void> => {
-    return request.post('/auth/account/email/activate', activateEmailData);
+export const sendReAuthCode = (scene: VerifyScene): PromiseResBody<void> => {
+    return request.post('/auth/account/re-auth', { scene });
 }
 
-export const changeEmail = (changeEmailData: ChangeEmailRequest): PromiseResBody<void> => {
-    return request.post('/auth/account/email/change', changeEmailData);
-}
-    
-export const activatePhone = (activatePhoneData: ActivatePhoneRequest): PromiseResBody<void> => {
-    return request.post('/auth/account/phone/activate', activatePhoneData);
-}
-    
-export const changePhone = (changePhoneData: ChangePhoneRequest): PromiseResBody<void> => {
-    return request.post('/auth/account/phone/change', changePhoneData);
+export const verifyReAuthCode = (scene: VerifyScene, code: string): PromiseResBody<ReAuthTokenVo> => {
+    return request.post('/auth/account/re-auth/verify', { scene, code });
 }
 
-export const unbindEmail = (unbindEmailData: UnbindEmailRequest): PromiseResBody<void> => {
-    return request.post('/auth/account/email/unbind', unbindEmailData);
+// -- 操作接口（均使用 reAuthToken） --
+
+export const resetPassword = (newPwd: string, confirmPwd: string, reAuthToken: string): PromiseResBody<void> => {
+    return request.post('/auth/account/password/reset', { reAuthToken, newPwd, confirmPwd });
+}
+
+export const setPassword = (newPwd: string, confirmPwd: string, reAuthToken: string): PromiseResBody<void> => {
+    return request.post('/auth/account/password/set', { reAuthToken, newPwd, confirmPwd });
+}
+
+export const activateEmail = (email: string, reAuthToken: string): PromiseResBody<void> => {
+    return request.post('/auth/account/email/activate', { reAuthToken, email });
+}
+
+export const changeEmail = (newEmail: string, reAuthToken: string): PromiseResBody<ChangeTargetResp> => {
+    return request.post('/auth/account/email/change', { reAuthToken, newEmail });
+}
+
+export const verifyChangeEmail = (verifyKey: string, code: string): PromiseResBody<void> => {
+    return request.post('/auth/account/email/change/verify', { verifyKey, code });
+}
+
+export const activatePhone = (phone: string, reAuthToken: string): PromiseResBody<void> => {
+    return request.post('/auth/account/phone/activate', { reAuthToken, phone });
+}
+
+export const changePhone = (newPhone: string, reAuthToken: string): PromiseResBody<ChangeTargetResp> => {
+    return request.post('/auth/account/phone/change', { reAuthToken, newPhone });
+}
+
+export const verifyChangePhone = (verifyKey: string, code: string): PromiseResBody<void> => {
+    return request.post('/auth/account/phone/change/verify', { verifyKey, code });
+}
+
+export const unbindEmail = (email: string, reAuthToken: string): PromiseResBody<void> => {
+    return request.post('/auth/account/email/unbind', { reAuthToken, email });
 }

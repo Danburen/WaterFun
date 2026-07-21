@@ -13,7 +13,7 @@ public final class CookieUtil {
     private static final String COOKIE_SAME_SITE_CONFIG = "Strict";
     private static final boolean COOKIE_SECURE = false;
     public static void setTokenCookie(HttpServletResponse response, TokenPair tokenPair) {
-        //setAccessTokenCookie(response, tokenPair.tokenValue(), tokenPair.accessExp()); // Cookie AccessToken
+        //setAccessTokenCookie(response, tokenPair.value(), tokenPair.accessExp()); // Cookie AccessToken
         setRefreshTokenCookie(response, tokenPair.refreshToken(), (long) (7 * 24 * 60 * 60));
     }
 
@@ -33,7 +33,7 @@ public final class CookieUtil {
                 .httpOnly(true)
                 .secure(COOKIE_SECURE)
                 .sameSite(COOKIE_SAME_SITE_CONFIG)
-                .maxAge(expireIn)  // same segment jwt refresh tokenValue
+                .maxAge(expireIn)  // same segment jwt refresh value
                 .path("/")
                 .build();
         response.addHeader("Set-Cookie", refreshCookie.toString());

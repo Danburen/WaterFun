@@ -8,12 +8,13 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 import org.waterwood.api.BaseResponseCode;
+import org.waterwood.common.RedisKeyPrefix;
+import org.waterwood.common.cache.RedisKeyBuilder;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.waterfunservicecore.entity.perm.Permission;
 import org.waterwood.waterfunservicecore.entity.user.Role;
 import org.waterwood.waterfunservicecore.exception.BizException;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
-import org.waterwood.common.constratin.UserKeyBuilder;
 import org.waterwood.waterfunservicecore.services.user.UserCoreService;
 
 import java.util.Arrays;
@@ -62,7 +63,7 @@ public class SecurityAspect {
 
     private Set<String> getRoles(){
         long userUid = UserCtxHolder.getUserUid();
-        Set<String> roles = redisHelper.setMembers(UserKeyBuilder.userRole(userUid)).stream()
+        Set<String> roles = redisHelper.setMembers(getUserRoleKey(userUid)).stream()
                 .map(Object::toString).collect(Collectors.toSet());
         if(roles.isEmpty()){
             roles = miss(userUid).getRoles();
@@ -72,7 +73,7 @@ public class SecurityAspect {
 
     private Set<String> getPermissions(){
         long userUid = UserCtxHolder.getUserUid();
-        Set<String> permissions = redisHelper.setMembers(UserKeyBuilder.userPerm(userUid)).stream()
+        Set<String> permissions = redisHelper.setMembers(getUserPermissionKey(userUid)).stream()
                 .map(Object::toString).collect(Collectors.toSet());
         if(permissions.isEmpty()){
             permissions = miss(userUid).getPermissions();
@@ -89,9 +90,9 @@ public class SecurityAspect {
         attrs.setRoles(roleNameSet);
         attrs.setPermissions(permCodeSet);
         redisHelper.setAdd(
-                UserKeyBuilder.userRole(userUid), roleNameSet.toArray(new String[0]));
+                getUserRoleKey(userUid), roleNameSet.toArray(new String[0]));
         redisHelper.setAdd(
-                UserKeyBuilder.userPerm(userUid), permCodeSet.toArray(new String[0]));
+                getUserPermissionKey(userUid), permCodeSet.toArray(new String[0]));
         return attrs;
     }
 
@@ -100,5 +101,21 @@ public class SecurityAspect {
     private static class UserAuthAttrs {
         protected Set<String> roles;
         protected Set<String> permissions;
+    }
+
+    private String getUserRoleKey(long userUid){
+        return RedisKeyBuilder.build(
+                RedisKeyPrefix.USER,
+                String.valueOf(userUid) ,
+                "role"
+        );
+    }
+
+    private String getUserPermissionKey(long userUid){
+        return RedisKeyBuilder.build(
+                RedisKeyPrefix.USER,
+                String.valueOf(userUid) ,
+                "perm"
+        );
     }
 }

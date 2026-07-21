@@ -6,6 +6,12 @@ import java.util.Map;
 import java.util.Set;
 
 public interface OnlineUserService {
+    /**
+     * Mark user online and stored in cache call when a user is online
+     * @param uid user uid
+     * @param sessionId session id
+     * @param ip ip
+     */
     void userOnline(Long uid, String sessionId, String ip);
     void userOffline(Long uid);
 

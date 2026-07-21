@@ -23,6 +23,30 @@
 - Success wrapper is `ApiResponse<T>` (`code/message/data`), not raw DTOs.
 - Errors use `ErrorResponse` + i18n keys from `BaseResponseCode` and `messages.properties`.
 - Keep controller return style consistent: `return ApiResponse.success(...)`.
+- **❌ Never return `ApiResponse<Map<String, String>>`.** Every API response MUST use a concrete VO/DTO class (e.g., `ReAuthTokenVo`, `ReAuthKeyVo`, `ReAuthInfo`). This ensures type safety, self-documenting API, and easier frontend consumption.
+- Request body: prefer concrete DTO classes over `@RequestBody Map<String, String>`. Use `Map` only for truly dynamic key-value data.
+
+## Re-auth (re-authentication) flow
+Sensitive operations (change phone/email, reset/set password, forgot-password) require the user to re-prove identity via SMS:
+
+```
+Step 1: GET  /api/auth/account/re-auth/info       → { maskedPhone: "138****0000" }
+Step 2: POST /api/auth/account/re-auth              { phone, scene }        → sends SMS
+Step 3: POST /api/auth/account/re-auth/verify       { scene, code }         → { reAuthToken }
+Step 4: POST /api/auth/account/password/reset       { reAuthToken, ... }    → executes operation
+```
+
+- For unauthenticated flows (forgot-password), use `POST /api/auth/forgot-password/re-auth` with identifier + captcha.
+- Redis key: `op:re-auth:{scene}:{uuid}` → userUid, TTL 5min, consumed via `getAndDel` (one-time).
+- Scene-scoped: a `CHANGE_PHONE` token cannot be used for `CHANGE_EMAIL`.
+
+## Redis key conventions
+- Root namespace prefixes live in `RootKeyConstants` (e.g., `THRESHOLD`, `VERIFY`, `USER`, `CLOUD`). These are the top-level scope for `SCAN MATCH user:*` etc.
+- Each service class must encapsulate its Redis key construction in **private (static) methods**.
+- Sub-key segments (after the root namespace) are **hardcoded as inline strings** in the private method — do not extract them into constants.
+- Method name describes the purpose (e.g., `targetMinKey`, `captchaKey`, `loginTempFailKey`), not the key structure.
+- Only extract a shared builder class (`XxxKeyBuilder`) when **the same key pattern is used across 2+ service classes**; otherwise a private method suffices.
+- ❌ No global `RedisKeyConstants`-style file listing key segments. Each service owns its key structure completely.
 
 ## Project-specific coding patterns
 - Keep controllers thin; put business logic into `waterfun-service-core/services/**`.
@@ -49,6 +73,18 @@
 ## Contracts and references
 - API artifacts are checked in under `docs/api_docs/*.json` and `reference/*.openapi.json`; update when changing external API shapes.
 - Admin frontend API files map directly to admin-service routes (e.g., `waterfun-admin/src/api/user.ts` <-> `/api/admin/users/**`).
+
+## DTO naming convention (user-facing API)
+
+All POST request body DTOs MUST use `Req` suffix:
+- ✅ `PwdLoginReq`, `SendCodeReq`, `PasswordChangeReq`, `ChangeEmailReq`, `ReAuthReq`
+- ❌ `LoginRequest`, `PasswordChangeRequest`, `SendCodeDto`, `ReAuthRequestBody`
+- Exception: GET request params may use `@RequestParam` directly (no DTO needed).
+
+All response DTOs (returned inside `ApiResponse<T>`) MUST use `Resp` or `Vo` suffix:
+- ✅ `AccountResp`, `ReAuthInfoResp`, `ReAuthTokenVo`, `LoginClientData`
+- ❌ `ReAuthInfo`, `AccountData`, `PlainDTO`
+- Exception: `CodeResult` and other internal service-core types that are service returns (not API-contract) may keep their existing naming.
 
 ## Enum convention
 All enum fields MUST use `tinyint UNSIGNED` in the database with a JPA `@Converter(autoApply = true)`.

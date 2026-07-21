@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import org.waterwood.utils.MaskUtil;
 import org.waterwood.waterfunservicecore.infrastructure.RedisHelperHolder;
 import org.waterwood.common.cache.RedisKeyBuilder;
+import static org.waterwood.common.RedisKeyPrefix.VERIFY;
 import org.waterwood.waterfunservicecore.api.auth.VerifyChannel;
 import org.waterwood.waterfunservicecore.api.auth.VerifyScene;
 import org.waterwood.waterfunservicecore.api.resp.auth.CodeResult;
 import org.waterwood.waterfunservicecore.infrastructure.utils.context.UserCtxHolder;
-import org.waterwood.waterfunservicecore.services.auth.VerifyKeyBuilder;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeVerifier;
 import org.waterwood.waterfunservicecore.services.auth.code.CodeSender;
 
@@ -28,11 +28,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SmsCodeService implements CodeVerifier, CodeSender {
     private final RedisHelperHolder redisHelper;
 
-    @Value("${expire.sms-code}")
+    @Value("${expiresIn.sms-code}")
     private Long expireDuration;
     @Value("${aliyun.sms.verify-code.template-name}")
     private String smsCodeTemplate;
     private final AliyunSmsService smsService;
+
+    // -- Redis key builders --
+
+    private static String smsCodeKey(String target, String scene, String identifier) {
+        return RedisKeyBuilder.build(VERIFY, "sms", target, scene, identifier);
+    }
 
     @Override
     public CodeResult sendCode(String target, VerifyScene scene) {
@@ -49,11 +55,7 @@ public class SmsCodeService implements CodeVerifier, CodeSender {
         );
         if(result.isSendSuccess()) {
             redisHelper.set(
-                    RedisKeyBuilder.buildKey(
-                            VerifyKeyBuilder.sms(target),
-                            scene.getValue(),
-                            uuid
-                    ),
+                    smsCodeKey(target, scene.getValue(), uuid),
                     code,
                     Duration.ofMinutes(expireDuration)
             );
@@ -64,11 +66,7 @@ public class SmsCodeService implements CodeVerifier, CodeSender {
     @Override
     public boolean verifyCode(String target, VerifyScene scene, String key, String code) {
         return redisHelper.validateAndRemove(
-                RedisKeyBuilder.buildKey(
-                        VerifyKeyBuilder.sms(target),
-                        scene.getValue(),
-                        key
-                ),
+                smsCodeKey(target, scene.getValue(), key),
                 code
         );
     }
